@@ -1,7 +1,5 @@
 # Cppuccino
 
-# Cppuccino
-
 Cppuccino is a C++ knowledge project.  
 We share concise concepts, ideas, or subtle C++ features from time to time, whenever a new insight or thought arises.  
 Think of it as "a cup of C++ knowledge for your coffee break".
