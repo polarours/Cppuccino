@@ -3,6 +3,8 @@
 In the move-is-not-moving chapter, we mentioned that `std::move` does not "move" anything; it simply converts an expression to an rvalue reference, thereby **allowing** subsequent code to choose move semantics.  
 In this article, we'll fill in that "to be added" note: **What exactly are rvalue references? What problem do they solve?**
 
+> **Tip**: For detailed definitions of lvalue references, see the [Lvalue References](/docs/en/lvalue-references.md) chapter.
+
 ## What are rvalue references? Why do we need them?
 Consider the following scenario:
 

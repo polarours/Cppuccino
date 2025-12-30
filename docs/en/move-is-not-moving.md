@@ -1,5 +1,3 @@
-[中文](move-is-not-moving_zh-CN.md) | [English](move-is-not-moving.md)
-
 # std::move does not "move" anything
 
 ## Core idea
@@ -13,7 +11,7 @@ Whether anything is actually moved depends entirely on:
 
 `std::move` just opens the door; it does not carry anything out.
 
-> Tip: For more about rvalue references, see the related chapter (to be added).
+> Tip: For more about rvalue references, see the [Rvalue References](/docs/en/rvalue-references.md) chapter.
 
 ## Common misunderstanding
 
