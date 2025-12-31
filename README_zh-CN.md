@@ -1,3 +1,5 @@
+[中文](README_zh-CN.md) | [English](README.md)
+
 # Cppuccino
 
 Cppuccino 是一个 C++ 知识项目。  

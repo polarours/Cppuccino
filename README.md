@@ -1,3 +1,5 @@
+[中文](README_zh-CN.md) | [English](README.md)
+
 # Cppuccino
 
 Cppuccino is a C++ knowledge project.  
