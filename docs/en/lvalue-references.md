@@ -5,8 +5,9 @@
 Many people think lvalue references are simply "references to named objects" and seem uncomplicated. However, in C++, lvalue references embody profound semantic intentions: they explicitly express a reference to a persistent object that can still be safely used and modified in the future.
 
 We need to pay special attention to the following points:
-- Lvalue references carry the semantic responsibility of "the resource will not be transferred and can still be used afterwards."
+- Lvalue references explicitly indicate that the resource will not be moved and remains valid for the duration of the reference, emphasizing the safety of the reference.
 - The clear distinction from rvalue references enables C++11 to introduce move semantics, thereby improving performance and resource management efficiency.
+- Lvalue references and rvalue references complement each other: rvalue references handle efficient transfer of temporary resources, while lvalue references provide safe access to persistent resources.
 
 > In one sentence: If rvalue references solve the problem of "how to give up efficiently," then lvalue references solve the problem of "how to safely continue."
 > **Note**: For the detailed definition of lvalue references, please refer to Section 3.10 "Lvalues and rvalues" of the C++11 draft standard N3337 "Working Draft, Standard for Programming Language C++".
@@ -46,17 +47,19 @@ The design intention of lvalue references is to explicitly express that **the cu
 #### Example: Modifying an Object Through a Reference
 
 ```cpp
+#include <iostream>
+
 void updateValue(int& value) {
-    value += 10; // Directly modify the passed object
+    std::cout << "[updateValue] value address: " << &value << std::endl;
+    value += 10;
 }
 
 int main() {
     int x = 5;
-    updateValue(x); // Pass a reference to x
-    // Now x's value becomes 15
-
-    // Continue using x
-    return 0;
+    std::cout << "[main] x value: " << x << std::endl;
+    std::cout << "[main] x address: " << &x << std::endl;
+    updateValue(x);
+    std::cout << "[main] x after update: " << x << std::endl;
 }
 ```
 
