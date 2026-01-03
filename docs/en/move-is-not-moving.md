@@ -2,7 +2,16 @@
 
 ## Core idea
 
-`std::move` itself **does not perform a move operation**. Its only job is to unconditionally cast an expression to an **rvalue reference**, which **allows** later code to choose move semantics.
+`std::move` is not an "action", but a "promise".
+By itself, it:
+- Does not copy
+- Does not release
+- Does not move
+- Does not modify
+
+The only thing it does is:
+> Unconditionally converts an expression to an rvalue reference, thereby explicitly indicating to the compiler and readers:
+> The ownership of the object can be transferred, and its current state no longer needs to be preserved.
 
 Whether anything is actually moved depends entirely on:
 - The object's type
@@ -13,15 +22,19 @@ Whether anything is actually moved depends entirely on:
 
 > Tip: For more about rvalue references, see the [Rvalue References](/docs/en/rvalue-references.md) chapter.
 
-## Common misunderstanding
+## A common but dangerous misunderstanding
 
-Many people (including me when I started) instinctively think:
+Many people semantically misunderstand as follows:
 
 ```cpp
 std::move(a); // a has been moved away
 ```
 
-In reality, `std::move` does not change `a`'s state or contents. The real move happens in the move constructor or move assignment operator, not in `std::move` itself.
+In fact, `std::move` does not change the state or content of `a`.
+The actual resource transfer happens in the subsequently called constructor or assignment operator, not in `std::move` itself.
+
+That is to say:
+> Moving happens at the "construction / assignment" stage, not at the `std::move` line.
 
 ## What does std::move actually do?
 Semantically, `std::move` is very simple, similar to this:
@@ -40,8 +53,22 @@ That means:
     
 It is just telling the compiler: "You may treat this lvalue as an object I'm about to abandon."
 
-## Example
+## Why does C++ need std::move?
 
+To understand `std::move`, the key is not "how to use it", but "why it must exist".
+
+In C++:
+- "Variable names" are lvalues (lvalue) by default
+- Even if a variable is no longer needed, it remains an lvalue unless explicitly cast otherwise
+
+What if `std::move` is not available?
+Therefore, the compiler cannot distinguish between "objects that should still be used" and "objects that can be safely discarded".
+
+This leads to:
+- Unable to call move constructors or move assignments, resulting in unnecessary copies and performance loss.
+- Only the copy constructors or copy assignments are called, which may not be efficient for large objects.
+
+## `std::move` and move constructors: the actual place where moving happens
 ```cpp 
 std::string str = "Hello, World!";
 std::string movedStr = std::move(str); // Calls std::string's move constructor
@@ -54,7 +81,7 @@ What happens?
 
 Moving is not a language behavior; it is a type behavior.
 
-## Object state after move
+## Object state after move: Why "valid but unspecified state"
 After using `std::move`, the source object's state depends on that type's move semantics.
 
 - For standard library types (like `std::string`, `std::vector`, etc.), moving typically transfers ownership of resources to the new object; the source becomes empty or "valid but unspecified."
