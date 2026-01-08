@@ -16,6 +16,13 @@ Before discussing `const`, we must distinguish between two levels of "state":
 - **Physical state**
   - Refers to the actual data storage and implementation details inside the object. For example, a counter object may have some cache variables or auxiliary data structures that are part of its physical state.
 
+The division of logical states is essentially a **designer's subjective decision**, not a requirement imposed by the language or compiler.
+
+Common rules of thumb are:
+- If a change to a member makes an **external observer perceive that the object has "changed"** → it belongs to logical state.
+- If the change is **purely implementation details, caching, debugging information, statistical counts, etc., and external users should not depend on it** → it can be classified as physical state.
+- The most classic use case for mutables is allowing modification of physical state in `const` methods without violating the invariance of logical states.
+
 `const` constrains the logical state, not whether physical memory is written to.
 
 Let's consider the following example:
@@ -56,6 +63,7 @@ int main() {
 In this example, the `getCount` method is declared as `const`, meaning it does not modify the logical state of the `Counter` object (i.e., `count_`). However, it does modify the member variables `cache_valid_` and `cached_value_`, which are part of the physical state.
 
 > Note: The division between logical and physical state is not language-enforced, but rather a design concept. In actual projects, reasonable division helps performance optimization and interface design.
+> The examples above demonstrate positive use cases for mutable. Of course, mutable can also be misused, leading to code that is difficult to understand and maintain. Subsequent chapters (to be added) will discuss negative examples of mutable and explain why it is necessary to use it.
 
 ### The True Meaning of const
 
