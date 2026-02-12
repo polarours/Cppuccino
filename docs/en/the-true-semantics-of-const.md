@@ -1,4 +1,6 @@
-# const is not "immutable", but an interface contract
+# The True Semantics of const
+
+## Introduction
 
 In C++, `const` is often misunderstood as "object cannot be modified".
 This understanding is not wrong, but very incomplete. More accurately, `const` is an interface-level commitment (interface contract):
