@@ -24,7 +24,6 @@
 ## 一个常见但危险的误解
 
 很多人会在语义上产生如下误解：
-
 ```cpp
 std::move(a); // a 已经被移动走了
 ```
@@ -33,13 +32,11 @@ std::move(a); // a 已经被移动走了
 真正发生资源转移的，是随后被调用的构造函数或赋值运算符，而不是 `std::move` 本身。
 
 也就是说：
-
 > 移动发生在“构造 / 赋值”阶段，而不是在 `std::move` 这一行。
 
 ## 那 std::move 真正做了什么？
 
 从语义上讲，`std::move` 的实现非常简单，类似于下面的代码：
-
 ```cpp
 template<class T>
 constexpr std::remove_reference_t<T>&& move(T&& t) noexcept {
