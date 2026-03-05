@@ -1,0 +1,3 @@
+[submodule "projects/tinyshell"]
+	path = projects/tinyshell
+	url = https://github.com/polarours/tinyshell.git
