@@ -6,7 +6,6 @@
 #include <unistd.h>
 
 namespace tiny_http_server {
-
 class Server {
     public:
         Server(const std::string& addr, int port);
@@ -22,5 +21,4 @@ class Server {
         void setup_socket();
         void cleanup();
 };
-
 } // namespace tiny_http_server
