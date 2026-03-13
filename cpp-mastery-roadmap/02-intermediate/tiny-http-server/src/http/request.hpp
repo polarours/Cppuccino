@@ -8,7 +8,7 @@ namespace tiny_http_server {
 class HttpRequest {
 public:
     HttpRequest() = default;
-
+    
     bool parse(const std::string& raw);
     std::string method() const { return method_; }
     std::string path() const { return path_; }
