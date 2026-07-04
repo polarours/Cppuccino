@@ -4,10 +4,10 @@ namespace tiny_http_server {
 
 HttpResponse::HttpResponse()
     : status_code_(200)
-    , status_message_("OK") 
-    {
-
-    }    
+    , status_message_("OK") {
+    headers_["Content-Type"] = "text/plain; charset=utf-8";
+    headers_["Connection"] = "close";
+}
 
 void HttpResponse::set_status(int code, const std::string& message) {
     status_code_ = code;
@@ -42,4 +42,4 @@ std::string HttpResponse::to_string() const {
     return response;
 }
 
-}
+} // namespace tiny_http_server

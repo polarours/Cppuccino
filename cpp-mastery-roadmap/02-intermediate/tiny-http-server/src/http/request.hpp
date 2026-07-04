@@ -10,9 +10,9 @@ public:
     HttpRequest() = default;
     
     bool parse(const std::string& raw);
-    std::string method() const { return method_; }
-    std::string path() const { return path_; }
-    std::string version() const { return version_; }
+    const std::string& method() const { return method_; }
+    const std::string& path() const { return path_; }
+    const std::string& version() const { return version_; }
     std::string header(const std::string& key) const;
 
 private:
