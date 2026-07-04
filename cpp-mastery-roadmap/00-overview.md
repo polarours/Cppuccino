@@ -109,6 +109,16 @@ Practice:
 
 - Pick one pitfall and write a minimal reproduction case for it
 - Then rewrite the code with a safer ownership or synchronization model
+- Build one of the Stage 3 projects to practice concurrency and systems programming
+
+### Stage 3 Projects
+
+- [thread-pool](03-advanced/thread-pool/README.md):
+  concurrent task execution with futures and synchronization
+- [allocator](03-advanced/allocator/README.md):
+  fixed-block memory allocator with STL interface
+- [json-parser](03-advanced/json-parser/README.md):
+  recursive descent parser with type-safe value tree
 
 ## Stage 4: Build Larger Things
 
