@@ -138,6 +138,15 @@ Projects:
 - [tinyshell](../tinyshell/README.md):
   side project for command parsing and process/system behavior
 
+### Stage 4 Projects (04-stage4)
+
+- [simple-db](04-stage4/simple-db/README.md):
+  in-memory database with table management and file persistence
+- [chat-server](04-stage4/chat-server/README.md):
+  multi-user chat server with rooms and commands
+- [web-server](04-stage4/web-server/README.md):
+  HTTP server with routing and middleware support
+
 Suggested progression:
 
 1. Read the stage overview and pick one project with explicit non-goals.
