@@ -147,6 +147,21 @@ Projects:
 - [web-server](04-stage4/web-server/README.md):
   HTTP server with routing and middleware support
 
+### C++20 Examples
+
+- [cpp20-concepts.cpp](../examples/cpp20-concepts.cpp):
+  concepts, requires expressions, constraints
+- [cpp20-ranges.cpp](../examples/cpp20-ranges.cpp):
+  ranges library, views, adaptors
+- [cpp20-span.cpp](../examples/cpp20-span.cpp):
+  non-owning views, subspan
+- [cpp20-format.cpp](../examples/cpp20-format.cpp):
+  std::format string formatting
+- [cpp20-coroutines.cpp](../examples/cpp20-coroutines.cpp):
+  generators, tasks, async patterns
+- [cpp20-consteval.cpp](../examples/cpp20-consteval.cpp):
+  consteval, constinit, compile-time evaluation
+
 Suggested progression:
 
 1. Read the stage overview and pick one project with explicit non-goals.

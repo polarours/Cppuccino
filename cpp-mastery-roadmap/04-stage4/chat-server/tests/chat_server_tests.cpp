@@ -67,6 +67,59 @@ void test_message_callbacks() {
     expect(leaveCount == 1, "expected 1 leave");
 }
 
+void test_online_users() {
+    chat_server::ChatServer server(17004);
+
+    // Note: getOnlineUsers() only returns users who have connected via TCP
+    // For unit testing, we test room-based user tracking instead
+    server.joinRoom("Alice", "general");
+    server.joinRoom("Bob", "general");
+    server.joinRoom("Charlie", "random");
+
+    auto generalUsers = server.getRoomUsers("general");
+    expect(generalUsers.size() == 2, "expected 2 users in general");
+
+    auto randomUsers = server.getRoomUsers("random");
+    expect(randomUsers.size() == 1, "expected 1 user in random");
+}
+
+void test_multiple_rooms() {
+    chat_server::ChatServer server(17005);
+
+    server.joinRoom("Alice", "room1");
+    server.joinRoom("Alice", "room2");
+    server.joinRoom("Bob", "room1");
+
+    auto aliceRooms = server.getRooms();
+    expect(aliceRooms.size() == 2, "expected 2 rooms");
+
+    auto room1Users = server.getRoomUsers("room1");
+    expect(room1Users.size() == 2, "expected 2 users in room1");
+
+    auto room2Users = server.getRoomUsers("room2");
+    expect(room2Users.size() == 1, "expected 1 user in room2");
+}
+
+void test_leave_all_rooms() {
+    chat_server::ChatServer server(17006);
+
+    server.joinRoom("Alice", "room1");
+    server.joinRoom("Alice", "room2");
+
+    server.leaveRoom("Alice", "room1");
+    server.leaveRoom("Alice", "room2");
+
+    auto rooms = server.getRooms();
+    expect(rooms.empty(), "expected no rooms after leaving all");
+}
+
+void test_nonexistent_room() {
+    chat_server::ChatServer server(17007);
+
+    auto users = server.getRoomUsers("nonexistent");
+    expect(users.empty(), "expected empty users for nonexistent room");
+}
+
 } // namespace
 
 int main() {
@@ -80,6 +133,18 @@ int main() {
 
         test_message_callbacks();
         std::cout << "  test_message_callbacks: PASS\n";
+
+        test_online_users();
+        std::cout << "  test_online_users: PASS\n";
+
+        test_multiple_rooms();
+        std::cout << "  test_multiple_rooms: PASS\n";
+
+        test_leave_all_rooms();
+        std::cout << "  test_leave_all_rooms: PASS\n";
+
+        test_nonexistent_room();
+        std::cout << "  test_nonexistent_room: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "chat_server_tests failed: " << exception.what() << std::endl;
