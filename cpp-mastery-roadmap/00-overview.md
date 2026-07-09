@@ -209,3 +209,12 @@ The goal is to make those gaps visible and then close them deliberately.
   topic-based publish-subscribe messaging system
 - [state-machine](08-stage8/state-machine/README.md):
   generic state machine for modeling state transitions
+
+### Stage 9 Projects (09-stage9)
+
+- [command-pattern](09-stage9/command-pattern/README.md):
+  command pattern with undo/redo support
+- [observer-pattern](09-stage9/observer-pattern/README.md):
+  observer pattern for event notification
+- [strategy-pattern](09-stage9/strategy-pattern/README.md):
+  strategy pattern for algorithm selection
