@@ -200,3 +200,12 @@ The goal is to make those gaps visible and then close them deliberately.
   generic thread-safe cache with TTL support
 - [lru-cache](07-stage7/lru-cache/README.md):
   LRU cache with O(1) operations and eviction
+
+### Stage 8 Projects (08-stage8)
+
+- [object-pool](08-stage8/object-pool/README.md):
+  generic object pool for reusing expensive objects
+- [publish-subscribe](08-stage8/publish-subscribe/README.md):
+  topic-based publish-subscribe messaging system
+- [state-machine](08-stage8/state-machine/README.md):
+  generic state machine for modeling state transitions
