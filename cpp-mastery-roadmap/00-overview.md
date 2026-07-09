@@ -179,3 +179,10 @@ has gaps between design intent and implementation.
 
 That is normal for this project.
 The goal is to make those gaps visible and then close them deliberately.
+
+### Stage 5 Projects (05-stage5)
+
+- [task-scheduler](05-stage5/task-scheduler/README.md):
+  priority-based task scheduling with delayed and repeating tasks
+- [web-framework](05-stage5/web-framework/README.md):
+  simple HTTP web framework with routing and middleware
