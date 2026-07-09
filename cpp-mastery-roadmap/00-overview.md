@@ -193,3 +193,10 @@ The goal is to make those gaps visible and then close them deliberately.
   generic connection pool for managing reusable resources
 - [ring-buffer](06-stage6/ring-buffer/README.md):
   thread-safe circular buffer for producer-consumer patterns
+
+### Stage 7 Projects (07-stage7)
+
+- [thread-safe-cache](07-stage7/thread-safe-cache/README.md):
+  generic thread-safe cache with TTL support
+- [lru-cache](07-stage7/lru-cache/README.md):
+  LRU cache with O(1) operations and eviction
