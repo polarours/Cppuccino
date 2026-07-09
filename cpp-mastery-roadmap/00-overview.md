@@ -186,3 +186,10 @@ The goal is to make those gaps visible and then close them deliberately.
   priority-based task scheduling with delayed and repeating tasks
 - [web-framework](05-stage5/web-framework/README.md):
   simple HTTP web framework with routing and middleware
+
+### Stage 6 Projects (06-stage6)
+
+- [connection-pool](06-stage6/connection-pool/README.md):
+  generic connection pool for managing reusable resources
+- [ring-buffer](06-stage6/ring-buffer/README.md):
+  thread-safe circular buffer for producer-consumer patterns
