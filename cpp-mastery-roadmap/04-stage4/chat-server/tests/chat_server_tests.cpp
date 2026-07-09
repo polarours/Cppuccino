@@ -120,6 +120,81 @@ void test_nonexistent_room() {
     expect(users.empty(), "expected empty users for nonexistent room");
 }
 
+void test_message_structure() {
+    chat_server::Message msg;
+    msg.sender = "Alice";
+    msg.content = "Hello";
+    msg.room = "general";
+    msg.timestamp = "12:00";
+
+    expect(msg.sender == "Alice", "expected sender");
+    expect(msg.content == "Hello", "expected content");
+    expect(msg.room == "general", "expected room");
+    expect(msg.timestamp == "12:00", "expected timestamp");
+}
+
+void test_room_auto_created() {
+    chat_server::ChatServer server(17008);
+
+    // Room should be created when first user joins
+    server.joinRoom("Alice", "new_room");
+
+    auto rooms = server.getRooms();
+    expect(rooms.size() == 1, "expected 1 room");
+
+    auto users = server.getRoomUsers("new_room");
+    expect(users.size() == 1, "expected 1 user");
+}
+
+void test_room_auto_deleted() {
+    chat_server::ChatServer server(17009);
+
+    server.joinRoom("Alice", "temp_room");
+    server.leaveRoom("Alice", "temp_room");
+
+    // Room should be deleted when last user leaves
+    auto rooms = server.getRooms();
+    expect(rooms.empty(), "expected no rooms after last user leaves");
+}
+
+void test_user_in_multiple_rooms() {
+    chat_server::ChatServer server(17010);
+
+    server.joinRoom("Alice", "room1");
+    server.joinRoom("Alice", "room2");
+    server.joinRoom("Alice", "room3");
+
+    auto rooms = server.getRooms();
+    expect(rooms.size() == 3, "expected 3 rooms");
+
+    // User should be in all 3 rooms
+    for (const auto& room : rooms) {
+        auto users = server.getRoomUsers(room);
+        expect(users.size() == 1, "expected 1 user in each room");
+    }
+}
+
+void test_multiple_users_same_room() {
+    chat_server::ChatServer server(17011);
+
+    for (int i = 0; i < 5; ++i) {
+        server.joinRoom("User" + std::to_string(i), "chat");
+    }
+
+    auto users = server.getRoomUsers("chat");
+    expect(users.size() == 5, "expected 5 users in chat");
+}
+
+void test_leave_nonexistent_room() {
+    chat_server::ChatServer server(17012);
+
+    // Should not crash when leaving nonexistent room
+    server.leaveRoom("Alice", "nonexistent");
+
+    auto rooms = server.getRooms();
+    expect(rooms.empty(), "expected no rooms");
+}
+
 } // namespace
 
 int main() {
@@ -145,6 +220,24 @@ int main() {
 
         test_nonexistent_room();
         std::cout << "  test_nonexistent_room: PASS\n";
+
+        test_message_structure();
+        std::cout << "  test_message_structure: PASS\n";
+
+        test_room_auto_created();
+        std::cout << "  test_room_auto_created: PASS\n";
+
+        test_room_auto_deleted();
+        std::cout << "  test_room_auto_deleted: PASS\n";
+
+        test_user_in_multiple_rooms();
+        std::cout << "  test_user_in_multiple_rooms: PASS\n";
+
+        test_multiple_users_same_room();
+        std::cout << "  test_multiple_users_same_room: PASS\n";
+
+        test_leave_nonexistent_room();
+        std::cout << "  test_leave_nonexistent_room: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "chat_server_tests failed: " << exception.what() << std::endl;
