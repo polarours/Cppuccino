@@ -254,3 +254,12 @@ The goal is to make those gaps visible and then close them deliberately.
   null object pattern for handling null cases
 - [memento-pattern](13-stage13/memento-pattern/README.md):
   memento pattern for state snapshots
+
+### Stage 14 Projects (14-stage14)
+
+- [interpreter-pattern](14-stage14/interpreter-pattern/README.md):
+  interpreter pattern for language parsing
+- [composite-pattern](14-stage14/composite-pattern/README.md):
+  composite pattern for tree structures
+- [proxy-pattern](14-stage14/proxy-pattern/README.md):
+  proxy pattern for controlled access
