@@ -227,3 +227,12 @@ The goal is to make those gaps visible and then close them deliberately.
   factory pattern for object creation
 - [adapter-pattern](10-stage10/adapter-pattern/README.md):
   adapter pattern for interface compatibility
+
+### Stage 11 Projects (11-stage11)
+
+- [builder-pattern](11-stage11/builder-pattern/README.md):
+  builder pattern for complex object construction
+- [prototype-pattern](11-stage11/prototype-pattern/README.md):
+  prototype pattern for object cloning
+- [mediator-pattern](11-stage11/mediator-pattern/README.md):
+  mediator pattern for object communication
