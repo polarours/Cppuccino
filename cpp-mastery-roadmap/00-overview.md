@@ -218,3 +218,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer pattern for event notification
 - [strategy-pattern](09-stage9/strategy-pattern/README.md):
   strategy pattern for algorithm selection
+
+### Stage 10 Projects (10-stage10)
+
+- [decorator-pattern](10-stage10/decorator-pattern/README.md):
+  decorator pattern for dynamic behavior composition
+- [factory-pattern](10-stage10/factory-pattern/README.md):
+  factory pattern for object creation
+- [adapter-pattern](10-stage10/adapter-pattern/README.md):
+  adapter pattern for interface compatibility
