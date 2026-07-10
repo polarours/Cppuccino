@@ -236,3 +236,12 @@ The goal is to make those gaps visible and then close them deliberately.
   prototype pattern for object cloning
 - [mediator-pattern](11-stage11/mediator-pattern/README.md):
   mediator pattern for object communication
+
+### Stage 12 Projects (12-stage12)
+
+- [flyweight-pattern](12-stage12/flyweight-pattern/README.md):
+  flyweight pattern for sharing common data
+- [chain-of-responsibility](12-stage12/chain-of-responsibility/README.md):
+  chain of responsibility for request handling
+- [visitor-pattern](12-stage12/visitor-pattern/README.md):
+  visitor pattern for operations on object structures
