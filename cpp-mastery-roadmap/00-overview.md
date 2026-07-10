@@ -245,3 +245,12 @@ The goal is to make those gaps visible and then close them deliberately.
   chain of responsibility for request handling
 - [visitor-pattern](12-stage12/visitor-pattern/README.md):
   visitor pattern for operations on object structures
+
+### Stage 13 Projects (13-stage13)
+
+- [singleton-pattern](13-stage13/singleton-pattern/README.md):
+  singleton pattern for single instance management
+- [null-object-pattern](13-stage13/null-object-pattern/README.md):
+  null object pattern for handling null cases
+- [memento-pattern](13-stage13/memento-pattern/README.md):
+  memento pattern for state snapshots
