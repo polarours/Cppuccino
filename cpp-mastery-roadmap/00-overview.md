@@ -263,3 +263,12 @@ The goal is to make those gaps visible and then close them deliberately.
   composite pattern for tree structures
 - [proxy-pattern](14-stage14/proxy-pattern/README.md):
   proxy pattern for controlled access
+
+### Stage 15 Projects (15-stage15)
+
+- [abstract-factory](15-stage15/abstract-factory/README.md):
+  abstract factory for creating families of objects
+- [template-method](15-stage15/template-method/README.md):
+  template method for algorithm skeleton
+- [iterator-pattern](15-stage15/iterator-pattern/README.md):
+  iterator pattern for traversing collections
