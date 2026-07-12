@@ -281,3 +281,12 @@ The goal is to make those gaps visible and then close them deliberately.
   virtual constructor for cloning without knowing type
 - [object-pool-advanced](16-stage16/object-pool-advanced/README.md):
   advanced object pool with validation
+
+### Stage 17 Projects (17-stage17)
+
+- [command-batch](17-stage17/command-batch/README.md):
+  command batch for grouping multiple commands
+- [observer-event](17-stage17/observer-event/README.md):
+  observer event system for event-driven architecture
+- [strategy-cache](17-stage17/strategy-cache/README.md):
+  strategy cache with LRU and TTL strategies
