@@ -272,3 +272,12 @@ The goal is to make those gaps visible and then close them deliberately.
   template method for algorithm skeleton
 - [iterator-pattern](15-stage15/iterator-pattern/README.md):
   iterator pattern for traversing collections
+
+### Stage 16 Projects (16-stage16)
+
+- [double-dispatch](16-stage16/double-dispatch/README.md):
+  double dispatch for multi-method polymorphism
+- [virtual-constructor](16-stage16/virtual-constructor/README.md):
+  virtual constructor for cloning without knowing type
+- [object-pool-advanced](16-stage16/object-pool-advanced/README.md):
+  advanced object pool with validation
