@@ -290,3 +290,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer event system for event-driven architecture
 - [strategy-cache](17-stage17/strategy-cache/README.md):
   strategy cache with LRU and TTL strategies
+
+### Stage 18 Projects (18-stage18)
+
+- [command-queue](18-stage18/command-queue/README.md):
+  thread-safe command queue for async task execution
+- [observer-pipeline](18-stage18/observer-pipeline/README.md):
+  pipeline for chained data processing
+- [strategy-selector](18-stage18/strategy-selector/README.md):
+  dynamic strategy selection system
