@@ -299,3 +299,12 @@ The goal is to make those gaps visible and then close them deliberately.
   pipeline for chained data processing
 - [strategy-selector](18-stage18/strategy-selector/README.md):
   dynamic strategy selection system
+
+### Stage 19 Projects (19-stage19)
+
+- [command-history](19-stage19/command-history/README.md):
+  command history manager for logging and replay
+- [observer-filter](19-stage19/observer-filter/README.md):
+  observer pattern with event filtering
+- [strategy-evaluator](19-stage19/strategy-evaluator/README.md):
+  strategy evaluation system for performance comparison
