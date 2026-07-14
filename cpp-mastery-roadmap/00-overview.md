@@ -362,3 +362,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer with debounced event dispatch
 - [strategy-combinator](25-stage25/strategy-combinator/README.md):
   strategy combinator for combining predicates
+
+### Stage 26 Projects (26-stage26)
+
+- [command-translator](26-stage26/command-translator/README.md):
+  translates commands between different formats
+- [observer-filter-chain](26-stage26/observer-filter-chain/README.md):
+  observer with chained event filters
+- [strategy-resolver](26-stage26/strategy-resolver/README.md):
+  resolves strategies dynamically based on context
