@@ -317,3 +317,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer pattern combined with mediator
 - [strategy-adapter](20-stage20/strategy-adapter/README.md):
   strategy adapter for interface compatibility
+
+### Stage 21 Projects (21-stage21)
+
+- [command-router](21-stage21/command-router/README.md):
+  command routing system for dispatching commands
+- [observer-bus](21-stage21/observer-bus/README.md):
+  event bus for publish-subscribe communication
+- [strategy-factory](21-stage21/strategy-factory/README.md):
+  factory for creating strategies dynamically
