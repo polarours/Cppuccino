@@ -335,3 +335,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer with throttled event dispatch
 - [strategy-chain](22-stage22/strategy-chain/README.md):
   chain for executing multiple strategies
+
+### Stage 23 Projects (23-stage23)
+
+- [command-queue-v2](23-stage23/command-queue-v2/README.md):
+  enhanced command queue with priority support
+- [observer-buffer](23-stage23/observer-buffer/README.md):
+  observer with buffered event dispatch
+- [strategy-decorator](23-stage23/strategy-decorator/README.md):
+  decorator pattern for adding behavior to strategies
