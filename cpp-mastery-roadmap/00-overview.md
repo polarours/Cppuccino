@@ -308,3 +308,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer pattern with event filtering
 - [strategy-evaluator](19-stage19/strategy-evaluator/README.md):
   strategy evaluation system for performance comparison
+
+### Stage 20 Projects (20-stage20)
+
+- [command-validator](20-stage20/command-validator/README.md):
+  command validation system
+- [observer-mediator](20-stage20/observer-mediator/README.md):
+  observer pattern combined with mediator
+- [strategy-adapter](20-stage20/strategy-adapter/README.md):
+  strategy adapter for interface compatibility
