@@ -353,3 +353,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer with RAII subscription management
 - [strategy-pipeline](24-stage24/strategy-pipeline/README.md):
   data processing pipeline using strategy pattern
+
+### Stage 25 Projects (25-stage25)
+
+- [command-memento](25-stage25/command-memento/README.md):
+  command pattern with memento for state preservation
+- [observer-debouncer](25-stage25/observer-debouncer/README.md):
+  observer with debounced event dispatch
+- [strategy-combinator](25-stage25/strategy-combinator/README.md):
+  strategy combinator for combining predicates
