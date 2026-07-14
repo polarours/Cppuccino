@@ -344,3 +344,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer with buffered event dispatch
 - [strategy-decorator](23-stage23/strategy-decorator/README.md):
   decorator pattern for adding behavior to strategies
+
+### Stage 24 Projects (24-stage24)
+
+- [command-snapshot](24-stage24/command-snapshot/README.md):
+  command pattern with state snapshots for undo/redo
+- [observer-subscription](24-stage24/observer-subscription/README.md):
+  observer with RAII subscription management
+- [strategy-pipeline](24-stage24/strategy-pipeline/README.md):
+  data processing pipeline using strategy pattern
