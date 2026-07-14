@@ -326,3 +326,12 @@ The goal is to make those gaps visible and then close them deliberately.
   event bus for publish-subscribe communication
 - [strategy-factory](21-stage21/strategy-factory/README.md):
   factory for creating strategies dynamically
+
+### Stage 22 Projects (22-stage22)
+
+- [command-logger](22-stage22/command-logger/README.md):
+  command logging system for tracking operations
+- [observer-throttler](22-stage22/observer-throttler/README.md):
+  observer with throttled event dispatch
+- [strategy-chain](22-stage22/strategy-chain/README.md):
+  chain for executing multiple strategies
