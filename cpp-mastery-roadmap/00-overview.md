@@ -389,3 +389,12 @@ The goal is to make those gaps visible and then close them deliberately.
   data access abstraction
 - [cqrs-pattern](28-stage28/cqrs-pattern/README.md):
   Command Query Responsibility Segregation
+
+### Stage 29 Projects (29-stage29) — Architecture Patterns
+
+- [event-sourcing](29-stage29/event-sourcing/README.md):
+  event-based state management and replay
+- [circuit-breaker](29-stage29/circuit-breaker/README.md):
+  fault tolerance pattern preventing cascading failures
+- [middleware-pipeline](29-stage29/middleware-pipeline/README.md):
+  chained request/response processing
