@@ -380,3 +380,12 @@ The goal is to make those gaps visible and then close them deliberately.
   simplified interface to complex subsystem
 - [specification-pattern](27-stage27/specification-pattern/README.md):
   composable business rules
+
+### Stage 28 Projects (28-stage28) — Architecture Patterns
+
+- [mvc-pattern](28-stage28/mvc-pattern/README.md):
+  Model-View-Controller architecture
+- [repository-pattern](28-stage28/repository-pattern/README.md):
+  data access abstraction
+- [cqrs-pattern](28-stage28/cqrs-pattern/README.md):
+  Command Query Responsibility Segregation
