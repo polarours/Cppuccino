@@ -371,3 +371,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer with chained event filters
 - [strategy-resolver](26-stage26/strategy-resolver/README.md):
   resolves strategies dynamically based on context
+
+### Stage 27 Projects (27-stage27) — GoF 23 Complete
+
+- [bridge-pattern](27-stage27/bridge-pattern/README.md):
+  separates abstraction from implementation
+- [facade-pattern](27-stage27/facade-pattern/README.md):
+  simplified interface to complex subsystem
+- [specification-pattern](27-stage27/specification-pattern/README.md):
+  composable business rules
