@@ -398,3 +398,12 @@ The goal is to make those gaps visible and then close them deliberately.
   fault tolerance pattern preventing cascading failures
 - [middleware-pipeline](29-stage29/middleware-pipeline/README.md):
   chained request/response processing
+
+### Stage 30 Projects (30-stage30) — Architecture Patterns
+
+- [service-locator](30-stage30/service-locator/README.md):
+  centralized service registry for dependency resolution
+- [unit-of-work](30-stage30/unit-of-work/README.md):
+  tracks changes and commits as a single transaction
+- [active-record](30-stage30/active-record/README.md):
+  object-relational mapping with persistence logic
