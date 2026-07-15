@@ -407,3 +407,12 @@ The goal is to make those gaps visible and then close them deliberately.
   tracks changes and commits as a single transaction
 - [active-record](30-stage30/active-record/README.md):
   object-relational mapping with persistence logic
+
+### Stage 31 Projects (31-stage31) — Architecture Patterns
+
+- [type-object](31-stage31/type-object/README.md):
+  defines types as data objects for runtime creation
+- [delegation](31-stage31/delegation/README.md):
+  objects delegate behavior to collaborators
+- [balking](31-stage31/balking/README.md):
+  skips action when preconditions are not met
