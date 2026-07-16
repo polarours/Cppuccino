@@ -425,3 +425,12 @@ The goal is to make those gaps visible and then close them deliberately.
   bounded buffer with thread-safe push/pop
 - [double-buffer](32-stage32/double-buffer/README.md):
   smooth data transition using two buffers
+
+### Stage 33 Projects (33-stage33) — Concurrency Patterns
+
+- [read-write-lock](33-stage33/read-write-lock/README.md):
+  concurrent map with shared/exclusive locking
+- [lock-free-queue](33-stage33/lock-free-queue/README.md):
+  wait-free queue using atomic operations
+- [thread-pool-advanced](33-stage33/thread-pool-advanced/README.md):
+  task-based thread pool with futures
