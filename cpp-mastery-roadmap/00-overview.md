@@ -434,3 +434,12 @@ The goal is to make those gaps visible and then close them deliberately.
   wait-free queue using atomic operations
 - [thread-pool-advanced](33-stage33/thread-pool-advanced/README.md):
   task-based thread pool with futures
+
+### Stage 34 Projects (34-stage34) — C++ Specific Patterns
+
+- [crtp-pattern](34-stage34/crtp-pattern/README.md):
+  Curiously Recurring Template Pattern
+- [sfinae-pattern](34-stage34/sfinae-pattern/README.md):
+  Substitution Failure Is Not An Anomaly
+- [varargs-pattern](34-stage34/varargs-pattern/README.md):
+  variadic templates for type-safe variadic functions
