@@ -416,3 +416,12 @@ The goal is to make those gaps visible and then close them deliberately.
   objects delegate behavior to collaborators
 - [balking](31-stage31/balking/README.md):
   skips action when preconditions are not met
+
+### Stage 32 Projects (32-stage32) — Concurrency Patterns
+
+- [guarded-suspension](32-stage32/guarded-suspension/README.md):
+  waits for condition before proceeding
+- [producer-consumer](32-stage32/producer-consumer/README.md):
+  bounded buffer with thread-safe push/pop
+- [double-buffer](32-stage32/double-buffer/README.md):
+  smooth data transition using two buffers
