@@ -452,3 +452,12 @@ The goal is to make those gaps visible and then close them deliberately.
   bump allocator for fast sequential allocation
 - [slab-allocator](35-stage35/slab-allocator/README.md):
   size-classified memory cache
+
+### Stage 36 Projects (36-stage36) — Modern C++ Patterns
+
+- [coroutine-pattern](36-stage36/coroutine-pattern/README.md):
+  C++20 coroutines for lazy evaluation and generators
+- [ranges-pattern](36-stage36/ranges-pattern/README.md):
+  lazy-evaluated range pipelines
+- [concepts-pattern](36-stage36/concepts-pattern/README.md):
+  C++20 Concepts for compile-time constraints
