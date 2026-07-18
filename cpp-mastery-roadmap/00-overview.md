@@ -443,3 +443,12 @@ The goal is to make those gaps visible and then close them deliberately.
   Substitution Failure Is Not An Anomaly
 - [varargs-pattern](34-stage34/varargs-pattern/README.md):
   variadic templates for type-safe variadic functions
+
+### Stage 35 Projects (35-stage35) — Memory Patterns
+
+- [memory-pool](35-stage35/memory-pool/README.md):
+  pre-allocated fixed-size block pool
+- [arena-allocator](35-stage35/arena-allocator/README.md):
+  bump allocator for fast sequential allocation
+- [slab-allocator](35-stage35/slab-allocator/README.md):
+  size-classified memory cache
