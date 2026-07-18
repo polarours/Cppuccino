@@ -461,3 +461,12 @@ The goal is to make those gaps visible and then close them deliberately.
   lazy-evaluated range pipelines
 - [concepts-pattern](36-stage36/concepts-pattern/README.md):
   C++20 Concepts for compile-time constraints
+
+### Stage 37 Projects (37-stage37) — Error Handling Patterns
+
+- [result-type](37-stage37/result-type/README.md):
+  type-safe error handling without exceptions
+- [error-code](37-stage37/error-code/README.md):
+  enum-based error reporting with messages
+- [expected-pattern](37-stage37/expected-pattern/README.md):
+  value-or-error with monadic operations
