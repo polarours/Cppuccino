@@ -470,3 +470,12 @@ The goal is to make those gaps visible and then close them deliberately.
   enum-based error reporting with messages
 - [expected-pattern](37-stage37/expected-pattern/README.md):
   value-or-error with monadic operations
+
+### Stage 38 Projects (38-stage38) — Testing Patterns
+
+- [mock-objects](38-stage38/mock-objects/README.md):
+  test doubles for verifying interactions
+- [test-fixture](38-stage38/test-fixture/README.md):
+  reusable test setup and teardown
+- [parameterized-tests](38-stage38/parameterized-tests/README.md):
+  data-driven test execution
