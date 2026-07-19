@@ -504,3 +504,12 @@ The goal is to make those gaps visible and then close them deliberately.
   manual SIMD-style vectorization for math operations
 - [memory-alignment](42-stage42/memory-alignment/README.md):
   cache-line alignment and aligned allocation
+
+### Stage 43 Projects (43-stage43) — Toolchain Patterns
+
+- [cmake-pattern](43-stage43/cmake-pattern/README.md):
+  programmatic CMakeLists.txt generation
+- [package-manager](43-stage43/package-manager/README.md):
+  dependency resolution and package management
+- [ci-cd-pattern](43-stage43/ci-cd-pattern/README.md):
+  pipeline pattern for build/test/deploy workflows
