@@ -495,3 +495,12 @@ The goal is to make those gaps visible and then close them deliberately.
   Complete HTTP framework combining 10 design patterns:
   Middleware Pipeline, Strategy, Observer, Command, Factory,
   Builder, Type Erasure, Facade, Singleton, Decorator
+
+### Stage 42 Projects (42-stage42) — Performance Patterns
+
+- [cache-friendly](42-stage42/cache-friendly/README.md):
+  AoS vs SoA data layout for cache performance
+- [simd-pattern](42-stage42/simd-pattern/README.md):
+  manual SIMD-style vectorization for math operations
+- [memory-alignment](42-stage42/memory-alignment/README.md):
+  cache-line alignment and aligned allocation
