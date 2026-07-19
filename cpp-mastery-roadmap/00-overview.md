@@ -488,3 +488,10 @@ The goal is to make those gaps visible and then close them deliberately.
   C++23 explicit object parameter for fluent APIs
 - [zip-range](40-stage40/zip-range/README.md):
   parallel iteration over multiple containers
+
+### Stage 41 — Capstone Project
+
+- [mini-http-framework](41-stage41/mini-http-framework/README.md):
+  Complete HTTP framework combining 10 design patterns:
+  Middleware Pipeline, Strategy, Observer, Command, Factory,
+  Builder, Type Erasure, Facade, Singleton, Decorator
