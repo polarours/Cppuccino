@@ -479,3 +479,12 @@ The goal is to make those gaps visible and then close them deliberately.
   reusable test setup and teardown
 - [parameterized-tests](38-stage38/parameterized-tests/README.md):
   data-driven test execution
+
+### Stage 40 Projects (40-stage40) — C++23 Features
+
+- [std-print](40-stage40/std-print/README.md):
+  type-safe formatted output with variadic templates
+- [deducing-this](40-stage40/deducing-this/README.md):
+  C++23 explicit object parameter for fluent APIs
+- [zip-range](40-stage40/zip-range/README.md):
+  parallel iteration over multiple containers
