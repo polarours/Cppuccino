@@ -19,8 +19,8 @@ public learning resource.
 | Documentation | 42 articles (20 en + 22 zh) |
 | Pitfalls | 34 articles (17 en + 17 zh) |
 | Examples | 47 runnable examples |
-| Projects | 115 projects across 40 stages |
-| Tests | 578 (all passing) |
+| Projects | 122 projects across 43 stages |
+| Tests | 615 (all passing) |
 
 ## Start Here
 
@@ -67,6 +67,11 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
 | 36 | Modern C++ (Coroutines, Ranges, Concepts) | 3 |
 | 37 | Error Handling Patterns | 3 |
 | 38 | Testing Patterns | 3 |
+| 39 | Examples & Pitfalls Enhancement | — |
+| 40 | C++23 Features | 3 |
+| 41 | Capstone Project (Mini HTTP Framework) | 1 |
+| 42 | Performance Patterns | 3 |
+| 43 | Toolchain Patterns (CMake, CI/CD, Package Manager) | 3 |
 | 39 | Examples & Pitfalls Enhancement | — |
 | 40 | C++23 Features | 3 |
 
@@ -220,6 +225,29 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
   C++23 explicit object parameter
 - [zip-range](cpp-mastery-roadmap/40-stage40/zip-range):
   Parallel iteration
+
+#### Stage 41: Capstone Project
+
+- [mini-http-framework](cpp-mastery-roadmap/41-stage41/mini-http-framework):
+  Complete HTTP framework combining 10 design patterns
+
+#### Stage 42: Performance Patterns
+
+- [cache-friendly](cpp-mastery-roadmap/42-stage42/cache-friendly):
+  AoS vs SoA data layout for cache performance
+- [simd-pattern](cpp-mastery-roadmap/42-stage42/simd-pattern):
+  Manual SIMD-style vectorization
+- [memory-alignment](cpp-mastery-roadmap/42-stage42/memory-alignment):
+  Cache-line alignment and aligned allocation
+
+#### Stage 43: Toolchain Patterns
+
+- [cmake-pattern](cpp-mastery-roadmap/43-stage43/cmake-pattern):
+  Programmatic CMakeLists.txt generation
+- [package-manager](cpp-mastery-roadmap/43-stage43/package-manager):
+  Dependency resolution and package management
+- [ci-cd-pattern](cpp-mastery-roadmap/43-stage43/ci-cd-pattern):
+  Pipeline pattern for build/test/deploy workflows
 
 ### Other
 

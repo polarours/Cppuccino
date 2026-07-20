@@ -18,8 +18,8 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
 | 文档 | 42 篇（20 英文 + 22 中文） |
 | 陷阱 | 34 篇（17 英文 + 17 中文） |
 | 示例 | 47 个可运行示例 |
-| 项目 | 115 个项目，横跨 40 个阶段 |
-| 测试 | 578（全部通过） |
+| 项目 | 122 个项目，横跨 43 个阶段 |
+| 测试 | 615（全部通过） |
 
 ## 从这里开始
 
@@ -68,6 +68,9 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
 | 38 | 测试模式 | 3 |
 | 39 | 补充示例和陷阱 | — |
 | 40 | C++23 新特性 | 3 |
+| 41 | 综合实战（Mini HTTP 框架） | 1 |
+| 42 | 性能模式 | 3 |
+| 43 | 工具链模式（CMake, CI/CD, 包管理） | 3 |
 
 ## 仓库地图
 
@@ -219,6 +222,29 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
   C++23 显式对象参数
 - [zip-range](cpp-mastery-roadmap/40-stage40/zip-range)：
   并行迭代
+
+#### 第四十一阶段：综合实战
+
+- [mini-http-framework](cpp-mastery-roadmap/41-stage41/mini-http-framework)：
+  组合 10 种设计模式的完整 HTTP 框架
+
+#### 第四十二阶段：性能模式
+
+- [cache-friendly](cpp-mastery-roadmap/42-stage42/cache-friendly)：
+  AoS 与 SoA 数据布局的缓存性能
+- [simd-pattern](cpp-mastery-roadmap/42-stage42/simd-pattern)：
+  手动 SIMD 风格向量化
+- [memory-alignment](cpp-mastery-roadmap/42-stage42/memory-alignment)：
+  缓存行对齐和对齐分配
+
+#### 第四十三阶段：工具链模式
+
+- [cmake-pattern](cpp-mastery-roadmap/43-stage43/cmake-pattern)：
+  程序化 CMakeLists.txt 生成
+- [package-manager](cpp-mastery-roadmap/43-stage43/package-manager)：
+  依赖解析和包管理
+- [ci-cd-pattern](cpp-mastery-roadmap/43-stage43/ci-cd-pattern)：
+  CI/CD 管道模式
 
 ### 其他
 
