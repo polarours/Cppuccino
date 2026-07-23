@@ -449,3 +449,9 @@ In robust C++ systems:
 When these conditions are met,
 exception safety becomes a composable property of architecture,
 not a fragile afterthought in control-flow branches.
+
+## See Also
+
+- **Related docs:** [Ownership and Lifetime](ownership-and-lifetime.md), [Undefined Behavior](undefined-behavior.md), [Noexcept and Move Operations](noexcept-and-move-operations.md)
+- **Pitfalls:** [Throwing from Destructor](../pitfalls/en/throwing-from-destructor.md), [Uninitialized Members](../pitfalls/en/uninitialized-members.md)
+- **Examples:** [raii-and-exception-safety.cpp](../examples/raii-and-exception-safety.cpp)

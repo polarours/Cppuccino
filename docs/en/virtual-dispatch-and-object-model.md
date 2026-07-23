@@ -398,3 +398,9 @@ A disciplined object-model mindset—virtual destructor correctness,
 constructor/destructor dispatch awareness,
 anti-slicing API design,
 and explicit ownership—turns polymorphism into a robust tool rather than a source of hidden defects.
+
+## See Also
+
+- **Related docs:** [Ownership and Lifetime](ownership-and-lifetime.md), [The True Semantics of `const`](the-true-semantics-of-const.md), [PImpl and ABI Stability](pimpl-and-abi-stability.md)
+- **Pitfalls:** [Object Slicing](../pitfalls/en/object-slicing.md), [Deleting Through Non-Virtual Base](../pitfalls/en/deleting-through-non-virtual-base.md), [Template Deduction Pitfalls](../pitfalls/en/template-deduction-pitfalls.md)
+- **Examples:** [virtual-dispatch-example.cpp](../examples/virtual-dispatch-example.cpp), [virtual-dispatch-and-slicing.cpp](../examples/virtual-dispatch-and-slicing.cpp), [crtp-basics.cpp](../examples/crtp-basics.cpp)
