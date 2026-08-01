@@ -41,17 +41,21 @@ void test_empty() {
 void test_concurrent_push_pop() {
     lock_free_queue::LockFreeQueue<int> queue;
     std::atomic<int> sum{0};
+    std::atomic<bool> done{false};
 
-    std::thread producer([&queue]() {
+    std::thread producer([&queue, &done]() {
         for (int i = 1; i <= 100; ++i) {
             queue.push(i);
         }
+        done = true;
     });
 
-    std::thread consumer([&queue, &sum]() {
-        for (int i = 0; i < 100; ++i) {
+    std::thread consumer([&queue, &sum, &done]() {
+        while (!done || !queue.empty()) {
             auto val = queue.pop();
-            if (val.has_value()) sum += *val;
+            if (val.has_value()) {
+                sum += *val;
+            }
         }
     });
 
