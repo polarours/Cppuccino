@@ -48,4 +48,5 @@ build/
 # Temporary files
 *.tmp
 *.temp
-*.swp
+*.swpbuild/
+cmake-build-*
