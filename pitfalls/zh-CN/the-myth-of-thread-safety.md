@@ -1,0 +1,185 @@
+# 并发陷阱：线程安全的神话
+
+## 问题描述
+
+在多线程编程中，一个常见的误解是认为单个线程安全的操作组合起来就是线程安全的。然而，多个线程安全操作的组合可能导致竞态条件和数据损坏。
+
+## 错误示例
+
+```cpp
+#include <iostream>
+#include <map>
+#include <mutex>
+#include <thread>
+
+std::map<int, std::string> cache;
+std::mutex mtx;
+
+// 这个函数本身是线程安全的
+std::string getValue(int key) {
+    std::lock_guard<std::mutex> lock(mtx);
+    auto it = cache.find(key);
+    if (it != cache.end()) {
+        return it->second;
+    }
+    return "";
+}
+
+// 这个函数本身也是线程安全的
+void setValue(int key, const std::string& value) {
+    std::lock_guard<std::mutex> lock(mtx);
+    cache[key] = value;
+}
+
+// 组合起来却有问题！
+std::string getOrCompute(int key) {
+    std::string value = getValue(key);  // 释放锁
+    if (value.empty()) {
+        value = computeExpensiveValue(key);
+        setValue(key, value);  // 可能与其他线程同时执行
+    }
+    return value;
+}
+```
+
+## 问题分析
+
+上面的代码存在经典的"检查后行动"（Check-Then-Act）竞态条件：
+
+1. **线程 A** 调用 `getValue(key)`，发现缓存为空
+2. **线程 B** 也调用 `getValue(key)`，也发现缓存为空（因为锁已释放）
+3. **线程 A 和 B** 同时开始计算 `computeExpensiveValue(key)`
+4. **线程 A** 调用 `setValue` 写入结果
+5. **线程 B** 也调用 `setValue` 写入结果，覆盖了 A 的结果
+
+## 正确的做法
+
+### 1. 使用双重检查锁定（正确实现）
+
+```cpp
+#include <mutex>
+#include <atomic>
+
+std::map<int, std::string> cache;
+std::mutex mtx;
+
+std::string getOrCompute(int key) {
+    // 第一次检查（无锁）
+    {
+        std::shared_lock<std::shared_mutex> readLock(mtx);
+        auto it = cache.find(key);
+        if (it != cache.end()) {
+            return it->second;
+        }
+    }
+    
+    // 获取写锁
+    std::unique_lock<std::shared_mutex> writeLock(mtx);
+    
+    // 第二次检查（持有锁）
+    {
+        auto it = cache.find(key);
+        if (it != cache.end()) {
+            return it->second;
+        }
+    }
+    
+    // 计算并存储
+    std::string value = computeExpensiveValue(key);
+    cache[key] = value;
+    return value;
+}
+```
+
+### 2. 使用原子操作
+
+```cpp
+#include <atomic>
+#include <mutex>
+
+std::atomic<bool> initialized{false};
+std::string value;
+std::mutex mtx;
+
+void initOnce() {
+    if (initialized.load(std::memory_order_acquire)) {
+        return;
+    }
+    
+    std::lock_guard<std::mutex> lock(mtx);
+    if (!initialized.load(std::memory_order_relaxed)) {
+        value = computeExpensiveValue();
+        std::atomic_thread_fence(std::memory_order_release);
+        initialized.store(true, std::memory_order_release);
+    }
+}
+```
+
+### 3. 使用 std::call_once
+
+```cpp
+#include <mutex>
+
+std::once_flag initFlag;
+std::string value;
+
+void initOnce() {
+    std::call_once(initFlag, []() {
+        value = computeExpensiveValue();
+    });
+}
+```
+
+## 常见陷阱模式
+
+### 1. 检查后行动（Check-Then-Act）
+
+```cpp
+// 危险
+if (cache.contains(key)) {
+    return cache[key];
+}
+// 其他线程可能在这里修改缓存
+```
+
+### 2. 读-修改-写（Read-Modify-Write）
+
+```cpp
+// 危险：不是原子操作
+int value = counter.load();
+counter.store(value + 1);
+```
+
+### 3. 复合操作
+
+```cpp
+// 危险：两个操作之间可能插入其他线程
+if (condition) {
+    doSomething();
+}
+```
+
+## 最佳实践
+
+1. **保持锁持有时间短**：不要在持锁时执行耗时操作
+2. **使用现有同步原语**：如 `std::mutex`、`std::atomic`、`std::call_once`
+3. **避免手动锁管理**：使用 RAII 包装（如 `std::lock_guard`）
+4. **测试并发代码**：使用 ThreadSanitizer 等工具
+5. **考虑无锁设计**：在可能的情况下使用并发数据结构
+
+## 工具推荐
+
+- **ThreadSanitizer (TSan)**：GCC/Clang 的 `-fsanitize=thread`
+- **AddressSanitizer (ASan)**：检测内存错误
+- **Helgrind**：Valgrind 的线程错误检测器
+
+## 总结
+
+> **单个线程安全的操作组合起来不一定是线程安全的。**
+
+- 竞态条件通常出现在"检查后行动"场景中
+- 使用原子操作或锁来保护复合操作
+- 优先使用标准库提供的同步原语
+- 使用工具检测并发问题
+
+记住：**线程安全不是默认属性，而是需要精心设计的结果。**
