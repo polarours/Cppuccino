@@ -1,0 +1,467 @@
+# 装饰器模式 (Decorator Pattern)
+
+## 什么是装饰器模式？
+
+装饰器模式（Decorator Pattern）是一种结构型设计模式，它允许向一个现有的对象添加新的功能，同时又不改变其结构。这种模式创建了一个装饰类来包装原始类，并提供额外的功能。
+
+> **核心思想**：通过组合而非继承来扩展对象的功能，保持类的单一职责。
+
+## 为什么需要装饰器模式？
+
+### 问题场景
+
+假设我们有一个图形绘制系统，需要支持各种形状的绘制：
+
+```cpp
+// 问题：继承会导致类爆炸
+class Shape {
+public:
+    virtual void draw() = 0;
+    virtual ~Shape() = default;
+};
+
+class Circle : public Shape { /* ... */ };
+class Rectangle : public Shape { /* ... */ };
+
+// 如果需要红色圆形、蓝色圆形、绿色圆形...
+class RedCircle : public Circle { /* ... */ };
+class BlueCircle : public Circle { /* ... */ };
+class RedRectangle : public Rectangle { /* ... */ };
+class BlueRectangle : public Rectangle { /* ... */ };
+// 类数量 = 形状数 × 颜色数 × 其他属性...
+```
+
+**问题**：
+1. 继承导致类数量爆炸
+2. 难以动态添加功能
+3. 违反开闭原则
+
+### 解决方案
+
+使用装饰器模式：
+
+```cpp
+class ShapeDecorator : public Shape {
+public:
+    explicit ShapeDecorator(std::unique_ptr<Shape> shape)
+        : shape_(std::move(shape)) {}
+    
+    void draw() override { shape_->draw(); }
+
+protected:
+    std::unique_ptr<Shape> shape_;
+};
+
+class RedDecorator : public ShapeDecorator {
+public:
+    using ShapeDecorator::ShapeDecorator;
+    
+    void draw() override {
+        std::cout << "[Red] ";
+        shape_->draw();
+    }
+};
+
+class Circle circle;
+circle.addDecorator(std::make_unique<RedDecorator>());
+circle.addDecorator(std::make_unique<BlueDecorator>());
+circle.draw();
+```
+
+**优点**：
+1. 灵活组合功能
+2. 不改变原有类
+3. 符合开闭原则
+
+## 模式结构
+
+```
+                    ┌─────────────┐
+                    │   Component │
+                    │  (Shape)    │
+                    └──────┬──────┘
+                           │
+           ┌───────────────┼───────────────┐
+           │               │               │
+    ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
+    │   Circle    │ │ Rectangle   │ │  Triangle   │ ← 具体组件
+    └──────┬──────┘ └──────┬──────┘ └──────┬──────┘
+           │               │               │
+           └───────────────┼───────────────┘
+                           │
+              ┌────────────▼────────────┐
+              │     Decorator           │ ← 抽象装饰器
+              │   (ShapeDecorator)      │
+              └────────────┬────────────┘
+                           │
+           ┌───────────────┼───────────────┐
+           │               │               │
+    ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
+    │  RedBorder  │ │  Shadow     │ │  Glow       │ ← 具体装饰器
+    └─────────────┘ └─────────────┘ └─────────────┘
+```
+
+## 代码实现
+
+### 1. 定义组件接口
+
+```cpp
+#include <memory>
+#include <string>
+#include <iostream>
+#include <vector>
+
+class Coffee {
+public:
+    virtual ~Coffee() = default;
+    virtual std::string describe() const = 0;
+    virtual double cost() const = 0;
+};
+```
+
+### 2. 实现具体组件
+
+```cpp
+class SimpleCoffee : public Coffee {
+public:
+    std::string describe() const override {
+        return "Simple Coffee";
+    }
+    
+    double cost() const override {
+        return 5.0;
+    }
+};
+
+class Espresso : public Coffee {
+public:
+    std::string describe() const override {
+        return "Espresso";
+    }
+    
+    double cost() const override {
+        return 8.0;
+    }
+};
+
+class Latte : public Coffee {
+public:
+    std::string describe() const override {
+        return "Latte";
+    }
+    
+    double cost() const override {
+        return 10.0;
+    }
+};
+```
+
+### 3. 定义装饰器
+
+```cpp
+class CoffeeDecorator : public Coffee {
+public:
+    explicit CoffeeDecorator(std::unique_ptr<Coffee> coffee)
+        : coffee_(std::move(coffee)) {}
+    
+    std::string describe() const override {
+        return coffee_->describe();
+    }
+    
+    double cost() const override {
+        return coffee_->cost();
+    }
+
+protected:
+    std::unique_ptr<Coffee> coffee_;
+};
+```
+
+### 4. 实现具体装饰器
+
+```cpp
+class MilkDecorator : public CoffeeDecorator {
+public:
+    using CoffeeDecorator::CoffeeDecorator;
+    
+    std::string describe() const override {
+        return coffee_->describe() + " with Milk";
+    }
+    
+    double cost() const override {
+        return coffee_->cost() + 2.0;
+    }
+};
+
+class SugarDecorator : public CoffeeDecorator {
+public:
+    using CoffeeDecorator::CoffeeDecorator;
+    
+    std::string describe() const override {
+        return coffee_->describe() + " with Sugar";
+    }
+    
+    double cost() const override {
+        return coffee_->cost() + 1.0;
+    }
+};
+
+class WhippedCreamDecorator : public CoffeeDecorator {
+public:
+    using CoffeeDecorator::CoffeeDecorator;
+    
+    std::string describe() const override {
+        return coffee_->describe() + " with Whipped Cream";
+    }
+    
+    double cost() const override {
+        return coffee_->cost() + 3.0;
+    }
+};
+
+class CaramelDecorator : public CoffeeDecorator {
+public:
+    using CoffeeDecorator::CoffeeDecorator;
+    
+    std::string describe() const override {
+        return coffee_->describe() + " with Caramel";
+    }
+    
+    double cost() const override {
+        return coffee_->cost() + 2.5;
+    }
+};
+```
+
+### 5. 客户端使用
+
+```cpp
+int main() {
+    // 简单咖啡
+    auto coffee = std::make_unique<SimpleCoffee>();
+    std::cout << coffee->describe() << " - $" << coffee->cost() << "\n";
+    
+    // 加牛奶
+    coffee = std::make_unique<MilkDecorator>(std::make_unique<SimpleCoffee>());
+    std::cout << coffee->describe() << " - $" << coffee->cost() << "\n";
+    
+    // 加牛奶和糖
+    coffee = std::make_unique<SugarDecorator>(
+        std::make_unique<MilkDecorator>(std::make_unique<SimpleCoffee>())
+    );
+    std::cout << coffee->describe() << " - $" << coffee->cost() << "\n";
+    
+    // 拿铁加 whipped cream 和焦糖
+    coffee = std::make_unique<CaramelDecorator>(
+        std::make_unique<WhippedCreamDecorator>(
+            std::make_unique<MilkDecorator>(
+                std::make_unique<Latte>()
+            )
+        )
+    );
+    std::cout << coffee->describe() << " - $" << coffee->cost() << "\n";
+    
+    return 0;
+}
+```
+
+## 现代 C++ 实现
+
+### 使用模板装饰器
+
+```cpp
+template<typename T>
+class CoffeeDecorator : public T {
+public:
+    using T::T;  // 继承构造函数
+    
+    std::string describe() const override {
+        return static_cast<const T&>(*this).describe() + " (decorated)";
+    }
+};
+```
+
+### 使用链式装饰
+
+```cpp
+class DecoratedCoffee {
+public:
+    explicit DecoratedCoffee(std::unique_ptr<Coffee> coffee)
+        : coffee_(std::move(coffee)) {}
+    
+    DecoratedCoffee& addMilk() {
+        coffee_ = std::make_unique<MilkDecorator>(std::move(coffee_));
+        return *this;
+    }
+    
+    DecoratedCoffee& addSugar() {
+        coffee_ = std::make_unique<SugarDecorator>(std::move(coffee_));
+        return *this;
+    }
+    
+    DecoratedCoffee& addWhippedCream() {
+        coffee_ = std::make_unique<WhippedCreamDecorator>(std::move(coffee_));
+        return *this;
+    }
+    
+    DecoratedCoffee& addCaramel() {
+        coffee_ = std::make_unique<CaramelDecorator>(std::move(coffee_));
+        return *this;
+    }
+    
+    std::string describe() const { return coffee_->describe(); }
+    double cost() const { return coffee_->cost(); }
+
+private:
+    std::unique_ptr<Coffee> coffee_;
+};
+
+// 使用
+auto coffee = DecoratedCoffee(std::make_unique<Latte>())
+    .addMilk()
+    .addSugar()
+    .addWhippedCream()
+    .addCaramel();
+std::cout << coffee.describe() << " - $" << coffee.cost() << "\n";
+```
+
+## 与相关模式的区别
+
+| 模式 | 区别 |
+|------|------|
+| **继承** | 继承在编译时添加功能；装饰器在运行时添加功能 |
+| **代理模式** | 代理控制访问；装饰器增强功能 |
+| **组合模式** | 组合处理树形结构；装饰器包装单个对象 |
+
+## 最佳实践
+
+### 1. 保持装饰器透明
+
+```cpp
+class TransparentDecorator : public CoffeeDecorator {
+public:
+    // 所有接口都应该转发给被装饰对象
+    std::string describe() const override {
+        return coffee_->describe();
+    }
+    
+    double cost() const override {
+        return coffee_->cost();
+    }
+};
+```
+
+### 2. 使用多层装饰
+
+```cpp
+// 允许层层叠加
+auto coffee = std::make_unique<SugarDecorator>(
+    std::make_unique<MilkDecorator>(
+        std::make_unique<WhippedCreamDecorator>(
+            std::make_unique<SimpleCoffee>()
+        )
+    )
+);
+```
+
+### 3. 避免过度装饰
+
+```cpp
+// 不推荐：装饰层数过多
+auto coffee = std::make_unique<A>(
+    std::make_unique<B>(
+        std::make_unique<C>(
+            std::make_unique<D>(
+                std::make_unique<E>(
+                    std::make_unique<SimpleCoffee>()
+                )
+            )
+        )
+    )
+);
+
+// 推荐：简化装饰
+class SuperDecorator : public CoffeeDecorator {
+public:
+    using CoffeeDecorator::CoffeeDecorator;
+    
+    std::string describe() const override {
+        return coffee_->describe() + " (with everything)";
+    }
+    
+    double cost() const override {
+        return coffee_->cost() + 10.0;
+    }
+};
+```
+
+## 常见陷阱
+
+### 陷阱 1：装饰器循环引用
+
+```cpp
+// 危险：装饰器互相引用
+class ADecorator : public CoffeeDecorator {
+public:
+    void setOther(std::unique_ptr<CDecorator> other) {
+        other_ = std::move(other);
+    }
+    
+    std::string describe() const override {
+        return coffee_->describe() + " + " + other_->describe();
+    }
+    
+private:
+    std::unique_ptr<CDecorator> other_;
+};
+```
+
+### 陷阱 2：忘记释放资源
+
+```cpp
+// 不推荐：裸指针管理
+class BadDecorator {
+public:
+    explicit BadDecorator(Coffee* coffee) : coffee_(coffee) {}
+    
+private:
+    Coffee* coffee_;  // 没有所有权，可能悬垂
+};
+
+// 推荐：智能指针
+class GoodDecorator {
+public:
+    explicit GoodDecorator(std::unique_ptr<Coffee> coffee)
+        : coffee_(std::move(coffee)) {}
+    
+private:
+    std::unique_ptr<Coffee> coffee_;  // 明确所有权
+};
+```
+
+### 陷阱 3：装饰器状态不一致
+
+```cpp
+// 问题：装饰器和被装饰对象状态不同步
+class StatefulDecorator : public CoffeeDecorator {
+public:
+    void setSpecialOption(bool option) {
+        option_ = option;
+        // 忘记同步到 coffee_
+    }
+    
+private:
+    bool option_ = false;
+};
+```
+
+## 总结
+
+装饰器模式的核心要点：
+
+- **适用场景**：需要动态添加功能、避免类爆炸、支持组合
+- **核心优点**：灵活、可扩展、符合开闭原则
+- **实现要点**：保持透明、多层装饰、使用智能指针
+- **常见陷阱**：循环引用、资源泄露、状态不一致
+
+> **记住**：装饰器模式的关键是"透明包装"——装饰器应该对用户透明，可以像原始对象一样使用。
