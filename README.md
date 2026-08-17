@@ -16,9 +16,9 @@ public learning resource.
 
 | Category | Count |
 |----------|-------|
-| Documentation | 42 articles (20 en + 22 zh) |
-| Pitfalls | 44 articles (22 en + 22 zh) |
-| Examples | 47 runnable examples |
+| Documentation | 85 articles (41 en + 44 zh) |
+| Pitfalls | 71 articles (34 en + 37 zh) |
+| Examples | 69 runnable examples |
 | Projects | 122 projects across 43 stages |
 | Tests | 615 (all passing) |
 
@@ -72,8 +72,6 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
 | 41 | Capstone Project (Mini HTTP Framework) | 1 |
 | 42 | Performance Patterns | 3 |
 | 43 | Toolchain Patterns (CMake, CI/CD, Package Manager) | 3 |
-| 39 | Examples & Pitfalls Enhancement | — |
-| 40 | C++23 Features | 3 |
 
 ## Repository Map
 
@@ -87,7 +85,7 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
 ### Examples
 
 - [examples](examples):
-  47 runnable code samples covering:
+  69 runnable code samples covering:
   - Core concepts: ownership, move semantics, smart pointers, RAII
   - Modern C++: lambda, constexpr, structured bindings, ranges
   - C++20: concepts, ranges, span, format, coroutines
