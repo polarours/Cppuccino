@@ -48,5 +48,8 @@ build/
 # Temporary files
 *.tmp
 *.temp
-*.swpbuild/
+*.swp
 cmake-build-*
+
+# WorkBuddy assistant working memory (not part of the project source)
+.workbuddy/
