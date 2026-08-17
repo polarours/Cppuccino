@@ -154,11 +154,11 @@ class ConcurrentMap {
     std::map<std::string, int> data_;
 public:
     int get(const std::string& key) const {
-        std::shared_lock<std::mutex> lock(mtx_);  // Multiple readers allowed
+        std::shared_lock<std::shared_mutex> lock(mtx_);  // Multiple readers allowed
         return data_.at(key);
     }
     void set(const std::string& key, int value) {
-        std::unique_lock<std::mutex> lock(mtx_);  // Exclusive access
+        std::unique_lock<std::shared_mutex> lock(mtx_);  // Exclusive access
         data_[key] = value;
     }
 };

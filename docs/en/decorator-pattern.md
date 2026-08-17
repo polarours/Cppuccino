@@ -62,10 +62,15 @@ public:
     }
 };
 
-class Circle circle;
-circle.addDecorator(std::make_unique<RedDecorator>());
-circle.addDecorator(std::make_unique<BlueDecorator>());
-circle.draw();
+class BlueDecorator : public ShapeDecorator {
+public:
+    using ShapeDecorator::ShapeDecorator;
+    
+    void draw() override {
+        std::cout << "[Blue] ";
+        shape_->draw();
+    }
+};
 ```
 
 **优点**：
