@@ -29,7 +29,7 @@ int main() {
     std::mdspan<int, std::extents<std::size_t, 2, 3>> matrix(data.data(), 2, 3);
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < 3; ++j) {
-            std::print("{} ", matrix(i, j));
+            std::print("{} ", matrix.at(i, j));
         }
         std::print("\n");
     }
