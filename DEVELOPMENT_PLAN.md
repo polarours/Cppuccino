@@ -37,8 +37,8 @@
 | P0 | 仓储模式 (Repository) | 中英 | 待开发 |
 | P0 | CQRS 模式 | 中英 | 待开发 |
 | P1 | 事件溯源 (Event Sourcing) | 中英 | 待开发 |
-| P1 | 单元工作模式 (Unit of Work) | 中英 | 待开发 |
-| P1 | 活动记录模式 (Active Record) | 中英 | 待开发 |
+| P1 | 单元工作模式 (Unit of Work) | 中英 | 已完成 |
+| P1 | 活动记录模式 (Active Record) | 中英 | 已完成 |
 | P2 | 其余架构模式 | 中英 | 待开发 |
 
 ### 1.3 现代 C++ 文档 (Stage 35-38, 40-43)
