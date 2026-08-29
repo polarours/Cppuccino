@@ -2,415 +2,123 @@
 
 ## 什么是工厂方法模式？
 
-工厂方法模式（Factory Method Pattern）是一种创建型设计模式，它定义了一个创建对象的接口，但由子类决定要实例化哪个类。工厂方法使一个类的实例化延迟到其子类。
+工厂方法模式（Factory Method Pattern）将"对象的创建"封装到一个方法中，让子类或注册项决定具体实例化哪个类。调用方只依赖抽象接口，不直接 `new` 具体类。
 
-> **核心思想**：将对象的创建逻辑封装到工厂类中，调用者只需指定工厂类型即可获得所需对象，而无需知道对象的具体创建细节。
+> **核心思想**：用工厂方法代替 `new`，把"用什么类"从使用点移到注册表/子类。
 
-## 为什么需要工厂方法？
+## 适用场景
 
-### 问题场景
+- 需要根据类型字符串/配置创建不同实现
+- 对象构造逻辑较复杂（依赖注入、池化、缓存）
+- 想在运行时扩展产品类型（开放-封闭原则）
 
-假设我们有一个图形绘制程序，需要创建各种形状对象：
+## 核心概念
 
-```cpp
-// 没有工厂方法 - 问题代码
-void drawShapes() {
-    Circle circle;           // 需要知道具体类
-    Rectangle rect;          // 耦合到具体实现
-    Triangle triangle;       // 难以扩展
-    
-    circle.draw();
-    rect.draw();
-    triangle.draw();
-}
-```
+- **产品接口（Product）**：所有具体产品实现的公共接口
+- **具体产品（Concrete Product）**：实现 Product 的具体类
+- **工厂（Factory）**：暴露 `create(type, ...)` 方法，按输入返回产品
+- **注册表（Registry）**：用 `type → creator` 映射代替 `if/else` 或 `switch`
 
-**问题**：
-1. 客户端代码与具体类紧密耦合
-2. 添加新形状需要修改所有使用点
-3. 无法在运行时动态决定创建哪种对象
+## 与 Simple Factory 的区别
 
-### 解决方案
-
-使用工厂方法模式：
+`if (type=="book") return new Book(...)` 也常被叫做"简单工厂"——但严格说它不是 GoF 23 模式，而是工厂方法的退化。GoF 工厂方法把创建逻辑下放到**子类**或**注册回调**里：
 
 ```cpp
-// 使用工厂方法 - 改进代码
-void drawShapes(ShapeFactory& factory) {
-    auto circle = factory.createCircle(5.0);      // 工厂创建
-    auto rect = factory.createRectangle(10, 20);  // 工厂创建
-    
-    circle->draw();
-    rect->draw();
-}
-```
-
-**优点**：
-1. 解耦：客户端不直接创建对象
-2. 可扩展：添加新形状只需新增工厂方法
-3. 灵活：可以在运行时选择工厂类型
-
-## 模式结构
-
-### 核心组件
-
-```
-                    ┌─────────────┐
-                    │  Shape      │ ← 抽象产品
-                    │  (Interface)│
-                    └──────┬──────┘
-                           │
-           ┌───────────────┼───────────────┐
-           │               │               │
-    ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-    │  Circle     │ │ Rectangle   │ │ Triangle    │ ← 具体产品
-    └──────┬──────┘ └──────┬──────┘ └──────┬──────┘
-           │               │               │
-    ┌──────▼───────────────▼───────────────▼──────┐
-    │         ShapeFactory (抽象工厂)               │
-    └──────┬───────────────┬───────────────┬──────┘
-           │               │               │
-    ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-    │ CircleFactory│ │ RectFactory │ │ TriFactory  │ ← 具体工厂
-    └─────────────┘ └─────────────┘ └─────────────┘
-```
-
-### 代码实现
-
-#### 1. 定义抽象产品
-
-```cpp
-#include <iostream>
-#include <memory>
-#include <string>
-
-// 抽象产品接口
-class Shape {
-public:
-    virtual ~Shape() = default;
-    virtual void draw() const = 0;
-    virtual std::string name() const = 0;
-};
-```
-
-#### 2. 实现具体产品
-
-```cpp
-// 具体产品：圆形
-class Circle : public Shape {
-public:
-    explicit Circle(double radius) : radius_(radius) {}
-    
-    void draw() const override {
-        std::cout << "Drawing circle with radius " << radius_ << "\n";
-    }
-    
-    std::string name() const override {
-        return "Circle";
-    }
-
-private:
-    double radius_;
-};
-
-// 具体产品：矩形
-class Rectangle : public Shape {
-public:
-    Rectangle(double width, double height) 
-        : width_(width), height_(height) {}
-    
-    void draw() const override {
-        std::cout << "Drawing rectangle " << width_ << "x" << height_ << "\n";
-    }
-    
-    std::string name() const override {
-        return "Rectangle";
-    }
-
-private:
-    double width_;
-    double height_;
-};
-```
-
-#### 3. 定义抽象工厂
-
-```cpp
-// 抽象工厂接口
-class ShapeFactory {
-public:
-    virtual ~ShapeFactory() = default;
-    virtual std::unique_ptr<Shape> createCircle(double radius) const = 0;
-    virtual std::unique_ptr<Shape> createRectangle(double width, double height) const = 0;
-};
-```
-
-#### 4. 实现具体工厂
-
-```cpp
-// 具体工厂：创建几何图形
-class GeometryFactory : public ShapeFactory {
-public:
-    std::unique_ptr<Shape> createCircle(double radius) const override {
-        return std::make_unique<Circle>(radius);
-    }
-    
-    std::unique_ptr<Shape> createRectangle(double width, double height) const override {
-        return std::make_unique<Rectangle>(width, height);
-    }
-};
-
-// 具体工厂：创建UI组件
-class UIFactory : public ShapeFactory {
-public:
-    std::unique_ptr<Shape> createCircle(double radius) const override {
-        return std::make_unique<Shape>("CircleButton");  // 模拟UI圆形按钮
-    }
-    
-    std::unique_ptr<Shape> createRectangle(double width, double height) const override {
-        return std::make_unique<Shape>("RectangleButton");  // 模拟UI矩形按钮
-    }
-};
-```
-
-#### 5. 客户端使用
-
-```cpp
-void render(ShapeFactory& factory) {
-    auto circle = factory.createCircle(10.0);
-    auto rect = factory.createRectangle(5.0, 3.0);
-    
-    circle->draw();
-    rect->draw();
+// 退化：所有逻辑在一个函数里
+Product* make(std::string type) {
+    if (type == "book") return new Book();
+    if (type == "toy")  return new Toy();
+    return nullptr;
 }
 
-int main() {
-    GeometryFactory geomFactory;
-    UIFactory uiFactory;
-    
-    std::cout << "=== Geometry ===\n";
-    render(geomFactory);
-    
-    std::cout << "\n=== UI ===\n";
-    render(uiFactory);
-    
-    return 0;
-}
+// 工厂方法：每种产品一个 creator
+factory.registerProduct("book", [](auto name, auto price){
+    return std::make_unique<Book>(name, price);
+});
+factory.registerProduct("toy", [](auto name, auto price){
+    return std::make_unique<Toy>(name, price);
+});
 ```
 
-## 变体与扩展
-
-### 变体 1：静态工厂方法
-
-对于简单的工厂，可以使用静态方法：
+## 代码实现
 
 ```cpp
-class ShapeFactory {
-public:
-    // 静态工厂方法
-    static std::unique_ptr<Shape> makeCircle(double radius) {
-        return std::make_unique<Circle>(radius);
-    }
-    
-    static std::unique_ptr<Shape> makeRectangle(double width, double height) {
-        return std::make_unique<Rectangle>(width, height);
-    }
-};
-
-// 使用
-auto circle = ShapeFactory::makeCircle(5.0);
-```
-
-### 变体 2：工厂函数（自由函数）
-
-```cpp
-// 工厂函数
-std::unique_ptr<Shape> createCircle(double radius) {
-    return std::make_unique<Circle>(radius);
-}
-
-std::unique_ptr<Shape> createRectangle(double width, double height) {
-    return std::make_unique<Rectangle>(width, height);
-}
-
-// 使用
-auto circle = createCircle(5.0);
-```
-
-### 变体 3：工厂注册表
-
-对于需要动态创建对象的场景：
-
-```cpp
-#include <map>
 #include <functional>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <map>
 
-class ShapeRegistry {
+class Product {
 public:
-    using Creator = std::function<std::unique_ptr<Shape>()>;
-    
-    void registerShape(const std::string& name, Creator creator) {
-        creators_[name] = std::move(creator);
+    virtual ~Product() = default;
+    virtual std::string name() const = 0;
+    virtual double price() const = 0;
+};
+
+class Book : public Product {
+public:
+    Book(std::string title, double price) : title_(std::move(title)), price_(price) {}
+    std::string name() const override { return "Book: " + title_; }
+    double price() const override { return price_; }
+private:
+    std::string title_; double price_;
+};
+
+class Electronics : public Product {
+public:
+    Electronics(std::string model, double price) : model_(std::move(model)), price_(price) {}
+    std::string name() const override { return "Electronics: " + model_; }
+    double price() const override { return price_; }
+private:
+    std::string model_; double price_;
+};
+
+class ProductFactory {
+public:
+    using Creator = std::function<std::unique_ptr<Product>(const std::string&, double)>;
+
+    static void registerProduct(const std::string& type, Creator creator) {
+        getRegistry()[type] = std::move(creator);
     }
-    
-    std::unique_ptr<Shape> create(const std::string& name) const {
-        auto it = creators_.find(name);
-        if (it == creators_.end()) {
-            throw std::runtime_error("Unknown shape: " + name);
-        }
-        return it->second();
+
+    static std::unique_ptr<Product> create(const std::string& type,
+                                           const std::string& name, double price) {
+        auto& reg = getRegistry();
+        auto it = reg.find(type);
+        if (it == reg.end()) throw std::runtime_error("Unknown product: " + type);
+        return it->second(name, price);
     }
 
 private:
-    std::map<std::string, Creator> creators_;
+    static std::map<std::string, Creator>& getRegistry() {
+        static std::map<std::string, Creator> r;
+        return r;
+    }
 };
-
-// 注册形状
-ShapeRegistry registry;
-registry.registerShape("Circle", [] { 
-    return std::make_unique<Circle>(1.0); 
-});
-registry.registerShape("Rectangle", [] { 
-    return std::make_unique<Rectangle>(2.0, 3.0); 
-});
-
-// 动态创建
-auto shape = registry.create("Circle");
 ```
 
-## 与相关模式的区别
+完整可运行示例见 [factory-pattern 项目](../../cpp-mastery-roadmap/10-stage10/factory-pattern)。
 
-| 模式 | 区别 |
-|------|------|
-| **抽象工厂** | 工厂方法针对单个产品等级结构；抽象工厂针对产品族 |
-| **建造者模式** | 建造者关注复杂对象的逐步构建；工厂方法关注简单对象的创建 |
-| **原型模式** | 原型通过克隆创建对象；工厂方法通过 new 创建对象 |
-| **静态工厂方法** | 静态工厂是工厂方法的特例，使用静态方法而非虚函数 |
+## 使用示例
+
+```cpp
+ProductFactory::registerProduct("book",
+    [](const std::string& n, double p){ return std::make_unique<Book>(n, p); });
+ProductFactory::registerProduct("electronics",
+    [](const std::string& n, double p){ return std::make_unique<Electronics>(n, p); });
+
+auto p = ProductFactory::create("book", "The C++ Programming Language", 59.99);
+assert(p->price() == 59.99);
+```
 
 ## 最佳实践
 
-### 1. 使用智能指针管理生命周期
-
-```cpp
-// 推荐：返回 unique_ptr
-std::unique_ptr<Shape> createShape();
-
-// 不推荐：裸指针
-Shape* createShape();  // 谁负责 delete？
-```
-
-### 2. 工厂方法应抛出异常而非返回空指针
-
-```cpp
-// 推荐：抛异常
-std::unique_ptr<Shape> create(const std::string& type) {
-    if (type == "Circle") return std::make_unique<Circle>(r);
-    throw std::invalid_argument("Unknown shape: " + type);
-}
-
-// 不推荐：返回空指针
-std::unique_ptr<Shape> create(const std::string& type) {
-    if (type == "Circle") return std::make_unique<Circle>(r);
-    return nullptr;  // 调用者可能忘记检查
-}
-```
-
-### 3. 考虑使用模板简化工厂
-
-```cpp
-template<typename T>
-std::unique_ptr<Shape> createTyped() {
-    return std::make_unique<T>();
-}
-
-// 使用
-auto circle = createTyped<Circle>();
-```
-
-### 4. 在工厂中添加调试信息
-
-```cpp
-std::unique_ptr<Shape> createCircle(double radius) const override {
-    std::cout << "[Factory] Creating Circle with radius " << radius << "\n";
-    return std::make_unique<Circle>(radius);
-}
-```
-
-## 常见陷阱
-
-### 陷阱 1：工厂过于复杂
-
-```cpp
-// 不推荐：工厂包含过多逻辑
-class ShapeFactory {
-public:
-    std::unique_ptr<Shape> createCircle(double radius) {
-        // 验证参数...
-        // 检查资源...
-        // 日志记录...
-        // 缓存检查...
-        return std::make_unique<Circle>(radius);
-    }
-};
-
-// 推荐：工厂只做创建
-class ShapeFactory {
-public:
-    std::unique_ptr<Shape> createCircle(double radius) {
-        return std::make_unique<Circle>(radius);
-    }
-};
-```
-
-### 陷阱 2：工厂耦合到具体类
-
-```cpp
-// 不推荐：工厂直接依赖具体类
-class ShapeFactory {
-public:
-    std::unique_ptr<Shape> create() {
-        return std::make_unique<Circle>(10.0);  // 硬编码
-    }
-};
-
-// 推荐：工厂可配置
-class ShapeFactory {
-public:
-    void setRadius(double r) { radius_ = r; }
-    std::unique_ptr<Shape> create() {
-        return std::make_unique<Circle>(radius_);
-    }
-
-private:
-    double radius_ = 1.0;
-};
-```
-
-### 陷阱 3：忘记处理异常
-
-```cpp
-// 不推荐：可能泄露资源
-Shape* create() {
-    auto* s = new Circle(10.0);
-    initialize(s);  // 如果抛出异常，s 泄露
-    return s;
-}
-
-// 推荐：使用智能指针
-std::unique_ptr<Shape> create() {
-    auto s = std::make_unique<Circle>(10.0);
-    initialize(*s);  // 如果抛出异常，自动清理
-    return s;
-}
-```
+1. **用 `std::function` 注册 creator**：比继承 + 工厂子类更轻量，且支持 lambda
+2. **注册放在翻译单元初始化期**：避免在并发路径上首次注册
+3. **未知 type 要明确报错**：`throw` 比返回 `nullptr` 更早暴露调用 bug
+4. **产品构造参数要保持一致**：所有 creator 接受相同签名，否则调用方难以泛化
 
 ## 总结
 
-工厂方法模式是 C++ 中最常用的设计模式之一：
-
-- **适用场景**：需要创建对象但不知道具体类型、需要延迟创建逻辑、需要封装创建细节
-- **核心优点**：解耦、可扩展、可测试
-- **实现要点**：使用智能指针、工厂只做创建、考虑注册表变体
-- **常见陷阱**：工厂过于复杂、耦合到具体类、异常安全
-
-> **记住**：工厂方法的核心是"延迟创建"——让调用者指定创建什么，让工厂决定如何创建。
+工厂方法把"决定具体类"从使用方挪到注册表，让新增产品只需一行 `registerProduct`——是消除 `if/else` 分支、保持代码对扩展开放的经典手段。
