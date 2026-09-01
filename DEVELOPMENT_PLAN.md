@@ -19,14 +19,14 @@
 | P0 | 单例模式 (Singleton) | 中英 | 已完成 |
 | P0 | 观察者模式 (Observer) | 中英 | 已完成 |
 | P0 | 策略模式 (Strategy) | 中英 | 已完成 |
-| P1 | 命令模式 (Command) | 中英 | 待开发 |
-| P1 | 适配器模式 (Adapter) | 中英 | 待开发 |
-| P1 | 装饰器模式 (Decorator) | 中英 | 待开发 |
-| P1 | 建造者模式 (Builder) | 中英 | 待开发 |
-| P2 | 原型模式 (Prototype) | 中英 | 待开发 |
-| P2 | 代理模式 (Proxy) | 中英 | 待开发 |
-| P2 | 组合模式 (Composite) | 中英 | 待开发 |
-| P2 | 外观模式 (Facade) | 中英 | 待开发 |
+| P1 | 命令模式 (Command) | 中英 | 已完成 |
+| P1 | 适配器模式 (Adapter) | 中英 | 已完成 |
+| P1 | 装饰器模式 (Decorator) | 中英 | 已完成 |
+| P1 | 建造者模式 (Builder) | 中英 | 已完成 |
+| P2 | 原型模式 (Prototype) | 中英 | 已完成 |
+| P2 | 代理模式 (Proxy) | 中英 | 已完成 |
+| P2 | 组合模式 (Composite) | 中英 | 已完成 |
+| P2 | 外观模式 (Facade) | 中英 | 已完成 |
 | P3 | 其余 GoF 模式 | 中英 | 待开发 |
 
 ### 1.2 架构模式文档 (Stage 28-31)
