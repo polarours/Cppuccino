@@ -27,7 +27,7 @@
 | P2 | 代理模式 (Proxy) | 中英 | 已完成 |
 | P2 | 组合模式 (Composite) | 中英 | 已完成 |
 | P2 | 外观模式 (Facade) | 中英 | 已完成 |
-| P3 | 其余 GoF 模式 | 中英 | 待开发 |
+| P3 | 其余 GoF 模式 | 中英 | 已完成 |
 
 ### 1.2 架构模式文档 (Stage 28-31)
 
@@ -129,8 +129,8 @@
 
 | 优先级 | 项目 | 任务 | 状态 |
 |--------|------|------|------|
-| P0 | simple-db | 完善 README，添加 API 文档 | 待开发 |
-| P0 | chat-server | 完善 README，添加测试用例 | 待开发 |
+| P0 | simple-db | 完善 README，添加 API 文档 | 已完成 |
+| P0 | chat-server | 完善 README，添加测试用例 | 已完成 |
 | P1 | web-server | 添加性能基准测试 | 待开发 |
 | P1 | task-scheduler | 完善错误处理文档 | 待开发 |
 | P2 | connection-pool | 添加并发安全分析 | 待开发 |
