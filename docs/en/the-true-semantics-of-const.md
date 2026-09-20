@@ -101,7 +101,7 @@ In the context of `const`, this contract means: when accessing an object through
 
 Using `const` can also help the compiler perform optimizations. Because the compiler knows that certain objects will not be modified, it can be more aggressive with optimizations, such as caching results, eliminating unnecessary copies, etc.
 
-For example, we can write a simple test program to compare the performance difference between const and non-const methods. The specific demonstration code can be found in [const_vs_nonconst.cpp](/examples/const_vs_nonconst.cpp).
+For example, we can write a simple test program to compare the performance difference between const and non-const methods. The specific demonstration code can be found in [const_vs_nonconst.cpp](../../examples/const-vs-non-const.cpp).
 
 ### Code Readability and Maintainability
 

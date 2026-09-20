@@ -254,5 +254,5 @@ We can use:
 ## See Also
 
 - **Related docs:** [RAII and Exception Safety](raii-and-exception-safety.md), [The True Semantics of `const`](the-true-semantics-of-const.md), [Lvalue and Rvalue References](lvalue-and-rvalue-references.md)
-- **Pitfalls:** [Dangling Pointer](../pitfalls/en/dangling-pointer.md), [Use After Move](../pitfalls/en/use-after-move.md), [Returning Reference to Local Object](../pitfalls/en/returning-reference-to-local-object.md), [Object Lifetime and Destruction Order](../pitfalls/en/object-lifetime-and-destruction-order-pitfalls.md)
-- **Examples:** [ownership-and-lifetime.cpp](../examples/ownership-and-lifetime.cpp), [smart-pointer-unique.cpp](../examples/smart-pointer-unique.cpp), [smart-pointer-shared.cpp](../examples/smart-pointer-shared.cpp)
+- **Pitfalls:** [Dangling Pointer](../../pitfalls/en/dangling-pointer.md), [Use After Move](../../pitfalls/en/use-after-move.md), [Returning Reference to Local Object](../../pitfalls/en/returning-reference-to-local-object.md), [Object Lifetime and Destruction Order](../../pitfalls/en/object-lifetime-and-destruction-order-pitfalls.md)
+- **Examples:** [ownership-and-lifetime.cpp](../../examples/ownership-and-lifetime.cpp), [smart-pointer-unique.cpp](../../examples/smart-pointer-unique.cpp), [smart-pointer-shared.cpp](../../examples/smart-pointer-shared.cpp)

@@ -101,7 +101,7 @@ private:
 
 使用 `const` 还可以帮助编译器进行优化。因为编译器知道某些对象不会被修改，它可以更大胆地进行优化，比如缓存结果、消除不必要的拷贝等。
 
-比如我们可以写一个简单的测试程序来对比 const 和非 const 方法的性能差异，具体的演示代码请参考[const_vs_nonconst.cpp](/examples/const_vs_nonconst.cpp)。
+比如我们可以写一个简单的测试程序来对比 const 和非 const 方法的性能差异，具体的演示代码请参考[const_vs_nonconst.cpp](../../examples/const-vs-non-const.cpp)。
 
 ### 代码可读性和维护性
 

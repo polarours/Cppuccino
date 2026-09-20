@@ -4,7 +4,7 @@
 
 ### 1.1 What is a Dangling Pointer?
 
-A dangling pointer is a pointer that refers to an object that has already been destroyed or freed. When a program tries to access that object through the dangling pointer, the result is [Undefined Behavior](/docs/en/undefined_behavior.md) (UB). This can lead to crashes, data corruption, or even security vulnerabilities.
+A dangling pointer is a pointer that refers to an object that has already been destroyed or freed. When a program tries to access that object through the dangling pointer, the result is [Undefined Behavior](../../docs/en/undefined-behavior.md) (UB). This can lead to crashes, data corruption, or even security vulnerabilities.
 
 Before diving into dangling pointers, it helps to distinguish them from null pointers and wild pointers.
 

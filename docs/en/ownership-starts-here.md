@@ -70,7 +70,7 @@ std::unique_ptr<int> ptr2 = std::move(ptr1); // Ownership transferred to ptr2
 // ptr1 no longer owns the resource and can't be used anymore
 ```
 
-More specific code can be found in [ownership_and_lifetime.cpp](/examples/ownership_and_lifetime.cpp).
+More specific code can be found in [ownership_and_lifetime.cpp](../../examples/ownership-and-lifetime.cpp).
 
 > More in-depth content about lifetime will be discussed in detail in subsequent chapters, tentatively titled **Ownership & Lifetime**.
 

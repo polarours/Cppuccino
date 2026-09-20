@@ -38,7 +38,7 @@ ctest --test-dir build --output-on-failure
 
 - [ring-buffer](../ring-buffer/): Thread-safe circular buffer implementation
 - [connection-pool](../connection-pool/): Another concurrency pattern using shared resources
-- [guarded-suspension](../../03-advanced/guarded-suspension/): Wait for condition before proceeding
+- [guarded-suspension](../../32-stage32/guarded-suspension): Wait for condition before proceeding
 
 ## Suggested Extensions
 

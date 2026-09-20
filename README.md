@@ -16,10 +16,10 @@ public learning resource.
 
 | Category | Count |
 |----------|-------|
-| Documentation | 96 articles (47 en + 49 zh) |
+| Documentation | 126 articles (59 en + 67 zh) |
 | Pitfalls | 71 articles (34 en + 37 zh) |
-| Examples | 74 runnable examples |
-| Projects | 124 projects across 43 stages |
+| Examples | 97 runnable examples |
+| Projects | 127 projects across 43 stages |
 | Tests | 615 (all passing) |
 
 ## Start Here

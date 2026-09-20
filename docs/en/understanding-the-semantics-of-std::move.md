@@ -20,7 +20,7 @@ Whether actual "movement" occurs depends entirely on:
 - Whether available move constructors / move assignments exist
 - Whether the current context allows calling them
 
-> **Note**: For detailed explanations of lvalue references and rvalue references, please refer to the [Lvalue References and Rvalue References](/docs/en/lvalue-and-rvalue-references.md) section.
+> **Note**: For detailed explanations of lvalue references and rvalue references, please refer to the [Lvalue References and Rvalue References](lvalue-and-rvalue-references.md) section.
 
 ## A Common But Dangerous Misconception
 

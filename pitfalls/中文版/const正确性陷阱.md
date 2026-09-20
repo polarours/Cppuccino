@@ -57,5 +57,5 @@ int* ptr = const_cast<int*>(&x);
 
 ## 另请参阅
 
-- [隐式转换](implicit-conversions.md)
-- [未定义行为](../docs/en/undefined-behavior.md)
+- [隐式转换](../en/implicit-conversions.md)
+- [未定义行为](../../docs/en/undefined-behavior.md)

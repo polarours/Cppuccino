@@ -84,7 +84,7 @@ private:
 };
 ```
 
-完整可运行示例见 [observer-pattern 项目](../../cpp-mastery-roadmap/08-stage8/observer-pattern)。
+完整可运行示例见 [observer-pattern 项目](../../cpp-mastery-roadmap/09-stage9/observer-pattern)。
 
 ## 使用示例
 

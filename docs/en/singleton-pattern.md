@@ -91,7 +91,7 @@ private:
 };
 ```
 
-完整可运行示例见 [singleton-pattern 项目](../../cpp-mastery-roadmap/10-stage10/singleton-pattern)。
+完整可运行示例见 [singleton-pattern 项目](../../cpp-mastery-roadmap/13-stage13/singleton-pattern)。
 
 ## 陷阱与最佳实践
 

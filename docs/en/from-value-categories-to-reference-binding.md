@@ -489,7 +489,7 @@ The actual moving happens in:
 The true semantics of a "moved-from object" are:
 
 > The object still has complete identity and lifetime, but its resources are in a "valid but unspecified state."
-> For more about `std::move`, please refer to the [move-is-not-moving](/docs/en/move-is-not-moving.md) section.
+> For more about `std::move`, please refer to the [move-is-not-moving](understanding-the-semantics-of-std::move.md) section.
 
 ## 6. Conclusion
 

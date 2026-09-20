@@ -429,5 +429,5 @@ RAII 把异常路径中的清理问题，从“分支补丁”升级为“类型
 ## 另请参阅
 
 - **相关文档：** [所有权与生命周期](所有权与生命周期.md)，[未定义行为](未定义行为.md)，[noexcept与移动操作](noexcept与移动操作.md)
-- **常见陷阱：** [析构函数抛出异常](../pitfalls/中文版/析构函数抛出异常.md)，[未初始化成员变量](../pitfalls/中文版/未初始化成员变量.md)
-- **示例：** [raii-and-exception-safety.cpp](../examples/raii-and-exception-safety.cpp)
+- **常见陷阱：** [析构函数抛出异常](../../pitfalls/中文版/析构函数抛出异常.md)，[未初始化成员变量](../../pitfalls/中文版/未初始化成员变量.md)
+- **示例：** [raii-and-exception-safety.cpp](../../examples/raii-and-exception-safety.cpp)

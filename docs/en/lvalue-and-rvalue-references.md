@@ -1,6 +1,6 @@
 # C++ References: Lvalue References (T&) and Rvalue References (T&&)
 
-> **Note**: It's recommended to read the [From Value Categories to Reference Binding](/docs/en/from-value-categories-to-reference-binding.md) chapter before reading this section.
+> **Note**: It's recommended to read the [From Value Categories to Reference Binding](from-value-categories-to-reference-binding.md) chapter before reading this section.
 > **Reference**: For detailed definitions of lvalues and rvalues (lvalue / rvalue / prvalue / xvalue), please refer to Section 3.10 "Lvalues and rvalues" in the C++11 standard draft N3337.
 
 ## 1. Introduction
@@ -100,7 +100,7 @@ int& getReference(int& externalVar) {
 
 In this modified example, the `getReference` function returns a reference to an external variable whose lifetime is managed by the caller, making it safe.
 
-> For more discussion on undefined behavior, please refer to [Undefined Behavior](/docs/en/undefined-behavior.md).
+> For more discussion on undefined behavior, please refer to [Undefined Behavior](undefined-behavior.md).
 
 > Key point: Lvalue references do not extend object lifetimes; they merely provide a safe access pathway, with lifetime still managed by the object itself.
 
@@ -179,7 +179,7 @@ void push_back(std::string&& value) {
 Therefore, the difference between "lvalues" and "rvalues" can also be explained from this perspective: it's fundamentally about **whether an object's lifetime and ownership can be transferred**.
 
 > It's important to emphasize: whether resources are actually transferred still completely depends on the type's move constructor/move assignment implementation, not the rvalue reference itself.
-> For a simple demonstration code, interested readers can refer to [move_semantics_example.cpp](/examples/move_semantics_example.cpp).
+> For a simple demonstration code, interested readers can refer to [move_semantics_example.cpp](../../examples/move-semantics-example.cpp).
 
 ### 5.3 How Did C++ Handle This Problem Before Rvalue References?
 
@@ -287,7 +287,7 @@ Another commonly used technique before C++11 was Copy-on-Write (COW) and referen
 
 The cost of this approach was increased complexity and runtime overhead, along with thread safety issues.
 
-> Specific demonstration code will be provided in [copy_on_write_example.cpp](/examples/copy_on_write_example.cpp).
+> Specific demonstration code will be provided in [copy_on_write_example.cpp](../../examples/copy_on_write_example.cpp).
 
 > None of the above solutions were perfect, having various issues such as complex semantics and performance overhead. C++11's introduction of rvalue references and move semantics was precisely to solve these problems, providing a more intuitive and efficient ownership transfer mechanism.
 
@@ -361,5 +361,5 @@ By understanding the design intent and usage scenarios of lvalue and rvalue refe
 ## See Also
 
 - **Related docs:** [Understanding the Semantics of `std::move`](understanding-the-semantics-of-std::move.md), [Forwarding References and Perfect Forwarding](understanding-forwarding-references-and-perfect-forwarding.md), [Ownership and Lifetime](ownership-and-lifetime.md)
-- **Pitfalls:** [Use After Move](../pitfalls/en/use-after-move.md), [Moving from Const Object](../pitfalls/en/moving-from-const-object.md), [Const Correctness](../pitfalls/en/const-correctness-pitfalls.md)
-- **Examples:** [lvalue-rvalue-references.cpp](../examples/lvalue-rvalue-references.cpp), [move-semantics-example.cpp](../examples/move-semantics-example.cpp), [perfect-forwarding.cpp](../examples/perfect-forwarding.cpp)
+- **Pitfalls:** [Use After Move](../../pitfalls/en/use-after-move.md), [Moving from Const Object](../../pitfalls/en/moving-from-const-object.md), [Const Correctness](../../pitfalls/en/const-correctness-pitfalls.md)
+- **Examples:** [lvalue-rvalue-references.cpp](../../examples/lvalue-rvalue-references.cpp), [move-semantics-example.cpp](../../examples/move-semantics-example.cpp), [perfect-forwarding.cpp](../../examples/perfect-forwarding.cpp)

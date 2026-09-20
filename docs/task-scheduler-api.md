@@ -109,7 +109,7 @@ int main() {
 
 ## 使用示例（含断言）
 
-见 [`examples/task-scheduler-error-handling.cpp`](../../examples/task-scheduler-error-handling.cpp)：
+见 [`examples/task-scheduler-error-handling.cpp`](../examples/task-scheduler-error-handling.cpp)：
 
 ```cpp
 TaskScheduler scheduler(1);
