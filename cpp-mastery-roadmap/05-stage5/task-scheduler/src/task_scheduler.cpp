@@ -109,7 +109,15 @@ void TaskScheduler::workerLoop() {
         if (hasTask) {
             auto it = activeTasks_.find(task.id);
             if (it != activeTasks_.end() && it->second) {
-                task.func();
+                try {
+                    task.func();
+                } catch (const std::exception& e) {
+                    std::cerr << "task " << task.id << " threw: "
+                              << e.what() << std::endl;
+                } catch (...) {
+                    std::cerr << "task " << task.id << " threw unknown exception"
+                              << std::endl;
+                }
                 completedCount_++;
 
                 if (task.recurring) {

@@ -133,7 +133,7 @@
 | P0 | chat-server | 完善 README，添加测试用例 | 已完成 |
 | P1 | web-server | 添加性能基准测试 | 已完成 |
 | P1 | task-scheduler | 完善错误处理文档 | 已完成 |
-| P2 | connection-pool | 添加并发安全分析 | 已完成 |
+| P2 | connection-pool | 添加并发安全分析 | 已完成：计数/容量/工厂异常回归及并发示例已运行 |
 | P2 | ring-buffer | 完善生产者-消费者文档 | 已完成 |
 
 ### 4.2 统一项目结构

@@ -5,6 +5,8 @@
 #include <string>
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
+#include <mutex>
 #include <thread>
 
 namespace {
@@ -128,6 +130,70 @@ void test_pending_tasks() {
     scheduler.stop();
 }
 
+void test_exception_in_task_keeps_workers_alive() {
+    task_scheduler::TaskScheduler scheduler(1);
+    std::atomic<int> counter{0};
+    std::mutex m;
+    std::condition_variable cv;
+    bool done = false;
+
+    scheduler.start();
+
+    // Throws: if this kills the worker, the sync task below never runs.
+    scheduler.schedule([]() { throw std::runtime_error("boom"); });
+    auto syncId = scheduler.schedule([&]() {
+        std::lock_guard<std::mutex> lock(m);
+        counter++;
+        done = true;
+        cv.notify_one();
+    });
+
+    {
+        std::unique_lock<std::mutex> lock(m);
+        bool ok = cv.wait_for(lock, std::chrono::seconds(5),
+                               [&]() { return done; });
+        expect(ok, "worker must still run tasks after a task throws");
+    }
+    (void)syncId;
+
+    scheduler.stop();
+    expect(counter == 1, "sync task must complete exactly once");
+}
+
+void test_cancel_delayed_task() {
+    task_scheduler::TaskScheduler scheduler(1);
+    std::atomic<int> executed{0};
+
+    scheduler.start();
+    auto id = scheduler.scheduleAt([&executed]() {
+        executed++;
+    }, std::chrono::steady_clock::now() + std::chrono::milliseconds(500),
+                                    task_scheduler::TaskPriority::Low);
+
+    // Cancel while the task is still waiting for its execute time.
+    scheduler.cancel(id);
+    std::this_thread::sleep_for(std::chrono::milliseconds(800));
+    scheduler.stop();
+
+    expect(executed == 0, "cancelled delayed task must not run");
+}
+
+void test_cancel_repeating_task() {
+    task_scheduler::TaskScheduler scheduler(1);
+    std::atomic<int> ticks{0};
+
+    scheduler.start();
+    auto id = scheduler.scheduleRepeating([&ticks]() { ticks++; },
+                                           std::chrono::milliseconds(20));
+    std::this_thread::sleep_for(std::chrono::milliseconds(120));
+    scheduler.cancel(id);
+    // Give the cancelled task a chance to (wrongly) keep ticking.
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    scheduler.stop();
+
+    expect(ticks < 20, "cancelled repeating task must stop ticking");
+}
+
 } // namespace
 
 int main() {
@@ -153,6 +219,15 @@ int main() {
 
         test_pending_tasks();
         std::cout << "  test_pending_tasks: PASS\n";
+
+        test_exception_in_task_keeps_workers_alive();
+        std::cout << "  test_exception_in_task_keeps_workers_alive: PASS\n";
+
+        test_cancel_delayed_task();
+        std::cout << "  test_cancel_delayed_task: PASS\n";
+
+        test_cancel_repeating_task();
+        std::cout << "  test_cancel_repeating_task: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "task_scheduler_tests failed: " << exception.what() << std::endl;

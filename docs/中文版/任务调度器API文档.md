@@ -89,6 +89,7 @@ int main() {
 
     // 取消任务
     scheduler.cancel(id2);
+    scheduler.cancel(id3);
 
     scheduler.stop();
     std::cout << "Completed: " << scheduler.completedTasks() << " tasks\n";
@@ -96,9 +97,35 @@ int main() {
 }
 ```
 
+## 异常安全与取消语义
+
+| 场景 | 行为 |
+|---|---|
+| 任务抛异常 | 被工作线程捕获并打印到 stderr（`task <id> threw: <message>`），工作线程继续运行；该任务计入 `completedTasks` |
+| `cancel(id)` 在任务出队前调用 | 任务永不执行，不占 `completedTasks` |
+| `cancel(id)` 在任务出队后调用 | 不生效——任务正在执行或已完成，`activeTasks_` 标记在出队读取时已消费 |
+| 取消周期性任务 | 停止后续 tick；已排入下一轮的出队任务仍可能被跳过 |
+| 任务体必须避免 | 无限阻塞（如 `sleep_for` 不返回）会占用工作线程直至 `stop()` 超时等待 |
+
+## 使用示例（含断言）
+
+见 [`examples/task-scheduler-error-handling.cpp`](../../examples/task-scheduler-error-handling.cpp)：
+
+```cpp
+TaskScheduler scheduler(1);
+std::atomic<int> delayedRuns{0};
+auto delayedId = scheduler.scheduleAt([&]() { delayedRuns++; },
+                                       Clock::now() + std::chrono::milliseconds(300));
+scheduler.start();
+scheduler.cancel(delayedId);               // 取消尚未到点的延迟任务
+std::this_thread::sleep_for(std::chrono::milliseconds(600));
+scheduler.stop();
+assert(delayedRuns == 0);                  // 取消的任务必须未执行
+```
+
 ## 最佳实践
 
 1. **线程数选择**：工作线程数应匹配 CPU 核心数，IO 密集型可适当增加
 2. **任务粒度**：避免在调度器线程中执行长时间阻塞操作
-3. **异常处理**：任务内异常不应传播到调度器，建议 catch 后记录日志
+3. **异常处理**：任务内异常会被工作线程捕获并打印到 stderr（不会杀死 worker），但生产代码应在任务体内自行 catch 并记录结构化日志
 4. **Graceful Shutdown**：先 cancel 未执行任务，再调用 stop()
