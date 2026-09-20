@@ -9,6 +9,7 @@
 #include <atomic>
 #include <chrono>
 #include <stdexcept>
+#include <utility>
 
 namespace connection_pool {
 
@@ -44,12 +45,14 @@ public:
         if (!pool_.empty()) {
             T conn = std::move(pool_.front());
             pool_.pop();
+            ++activeConnections_;
             return conn;
         }
 
         if (activeConnections_ < maxSize_) {
-            activeConnections_++;
-            return creator_();
+            T conn = creator_();
+            ++activeConnections_;
+            return conn;
         }
 
         condition_.wait_for(lock, timeout_, [this]() {
@@ -66,6 +69,7 @@ public:
 
         T conn = std::move(pool_.front());
         pool_.pop();
+        ++activeConnections_;
         return conn;
     }
 

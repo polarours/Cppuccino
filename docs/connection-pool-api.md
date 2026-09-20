@@ -1,99 +1,78 @@
-# Connection Pool API 文档
+# Connection Pool API
 
-## 概述
+## 1. What it is
 
-`connection-pool` 是一个通用的连接池模板类，支持最小/最大连接数限制、超时获取和线程安全访问。
+`ConnectionPool<T>` reuses values produced by a factory and limits simultaneous loans.
 
-## 核心类型
+> Track borrowed connections separately from idle connections.
 
-### Creator / Deleter
+## 2. Pool versus per-operation creation
 
-```cpp
-using Creator = std::function<T()>;
-using Deleter = std::function<void(T*)>;
-```
-
-- `Creator`：工厂函数，用于创建新连接
-- `Deleter`：析构函数，用于销毁连接（当前实现中未使用，可通过自定义释放逻辑扩展）
-
-## ConnectionPool<T> 类 API
-
-### 构造
-
-| 方法 | 签名 | 说明 |
+| Approach | Benefit | Responsibility |
 |---|---|---|
-| 构造器 | `ConnectionPool(Creator creator, std::size_t minSize, std::size_t maxSize, std::chrono::milliseconds timeout = 5000ms)` | 创建池，预热 minSize 个连接 |
+| Create per operation | Simple ownership | Repeated setup cost |
+| Pool | Reuse and bounded capacity | Return each loan exactly once |
 
-### 连接管理
+## 3. Core concepts and API
 
-| 方法 | 签名 | 说明 |
-|---|---|---|
-| `acquire` | `T acquire()` | 从池中获取连接，超时抛出异常 |
-| `release` | `void release(T connection)` | 归还连接到池中 |
-| `close` | `void close()` | 关闭池，唤醒所有等待线程 |
+- `Creator = std::function<T()>` constructs a connection; `Deleter` is an unused alias, not an installed cleanup callback.
+- Constructor parameters are creator, initial size, maximum size and wait timeout (default 5000 ms). Supply `0 <= minSize <= maxSize`, `maxSize > 0`, a callable factory and a nonnegative timeout; the implementation does not validate these arguments.
+- `acquire()` returns an idle or newly created value, or waits for a return. Closed pools and exhausted waits throw `std::runtime_error`.
+- `release(T)` returns a loan; `size()` reports idle values and `activeConnections()` reports borrowed values while the pool is open.
+- `close()` rejects future acquisitions and wakes waiters. It does not join callers or destroy the idle queue immediately.
 
-### 状态查询
+## 4. Accounting problem and solution
 
-| 方法 | 签名 | 说明 |
-|---|---|---|
-| `size` | `std::size_t size() const` | 返回池中可用连接数 |
-| `activeConnections` | `std::size_t activeConnections() const` | 返回当前活跃连接数 |
+Incrementing only on creation but decrementing every return underflows the unsigned count and permits capacity overflow. Increment after every successful acquisition, including reuse and wake-up; increment only after the factory succeeds.
 
-### 线程安全
+While open, with valid arguments and correctly paired loans, `idle + borrowed <= maxSize`. Creation happens only when idle is zero, so comparing borrowed against the maximum is sufficient.
 
-- `acquire` / `release` 通过 `std::mutex` 保护共享状态
-- `condition_variable` 用于等待空闲连接
-- `activeConnections_` 和 `closed_` 是 `std::atomic`，无锁读取
-
-## 使用示例
+## 5. Runnable example
 
 ```cpp
 #include "connection_pool.hpp"
-#include <iostream>
-#include <thread>
-
-struct DBConnection {
-    int id;
-    bool connected = true;
-};
+#include <cassert>
+#include <chrono>
+#include <string>
 
 int main() {
-    connection_pool::ConnectionPool<DBConnection> pool(
-        [](){ return DBConnection{.id = ++counter}; },
-        2,   // 最小连接数
-        5,   // 最大连接数
-        std::chrono::milliseconds(1000)
-    );
-
-    std::cout << "Pool size: " << pool.size() << "\n";
-
-    // 并发获取连接
-    std::vector<std::thread> threads;
-    for (int i = 0; i < 10; ++i) {
-        threads.emplace_back([&]() {
-            auto conn = pool.acquire();
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            pool.release(std::move(conn));
-        });
+    int counter = 0;
+    connection_pool::ConnectionPool<int> pool(
+        [&]() { return ++counter; }, 1, 1, std::chrono::milliseconds(10));
+    auto conn = pool.acquire();
+    assert(pool.activeConnections() == 1);
+    bool timedOut = false;
+    try {
+        pool.acquire();
+    } catch (const std::runtime_error& error) {
+        timedOut = std::string(error.what()) == "Connection pool timeout";
     }
-    for (auto& t : threads) t.join();
-
+    assert(timedOut);
+    pool.release(conn);
+    assert(pool.activeConnections() == 0);
+    assert(pool.size() == 1);
     pool.close();
-    return 0;
 }
 ```
 
-## 异常安全
+From the repository root, after saving the block as `/tmp/pool-api.cpp`:
 
-| 场景 | 行为 |
-|---|---|
-| 池已关闭 | `acquire()` 抛出 `std::runtime_error("Pool is closed")` |
-| 超时未获取 | `acquire()` 抛出 `std::runtime_error("Connection pool timeout")` |
-| `close()` 调用 | 唤醒所有等待线程，后续 `acquire()` 失败 |
+```bash
+g++ -std=c++17 -pthread -Wall -Wextra -Werror -Icpp-mastery-roadmap/06-stage6/connection-pool/include /tmp/pool-api.cpp -o /tmp/pool-api
+/tmp/pool-api
+```
 
-## 最佳实践
+## 6. Concurrency, exceptions and limitations
 
-1. **最小连接数**：设置为预期并发量的 10-20%，避免频繁创建
-2. **超时设置**：根据业务容忍度设置，一般 1-5 秒
-3. **资源释放**：确保 `release()` 在 finally 块中调用，防止连接泄漏
-4. **优雅关闭**：先设置 `closed_`，再 `notify_all()`，最后等待线程退出
+- Queue access, factory calls and close transitions use the same mutex. A factory must not re-enter the pool; a slow factory blocks other operations. The wait timeout does not bound mutex acquisition or factory execution.
+- A factory exception propagates without consuming capacity. Throwing moves of `T` do not have a strong exception-safety guarantee; prefer nonthrowing-movable RAII values.
+- Return each acquired value exactly once. Foreign values and duplicate returns are not detected. Raw pointers are not automatically deleted; use RAII ownership.
+- `release()` after close discards its argument without updating the borrowed counter, so that counter is not a live-loan metric after close. Idle values are destroyed with the pool.
+- `close()` wakes waiters but cannot make destruction concurrent with callers safe. Join all callers before destroying the pool. C++ has no `finally` block: use a scope guard or explicit exception-safe return.
+- Individual queries are synchronized, but separate calls to `size()` and `activeConnections()` are not an atomic snapshot. No fairness guarantee is provided.
+
+## 7. Summary
+
+Correct accounting makes the capacity limit meaningful; mutexes alone do not establish correct resource ownership.
+
+[Project source](../cpp-mastery-roadmap/06-stage6/connection-pool/) · [Concurrent example](../examples/connection-pool-concurrency.cpp)

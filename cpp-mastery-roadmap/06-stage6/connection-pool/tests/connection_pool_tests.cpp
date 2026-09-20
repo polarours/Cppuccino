@@ -22,6 +22,51 @@ struct MockConnection {
     explicit MockConnection(int i) : id(i) {}
 };
 
+void test_accounting_and_capacity() {
+    int created = 0;
+    connection_pool::ConnectionPool<int> pool(
+        [&]() { return ++created; }, 1, 2, std::chrono::milliseconds(20));
+    expect(pool.activeConnections() == 0, "initial active count must be zero");
+    auto first = pool.acquire();
+    expect(pool.activeConnections() == 1, "reused connection must increment active count");
+    auto second = pool.acquire();
+    expect(pool.activeConnections() == 2, "both connections must be active");
+    bool timedOut = false;
+    try {
+        pool.acquire();
+    } catch (const std::runtime_error& error) {
+        timedOut = std::string(error.what()) == "Connection pool timeout";
+    }
+    expect(timedOut, "acquire at capacity must time out");
+    expect(created == 2, "prewarmed connections count toward maximum");
+    pool.release(first);
+    pool.release(second);
+    expect(pool.activeConnections() == 0, "release must not underflow active count");
+    expect(pool.size() == 2, "idle pool must respect maximum");
+    auto reused = pool.acquire();
+    expect(pool.activeConnections() == 1, "second reuse must increment count");
+    pool.release(reused);
+}
+
+void test_creator_failure_preserves_capacity() {
+    int attempts = 0;
+    connection_pool::ConnectionPool<int> pool([&]() {
+        if (++attempts == 1) throw std::runtime_error("creator failed");
+        return attempts;
+    }, 0, 1, std::chrono::milliseconds(20));
+    bool threw = false;
+    try {
+        pool.acquire();
+    } catch (const std::runtime_error& error) {
+        threw = std::string(error.what()) == "creator failed";
+    }
+    expect(threw, "creator exception must propagate");
+    expect(pool.activeConnections() == 0, "failed creation must not consume capacity");
+    auto conn = pool.acquire();
+    expect(conn == 2, "creation must be retryable");
+    pool.release(conn);
+}
+
 void test_basic_acquire_release() {
     int nextId = 0;
     connection_pool::ConnectionPool<MockConnection> pool(
@@ -147,6 +192,10 @@ void test_pool_release_after_close() {
 int main() {
     try {
         std::cout << "Connection Pool Tests:\n";
+        test_accounting_and_capacity();
+        std::cout << "  test_accounting_and_capacity: PASS\n";
+        test_creator_failure_preserves_capacity();
+        std::cout << "  test_creator_failure_preserves_capacity: PASS\n";
         test_basic_acquire_release();
         std::cout << "  test_basic_acquire_release: PASS\n";
 

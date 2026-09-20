@@ -1,99 +1,78 @@
-# Connection Pool API 文档
+# 连接池 API
 
-## 概述
+## 1. 是什么
 
-`connection-pool` 是一个通用的连接池模板类，支持最小/最大连接数限制、超时获取和线程安全访问。
+`ConnectionPool<T>` 复用工厂创建的值，并限制同时借出的连接数量。
 
-## 核心类型
+> 分开理解空闲连接与已借出连接的计数。
 
-### Creator / Deleter
+## 2. 与逐次创建的对比
 
-```cpp
-using Creator = std::function<T()>;
-using Deleter = std::function<void(T*)>;
-```
-
-- `Creator`：工厂函数，用于创建新连接
-- `Deleter`：析构函数，用于销毁连接（当前实现中未使用，可通过自定义释放逻辑扩展）
-
-## ConnectionPool<T> 类 API
-
-### 构造
-
-| 方法 | 签名 | 说明 |
+| 方式 | 优点 | 调用方责任 |
 |---|---|---|
-| 构造器 | `ConnectionPool(Creator creator, std::size_t minSize, std::size_t maxSize, std::chrono::milliseconds timeout = 5000ms)` | 创建池，预热 minSize 个连接 |
+| 每次创建 | 所有权简单 | 承担重复初始化成本 |
+| 连接池 | 复用并限制容量 | 每次借出恰好归还一次 |
 
-### 连接管理
+## 3. 核心概念与 API
 
-| 方法 | 签名 | 说明 |
-|---|---|---|
-| `acquire` | `T acquire()` | 从池中获取连接，超时抛出异常 |
-| `release` | `void release(T connection)` | 归还连接到池中 |
-| `close` | `void close()` | 关闭池，唤醒所有等待线程 |
+- `Creator = std::function<T()>` 创建连接；`Deleter` 只是未使用的类型别名，并没有注册清理回调。
+- 构造参数为工厂、初始数量、最大数量、等待超时（默认 5000 ms）。调用方必须保证 `0 <= minSize <= maxSize`、`maxSize > 0`、工厂可调用且超时非负；当前实现不验证这些参数。
+- `acquire()` 返回空闲或新建连接，否则等待归还。池已关闭或等待超时会抛出 `std::runtime_error`。
+- `release(T)` 归还连接；`size()` 返回空闲数量；池开启期间 `activeConnections()` 返回已借出数量。
+- `close()` 拒绝后续获取并唤醒等待者，不负责 join 调用线程，也不立即销毁空闲队列。
 
-### 状态查询
+## 4. 计数问题与解决方案
 
-| 方法 | 签名 | 说明 |
-|---|---|---|
-| `size` | `std::size_t size() const` | 返回池中可用连接数 |
-| `activeConnections` | `std::size_t activeConnections() const` | 返回当前活跃连接数 |
+仅在创建时递增、每次归还却递减，会造成无符号计数下溢和容量超限。每条成功获取路径（包括复用、等待唤醒）都要递增；工厂成功后才能计入借出数量。
 
-### 线程安全
+池开启、参数合法且借还配对时，保持 `空闲 + 借出 <= maxSize`。只有空闲为零才创建，因此此时比较借出数量与最大容量即可。
 
-- `acquire` / `release` 通过 `std::mutex` 保护共享状态
-- `condition_variable` 用于等待空闲连接
-- `activeConnections_` 和 `closed_` 是 `std::atomic`，无锁读取
-
-## 使用示例
+## 5. 可运行示例
 
 ```cpp
 #include "connection_pool.hpp"
-#include <iostream>
-#include <thread>
-
-struct DBConnection {
-    int id;
-    bool connected = true;
-};
+#include <cassert>
+#include <chrono>
+#include <string>
 
 int main() {
-    connection_pool::ConnectionPool<DBConnection> pool(
-        [](){ return DBConnection{.id = ++counter}; },
-        2,   // 最小连接数
-        5,   // 最大连接数
-        std::chrono::milliseconds(1000)
-    );
-
-    std::cout << "Pool size: " << pool.size() << "\n";
-
-    // 并发获取连接
-    std::vector<std::thread> threads;
-    for (int i = 0; i < 10; ++i) {
-        threads.emplace_back([&]() {
-            auto conn = pool.acquire();
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            pool.release(std::move(conn));
-        });
+    int counter = 0;
+    connection_pool::ConnectionPool<int> pool(
+        [&]() { return ++counter; }, 1, 1, std::chrono::milliseconds(10));
+    auto conn = pool.acquire();
+    assert(pool.activeConnections() == 1);
+    bool timedOut = false;
+    try {
+        pool.acquire();
+    } catch (const std::runtime_error& error) {
+        timedOut = std::string(error.what()) == "Connection pool timeout";
     }
-    for (auto& t : threads) t.join();
-
+    assert(timedOut);
+    pool.release(conn);
+    assert(pool.activeConnections() == 0);
+    assert(pool.size() == 1);
     pool.close();
-    return 0;
 }
 ```
 
-## 异常安全
+把代码块保存为 `/tmp/pool-api.cpp`，从仓库根目录执行：
 
-| 场景 | 行为 |
-|---|---|
-| 池已关闭 | `acquire()` 抛出 `std::runtime_error("Pool is closed")` |
-| 超时未获取 | `acquire()` 抛出 `std::runtime_error("Connection pool timeout")` |
-| `close()` 调用 | 唤醒所有等待线程，后续 `acquire()` 失败 |
+```bash
+g++ -std=c++17 -pthread -Wall -Wextra -Werror -Icpp-mastery-roadmap/06-stage6/connection-pool/include /tmp/pool-api.cpp -o /tmp/pool-api
+/tmp/pool-api
+```
 
-## 最佳实践
+## 6. 并发、异常与限制
 
-1. **最小连接数**：设置为预期并发量的 10-20%，避免频繁创建
-2. **超时设置**：根据业务容忍度设置，一般 1-5 秒
-3. **资源释放**：确保 `release()` 在 finally 块中调用，防止连接泄漏
-4. **优雅关闭**：先设置 `closed_`，再 `notify_all()`，最后等待线程退出
+- 队列访问、工厂调用、关闭操作共用一把互斥锁。工厂不能重入该池；慢工厂会阻塞其他操作。等待超时不覆盖获取互斥锁及执行工厂的时间。
+- 工厂异常原样传播且不消耗容量。`T` 的移动若抛异常，不提供强异常安全保证；优先使用可无异常移动的 RAII 类型。
+- 每次借出必须恰好归还一次；不检测外来连接与重复归还。裸指针不会自动 delete，应使用 RAII 管理资源。
+- 关闭后 `release()` 丢弃传入值但不更新借出计数，因此关闭后的计数不能视为实时借出量。空闲值在池析构时销毁。
+- `close()` 唤醒等待者不等于支持并发析构。必须先 join 所有调用线程再销毁池。C++ 没有 `finally`，应使用作用域守卫或显式异常安全归还。
+- 单次查询是同步的，但分别读取 `size()` 和 `activeConnections()` 不是原子快照。不保证等待公平性。
+
+## 7. 总结
+
+正确计数才能保证容量约束；有互斥锁不代表资源所有权管理正确。
+
+[项目源码](../../cpp-mastery-roadmap/06-stage6/connection-pool/) · [并发示例](../../examples/connection-pool-concurrency.cpp)

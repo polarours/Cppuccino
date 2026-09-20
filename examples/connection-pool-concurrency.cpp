@@ -4,6 +4,8 @@
 
 #include "../cpp-mastery-roadmap/06-stage6/connection-pool/include/connection_pool.hpp"
 
+#include <atomic>
+#include <cassert>
 #include <chrono>
 #include <iostream>
 #include <thread>
@@ -57,6 +59,10 @@ int main() {
 
     for (auto& t : threads) t.join();
 
+    assert(acquired == 10);
+    assert(pool.size() <= 5);
+    assert(pool.activeConnections() == 0);
+
     std::cout << "\nAcquired connections: " << acquired << "\n";
     std::cout << "Pool size after: " << pool.size() << "\n";
     std::cout << "Active after: " << pool.activeConnections() << "\n";
@@ -71,7 +77,8 @@ int main() {
     auto start = std::chrono::steady_clock::now();
     bool timedOut = false;
     try {
-        auto conn = pool.acquire(); // should timeout
+        auto conn = pool.acquire(); // Unexpected success must fail verification.
+        pool.release(conn);
     } catch (const std::runtime_error& e) {
         timedOut = true;
         std::cout << "Timeout caught: " << e.what() << "\n";
@@ -79,6 +86,9 @@ int main() {
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now() - start).count();
     std::cout << "Elapsed: " << elapsed << " ms (expected ~1000 ms)\n";
+
+    assert(timedOut);
+    assert(elapsed >= 1000);
 
     // Release and close
     for (auto& conn : held) {
