@@ -1,102 +1,61 @@
-# Student Management System v2
+# Student Management System v3
 
-An improved version of the student management system, demonstrating common code quality improvements.
+An improved version of the student management system, demonstrating the **borrowing ownership model** via `std::string_view` parameters.
 
-## Improvements Over v1
+## Improvements Over v2
 
-### 1. Consistent I/O
+### 1. `std::string_view` Borrowing Parameters
 
-v1 mixed `std::scanf` and `std::cin`, which is error-prone. v2 uses only C++ I/O streams.
-
-### 2. Input Validation
-
-v2 validates user input and handles invalid data gracefully:
+v2 passed string parameters by value, then moved them into the object. v3 borrows the input with `std::string_view` and makes its own copy internally:
 
 ```cpp
-int readInt(const std::string& prompt) {
-    int value;
-    while (true) {
-        std::cout << prompt;
-        if (std::cin >> value) {
-            clearInput();
-            return value;
-        }
-        std::cout << "Invalid input. Please enter a number.\n";
-        clearInput();
-    }
-}
+// v2: pass by value, then move
+Student(int id, std::string name, int age, std::string major,
+        double grade, std::string email, int phoneNumber);
+
+// v3: borrow at the boundary, own internally
+Student(int id, std::string_view name, int age, std::string_view major,
+        double grade, std::string_view email, int phoneNumber);
 ```
 
-### 3. Separation of UI and Domain Logic
+Why this matters:
 
-v1 mixed UI code with business logic. v2 separates concerns:
+- **Caller side**: no temporary `std::string` construction on hot call paths — the signature makes the borrow explicit.
+- **Owner side**: `Student` still owns its own `std::string` members. The object never holds a view, so there is no dangling risk.
+- **API boundary**: the class documents its ownership model at the signature level — borrow at the boundary, own internally.
 
-- `Student` - data class
-- `StudentManager` - business logic
-- `main.cpp` - UI only
-
-### 4. Proper Error Handling
-
-v1 had no error handling. v2 returns `bool` or `std::optional` to indicate success/failure:
+### 2. Setters Borrow Too
 
 ```cpp
-bool addStudent(Student student);
-std::optional<Student> findStudent(int id) const;
+void setName(std::string_view name) { name_ = name; }  // copy from view
 ```
 
-### 5. Modern C++ Idioms
+The member stays a `std::string` (owning); the setter avoids taking a by-value `std::string` just to move it.
 
-- Use `const` references for getters
-- Use `std::move` for efficient string passing
-- Use `std::optional` instead of raw pointers
-- Use `friend` for stream operators
+### 3. Everything From v2 Is Kept
 
-### 6. File Format
-
-v1 used a simple text format without structure. v2 includes a count header:
-
-```
-2
-1
-Alice
-20
-CS
-3.8
-alice@example.com
-1234567
-2
-Bob
-21
-Math
-3.9
-bob@example.com
-7654321
-```
+Input validation, separated UI, `bool`/`std::optional` error handling, and the count-header file format from v2 are all unchanged.
 
 ## Build
 
 ```bash
-cmake -S . -B build
+cmake -S . -B build -DBUILD_TESTING=ON
 cmake --build build
 ```
 
 ## Run
 
 ```bash
-./build/student_management_v2
+./build/student_management_v3
 ```
 
 ## Test
 
 ```bash
-cmake -S . -B build -DBUILD_TESTING=ON
-cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-## Suggested Next Steps
+## See Also
 
-- Add unit tests for edge cases (negative IDs, empty names, etc.)
-- Add support for updating individual fields
-- Add search by name or major
-- Add data validation (age range, grade range, email format)
+- [v1](../v1/): baseline with the problems
+- [v2](../v2/): validation, error handling, UI separation

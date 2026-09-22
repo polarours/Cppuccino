@@ -1,17 +1,17 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(student_management_v2 LANGUAGES CXX)
+project(student_management_v3 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(student_management_v2
+add_executable(student_management_v3
     main.cpp
     student.cpp
     student_manager.cpp
 )
 
-target_include_directories(student_management_v2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(student_management_v3 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 enable_testing()
 
