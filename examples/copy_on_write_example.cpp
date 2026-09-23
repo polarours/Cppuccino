@@ -116,6 +116,7 @@ private:
         std::vector<T> items;
         Data() = default;
         Data(std::initializer_list<T> init) : items(init) {}
+        Data(const std::vector<T>& items) : items(items) {}  // For COW detach copy
     };
     
     std::shared_ptr<Data> data_;

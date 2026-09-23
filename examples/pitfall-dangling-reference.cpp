@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <optional>
 
 // --- 1. Dangling Reference to Local Variable ---
 

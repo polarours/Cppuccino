@@ -8,13 +8,6 @@
 #include <vector>
 #include <memory>
 
-// Perfect forwarding wrapper
-template<typename T>
-void wrapper(T&& arg) {
-    // std::forward preserves value category
-    process(std::forward<T>(arg));
-}
-
 // Overloaded functions to demonstrate forwarding
 void process(int& x) {
     std::cout << "process(int&): " << x << '\n';
@@ -28,6 +21,13 @@ void process(const int& x) {
 void process(int&& x) {
     std::cout << "process(int&&): " << x << '\n';
     x += 100;
+}
+
+// Perfect forwarding wrapper
+template<typename T>
+void wrapper(T&& arg) {
+    // std::forward preserves value category
+    process(std::forward<T>(arg));
 }
 
 // Factory function using perfect forwarding

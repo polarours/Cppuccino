@@ -5,6 +5,7 @@
 #include <expected>
 #include <flat_map>
 #include <mdspan>
+#include <vector>
 
 int main() {
     std::print("=== C++23 Features Demo ===\n\n");
@@ -27,9 +28,10 @@ int main() {
     std::print("\n3. std::mdspan:\n");
     std::vector<int> data = {1, 2, 3, 4, 5, 6};
     std::mdspan<int, std::extents<std::size_t, 2, 3>> matrix(data.data(), 2, 3);
-    for (int i = 0; i < 2; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            std::print("{} ", matrix.at(i, j));
+    for (std::size_t i = 0; i < 2; ++i) {
+        for (std::size_t j = 0; j < 3; ++j) {
+            // Pack-index subscript (P2259); operator()/at() not in this libstdc++
+            std::print("{} ", matrix[i, j]);
         }
         std::print("\n");
     }

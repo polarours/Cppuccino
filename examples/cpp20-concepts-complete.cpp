@@ -4,6 +4,7 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
+#include <type_traits>
 
 // C++20 Concepts 完整示例
 // 展示 concepts 的多种用法和组合
@@ -36,8 +37,8 @@ concept Container = requires(T a) {
     { a.end() } -> std::input_iterator;
 };
 
-template<Printable T, Addable T>
-concept PrintableAndAddable = true;
+template<typename T>
+concept PrintableAndAddable = Printable<T> && Addable<T>;
 
 // 使用概念的函数
 template<Printable T>
@@ -64,9 +65,9 @@ public:
     }
     
     template<Container C>
-    auto sum(const C& container) -> decltype(*container.begin()) {
-        return std::accumulate(container.begin(), container.end(), 
-                               decltype(*container.begin()){});
+    auto sum(const C& container) -> std::remove_reference_t<decltype(*container.begin())> {
+        using value_type = std::remove_reference_t<decltype(*container.begin())>;
+        return std::accumulate(container.begin(), container.end(), value_type{});
     }
 };
 

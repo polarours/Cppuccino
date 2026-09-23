@@ -157,9 +157,14 @@ void copyRename() {
 void fileSizeTime() {
     std::cout << "\n--- File Size and Time ---\n";
 
-    fs::path p = ".";
+    // fs::file_size throws on directories; measure a regular file instead
+    const fs::path p = fs::temp_directory_path() / "cppfs_size_demo.txt";
+    {
+        std::ofstream out(p);
+        out << "0123456789";
+    }
 
-    if (fs::exists(p)) {
+    if (fs::is_regular_file(p)) {
         auto size = fs::file_size(p);
         std::cout << "Size: " << size << " bytes\n";
 
@@ -169,6 +174,7 @@ void fileSizeTime() {
         );
         auto time = std::chrono::system_clock::to_time_t(sctp);
         std::cout << "Last write: " << std::ctime(&time);
+        fs::remove(p);
     }
 }
 

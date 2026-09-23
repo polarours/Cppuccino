@@ -6,6 +6,7 @@
 #include <exception>
 #include <optional>
 #include <string>
+#include <utility>
 
 // 简单协程：生成器
 template<typename T>
@@ -24,7 +25,13 @@ public:
         void return_value(T value) {
             current_value = value;
         }
-        
+
+        // Required for co_yield
+        std::suspend_always yield_value(T value) {
+            current_value = value;
+            return {};
+        }
+
         void unhandled_exception() {
             std::terminate();
         }
@@ -57,15 +64,21 @@ public:
     // 迭代器接口
     struct Iterator {
         handle_type handle;
-        
+
         T& operator*() { return handle.promise().current_value; }
-        T* operator->() { return &operator*(); }
-        
-        bool operator==(const Iterator& other) const { return handle == other.handle; }
-        bool operator!=(const Iterator& other) const { return handle != other.handle; }
-        
+        T* operator->() { return &handle.promise().current_value; }
+
+        // 哨兵语义：end() 迭代器的 handle 为空。
+        bool operator==(const Iterator& other) const {
+            if (!other.handle) return handle ? handle.done() : true;
+            if (!handle) return other.handle.done();
+            return handle == other.handle;
+        }
+        bool operator!=(const Iterator& other) const { return !(*this == other); }
+
         Iterator& operator++() {
-            handle.resume();
+            // 防止在 final suspend 之后 resume（那是 UB）
+            if (handle && !handle.done()) handle.resume();
             return *this;
         }
     };
@@ -93,16 +106,20 @@ class Task {
 public:
     struct promise_type {
         std::exception_ptr exc_;
-        
+        int result_ = 0;
+
         Task get_return_object() {
             return Task{std::coroutine_handle<promise_type>::from_promise(*this)};
         }
-        
-        std::suspend_never initial_suspend() { return {}; }
-        std::suspend_never final_suspend() noexcept { return {}; }
-        
-        void return_value(int value) {}
-        
+
+        // 两点都挂起（惰性 Task）：帧一直存活，析构时由 destroy() 统一释放。
+        // 若 final_suspend 用 suspend_never，帧会在 co_return 处被运行时自动
+        // 回收，再调 destroy() 就是 double-destroy → SIGSEGV。
+        std::suspend_always initial_suspend() { return {}; }
+        std::suspend_always final_suspend() noexcept { return {}; }
+
+        void return_value(int value) { result_ = value; }
+
         void unhandled_exception() {
             exc_ = std::current_exception();
         }
@@ -120,10 +137,12 @@ public:
         if (handle_.promise().exc_) {
             std::rethrow_exception(handle_.promise().exc_);
         }
-        return 0;
+        return handle_.promise().result_;
     }
-    
+
     bool is_done() const { return handle_.done(); }
+
+    void resume() { handle_.resume(); }
 
 private:
     handle_type handle_;
@@ -149,6 +168,7 @@ void demonstrateGenerator() {
 void demonstrateTask() {
     std::cout << "=== Task Demo ===\n";
     auto task = async_compute();
+    task.resume();  // Lazy task: run it to the (final) suspension point
     std::cout << "Result: " << task.get_result() << "\n\n";
 }
 
@@ -179,6 +199,7 @@ public:
         std::suspend_always initial_suspend() { return {}; }
         std::suspend_always final_suspend() noexcept { return {}; }
         void return_value(int) {}
+        std::suspend_always yield_value(int) { return {}; }
         void unhandled_exception() { std::terminate(); }
         
         Chain get_return_object() {

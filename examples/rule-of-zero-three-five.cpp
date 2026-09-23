@@ -132,7 +132,7 @@ private:
 
 class Application {
 public:
-    Application(const std::string& appName) : name_(appName) {
+    Application(const std::string& appName) : name_(appName), logger_(appName) {
         std::cout << "[App] Created: " << name_ << '\n';
     }
     
