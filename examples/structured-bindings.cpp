@@ -214,11 +214,12 @@ void nestedBindings() {
 void ignoreValues() {
     std::cout << "\n--- Ignore Values ---\n";
 
-    auto [id, _] = std::make_pair(42, "ignored");
+    auto [id, ignored1] = std::make_pair(42, "ignored");
     std::cout << "ID: " << id << "\n";
 
-    auto [_, name, _2] = std::make_tuple(1, "Alice", 3.14);
+    auto [num, name, pi] = std::make_tuple(1, "Alice", 3.14);
     std::cout << "Name: " << name << "\n";
+    (void)ignored1; (void)num; (void)pi;
 }
 
 int main() {
