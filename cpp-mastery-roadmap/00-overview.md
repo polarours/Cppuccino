@@ -183,6 +183,13 @@ Practice:
   fixed-block memory allocator with STL interface
 - [json-parser](03-advanced/json-parser/README.md):
   recursive descent parser with type-safe value tree
+- [skip-list](03-advanced/skip-list/README.md):
+  probabilistic ordered set with randomized levels
+- [csv-parser](03-advanced/csv-parser/README.md):
+  RFC-4180 quoting rules with roundtrip formatting
+- [base64-codec](03-advanced/base64-codec/README.md):
+  RFC 4648 encode/decode with strict padding validation
+
 
 ## Stage 4: Build Larger Things
 
@@ -201,6 +208,12 @@ Projects:
   design-stage storage exercise focused on state ownership and persistence boundaries
 - [tinyshell](../tinyshell/README.md):
   side project for command parsing and process/system behavior
+- [trie](02-intermediate/trie/README.md):
+  prefix tree with word/prefix counts and lexicographic enumeration
+- [union-find](02-intermediate/union-find/README.md):
+  DSU with iterative path compression and union by rank
+- [binary-heap](02-intermediate/binary-heap/README.md):
+  array-backed heap with comparator ordering and bottom-up heapify
 
 ### Stage 4 Projects (04-stage4)
 
@@ -210,6 +223,9 @@ Projects:
   multi-user chat server with rooms and commands
 - [web-server](04-stage4/web-server/README.md):
   HTTP server with routing and middleware support
+- [mini-redis](04-stage4/mini-redis/README.md):
+  in-memory KV store with RESP-style replies and lazy TTL expiry
+
 
 ### C++20 Examples
 
@@ -250,6 +266,9 @@ The goal is to make those gaps visible and then close them deliberately.
   priority-based task scheduling with delayed and repeating tasks
 - [web-framework](05-stage5/web-framework/README.md):
   simple HTTP web framework with routing and middleware
+- [timer-wheel](05-stage5/timer-wheel/README.md):
+  O(1) tick-based scheduling with absolute fire times
+
 
 ### Stage 6 Projects (06-stage6)
 
@@ -257,6 +276,9 @@ The goal is to make those gaps visible and then close them deliberately.
   generic connection pool for managing reusable resources
 - [ring-buffer](06-stage6/ring-buffer/README.md):
   thread-safe circular buffer for producer-consumer patterns
+- [blocking-queue](06-stage6/blocking-queue/README.md):
+  bounded MPMC queue with dual condition variables and close semantics
+
 
 ### Stage 7 Projects (07-stage7)
 
@@ -264,6 +286,11 @@ The goal is to make those gaps visible and then close them deliberately.
   generic thread-safe cache with TTL support
 - [lru-cache](07-stage7/lru-cache/README.md):
   LRU cache with O(1) operations and eviction
+- [lfu-cache](07-stage7/lfu-cache/README.md):
+  least-frequently-used eviction with LRU tie-breaking
+- [bloom-filter](07-stage7/bloom-filter/README.md):
+  probabilistic membership with double hashing over packed bits
+
 
 ### Stage 8 Projects (08-stage8)
 
@@ -273,6 +300,9 @@ The goal is to make those gaps visible and then close them deliberately.
   topic-based publish-subscribe messaging system
 - [state-machine](08-stage8/state-machine/README.md):
   generic state machine for modeling state transitions
+- [rate-limiter](08-stage8/rate-limiter/README.md):
+  token bucket, fixed window and sliding window algorithms
+
 
 ### Stage 9 Projects (09-stage9)
 
@@ -498,6 +528,9 @@ The goal is to make those gaps visible and then close them deliberately.
   wait-free queue using atomic operations
 - [thread-pool-advanced](33-stage33/thread-pool-advanced/README.md):
   task-based thread pool with futures
+- [actor-mailbox](33-stage33/actor-mailbox/README.md):
+  bounded mailbox with single-consumer actor loop
+
 
 ### Stage 34 Projects (34-stage34) — C++ Specific Patterns
 
@@ -507,6 +540,9 @@ The goal is to make those gaps visible and then close them deliberately.
   Substitution Failure Is Not An Anomaly
 - [varargs-pattern](34-stage34/varargs-pattern/README.md):
   variadic templates for type-safe variadic functions
+- [type-erasure](34-stage34/type-erasure/README.md):
+  hand-rolled std::function-style wrapper with Concept/Holder split
+
 
 ### Stage 35 Projects (35-stage35) — Memory Patterns
 
@@ -516,6 +552,9 @@ The goal is to make those gaps visible and then close them deliberately.
   bump allocator for fast sequential allocation
 - [slab-allocator](35-stage35/slab-allocator/README.md):
   size-classified memory cache
+- [allocation-tracker](35-stage35/allocation-tracker/README.md):
+  process-wide alloc counters and a counting STL allocator
+
 
 ### Stage 36 Projects (36-stage36) — Modern C++ Patterns
 
@@ -534,6 +573,9 @@ The goal is to make those gaps visible and then close them deliberately.
   enum-based error reporting with messages
 - [expected-pattern](37-stage37/expected-pattern/README.md):
   value-or-error with monadic operations
+- [error-category](37-stage37/error-category/README.md):
+  custom std::error_code category mapped to standard conditions
+
 
 ### Stage 38 Projects (38-stage38) — Testing Patterns
 
@@ -543,6 +585,18 @@ The goal is to make those gaps visible and then close them deliberately.
   reusable test setup and teardown
 - [parameterized-tests](38-stage38/parameterized-tests/README.md):
   data-driven test execution
+- [golden-file-testing](38-stage38/golden-file-testing/README.md):
+  snapshot assertions with line diffs and UPDATE_GOLDEN flow
+
+
+### Stage 39 Projects (39-stage39) — Content Enhancement
+
+- [markdown-parser](39-stage39/markdown-parser/README.md):
+  block-level markdown to structured blocks with inline link extraction
+- [link-checker](39-stage39/link-checker/README.md):
+  relative link validation with lexical path normalization
+- [text-diff](39-stage39/text-diff/README.md):
+  LCS line diff with unified-style rendering and similarity score
 
 ### Stage 40 Projects (40-stage40) — C++23 Features
 
@@ -552,6 +606,9 @@ The goal is to make those gaps visible and then close them deliberately.
   C++23 explicit object parameter for fluent APIs
 - [zip-range](40-stage40/zip-range/README.md):
   parallel iteration over multiple containers
+- [generator-pipeline](40-stage40/generator-pipeline/README.md):
+  lazy std::generator pipelines with early-exit propagation
+
 
 ### Stage 41 — Capstone Project
 
@@ -559,6 +616,11 @@ The goal is to make those gaps visible and then close them deliberately.
   Complete HTTP framework combining 10 design patterns:
   Middleware Pipeline, Strategy, Observer, Command, Factory,
   Builder, Type Erasure, Facade, Singleton, Decorator
+- [http-router](41-stage41/http-router/README.md):
+  method+path routing with :param extraction
+- [template-engine](41-stage41/template-engine/README.md):
+  mustache-like sections with context chaining
+
 
 ### Stage 42 Projects (42-stage42) — Performance Patterns
 
