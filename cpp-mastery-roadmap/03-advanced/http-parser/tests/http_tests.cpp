@@ -81,8 +81,17 @@ void test_response_with_headers() {
 
     std::string serialized = resp.serialize();
     expect(serialized.find("201 Created") != std::string::npos, "expected 201");
-    expect(serialized.find("X-Custom: value") != std::string::npos, "expected header");
-    expect(serialized.find("Content-Length: 7") != std::string::npos, "expected content length");
+    // Project convention: header names are stored lowercased (as in
+    // Request::parse / getHeader) because HTTP field names are
+    // case-insensitive; setBody writes "content-length" too, and
+    // normalizing avoids duplicate keys like Content-Length + content-length.
+    expect(serialized.find("x-custom: value") != std::string::npos,
+           "expected normalized custom header");
+    expect(serialized.find("content-length: 7") != std::string::npos,
+           "expected content length (lowercase)");
+    // no duplicate differently-cased copies
+    expect(serialized.find("Content-Length") == std::string::npos,
+           "no mixed-case duplicate");
 }
 
 void test_method_names() {
