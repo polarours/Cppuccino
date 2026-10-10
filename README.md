@@ -16,8 +16,8 @@ public learning resource.
 
 | Category | Count |
 |----------|-------|
-| Documentation | 126 articles (59 en + 67 zh) |
-| Pitfalls | 71 articles (34 en + 37 zh) |
+| Documentation | 134 articles (67 en + 67 zh) |
+| Pitfalls | 74 articles (37 en + 37 zh) |
 | Examples | 120 runnable examples |
 | Projects | 150 projects across 43 stages |
 | Tests | 848 (all passing) |
@@ -48,6 +48,7 @@ If this is your first visit, use this order:
 
 - **Object model and deeper semantics:**
   [Virtual Dispatch and Object Model](docs/en/virtual-dispatch-and-object-model.md),
+  [Understanding the C++ Object Model](docs/en/understanding-the-cpp-object-model.md),
   [Undefined Behavior](docs/en/undefined-behavior.md),
   [C++ Memory Model and Atomics Basics](docs/en/cpp-memory-model-and-atomics-basics.md),
   [virtual-dispatch-and-slicing.cpp](examples/virtual-dispatch-and-slicing.cpp)
@@ -58,18 +59,18 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
 
 | Stages | Theme | Projects |
 |--------|-------|----------|
-| 1–7 | C++ Foundations to Advanced | 7 |
-| 8–27 | Design Patterns (GoF 23 + Specification) | 60 |
+| 1–7 | C++ Foundations to Advanced | 35 |
+| 8–27 | Design Patterns (GoF 23 + Specification) | 61 |
 | 28–31 | Architecture Patterns | 12 |
-| 32–33 | Concurrency Patterns | 6 |
-| 34 | C++ Specific Patterns (CRTP, SFINAE, Variadic) | 3 |
-| 35 | Memory Patterns | 3 |
+| 32–33 | Concurrency Patterns | 7 |
+| 34 | C++ Specific Patterns (CRTP, SFINAE, Variadic) | 4 |
+| 35 | Memory Patterns | 4 |
 | 36 | Modern C++ (Coroutines, Ranges, Concepts) | 3 |
-| 37 | Error Handling Patterns | 3 |
-| 38 | Testing Patterns | 3 |
-| 39 | Examples & Pitfalls Enhancement | — |
-| 40 | C++23 Features | 3 |
-| 41 | Capstone Project (Mini HTTP Framework) | 1 |
+| 37 | Error Handling Patterns | 4 |
+| 38 | Testing Patterns | 4 |
+| 39 | Content Enhancement (Parser / Diff Tools) | 3 |
+| 40 | C++23 Features | 4 |
+| 41 | Capstone (HTTP Framework, Router, Template Engine) | 3 |
 | 42 | Performance Patterns | 3 |
 | 43 | Toolchain Patterns (CMake, CI/CD, Package Manager) | 3 |
 
@@ -85,7 +86,7 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
 ### Examples
 
 - [examples](examples):
-  69 runnable code samples covering:
+  120 runnable code samples covering:
   - Core concepts: ownership, move semantics, smart pointers, RAII
   - Modern C++: lambda, constexpr, structured bindings, ranges
   - C++20: concepts, ranges, span, format, coroutines
@@ -100,6 +101,8 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
   Basic student management system
 - [student-management/v2](cpp-mastery-roadmap/01-beginner/student-management/v2):
   Improved version with better I/O and tests
+- [student-management/v3](cpp-mastery-roadmap/01-beginner/student-management/v3):
+  Borrowing parameters with std::string_view
 
 #### Stage 2: Intermediate
 
@@ -107,6 +110,16 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
   Complete key-value store with protocol, server, client, and concurrency
 - [tiny-http-server](cpp-mastery-roadmap/02-intermediate/tiny-http-server):
   HTTP server with routing and thread pool
+- [copy-move-demo](cpp-mastery-roadmap/02-intermediate/copy-move-demo):
+  Copy/move semantics with observable constructors
+- [reference-binding-demo](cpp-mastery-roadmap/02-intermediate/reference-binding-demo):
+  Reference binding and lifetime extension rules
+- [trie](cpp-mastery-roadmap/02-intermediate/trie):
+  Prefix tree with word/prefix counts
+- [union-find](cpp-mastery-roadmap/02-intermediate/union-find):
+  Disjoint set union with path compression
+- [binary-heap](cpp-mastery-roadmap/02-intermediate/binary-heap):
+  Array-backed heap with bottom-up heapify
 
 #### Stage 3: Advanced
 
@@ -122,6 +135,14 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
   Custom smart pointer implementation
 - [event-loop](cpp-mastery-roadmap/03-advanced/event-loop):
   Event loop with priority queue for timers
+- [static-init-demo](cpp-mastery-roadmap/03-advanced/static-init-demo):
+  Static initialization order fiasco and the fix
+- [skip-list](cpp-mastery-roadmap/03-advanced/skip-list):
+  Probabilistic ordered set with randomized levels
+- [csv-parser](cpp-mastery-roadmap/03-advanced/csv-parser):
+  RFC-4180 quoting rules with roundtrip formatting
+- [base64-codec](cpp-mastery-roadmap/03-advanced/base64-codec):
+  RFC 4648 encode/decode with strict padding validation
 
 #### Stages 4–7: More Practice
 
@@ -131,6 +152,18 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
   Multi-client chat server
 - [web-server](cpp-mastery-roadmap/04-stage4/web-server):
   HTTP web server with static files
+- [mini-redis](cpp-mastery-roadmap/04-stage4/mini-redis):
+  In-memory KV store with RESP-style replies and lazy TTL
+- [task-scheduler](cpp-mastery-roadmap/05-stage5/task-scheduler):
+  Priority/delayed/repeating task scheduler
+- [timer-wheel](cpp-mastery-roadmap/05-stage5/timer-wheel):
+  O(1) tick-based timer scheduling
+- [blocking-queue](cpp-mastery-roadmap/06-stage6/blocking-queue):
+  Bounded MPMC queue with dual condition variables
+- [lfu-cache](cpp-mastery-roadmap/07-stage7/lfu-cache):
+  Least-frequently-used eviction with LRU tie-breaking
+- [bloom-filter](cpp-mastery-roadmap/07-stage7/bloom-filter):
+  Probabilistic membership with double hashing
 
 #### Stages 8–27: Design Patterns
 
@@ -139,6 +172,8 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
 - **Command pattern variants**: command-history, command-logger, command-memento, command-router, command-snapshot, command-translator, command-validator
 - **Observer pattern variants**: observer-bus, observer-buffer, observer-debouncer, observer-filter-chain, observer-mediator, observer-subscription, observer-throttler
 - **Strategy pattern variants**: strategy-adapter, strategy-chain, strategy-combinator, strategy-decorator, strategy-evaluator, strategy-factory, strategy-pipeline, strategy-resolver
+- [rate-limiter](cpp-mastery-roadmap/08-stage8/rate-limiter):
+  Token bucket, fixed window, and sliding window algorithms
 
 #### Stages 28–31: Architecture Patterns
 
@@ -181,6 +216,8 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
   Wait-free queue
 - [thread-pool-advanced](cpp-mastery-roadmap/33-stage33/thread-pool-advanced):
   Task-based thread pool with futures
+- [actor-mailbox](cpp-mastery-roadmap/33-stage33/actor-mailbox):
+  Bounded mailbox with a single-consumer actor loop
 
 #### Stages 34–38: C++, Memory, Modern C++, Error, Testing
 
@@ -214,6 +251,23 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
   Reusable test setup
 - [parameterized-tests](cpp-mastery-roadmap/38-stage38/parameterized-tests):
   Data-driven tests
+- [type-erasure](cpp-mastery-roadmap/34-stage34/type-erasure):
+  Hand-rolled std::function-style wrapper (Concept/Holder)
+- [allocation-tracker](cpp-mastery-roadmap/35-stage35/allocation-tracker):
+  Process-wide allocation counters and counting allocator
+- [error-category](cpp-mastery-roadmap/37-stage37/error-category):
+  Custom std::error_code category mapped to std::errc
+- [golden-file-testing](cpp-mastery-roadmap/38-stage38/golden-file-testing):
+  Snapshot assertions with line diffs and UPDATE_GOLDEN flow
+
+#### Stage 39: Content Enhancement
+
+- [markdown-parser](cpp-mastery-roadmap/39-stage39/markdown-parser):
+  Block-level markdown parsing with inline link extraction
+- [link-checker](cpp-mastery-roadmap/39-stage39/link-checker):
+  Relative link validation with lexical path normalization
+- [text-diff](cpp-mastery-roadmap/39-stage39/text-diff):
+  LCS line diff with unified-style rendering
 
 #### Stage 40: C++23 Features
 
@@ -223,11 +277,17 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
   C++23 explicit object parameter
 - [zip-range](cpp-mastery-roadmap/40-stage40/zip-range):
   Parallel iteration
+- [generator-pipeline](cpp-mastery-roadmap/40-stage40/generator-pipeline):
+  Lazy std::generator pipelines with early-exit propagation
 
 #### Stage 41: Capstone Project
 
 - [mini-http-framework](cpp-mastery-roadmap/41-stage41/mini-http-framework):
   Complete HTTP framework combining 10 design patterns
+- [http-router](cpp-mastery-roadmap/41-stage41/http-router):
+  Method+path routing with :param extraction
+- [template-engine](cpp-mastery-roadmap/41-stage41/template-engine):
+  Mustache-like sections with context chaining
 
 #### Stage 42: Performance Patterns
 

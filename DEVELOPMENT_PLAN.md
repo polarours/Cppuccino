@@ -4,8 +4,8 @@
 
 | 类型 | 英文 | 中文 | 总计 |
 |------|------|------|------|
-| 学习文档 (docs) | 59 篇 | 67 篇 | 126 篇 |
-| 陷阱文章 (pitfalls) | 34 篇 | 37 篇 | 71 篇 |
+| 学习文档 (docs) | 67 篇 | 67 篇 | 134 篇 |
+| 陷阱文章 (pitfalls) | 37 篇 | 37 篇 | 74 篇 |
 | 示例代码 (examples) | - | - | 120 个 |
 | 项目练习 | - | - | 150 个 |
 
@@ -181,7 +181,65 @@
 
 | 类型 | 英文 | 中文 | 总计 | 当前 |
 |------|------|------|------|------|
-| 学习文档 | 40 篇 | 40 篇 | 80 篇 | 126 篇 |
-| 陷阱文章 | 35 篇 | 35 篇 | 70 篇 | 71 篇 |
+| 学习文档 | 40 篇 | 40 篇 | 80 篇 | 134 篇 |
+| 陷阱文章 | 35 篇 | 35 篇 | 70 篇 | 74 篇 |
 | 示例代码 | - | - | 120 个 | 120 个 |
 | 项目练习 | - | - | 150 个 | 150 个 |
+
+## 第六阶段：docs/en 英文正文欠账（2026-10-04 发现）
+
+**问题**：`docs/en/` 62 篇中 38 篇（34 篇纯中文 + 4 篇中英混合）正文不是英文，
+其中 32 篇与 `docs/中文版/` 对应文件**逐字节相同**（中文副本，从未翻译），合计
+11,810 行。文件名是英文 kebab-case，但打开全是中文——按文件名统计的"英文 67 篇"
+掩盖了这一欠账。
+
+**完成判据**（每篇）：
+1. 正文 CJK 字符数 < 拉丁字母数（脚本判定 EN-body；代码注释也应为英文）
+2. 所有 ```cpp 块 g++ 编译通过（预期失败块须给出正确错误原因）
+3. 与中文版章节骨架一一对应，代码块结构一致
+4. 修完一批跑一次全仓链接校验（0 坏链）
+
+**清单（进度 8/38，按行数从小到大；每批完成后勾掉）**：
+
+- [x] service-locator-pattern.md (103L)
+- [x] delegation-pattern.md (106L)
+- [x] active-record-pattern.md (112L)
+- [x] singleton-pattern.md (112L)
+- [x] unit-of-work-pattern.md (119L)
+- [x] strategy-pattern.md (119L)
+- [x] observer-pattern.md (120L)
+- [x] type-object-pattern.md (121L)
+- [ ] factory-method-pattern.md (124L)
+- [ ] mvc-pattern.md (158L)
+- [ ] repository-pattern.md (144L)
+- [ ] balking-pattern.md (133L)
+- [ ] simd-and-performance-optimization.md (133L)
+- [ ] std-expected.md (96L, MIXED)
+- [ ] ranges-pattern.md (111L, MIXED)
+- [ ] cmake-and-build-systems.md (153L, MIXED)
+- [ ] cpp20-concepts.md (161L, MIXED)
+- [ ] memory-pool-and-allocators.md (170L)
+- [ ] testing-patterns.md (282L)
+- [ ] adapter-pattern.md (421L)
+- [ ] chain-of-responsibility-pattern.md (446L)
+- [ ] bridge-pattern.md (462L)
+- [ ] flyweight-pattern.md (464L)
+- [ ] decorator-pattern.md (472L)
+- [ ] template-method-pattern.md (472L)
+- [ ] state-pattern.md (475L)
+- [ ] facade-pattern.md (480L)
+- [ ] prototype-pattern.md (483L)
+- [ ] visitor-pattern.md (484L)
+- [ ] builder-pattern.md (485L)
+- [ ] iterator-pattern.md (487L)
+- [ ] abstract-factory-pattern.md (491L)
+- [ ] composite-pattern.md (494L)
+- [ ] proxy-pattern.md (501L)
+- [ ] specification-pattern.md (504L)
+- [ ] memento-pattern.md (511L)
+- [ ] mediator-pattern.md (520L)
+- [ ] command-pattern.md (581L)
+
+**规则**：翻译时保留章节骨架与代码块结构（代码注释译为英文）；不删除、不移动
+中文版；每完成一篇把清单勾掉（进度以第六阶段勾选数为准；"当前状态"表按文件数
+统计，不因翻译改变）。

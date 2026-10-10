@@ -15,8 +15,8 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
 
 | 类别 | 数量 |
 |------|------|
-| 文档 | 126 篇（59 英文 + 67 中文） |
-| 陷阱 | 71 篇（34 英文 + 37 中文） |
+| 文档 | 134 篇（67 英文 + 67 中文） |
+| 陷阱 | 74 篇（37 英文 + 37 中文） |
 | 示例 | 120 个可运行示例 |
 | 项目 | 150 个项目，横跨 43 个阶段 |
 | 测试 | 848（全部通过） |
@@ -47,6 +47,7 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
 
 - **对象模型与更深层语义：**
   [虚函数分发与对象模型](docs/中文版/虚函数分发与对象模型.md)，
+  [深入理解 C++ 对象模型](docs/中文版/深入理解 C++ 对象模型.md)，
   [未定义行为](docs/中文版/未定义行为.md)，
   [C++ 内存模型与原子操作基础](docs/中文版/C++内存模型与原子操作基础.md)，
   [virtual-dispatch-and-slicing.cpp](examples/virtual-dispatch-and-slicing.cpp)
@@ -57,18 +58,18 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
 
 | 阶段 | 主题 | 项目数 |
 |------|------|--------|
-| 1–7 | C++ 基础到高级 | 7 |
-| 8–27 | 设计模式（GoF 23 + Specification） | 60 |
+| 1–7 | C++ 基础到高级 | 35 |
+| 8–27 | 设计模式（GoF 23 + Specification） | 61 |
 | 28–31 | 架构模式 | 12 |
-| 32–33 | 并发模式 | 6 |
-| 34 | C++ 特有模式（CRTP, SFINAE, 变参模板） | 3 |
-| 35 | 内存模式 | 3 |
+| 32–33 | 并发模式 | 7 |
+| 34 | C++ 特有模式（CRTP, SFINAE, 变参模板） | 4 |
+| 35 | 内存模式 | 4 |
 | 36 | 现代 C++（协程, Ranges, Concepts） | 3 |
-| 37 | 错误处理模式 | 3 |
-| 38 | 测试模式 | 3 |
-| 39 | 补充示例和陷阱 | — |
-| 40 | C++23 新特性 | 3 |
-| 41 | 综合实战（Mini HTTP 框架） | 1 |
+| 37 | 错误处理模式 | 4 |
+| 38 | 测试模式 | 4 |
+| 39 | 内容增强（解析 / Diff 工具） | 3 |
+| 40 | C++23 新特性 | 4 |
+| 41 | 综合实战（HTTP 框架、路由器、模板引擎） | 3 |
 | 42 | 性能模式 | 3 |
 | 43 | 工具链模式（CMake, CI/CD, 包管理） | 3 |
 
@@ -84,7 +85,7 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
 ### 示例
 
 - [examples](examples)：
-  47 个可运行示例，涵盖：
+  120 个可运行示例，涵盖：
   - 核心概念：所有权、move 语义、智能指针、RAII
   - 现代 C++：lambda、constexpr、结构化绑定、ranges
   - C++20：concepts、ranges、span、format、coroutines
@@ -99,6 +100,8 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
   基础学生管理系统
 - [student-management/v2](cpp-mastery-roadmap/01-beginner/student-management/v2)：
   改进版本，更好的 I/O 和测试
+- [student-management/v3](cpp-mastery-roadmap/01-beginner/student-management/v3)：
+  用 std::string_view 实现借用参数
 
 #### 第二阶段：中级
 
@@ -106,6 +109,16 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
   完整的键值存储，包含协议、服务器、客户端和并发支持
 - [tiny-http-server](cpp-mastery-roadmap/02-intermediate/tiny-http-server)：
   HTTP 服务器，支持路由和线程池
+- [copy-move-demo](cpp-mastery-roadmap/02-intermediate/copy-move-demo)：
+  可观察的拷贝/移动语义演示
+- [reference-binding-demo](cpp-mastery-roadmap/02-intermediate/reference-binding-demo)：
+  引用绑定与生命周期延长规则
+- [trie](cpp-mastery-roadmap/02-intermediate/trie)：
+  前缀树，支持词/前缀计数
+- [union-find](cpp-mastery-roadmap/02-intermediate/union-find)：
+  并查集，路径压缩 + 按秩合并
+- [binary-heap](cpp-mastery-roadmap/02-intermediate/binary-heap)：
+  数组实现的二叉堆，自底向上 heapify
 
 #### 第三阶段：高级
 
@@ -121,6 +134,14 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
   自定义智能指针实现
 - [event-loop](cpp-mastery-roadmap/03-advanced/event-loop)：
   带定时器优先队列的事件循环
+- [static-init-demo](cpp-mastery-roadmap/03-advanced/static-init-demo)：
+  静态初始化顺序难题及其解法
+- [skip-list](cpp-mastery-roadmap/03-advanced/skip-list)：
+  随机层级的概率型有序集合
+- [csv-parser](cpp-mastery-roadmap/03-advanced/csv-parser)：
+  RFC-4180 引号规则，支持无损往返
+- [base64-codec](cpp-mastery-roadmap/03-advanced/base64-codec)：
+  RFC 4648 编解码，严格填充校验
 
 #### 第四阶段：更多练习
 
@@ -130,6 +151,18 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
   多客户端聊天服务器
 - [web-server](cpp-mastery-roadmap/04-stage4/web-server)：
   支持静态文件的 HTTP 服务器
+- [mini-redis](cpp-mastery-roadmap/04-stage4/mini-redis)：
+  RESP 风格应答与惰性 TTL 的内存 KV 存储
+- [task-scheduler](cpp-mastery-roadmap/05-stage5/task-scheduler)：
+  优先级/延迟/重复任务调度器
+- [timer-wheel](cpp-mastery-roadmap/05-stage5/timer-wheel)：
+  O(1) 基于 tick 的时间轮调度
+- [blocking-queue](cpp-mastery-roadmap/06-stage6/blocking-queue)：
+  双条件变量的有界 MPMC 队列
+- [lfu-cache](cpp-mastery-roadmap/07-stage7/lfu-cache)：
+  最少使用频率淘汰，LRU 打破平局
+- [bloom-filter](cpp-mastery-roadmap/07-stage7/bloom-filter)：
+  双哈希布隆过滤器
 
 #### 第八至二十七阶段：设计模式
 
@@ -138,6 +171,8 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
 - **命令模式变体**：command-history, command-logger, command-memento, command-router, command-snapshot, command-translator, command-validator
 - **观察者模式变体**：observer-bus, observer-buffer, observer-debouncer, observer-filter-chain, observer-mediator, observer-subscription, observer-throttler
 - **策略模式变体**：strategy-adapter, strategy-chain, strategy-combinator, strategy-decorator, strategy-evaluator, strategy-factory, strategy-pipeline, strategy-resolver
+- [rate-limiter](cpp-mastery-roadmap/08-stage8/rate-limiter)：
+  令牌桶、固定窗口、滑动窗口三种限流算法
 
 #### 第二十八至三十一阶段：架构模式
 
@@ -180,6 +215,8 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
   无锁队列
 - [thread-pool-advanced](cpp-mastery-roadmap/33-stage33/thread-pool-advanced)：
   高级线程池
+- [actor-mailbox](cpp-mastery-roadmap/33-stage33/actor-mailbox)：
+  单消费者 actor 循环的有界邮箱
 
 #### 第三十四至三十八阶段
 
@@ -213,6 +250,23 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
   测试夹具
 - [parameterized-tests](cpp-mastery-roadmap/38-stage38/parameterized-tests)：
   参数化测试
+- [type-erasure](cpp-mastery-roadmap/34-stage34/type-erasure)：
+  手写 std::function 风格包装（Concept/Holder）
+- [allocation-tracker](cpp-mastery-roadmap/35-stage35/allocation-tracker)：
+  进程级分配计数与计数分配器
+- [error-category](cpp-mastery-roadmap/37-stage37/error-category)：
+  映射到 std::errc 的自定义 error_code 类别
+- [golden-file-testing](cpp-mastery-roadmap/38-stage38/golden-file-testing)：
+  快照断言，逐行 diff 与 UPDATE_GOLDEN 流程
+
+#### 第三十九阶段：内容增强
+
+- [markdown-parser](cpp-mastery-roadmap/39-stage39/markdown-parser)：
+  Markdown 分块解析与行内链接提取
+- [link-checker](cpp-mastery-roadmap/39-stage39/link-checker)：
+  词法路径归一化的相对链接校验
+- [text-diff](cpp-mastery-roadmap/39-stage39/text-diff)：
+  LCS 逐行 diff，unified 风格渲染
 
 #### 第四十阶段：C++23 新特性
 
@@ -222,11 +276,17 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
   C++23 显式对象参数
 - [zip-range](cpp-mastery-roadmap/40-stage40/zip-range)：
   并行迭代
+- [generator-pipeline](cpp-mastery-roadmap/40-stage40/generator-pipeline)：
+  惰性 std::generator 流水线，早退出向上传播
 
 #### 第四十一阶段：综合实战
 
 - [mini-http-framework](cpp-mastery-roadmap/41-stage41/mini-http-framework)：
   组合 10 种设计模式的完整 HTTP 框架
+- [http-router](cpp-mastery-roadmap/41-stage41/http-router)：
+  方法+路径路由，提取 :param 参数
+- [template-engine](cpp-mastery-roadmap/41-stage41/template-engine)：
+  mustache 风格段落与上下文链
 
 #### 第四十二阶段：性能模式
 

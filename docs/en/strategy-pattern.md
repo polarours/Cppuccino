@@ -1,33 +1,37 @@
-# 策略模式 (Strategy Pattern)
+# Strategy Pattern
 
-## 什么是策略模式？
+## What Is the Strategy Pattern?
 
-策略模式（Strategy Pattern）定义一族算法，把每个算法**封装**起来，并使它们可以**互相替换**。策略让算法的变化独立于使用算法的客户。
+The strategy pattern defines a family of algorithms, **encapsulates** each one,
+and makes them **interchangeable**. Strategy lets the algorithm vary
+independently from the clients that use it.
 
-> **核心思想**：把"会变的行为"抽到独立类族，Context 通过接口持有当前策略。
+> **Core idea**: extract the "behavior that changes" into a family of standalone
+> classes; the Context holds the current strategy through an interface.
 
-## 适用场景
+## When It Fits
 
-- 多种排序/压缩/加密算法可选
-- 业务规则多变（折扣、税率、运费计算）
-- 同一任务的多种实现（同步/异步、内存/磁盘）
+- Multiple sorting/compression/encryption algorithms to choose from
+- Business rules that change often (discounts, tax rates, shipping costs)
+- Several implementations of the same task (sync/async, memory/disk)
 
-## 核心概念
+## Core Concepts
 
-- **Strategy 接口**：声明算法的统一接口
-- **Concrete Strategy**：实现具体算法
-- **Context**：持有 `unique_ptr<Strategy>`，转发请求到当前策略
-- **可替换性**：运行时通过 `setStrategy` 切换
+- **Strategy interface**: declares the uniform algorithm interface
+- **Concrete strategy**: implements one algorithm
+- **Context**: holds a `shared_ptr<Strategy>` and forwards requests to the
+  current strategy
+- **Interchangeability**: swap at runtime via `setStrategy`
 
-## 与状态模式的对比
+## Strategy vs State
 
 | | Strategy | State |
 |---|---|---|
-| 切换方 | 客户端显式选择 | 状态对象内部迁移 |
-| 策略数量 | 平等、可任选 | 通常有迁移图 |
-| 意图 | "怎么做" | "现在是什么状态" |
+| Who switches | The client chooses explicitly | Transitions happen inside the state objects |
+| Relationship among variants | Equal, any may be chosen | Usually a transition graph |
+| Intent | "how to do it" | "what state am I in now" |
 
-## 代码实现
+## Implementation
 
 ```cpp
 #include <algorithm>
@@ -80,40 +84,57 @@ public:
     explicit Sorter(std::shared_ptr<SortStrategy<T>> s) : strategy_(std::move(s)) {}
     void setStrategy(std::shared_ptr<SortStrategy<T>> s) { strategy_ = std::move(s); }
     void sort(std::vector<T>& data) { strategy_->sort(data); }
-    const std::string& currentStrategyName() const { return strategy_->name(); }
+    // returns by value: strategy_->name() returns a temporary — never bind it to a const&
+    std::string getStrategyName() const {
+        return strategy_ ? strategy_->name() : "None";
+    }
 private:
     std::shared_ptr<SortStrategy<T>> strategy_;
 };
 ```
 
-完整可运行示例见 [strategy-pattern 项目](../../cpp-mastery-roadmap/09-stage9/strategy-pattern)。
+For the full runnable example, see the
+[strategy-pattern project](../../cpp-mastery-roadmap/09-stage9/strategy-pattern).
 
-## 使用示例
+## Usage Example
 
 ```cpp
+#include <cassert>
+
 std::vector<int> v{5, 1, 4, 2, 3};
 Sorter<int> sorter(std::make_shared<QuickSort<int>>());
 sorter.sort(v);
-assert(sorter.currentStrategyName() == "QuickSort");
+assert(sorter.getStrategyName() == "QuickSort");
 
 sorter.setStrategy(std::make_shared<BubbleSort<int>>());
 sorter.sort(v);
-assert(sorter.currentStrategyName() == "BubbleSort");
+assert(sorter.getStrategyName() == "BubbleSort");
 ```
 
-## 关键陷阱
+## Key Traps
 
-1. **空策略**：`Sorter` 持有 `nullptr` 时 `sort` 会崩——构造时必须传入默认策略
-2. **策略对象有状态**：把 QuickSort 改成"原地 partition + 缓存"需要警惕"上一个排序残留状态"
-3. **多策略组合**：当一种 Context 需要同时用多种策略时（折扣 + 运费 + 税），考虑用**装饰器**或**责任链**而非一个 Context 持多个 Strategy
-4. **性能开销**：虚函数调用 + 间接寻址——在热路径上可考虑 CRTP 静态多态
+1. **Null strategy**: `Sorter` holding `nullptr` crashes on `sort` — always
+   pass a default strategy at construction
+2. **Stateful strategies**: if QuickSort were rewritten to "in-place partition +
+   cache", watch for residue from the previous sort
+3. **Multiple strategies at once**: when a Context needs several strategies
+   simultaneously (discount + shipping + tax), prefer a **decorator** or
+   **chain of responsibility** over one Context holding many strategies
+4. **Performance cost**: virtual call + indirection — consider CRTP static
+   polymorphism on hot paths
 
-## 最佳实践
+## Best Practices
 
-1. **用 `unique_ptr` 而非 `shared_ptr`**：策略通常是无状态的，`unique_ptr` 表达意图更清晰；本项目用 `shared_ptr` 是因为想和模板参数统一
-2. **默认策略**：Context 构造时接受一个默认策略，避免空指针
-3. **策略注册表**：用 `std::function` 也能实现轻量策略（见 strategy-adapter 项目）
+1. **Prefer `unique_ptr` over `shared_ptr`**: strategies are usually stateless
+   and `unique_ptr` states intent better; this project uses `shared_ptr` to stay
+   consistent with the template parameter
+2. **Default strategy**: the Context accepts one at construction to avoid null
+   pointers
+3. **Strategy registry**: `std::function` also works for lightweight strategies
+   (see the strategy-adapter project)
 
-## 总结
+## Summary
 
-策略模式把"会变的行为"从 Context 中抽离，让新增算法只需一个新类；它和工厂、模板方法、装饰器是"行为可变"这一主题下的不同表达方式。
+Strategy extracts the "behavior that varies" out of the Context so adding an
+algorithm means adding one class; it, Factory, Template Method, and Decorator
+are different expressions of the same "varying behavior" theme.

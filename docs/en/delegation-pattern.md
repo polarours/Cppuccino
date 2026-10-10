@@ -1,32 +1,40 @@
-# 委托模式 (Delegation Pattern)
+# Delegation Pattern
 
-## 什么是委托模式？
+## What Is the Delegation Pattern?
 
-委托模式（Delegation Pattern）把"完成某件事"这件事转发给一个被组合进来的辅助对象（delegate / helper），宿主类只负责持有、转发和组合，而具体行为由辅助对象实现。
+The delegation pattern forwards "getting something done" to an auxiliary object
+(the delegate/helper) that is composed into the host: the host class only
+holds, forwards, and combines, while the concrete behavior lives in the
+delegate.
 
-> **核心思想**：用组合替代继承，把"行为变化的部分"抽到独立对象里，宿主通过接口调用。
+> **Core idea**: replace inheritance with composition — extract the "parts that
+> vary" into a separate object the host calls through an interface.
 
-## 与继承的对比
+## Delegation vs Inheritance
 
-| | 继承 | 委托 |
+| | Inheritance | Delegation |
 |---|---|---|
-| 关系 | "is-a" | "has-a" |
-| 行为共享方式 | 父类方法 | 持有辅助对象并调用 |
-| 运行时替换 | 不可（vtable 静态） | 容易（setter 换对象） |
-| 多重行为来源 | 受菱形继承困扰 | 自然支持多委托组合 |
-| 副作用 | 子类与父类紧耦合 | 委托对象可独立测试 |
+| Relationship | "is-a" | "has-a" |
+| How behavior is shared | Parent's methods | Hold an auxiliary object and call it |
+| Runtime replacement | No (vtable is static) | Easy (swap the object via setter) |
+| Multiple behavior sources | Hampered by the diamond | Multiple delegates compose naturally |
+| Side effects | Subclass tightly coupled to parent | Delegates testable in isolation |
 
-## 核心概念
+## Core Concepts
 
-- **委托对象（Delegate）**：实现某接口的具体行为载体
-- **宿主对象（Host）**：持有一个 `shared_ptr<Interface>`，转发请求给委托
-- **可替换性**：通过 `setDelegate` 可以在运行时改变宿主的行为
+- **Delegate**: the concrete behavior carrier implementing some interface
+- **Host**: holds a `shared_ptr<Interface>` and forwards requests to the delegate
+- **Replaceability**: `setDelegate` changes the host's behavior at runtime
 
-## 与 Strategy 的关系
+## How It Relates to Strategy
 
-委托模式 = 委派给单个行为对象；Strategy 模式 = 把一族算法作为可互换的策略。两者结构高度相似，区别在于意图：Strategy 强调"在多个算法间选择"，委托强调"宿主自己不实现，交给别人"。
+Delegation = forwarding to a single behavior object; Strategy = a family of
+algorithms as interchangeable strategies. The structures are nearly identical —
+the difference is intent: Strategy emphasizes "choosing among algorithms",
+delegation emphasizes "the host does not implement it itself, someone else
+does".
 
-## 代码实现
+## Implementation
 
 ```cpp
 #include <memory>
@@ -80,27 +88,37 @@ public:
 };
 ```
 
-完整可运行示例见 [delegation 项目](../../cpp-mastery-roadmap/31-stage31/delegation)。
+For the full runnable example, see the
+[delegation project](../../cpp-mastery-roadmap/31-stage31/delegation).
 
-## 使用示例
+## Usage Example
 
 ```cpp
+#include <cassert>
+
 auto html = std::make_shared<TextRenderer>("<b>OK</b>");
 Button ok(html, "OK");
 assert(ok.draw() == "[OK: <b>OK</b>]");
 
-// 运行时换委托
+// swap the delegate at runtime
 ok.setRenderer(std::make_shared<TextRenderer>("✓"));
 assert(ok.draw() == "[OK: ✓]");
 ```
 
-## 最佳实践
+## Best Practices
 
-1. **委托接口要窄**：只暴露宿主真正会用到的方法，否则宿主会替委托承担过多承诺
-2. **多委托用组合**：宿主持有一组 `vector<shared_ptr<IDelegate>>`，按顺序调用
-3. **避免委托链过度**：`A → B → C → D` 难以调试，宁可在 A 显式组合 B/C
-4. **委托对象要可独立构造**：不要让委托的构造参数依赖宿主
+1. **Keep the delegate interface narrow**: expose only what the host actually
+   uses, otherwise the host promises too much on the delegate's behalf
+2. **Compose multiple delegates**: hold a `vector<shared_ptr<IDelegate>>` and
+   call them in order
+3. **Avoid long delegation chains**: `A → B → C → D` is hard to debug; prefer
+   composing B/C explicitly in A
+4. **Delegates must be independently constructible**: a delegate's constructor
+   arguments must not depend on the host
 
-## 总结
+## Summary
 
-委托模式用组合替代继承，是开放-封闭原则（OCP）的直接体现——新增行为只需新增委托类，宿主无需改动。它是 Bridge、Decorator、Strategy 等多种模式的共同基石。
+Delegation replaces inheritance with composition and is a direct expression of
+the open-closed principle — adding behavior means adding a delegate class,
+never touching the host. It is a common building block of Bridge, Decorator,
+Strategy, and many other patterns.

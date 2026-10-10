@@ -1,51 +1,83 @@
-# 单元工作模式 (Unit of Work Pattern)
+# Unit of Work Pattern
 
-## 什么是单元工作模式？
+## What Is the Unit of Work Pattern?
 
-单元工作模式（Unit of Work Pattern）是一种数据访问模式，它将一组业务操作收集为一次原子提交，统一协调对数据库的所有更改。
+Unit of Work is a data-access pattern that collects a group of business
+operations into one atomic commit, coordinating every change to the database
+through a single point.
 
-> **核心思想**：维护一个受业务事务影响的对象列表，协调变更的写入和并发问题的解决。
+> **Core idea**: keep a list of objects affected by a business transaction and
+> coordinate writing the changes and resolving concurrency issues.
 
-## 与仓储模式的关系
+## How It Relates to the Repository Pattern
 
-仓储模式管理单个实体的集合访问；单元工作模式管理**跨多个仓储的一次提交**。两者常配合使用：
+A repository manages access to a collection of a single entity; a unit of work
+manages **one commit across several repositories**. The two are usually used
+together:
 
 ```cpp
+class UserRepository { /* ... */ };
+class OrderRepository { /* ... */ };
+class UnitOfWork { /* ... */ };  // full implementation below
+
 class AppDbContext {
 public:
-    UserRepository users;   // 仓储
-    OrderRepository orders; // 仓储
-    UnitOfWork unitOfWork;  // 统一提交点
+    UserRepository users;   // repositories
+    OrderRepository orders; // repositories
+    UnitOfWork unitOfWork;  // the single commit point
 };
 ```
 
-## 核心概念
+## Core Concepts
 
-- **注册（Register）**：把新增/修改/删除记录到变更集，而不是立即写库
-- **提交（Commit）**：一次性按顺序写出所有变更（先删后增等顺序由 UoW 决定）
-- **回滚（Rollback）**：丢弃未提交的变更
+- **Register**: record adds/changes/removes into a change set instead of
+  writing to the database immediately
+- **Commit**: write every change out once, in a defined order (the unit of work
+  decides delete-before-insert and friends)
+- **Rollback**: discard uncommitted changes
 
-## 问题场景
+## Problem Scenario
 
 ```cpp
-// 问题：每个操作立即写库，无法保证一致性
+// Problem: every operation writes immediately — consistency not guaranteed
+struct User { int id; };
+struct Order { int id; };
+
+struct Repo {
+    template <typename T> bool save(const T&) { return true; }
+};
+
+Repo userRepo;
+Repo orderRepo;
+
 void transferOwnership(User& user, Order& order) {
-    userRepo.save(user);    // 成功
-    orderRepo.save(order);  // 失败 → 数据不一致
+    userRepo.save(user);    // succeeds
+    orderRepo.save(order);  // fails → data now inconsistent
 }
 ```
 
-### 解决方案
+### Solution
 
 ```cpp
+// Solution: register the changes, then commit once — all or nothing
+struct User { int id; };
+struct Order { int id; };
+
+class UnitOfWork {  // full implementation in the section below
+public:
+    void registerModified(const User&) {}
+    void registerModified(const Order&) {}
+    bool commit() { return true; }  // all succeed or none take effect
+};
+
 void transferOwnership(UnitOfWork& uow, User& user, Order& order) {
     uow.registerModified(user);
     uow.registerModified(order);
-    uow.commit();           // 全部成功或全部不生效
+    uow.commit();               // all succeed or none take effect
 }
 ```
 
-## 代码实现
+## Implementation
 
 ```cpp
 #include <map>
@@ -73,7 +105,7 @@ public:
     void registerModified(const Entity& entity) {
         auto it = tracked_.find(entity.id);
         if (it != tracked_.end() && it->second.changeType == ChangeType::Add) {
-            it->second.entity = entity;  // 新增后又改：仍是 Add
+            it->second.entity = entity;  // added, then modified: still Add
         } else {
             tracked_[entity.id] = {entity, ChangeType::Modify};
         }
@@ -82,7 +114,7 @@ public:
     void registerRemoved(int id) {
         auto it = tracked_.find(id);
         if (it != tracked_.end() && it->second.changeType == ChangeType::Add) {
-            tracked_.erase(it);          // 新增后删除：直接抵消
+            tracked_.erase(it);          // added, then removed: cancel out
         } else {
             Entity dummy; dummy.id = id;
             tracked_[id] = {dummy, ChangeType::Remove};
@@ -91,7 +123,7 @@ public:
 
     void commit() {
         for (auto& [id, tracked] : tracked_) {
-            committed_.push_back(tracked);  // 真实实现中此处写数据库
+            committed_.push_back(tracked);  // a real implementation writes the DB here
         }
         tracked_.clear();
     }
@@ -105,15 +137,19 @@ private:
 };
 ```
 
-完整可运行示例见 [unit-of-work 项目](../../cpp-mastery-roadmap/30-stage30/unit-of-work)。
+For the full runnable example, see the
+[unit-of-work project](../../cpp-mastery-roadmap/30-stage30/unit-of-work).
 
-## 最佳实践
+## Best Practices
 
-1. 变更合并要正确处理状态转移（新增后再删除 = 无操作）
-2. 提交顺序很重要：通常先 Remove，再 Modify，最后 Add（避免唯一键冲突）
-3. 一个业务事务对应一个 UnitOfWork 实例，用完即弃
-4. 与身份映射（Identity Map）配合可避免重复加载同一行
+1. Merge changes with correct state transitions (add then remove = no-op)
+2. Commit order matters: usually Remove first, then Modify, finally Add (to
+   avoid unique-key conflicts)
+3. One business transaction = one UnitOfWork instance, discarded after use
+4. Combine with an Identity Map to avoid loading the same row twice
 
-## 总结
+## Summary
 
-单元工作模式通过集中跟踪和延迟提交，把"多次零散写入"变成"一次原子写入"，是保证业务事务一致性的关键结构。
+By tracking changes centrally and deferring the write, Unit of Work turns
+"many scattered writes" into "one atomic write" — the key structure for
+business-transaction consistency.

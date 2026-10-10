@@ -1,27 +1,33 @@
-# 活动记录模式 (Active Record Pattern)
+# Active Record Pattern
 
-## 什么是活动记录模式？
+## What Is the Active Record Pattern?
 
-活动记录模式（Active Record Pattern）是一种数据访问模式：一个对象既封装业务数据，又封装持久化操作。表的一行对应对象的一个实例。
+Active Record is a data-access pattern: one object encapsulates both the
+business data and the persistence operations. A table row corresponds to one
+object instance.
 
-> **核心思想**：让实体自己知道如何 `save()`、`remove()` 和静态地 `find()` 自己。
+> **Core idea**: the entity itself knows how to `save()`, `remove()`, and
+> statically `find()` itself.
 
-## 与仓储模式的对比
+## Active Record vs Repository
 
 | | Active Record | Repository |
 |---|---|---|
-| 数据与访问逻辑 | 合一（实体自带 CRUD） | 分离（仓储负责持久化） |
-| 业务层依赖 | 直接依赖具体实体类 | 只依赖仓储接口 |
-| 可测试性 | 较弱（实体耦合存储） | 较强（可注入内存实现） |
-| 适用场景 | 简单 CRUD、脚本、小型服务 | 复杂领域逻辑、需要换存储 |
+| Data and access logic | Combined (entity carries CRUD) | Separated (repository owns persistence) |
+| Business-layer dependency | Depends directly on concrete entity classes | Depends only on the repository interface |
+| Testability | Weaker (entity coupled to storage) | Stronger (an in-memory implementation can be injected) |
+| Fit | Simple CRUD, scripts, small services | Complex domain logic, storage must be swappable |
 
-## 核心概念
+## Core Concepts
 
-- **脏标记（Dirty Flag）**：字段被修改后标记为 dirty，保存时才知道要写库
-- **新记录判定**：`id == 0` 表示未持久化，`save()` 时走 INSERT 而非 UPDATE
-- **静态注册表**：`find/findAll` 从注册表（模拟数据库）取回实例
+- **Dirty flag**: fields are marked dirty when modified, so `save()` knows
+  what to write
+- **New-record detection**: `id == 0` means not yet persisted; `save()` takes
+  the INSERT path instead of UPDATE
+- **Static registry**: `find/findAll` retrieve instances from the registry
+  (a stand-in database)
 
-## 代码实现
+## Implementation
 
 ```cpp
 #include <map>
@@ -83,11 +89,14 @@ private:
 };
 ```
 
-完整可运行示例见 [active-record 项目](../../cpp-mastery-roadmap/30-stage30/active-record)。
+For the full runnable example, see the
+[active-record project](../../cpp-mastery-roadmap/30-stage30/active-record).
 
-## 使用示例
+## Usage Example
 
 ```cpp
+#include <cassert>
+
 UserRecord::clearRegistry();
 
 UserRecord user("Alice", "alice@example.com");
@@ -100,13 +109,16 @@ auto found = UserRecord::find(1);
 assert(found && found->name() == "Alice Smith");
 ```
 
-## 最佳实践
+## Best Practices
 
-1. setter 中自动 `markDirty()`，避免调用方忘记标记
-2. 静态成员用 `static inline`（C++17 起）避免单独定义
-3. 实体逻辑复杂后应及时迁移到 Repository + 领域对象，避免"胖模型"
-4. 多线程环境下注意静态注册表的并发访问
+1. Call `markDirty()` inside setters so callers cannot forget to mark
+2. Use `static inline` members (C++17 and later) to avoid separate definitions
+3. Once entity logic grows complex, migrate to Repository + domain objects
+   before the model becomes "fat"
+4. Under concurrency, watch out for concurrent access to the static registry
 
-## 总结
+## Summary
 
-活动记录模式以最少的层换取最直接的持久化体验；简单场景下非常高效，但数据与存储的耦合限制了它在复杂系统中的扩展性。
+Active Record trades layers for the most direct persistence experience: very
+efficient in simple scenarios, but the coupling of data to storage limits how
+well it scales into complex systems.

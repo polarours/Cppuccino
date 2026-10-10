@@ -1,35 +1,41 @@
-# 观察者模式 (Observer Pattern)
+# Observer Pattern
 
-## 什么是观察者模式？
+## What Is the Observer Pattern?
 
-观察者模式（Observer Pattern）定义对象间的一种**一对多依赖**：当"主题"（Subject）状态变化时，所有"观察者"（Observer）都会收到通知。
+The observer pattern defines a **one-to-many dependency** between objects: when
+the "subject's" state changes, every "observer" is notified.
 
-> **核心思想**：主题不直接调用观察者，而是通过接口广播；观察者自行订阅/退订。
+> **Core idea**: the subject never calls observers directly — it broadcasts
+> through an interface, and observers subscribe/unsubscribe themselves.
 
-## 适用场景
+## When It Fits
 
-- 事件总线（UI 更新、消息分发）
-- 实时数据推送（行情、心跳）
-- 模型-视图同步（MVC 中的 View 订阅 Model）
-- 状态变化触发多个独立处理（缓存失效 + 日志 + 告警）
+- Event buses (UI updates, message dispatch)
+- Real-time data push (market data, heartbeats)
+- Model-view synchronization (a View subscribing to a Model in MVC)
+- One state change triggering several independent handlers (cache invalidation
+  + logging + alerting)
 
-## 核心概念
+## Core Concepts
 
-- **Subject（主题）**：维护观察者列表，提供 `attach / detach / notify`
-- **Observer（观察者）**：实现 `update(value)` 接口
-- **弱引用 vs 强引用**：观察者用 `weak_ptr` 存储避免循环引用，Subject 不延长观察者寿命
-- **拉模型 vs 推模型**：推模型 `update(value)` 携带数据；拉模型只通知变化，Observer 主动 `subject.getValue()`
+- **Subject**: keeps the observer list and provides
+  `attach / detach / notify`
+- **Observer**: implements the `update(value)` interface
+- **Weak vs strong references**: store observers as `weak_ptr` to avoid
+  reference cycles; the Subject must not extend observers' lifetimes
+- **Push vs pull model**: push carries the data in `update(value)`; pull only
+  announces the change and the observer actively calls `subject.getValue()`
 
-## 与发布-订阅的对比
+## Observer vs Pub/Sub
 
 | | Observer | Pub/Sub |
 |---|---|---|
-| 中介 | 无（直接调用） | 事件总线/消息中间件 |
-| 耦合 | Subject 知道 Observer 类型 | 发布者和订阅者互不知道 |
-| 同步 | 通常同步 | 经常异步 |
-| 范围 | 进程内 | 可跨进程/跨网络 |
+| Intermediary | None (direct calls) | Event bus / message middleware |
+| Coupling | Subject knows the Observer type | Publisher and subscriber don't know each other |
+| Sync style | Usually synchronous | Often asynchronous |
+| Scope | In-process | Cross-process / cross-network |
 
-## 代码实现
+## Implementation
 
 ```cpp
 #include <algorithm>
@@ -50,14 +56,17 @@ public:
         observers_.push_back(std::move(observer));
     }
 
-    void detach(const std::shared_ptr<Observer<T>>& observer) {
+    void detach(std::shared_ptr<Observer<T>> observer) {
         observers_.erase(
-            std::remove(observers_.begin(), observers_.end(), observer),
+            std::remove_if(observers_.begin(), observers_.end(),
+                [&observer](const std::weak_ptr<Observer<T>>& wp) {
+                    return wp.expired() || wp.lock() == observer;
+                }),
             observers_.end());
     }
 
     void notify(const T& value) {
-        // 拷贝列表：避免回调中修改原列表
+        // copy the list: callbacks may modify the original
         auto snapshot = observers_;
         for (auto& w : snapshot) {
             if (auto sp = w.lock()) sp->update(value);
@@ -84,9 +93,10 @@ private:
 };
 ```
 
-完整可运行示例见 [observer-pattern 项目](../../cpp-mastery-roadmap/09-stage9/observer-pattern)。
+For the full runnable example, see the
+[observer-pattern project](../../cpp-mastery-roadmap/09-stage9/observer-pattern).
 
-## 使用示例
+## Usage Example
 
 ```cpp
 Subject<int> temperature;
@@ -96,25 +106,32 @@ auto alarm   = std::make_shared<Logger<int>>();
 temperature.attach(display);
 temperature.attach(alarm);
 
-temperature.setValue(42);    // 触发 display.update + alarm.update
+temperature.setValue(42);    // triggers display.update + alarm.update
 temperature.detach(alarm);
-temperature.setValue(43);    // 只剩 display
+temperature.setValue(43);    // only display left
 ```
 
-## 关键陷阱
+## Key Traps
 
-1. **观察者列表在通知中被修改**：迭代过程中 `attach/detach` 会使迭代器失效。务必先 `snapshot` 拷贝
-2. **观察者持有 Subject 强引用** → 循环引用。用 `weak_ptr` 解决
-3. **异常传播**：一个观察者 `throw`，后续观察者不会被通知。把每个 `update` 包在 `try/catch` 里
-4. **生命周期错位**：Subject 析构后仍被观察者访问会悬空——`weak_ptr.lock()` 失败时跳过
-5. **顺序依赖**：观察者之间的调用顺序应被视为未定义，逻辑上不能相互依赖
+1. **The observer list is modified during notification**: `attach/detach`
+   during iteration invalidates iterators. Always `snapshot` a copy first
+2. **Observers holding a strong reference to the Subject** → reference cycle.
+   Solve with `weak_ptr`
+3. **Exception propagation**: if one observer `throw`s, the rest are never
+   notified. Wrap each `update` in `try/catch`
+4. **Lifetime mismatch**: touching the Subject after it was destroyed dangles —
+   skip when `weak_ptr.lock()` fails
+5. **Ordering**: the call order among observers must be treated as undefined;
+   they must not depend on each other logically
 
-## 何时不用
+## When Not to Use It
 
-- 状态变化只触发一个处理 → 直接调用
-- 跨进程、跨语言 → 用真正的消息队列（ZeroMQ / Kafka）
-- 一对一的通知 → 函数指针 / `std::function`
+- A change triggers exactly one handler → call it directly
+- Cross-process, cross-language → a real message queue (ZeroMQ / Kafka)
+- One-to-one notification → function pointer / `std::function`
 
-## 总结
+## Summary
 
-观察者模式是事件驱动架构的最小单元；正确实现的核心是"列表拷贝 + 弱引用 + 异常隔离"，三者缺一就会在生产中暴露稳定性问题。
+Observer is the smallest unit of event-driven architecture; a correct
+implementation hinges on "list copy + weak references + exception isolation" —
+miss any one of the three and production stability will show you why.

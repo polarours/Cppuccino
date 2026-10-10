@@ -1,33 +1,41 @@
-# 类型对象模式 (Type Object Pattern)
+# Type Object Pattern
 
-## 什么是类型对象模式？
+## What Is the Type Object Pattern?
 
-类型对象模式（Type Object Pattern）通过把"类型"建模为一个独立对象，让"实例"持有一个指向类型对象的引用，从而在**不引入新类**的前提下创建大量相似但参数不同的种类。
+The type object pattern models "type" as a separate object and lets each
+"instance" hold a reference to its type object — creating large numbers of
+similar-but-parameterized kinds **without introducing new classes**.
 
-> **核心思想**：分类信息从类（编译期）下沉到对象（运行期），把 N 个类替换为 1 个类 + N 个类型对象。
+> **Core idea**: move classification from classes (compile time) down to
+> objects (runtime): replace N classes with 1 class + N type objects.
 
-## 适用场景
+## When It Fits
 
-- 需要大量相似子类（RPG 怪物、棋子类、UI 主题……）
-- 分类需要运行时创建或从配置/数据中加载
-- 分类之间的关系（HP 相加、技能继承）需要在数据层而非继承层表达
+- Many similar subclasses are needed (RPG monsters, chess piece kinds, UI
+  themes…)
+- The classification must be created at runtime or loaded from config/data
+- Relationships between kinds (summed HP, inherited skills) belong in the data
+  layer, not the inheritance layer
 
-## 核心概念
+## Core Concepts
 
-- **类型对象（Type Object）**：描述一类事物的属性（HP/攻击/防御/技能列表）
-- **实例对象**：持有一个 `shared_ptr<Type>` 的对象，其行为委派给类型对象
-- **类型注册表**：用名字索引类型对象，支持查表构造实例
+- **Type object**: describes the properties of a kind (HP/attack/defense/skill
+  list)
+- **Instance object**: holds a `shared_ptr<Type>` and delegates its behavior to
+  the type object
+- **Type registry**: indexes type objects by name and supports table-driven
+  instance construction
 
-## 与继承/多态的关系
+## Type Object vs Inheritance
 
-| | 继承 | Type Object |
+| | Inheritance | Type Object |
 |---|---|---|
-| 扩展点 | 新类（编译期） | 新数据条目（运行期） |
-| 内存开销 | 每个类一份 vtable | 每个类型对象一份数据 |
-| 关系表达 | 继承树 | 类型对象引用 / 组合 |
-| 动态创建 | 不友好 | 自然支持 |
+| Extension point | New class (compile time) | New data entry (runtime) |
+| Memory cost | One vtable per class | One data record per type object |
+| Expressing relationships | Inheritance tree | Type-object references / composition |
+| Dynamic creation | Awkward | Natural |
 
-## 代码实现
+## Implementation
 
 ```cpp
 #include <map>
@@ -94,28 +102,39 @@ private:
 };
 ```
 
-完整可运行示例见 [type-object 项目](../../cpp-mastery-roadmap/31-stage31/type-object)。
+For the full runnable example, see the
+[type-object project](../../cpp-mastery-roadmap/31-stage31/type-object).
 
-## 使用示例
+## Usage Example
 
 ```cpp
+#include <cassert>
+
 CharacterTypeRegistry registry;
 registry.registerType(std::make_shared<CharacterType>("Goblin", 30, 8, 2));
 registry.registerType(std::make_shared<CharacterType>("Dragon", 500, 50, 30));
 
 auto dragon = registry.getType("Dragon");
 Character hero(dragon, "Aldric");
-hero.takeDamage(60);    // 实际扣血 = max(1, 60 - 30) = 30
+hero.takeDamage(60);    // actual damage = max(1, 60 - 30) = 30
 assert(hero.currentHp() == 470);
 ```
 
-## 最佳实践
+## Best Practices
 
-1. **类型对象不可变**：让 `CharacterType` 成员 `const`，所有变化通过 `registerType` 走新对象，避免实例缓存与类型对象错位
-2. **共享类型对象**：同一类型的所有实例共享同一个 `CharacterType`，节省内存；用 `shared_ptr` 表达所有权
-3. **配合工厂方法**：把"按名字建实例"封装成 `registry.create("Dragon", "Aldric")`，调用方不直接拿原始指针
-4. **可序列化**：把类型数据从代码移到 JSON/数据库后，可以用同一份代码处理 mod 与关卡数据
+1. **Type objects are immutable**: make `CharacterType` members `const`; all
+   changes go through `registerType` with a new object, so cached instances
+   never disagree with their type
+2. **Share type objects**: every instance of a kind shares one `CharacterType`
+   — express ownership with `shared_ptr` and save memory
+3. **Combine with Factory Method**: wrap name-based construction as
+   `registry.create("Dragon", "Aldric")` so callers never touch raw pointers
+4. **Serializable**: once type data moves from code into JSON/databases, the
+   same code serves mods and level data alike
 
-## 总结
+## Summary
 
-Type Object 把类的多样性平移到数据层，是处理"分类多、变化频繁、需运行时加载"问题的标准武器——也是 ECS、依赖注入容器、游戏引擎 entity 系统的底层模式之一。
+Type Object shifts the diversity of classes into the data layer — the standard
+weapon for "many kinds, frequent change, runtime loading", and one of the
+underlying patterns of ECS, dependency-injection containers, and game-engine
+entity systems.
