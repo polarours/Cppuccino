@@ -1,4 +1,4 @@
-# 虚函数分发与对象模型
+# 深入理解 C++ 对象模型
 
 ## C++ 对象模型基础
 
@@ -216,7 +216,10 @@ public:
 };
 
 // std::variant（值语义多态）
-std::variant<Circle, Rectangle, Triangle> shape;
+struct Square {};
+struct Rectangle {};
+struct Triangle {};
+std::variant<Square, Rectangle, Triangle> shape;
 ```
 
 ## 总结

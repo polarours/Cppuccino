@@ -157,6 +157,7 @@ coroutine lifetime.
 Read:
 
 - [Virtual Dispatch and Object Model](../docs/en/virtual-dispatch-and-object-model.md)
+- [Understanding the C++ Object Model](../docs/en/understanding-the-cpp-object-model.md)
 - [C++ Memory Model and Atomics Basics](../docs/en/cpp-memory-model-and-atomics-basics.md)
 - [Template Instantiation and Two-Phase Lookup](../docs/en/template-instantiation-and-two-phase-lookup.md)
 - [PImpl and ABI Stability](../docs/en/pimpl-and-abi-stability.md)
