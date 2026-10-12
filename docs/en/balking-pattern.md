@@ -1,59 +1,71 @@
-# 推辞模式 (Balking Pattern)
+# Balking Pattern
 
-## 什么是推辞模式？
+## What Is the Balking Pattern?
 
-推辞模式（Balking Pattern）让一个对象在"不满足前置条件"时**直接返回**，既不阻塞、也不抛错、也不重试——调用方视之为"什么都没发生"。
+The balking pattern lets an object **return immediately** when a precondition
+is not met — no blocking, no exception, no retry. The caller treats it as
+"nothing happened".
 
-> **核心思想**：用一个守卫检查（guard check）决定是否继续；条件不满足则立刻退出。
+> **Core idea**: a guard check decides whether to proceed; if the condition
+> fails, exit right away.
 
-## 与 Guarded Suspension 的关系
+## How It Relates to Guarded Suspension
 
 | | Balking | Guarded Suspension |
 |---|---|---|
-| 条件不满足时 | 立即返回 | 等待条件成立 |
-| 调用方拿到 | "无操作" | 成功的执行结果 |
-| 适用场景 | 一次性机会、可丢失的事件 | 必须完成的请求 |
-| 复杂度 | 低（无需条件变量） | 中（条件变量 + 锁） |
+| Condition not met | Return immediately | Wait until the condition holds |
+| Caller receives | "No operation" | A successful result |
+| Fit | One-shot chances, droppable events | Requests that must complete |
+| Complexity | Low (no condition variable) | Medium (condition variable + lock) |
 
-## 核心概念
+## Core Concepts
 
-- **守卫（Guard）**：在方法入口检查状态字段
-- **推辞（Balks）**：守卫失败时 `return`（不抛、不重试）
-- **幂等性**：重复调用是安全的，因为重复推辞不会有副作用
+- **Guard**: a check of the state field at method entry
+- **Balks**: `return` when the guard fails (no throw, no retry)
+- **Idempotency**: repeated calls are safe because repeating a balk has no
+  side effects
 
-## 适用场景
+## When It Fits
 
-- 设备已经打开，再次 `open()` 是 no-op
-- 数据未就绪时跳过处理（流式场景中允许丢帧）
-- 用户已经登录，再次点登录按钮无反应
-- 单次触发型事件（按钮按下后短时间内重复按下被忽略）
+- The device is already open — a second `open()` is a no-op
+- Skipping processing when data is not ready (dropping frames is acceptable in
+  streaming)
+- The user is already logged in — clicking login again does nothing
+- Single-shot events (a second press shortly after the first is ignored)
 
-## 问题场景
+## Problem Scenario
 
 ```cpp
-// 问题：用异常表达"重复打开"
+// Problem: expressing "already open" with an exception
+struct AlreadyOpen {};
+
 class Document {
+public:
     void open() {
         if (opened_) throw AlreadyOpen{};
         opened_ = true;
     }
+private:
+    bool opened_ = false;
 };
-// 调用方必须 try-catch，可读性差且代价高
+// callers must try-catch: poor readability and needless cost
 ```
 
-### 解决方案
+### Solution
 
 ```cpp
+#include <mutex>
+
 class Document {
 public:
     void open() {
         std::lock_guard<std::mutex> lock(mutex_);
-        if (opened_) return;     // 静默推辞
+        if (opened_) return;     // silent balking
         opened_ = true;
     }
     void save() {
         std::lock_guard<std::mutex> lock(mutex_);
-        if (!opened_) return;    // 没打开就别保存
+        if (!opened_) return;    // don't save what was never opened
         saved_ = true;
     }
 private:
@@ -63,7 +75,7 @@ private:
 };
 ```
 
-## 代码实现
+## Implementation
 
 ```cpp
 #include <atomic>
@@ -100,14 +112,14 @@ class Sensor {
 public:
     explicit Sensor(int threshold = 100) : threshold_(threshold) {}
 
-    // 无锁版本：单生产者单消费者
+    // lock-free version: single producer, single consumer
     bool read(int value) {
         if (value > threshold_) {
             lastValue_ = value;
             triggered_ = true;
             return true;
         }
-        return false;             // 不触发即推辞
+        return false;             // below threshold: balk
     }
     bool wasTriggered() const { return triggered_; }
     int lastValue() const { return lastValue_; }
@@ -119,15 +131,22 @@ private:
 };
 ```
 
-完整可运行示例见 [balking 项目](../../cpp-mastery-roadmap/31-stage31/balking)。
+For the full runnable example, see the
+[balking project](../../cpp-mastery-roadmap/31-stage31/balking).
 
-## 最佳实践
+## Best Practices
 
-1. **文档化推辞语义**：调用方必须知道某次调用可能是"无操作"——方法名最好暗示（如 `tryOpen`）
-2. **守卫检查与状态修改要在同一锁内**：避免 TOCTOU 竞争
-3. **不要把推辞当静默失败**：在关键路径上，记录一次推辞便于排障
-4. **幂等性是推辞的前提**：被推辞的方法在重复调用下不应留下脏状态
+1. **Document the balking semantics**: callers must know a call may be a
+   no-op — the method name should hint at it (e.g. `tryOpen`)
+2. **Guard check and state mutation inside the same lock**: avoids TOCTOU
+   races
+3. **Never treat a balk as silent failure**: on critical paths, log the balk
+   once for later debugging
+4. **Idempotency is a precondition for balking**: a balked method must not
+   leave dirty state behind when called repeatedly
 
-## 总结
+## Summary
 
-Balking 以"无操作"代替"阻塞或异常"，是处理幂等操作和短窗口防抖的简洁工具；正确使用时能让 API 更宽容，但要确保调用方明确知道"这次什么都没发生"。
+Balking replaces "block or throw" with "nothing happened" — a tidy tool for
+idempotent operations and short debounce windows; used well it makes APIs more
+tolerant, as long as callers know explicitly that this time nothing occurred.

@@ -137,7 +137,7 @@ public:
         callback_ = std::move(cb);
     }
     
-    const TodoModel::Items& getItems() const {
+    const std::vector<TodoModel::Item>& getItems() const {
         return model_.getItems();
     }
 

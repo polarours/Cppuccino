@@ -199,7 +199,7 @@
 3. 与中文版章节骨架一一对应，代码块结构一致
 4. 修完一批跑一次全仓链接校验（0 坏链）
 
-**清单（进度 8/38，按行数从小到大；每批完成后勾掉）**：
+**清单（进度 12/38，按行数从小到大；每批完成后勾掉）**：
 
 - [x] service-locator-pattern.md (103L)
 - [x] delegation-pattern.md (106L)
@@ -209,10 +209,10 @@
 - [x] strategy-pattern.md (119L)
 - [x] observer-pattern.md (120L)
 - [x] type-object-pattern.md (121L)
-- [ ] factory-method-pattern.md (124L)
-- [ ] mvc-pattern.md (158L)
-- [ ] repository-pattern.md (144L)
-- [ ] balking-pattern.md (133L)
+- [x] factory-method-pattern.md (124L)
+- [x] mvc-pattern.md (158L)
+- [x] repository-pattern.md (144L)
+- [x] balking-pattern.md (133L)
 - [ ] simd-and-performance-optimization.md (133L)
 - [ ] std-expected.md (96L, MIXED)
 - [ ] ranges-pattern.md (111L, MIXED)
