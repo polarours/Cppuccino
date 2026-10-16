@@ -92,6 +92,8 @@ private:
 ### 使用示例
 
 ```cpp
+#include <cassert>
+
 MockDatabase db;
 UserRepository repo(db);
 
@@ -188,16 +190,22 @@ private:
 ### 使用示例
 
 ```cpp
+#include <cassert>
+
+// 每个测试都从干净的 fixture 开始
 void test_add_item() {
     TodoTestFixture f;
     int newId = f.list().add("New task");
+    assert(newId != 0);
     assert(f.list().size() == 4);  // 原有3条 + 新增1条
 }
 
 void test_complete_item() {
     TodoTestFixture f;
-    f.list().complete(f.id1());    // 完成 "Buy milk"
-    assert(!f.list().all()[0].done);  // fixture 重置后重新查
+    f.list().complete(f.id1());       // 完成 "Buy milk"
+    auto items = f.list().all();      // 当前状态的快照
+    assert(items.size() == 3);        // 完成不会删除条目
+    assert(items[0].done);            // 且已标记为完成
 }
 ```
 
@@ -252,16 +260,26 @@ private:
 ### 使用示例
 
 ```cpp
-TestRunner runner;
-runner.addTest("parse positive", [] { return parseInt("42").has_value(); });
-runner.addTest("parse negative", [] { return parseInt("-7").has_value(); });
-runner.addTest("parse zero", [] { return parseInt("0").has_value(); });
-runner.addTest("parse invalid", [] { return !parseInt("abc").has_value(); });
+#include <cassert>
+#include <optional>
+#include <string>
 
-auto r = runner.run();
-assert(r.total == 4);
-assert(r.passed == 4);
-assert(r.failed == 0);
+std::optional<int> parseInt(const std::string& s) {
+    try { return std::stoi(s); } catch (...) { return std::nullopt; }
+}
+
+void demo() {
+    TestRunner runner;
+    runner.addTest("parse positive", [] { return parseInt("42").has_value(); });
+    runner.addTest("parse negative", [] { return parseInt("-7").has_value(); });
+    runner.addTest("parse zero",     [] { return parseInt("0").has_value(); });
+    runner.addTest("parse invalid",  [] { return !parseInt("abc").has_value(); });
+
+    auto r = runner.run();
+    assert(r.total == 4);
+    assert(r.passed == 4);
+    assert(r.failed == 0);
+}
 ```
 
 ---

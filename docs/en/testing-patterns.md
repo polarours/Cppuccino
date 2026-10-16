@@ -1,20 +1,27 @@
-# C++ 测试模式 (Testing Patterns in C++)
+# Testing Patterns in C++
 
-## 为什么需要测试模式？
+## Why Do Testing Patterns Matter?
 
-单元测试的目标是**隔离**、**可重复**、**快速**地验证代码逻辑。C++ 没有内置测试框架，社区惯用 Google Test、Boost.Test、Catch2 等，但无论选哪个框架，三种核心测试模式——**Mock Objects**、**Test Fixture**、**Parameterized Tests**——都通用。
+Unit tests exist to verify logic in **isolation**, **repeatably**, and
+**fast**. C++ ships no built-in test framework — the community uses Google
+Test, Boost.Test, Catch2 — but whichever you pick, three core patterns stay
+the same: **Mock Objects**, **Test Fixture**, and **Parameterized Tests**.
 
-> **核心目标**：把"被测代码"和"其依赖"分开，让测试只验证一件事。
+> **Core goal**: separate "the code under test" from "its dependencies", so
+> each test verifies exactly one thing.
 
-## 1. Mock Objects（模拟对象）
+## 1. Mock Objects
 
-### 什么是 Mock？
+### What Is a Mock?
 
-Mock 是测试替身（Test Double）的一种，它**记录调用**但不真正执行副作用。常用于验证两个对象间的交互（调用次数、参数、顺序），而不需要真实的数据库/网络/文件。
+A mock is one kind of test double: it **records calls** without performing
+real side effects. It is used to verify the interaction between two objects
+(call counts, arguments, order) without a real database/network/file.
 
-> Mock 记录调用 → Stub 返回预设值 → Fake 是轻量仿实现
+> Mock records calls → Stub returns canned data → Fake is a lightweight real
+> implementation.
 
-### 代码实现
+### Implementation
 
 ```cpp
 #include <functional>
@@ -45,14 +52,14 @@ public:
 
     void disconnect() override { disconnectCalled_ = true; }
 
-    // --- Mock 控制点 ---
+    // --- mock control points ---
     void setShouldSucceed(bool v) { shouldSucceed_ = v; }
     void setLastQueryResult(const std::string& r) { lastQueryResult_ = r; }
     void setQueryHandler(std::function<bool(const std::string&, std::string&)> h) {
         queryHandler_ = std::move(h);
     }
 
-    // --- 断言点 ---
+    // --- assertion points ---
     std::size_t connectCallCount() const { return connectCalls_.size(); }
     std::size_t queryCallCount() const { return queryCalls_.size(); }
     bool disconnectCalled() const { return disconnectCalled_; }
@@ -66,7 +73,7 @@ private:
     std::function<bool(const std::string&, std::string&)> queryHandler_;
 };
 
-// 被测对象
+// the object under test
 class UserRepository {
 public:
     explicit UserRepository(Database& db) : db_(db) {}
@@ -80,11 +87,14 @@ private:
 };
 ```
 
-完整可运行示例见 [mock-objects 项目](../../cpp-mastery-roadmap/38-stage38/mock-objects)。
+For the full runnable example, see the
+[mock-objects project](../../cpp-mastery-roadmap/38-stage38/mock-objects).
 
-### 使用示例
+### Usage Example
 
 ```cpp
+#include <cassert>
+
 MockDatabase db;
 UserRepository repo(db);
 
@@ -105,21 +115,24 @@ assert(db.queryCallCount() == 1);
 
 | | Mock | Stub | Fake |
 |---|---|---|---|
-| 目标 | 验证交互 | 提供预设数据 | 轻量仿实现 |
-| 行为 | 记录调用 | 返回固定值 | 有实际逻辑 |
-| 典型场景 | "是否调用了 X" | "查不到时返回空" | 内存数据库 |
+| Purpose | verify interaction | provide canned data | lightweight real implementation |
+| Behavior | records calls | returns fixed values | has actual logic |
+| Typical use | "was X called?" | "return empty when not found" | in-memory database |
 
 ---
 
-## 2. Test Fixture（测试夹具）
+## 2. Test Fixture
 
-### 什么是 Fixture？
+### What Is a Fixture?
 
-Fixture 把"每个测试都用到的初始化/清理代码"提取到一个共享结构中，避免重复 `setup()` / `teardown()` 逻辑，并保证测试间相互隔离。
+A fixture extracts the setup/teardown that every test in a group needs into a
+shared structure, removing duplicated `setup()` / `teardown()` code and
+keeping tests isolated from each other.
 
-> **核心思想**：`setup()` 准备数据，`teardown()` 清理状态，每个测试从干净状态开始。
+> **Core idea**: `setup()` prepares the data, `teardown()` cleans the state;
+> every test starts from a clean slate.
 
-### 代码实现
+### Implementation
 
 ```cpp
 #include <string>
@@ -156,7 +169,7 @@ private:
     int nextId_ = 1;
 };
 
-// 夹具：每个测试前自动 setup，测试后自动 teardown
+// fixture: setup on construction, teardown on destruction
 class TodoTestFixture {
 public:
     TodoTestFixture() { setup(); }
@@ -170,7 +183,7 @@ public:
     }
 
     void teardown() {
-        list_ = TodoList();  // 重置状态
+        list_ = TodoList();  // reset state
     }
 
     TodoList& list() { return list_; }
@@ -184,35 +197,41 @@ private:
 };
 ```
 
-完整可运行示例见 [test-fixture 项目](../../cpp-mastery-roadmap/38-stage38/test-fixture)。
+For the full runnable example, see the
+[test-fixture project](../../cpp-mastery-roadmap/38-stage38/test-fixture).
 
-### 使用示例
+### Usage Example
 
 ```cpp
-// 每个测试都从干净的 fixture 开始
+#include <cassert>
+
+// every test starts from a fresh fixture
 void test_add_item() {
     TodoTestFixture f;
     int newId = f.list().add("New task");
-    assert(f.list().size() == 4);  // 原有3条 + 新增1条
+    assert(newId != 0);
+    assert(f.list().size() == 4);  // 3 from setup + the new one
 }
 
 void test_complete_item() {
     TodoTestFixture f;
-    f.list().complete(f.id1());    // 完成 "Buy milk"
-    assert(!f.list().all()[0].done);  // 被 fixture 重置？不，这个是快照
-    // 正确做法：fixture 重置后重新查
+    f.list().complete(f.id1());       // complete "Buy milk"
+    auto items = f.list().all();      // a snapshot of the current state
+    assert(items.size() == 3);        // completing does not remove the item
+    assert(items[0].done);            // and it is now marked done
 }
 ```
 
 ---
 
-## 3. Parameterized Tests（参数化测试）
+## 3. Parameterized Tests
 
-### 什么是参数化测试？
+### What Are Parameterized Tests?
 
-同一测试逻辑用不同数据反复运行——避免为每组数据写一个测试函数。数据驱动测试（DDT）的 C++ 实现。
+Run one piece of test logic over many data sets — instead of writing a test
+function per data set. This is data-driven testing (DDT), C++ style.
 
-### 代码实现
+### Implementation
 
 ```cpp
 #include <functional>
@@ -250,33 +269,52 @@ private:
 };
 ```
 
-完整可运行示例见 [parameterized-tests 项目](../../cpp-mastery-roadmap/38-stage38/parameterized-tests)。
+For the full runnable example, see the
+[parameterized-tests project](../../cpp-mastery-roadmap/38-stage38/parameterized-tests).
 
-### 使用示例
+### Usage Example
 
 ```cpp
-TestRunner runner;
-runner.addTest("parse positive", [] { return parseInt("42").has_value(); });
-runner.addTest("parse negative", [] { return parseInt("-7").has_value(); });
-runner.addTest("parse zero", [] { return parseInt("0").has_value(); });
-runner.addTest("parse invalid", [] { return !parseInt("abc").has_value(); });
+#include <cassert>
+#include <optional>
+#include <string>
 
-auto r = runner.run();
-assert(r.total == 4);
-assert(r.passed == 4);
-assert(r.failed == 0);
+std::optional<int> parseInt(const std::string& s) {
+    try { return std::stoi(s); } catch (...) { return std::nullopt; }
+}
+
+void demo() {
+    TestRunner runner;
+    runner.addTest("parse positive", [] { return parseInt("42").has_value(); });
+    runner.addTest("parse negative", [] { return parseInt("-7").has_value(); });
+    runner.addTest("parse zero",     [] { return parseInt("0").has_value(); });
+    runner.addTest("parse invalid",  [] { return !parseInt("abc").has_value(); });
+
+    auto r = runner.run();
+    assert(r.total == 4);
+    assert(r.passed == 4);
+    assert(r.failed == 0);
+}
 ```
 
 ---
 
-## 最佳实践
+## Best Practices
 
-1. **Mock 验证行为，不验证实现**：Mock 关注"是否调用了正确方法"，而不是"用了哪个私有成员"
-2. **Fake 不要有分支逻辑**：Fake 的目的是跑通路径，不是验证正确性——不要在 Fake 里写业务逻辑
-3. **Fixture 要轻量**：每个测试都重新 setup，fixture 太重会拖慢测试套件
-4. **参数化测试要覆盖边界**：空字符串、极大数、负数、特殊字符——数据要有代表性
-5. **测试隔离是铁律**：测试 A 改了全局状态，不应影响测试 B 的结果
+1. **Mocks verify behavior, not implementation**: a mock cares "was the right
+   method called", never "which private member was used"
+2. **Fakes contain no branching business logic**: a fake exists to exercise
+   the path, not to validate correctness
+3. **Keep fixtures light**: every test re-runs `setup()` — heavy fixtures
+   slow the whole suite down
+4. **Parameterized data must cover the boundaries**: empty strings, extreme
+   values, negatives, special characters — the data has to be representative
+5. **Test isolation is the iron rule**: state a test A mutated must not
+   change test B's result
 
-## 总结
+## Summary
 
-三种测试模式各司其职：Mock 验证交互，Fixture 保证隔离，Parameterized Tests 批量验证等价路径。配合 CMake + CTest 自动化构建，是 C++ 项目的测试基础设施标准配置。
+The three patterns divide the work: mocks verify interactions, fixtures
+guarantee isolation, parameterized tests sweep equivalent paths in bulk.
+Together with CMake + CTest automation they are the standard testing
+infrastructure of a C++ project.
