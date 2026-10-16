@@ -62,17 +62,27 @@ std::expected<double, ErrorCode> divide(double a, double b) {
 `std::expected` 支持 `and_then` / `transform` / `or_else`，让错误在链式调用中自然传播：
 
 ```cpp
-// parseInt("10") → /2 → 结果
-auto result = parseInt("10")
-    .and_then([](int v) { return divide(v, 2.0); });  // 5.0
+#include <cassert>
 
-// transform：不改变错误类型，只改变值类型
-auto doubled = parseInt("21")
-    .transform([](int v) { return v * 2; });  // 42
+int main() {
+    // parseInt("10") → 除以 2 → 5.0
+    auto result = parseInt("10")
+        .and_then([](int v) { return divide(v, 2.0); });
+    assert(result && *result == 5.0);
 
-// or_else：自定义错误处理
-auto safe = parseInt("abc")
-    .or_else([](ErrorCode) { return std::unexpected(ErrorCode::NetworkError); });
+    // transform：不改变错误类型，只改变值类型
+    auto doubled = parseInt("21")
+        .transform([](int v) { return v * 2; });
+    assert(doubled && *doubled == 42);
+
+    // or_else：自定义错误处理
+    auto safe = parseInt("abc")
+        .or_else([](ErrorCode) -> std::expected<int, ErrorCode> {
+            return std::unexpected(ErrorCode::NetworkError);
+        });
+    assert(!safe && safe.error() == ErrorCode::NetworkError);
+    return 0;
+}
 ```
 
 ## 最佳实践
@@ -88,6 +98,10 @@ auto safe = parseInt("abc")
 大型系统推荐把错误类型设为 `std::error_code`，它本身可组合、可比较、已存在于标准库生态中：
 
 ```cpp
+#include <expected>
+#include <system_error>
+#include <string>
+
 std::expected<int, std::error_code> readConfig(const std::string& key);
 ```
 

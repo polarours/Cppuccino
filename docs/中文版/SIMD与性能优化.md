@@ -43,6 +43,9 @@ std::vector<float> add(const std::vector<float>& a, const std::vector<float>& b)
 点积是典型 SIMD 友好算法——每个 SIMD lane 独立累加后再 sum：
 
 ```cpp
+#include <vector>
+#include <cstddef>
+
 float dotProduct(const std::vector<float>& a, const std::vector<float>& b) {
     float sums[4] = {0, 0, 0, 0};   // 4 个 lane 独立累加
     std::size_t i = 0;
@@ -62,6 +65,9 @@ float dotProduct(const std::vector<float>& a, const std::vector<float>& b) {
 ## Lerp（线性插值）：GPU 常用
 
 ```cpp
+#include <vector>
+#include <cstddef>
+
 std::vector<float> lerp(const std::vector<float>& a,
                         const std::vector<float>& b,
                         float t) {
@@ -85,6 +91,8 @@ std::vector<float> lerp(const std::vector<float>& a,
 更精细的控制可以用 compiler intrinsics（x86 SSE/AVX）：
 
 ```cpp
+#include <cstddef>
+
 #ifdef __x86_64__
 #include <immintrin.h>
 

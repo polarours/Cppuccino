@@ -70,20 +70,25 @@ int main() {
 ```cpp
 #include <ranges>
 #include <vector>
+#include <cstddef>
+#include <iterator>
 
 class EvenView : public std::ranges::view_base {
     std::vector<int>& data_;
 public:
-    EvenView(std::vector<int>& d) : data_(d) {}
+    explicit EvenView(std::vector<int>& d) : data_(d) {}
 
     struct iterator {
+        std::vector<int>* owner = nullptr;   // 指向被遍历的序列
         std::vector<int>::iterator cur;
         using difference_type = std::ptrdiff_t;
         using value_type = int;
         using iterator_category = std::input_iterator_tag;
 
+        // 前进到下一个偶数
         iterator& operator++() {
-            while (++cur != data_.end() && *cur % 2 != 0) {}
+            const auto last = owner->end();
+            while (++cur != last && *cur % 2 != 0) {}
             return *this;
         }
         int operator*() const { return *cur; }
@@ -91,11 +96,12 @@ public:
     };
 
     iterator begin() {
-        iterator it{data_.begin()};
-        ++it;
+        iterator it{&data_, data_.begin()};
+        const auto last = data_.end();
+        while (it.cur != last && *it.cur % 2 != 0) ++it.cur;  // 跳过开头的奇数
         return it;
     }
-    iterator end() { return {data_.end()}; }
+    iterator end() { return {&data_, data_.end()}; }
 };
 ```
 

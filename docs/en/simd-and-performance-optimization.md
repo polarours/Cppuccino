@@ -1,16 +1,24 @@
-# SIMD 与性能优化 (SIMD Pattern)
+# SIMD and Performance Optimization
 
-## 什么是 SIMD？
+## What Is SIMD?
 
-SIMD（Single Instruction, Multiple Data）是一条 CPU 指令集（如 x86 的 SSE/AVX、ARM 的 NEON），让一条指令同时处理多个数据——例如一次指令加 4 个 float（`__m128`）。手写 SIMD 可以显著提升矩阵运算、信号处理、游戏物理等场景的吞吐量。
+SIMD (Single Instruction, Multiple Data) is a CPU instruction set — x86
+SSE/ARM NEON and their successors such as AVX — where one instruction processes
+multiple values at once, e.g. four floats (`__m128`) in a single add. Hand-written
+SIMD can dramatically raise throughput in matrix math, signal processing, and
+game physics.
 
-> **核心思想**：把标量运算向量化，用 4× 并行吞吐换取同样多的数据。
+> **Core idea**: vectorize scalar work — trade 4× parallel throughput for the
+> same amount of data.
 
-## 为什么要手写 SIMD 而不是依赖编译器？
+## Why Hand-Write SIMD Instead of Trusting the Compiler?
 
-现代编译器（GCC/Clang -O3）会自动 vectorize 简单循环，但条件复杂、对齐不佳或循环体不规则时，编译器会放弃 auto-vectorization。手写 `#pragma omp simd` 或用 intrinsics 可以强制 SIMD 路径，保证性能不退化。
+Modern compilers (GCC/Clang at `-O3`) auto-vectorize simple loops, but give up
+when the conditions are complex, alignment is poor, or the loop body is
+irregular. Hand-written `#pragma omp simd` or intrinsics force the SIMD path
+and keep performance from regressing.
 
-## 基础：手写出向量化加法
+## Basics: A Hand-Written Vectorized Add
 
 ```cpp
 #include <vector>
@@ -20,7 +28,7 @@ SIMD（Single Instruction, Multiple Data）是一条 CPU 指令集（如 x86 的
 std::vector<float> add(const std::vector<float>& a, const std::vector<float>& b) {
     std::vector<float> result(a.size());
 
-    // 向量化循环：每次处理 4 个 float（对齐到 16 字节边界）
+    // vectorized loop: 4 floats per iteration (16-byte aligned)
     std::size_t i = 0;
     for (; i + 4 <= a.size(); i += 4) {
         result[i]     = a[i]     + b[i];
@@ -28,7 +36,7 @@ std::vector<float> add(const std::vector<float>& a, const std::vector<float>& b)
         result[i + 2] = a[i + 2] + b[i + 2];
         result[i + 3] = a[i + 3] + b[i + 3];
     }
-    // 剩余标量处理
+    // scalar tail
     for (; i < a.size(); ++i) {
         result[i] = a[i] + b[i];
     }
@@ -36,15 +44,20 @@ std::vector<float> add(const std::vector<float>& a, const std::vector<float>& b)
 }
 ```
 
-核心技巧：**向量化循环** + **标量尾部**。`i + 4 <= size` 确保向量循环不越界，末尾用标量兜底。
+The core trick: **vectorized loop + scalar tail**. `i + 4 <= size` keeps the
+vector loop in bounds; the scalar loop handles the remainder.
 
-## Dot Product：并行累加
+## Dot Product: Parallel Accumulation
 
-点积是典型 SIMD 友好算法——每个 SIMD  lane 独立累加后再 sum：
+The dot product is the classic SIMD-friendly algorithm — each lane accumulates
+independently, then the lanes are summed:
 
 ```cpp
+#include <vector>
+#include <cstddef>
+
 float dotProduct(const std::vector<float>& a, const std::vector<float>& b) {
-    float sums[4] = {0, 0, 0, 0};   // 4 个 lane 独立累加
+    float sums[4] = {0, 0, 0, 0};   // 4 independent lanes
     std::size_t i = 0;
     for (; i + 4 <= a.size(); i += 4) {
         sums[0] += a[i]     * b[i];
@@ -59,9 +72,12 @@ float dotProduct(const std::vector<float>& a, const std::vector<float>& b) {
 }
 ```
 
-## Lerp（线性插值）：GPU 常用
+## Lerp (Linear Interpolation): Common on GPUs
 
 ```cpp
+#include <vector>
+#include <cstddef>
+
 std::vector<float> lerp(const std::vector<float>& a,
                         const std::vector<float>& b,
                         float t) {
@@ -80,11 +96,13 @@ std::vector<float> lerp(const std::vector<float>& a,
 }
 ```
 
-## 使用 `<immintrin.h>` / `<arm_neon.h>` 的内建函数
+## Intrinsics via `<immintrin.h>` / `<arm_neon.h>`
 
-更精细的控制可以用 compiler intrinsics（x86 SSE/AVX）：
+For finer control, use compiler intrinsics (x86 SSE/AVX):
 
 ```cpp
+#include <cstddef>
+
 #ifdef __x86_64__
 #include <immintrin.h>
 
@@ -93,41 +111,52 @@ void add_with_intrinsics(const float* __restrict__ a,
                          float* __restrict__ out,
                          std::size_t n) {
     std::size_t i = 0;
-    // AVX: 每次 8 个 float（256 位）
+    // AVX: 8 floats (256 bits) per iteration
     for (; i + 8 <= n; i += 8) {
         __m256 va = _mm256_loadu_ps(a + i);
         __m256 vb = _mm256_loadu_ps(b + i);
         __m256 vr = _mm256_add_ps(va, vb);
         _mm256_storeu_ps(out + i, vr);
     }
-    // 标量尾部
+    // scalar tail
     for (; i < n; ++i)
         out[i] = a[i] + b[i];
 }
 #endif
 ```
 
-`_mm256_loadu_ps` / `_mm256_storeu_ps` 是不对齐加载/存储的 AVX 版本（对齐版本 `_mm256_load_ps` 更快，但要求 32 字节对齐）。
+`_mm256_loadu_ps` / `_mm256_storeu_ps` are the *unaligned* AVX load/store
+forms; the aligned versions (`_mm256_load_ps`) are faster but demand 32-byte
+alignment.
 
-## 对齐与 `alignas`
+## Alignment and `alignas`
 
 ```cpp
-// 确保 32 字节对齐，适合 AVX 对齐指令
+// 32-byte alignment, suitable for aligned AVX instructions
 alignas(32) float aligned_a[1024];
 alignas(32) float aligned_b[1024];
 alignas(32) float aligned_result[1024];
 ```
 
-对齐的好处：编译器可以用 `_mm256_load_ps`（比 `_mm256_loadu_ps` 快约 10-20%），减少 cache miss。
+Benefits of alignment: the compiler can use `_mm256_load_ps` (about 10–20%
+faster than `_mm256_loadu_ps`) and cache misses decrease.
 
-## 最佳实践
+## Best Practices
 
-1. **先跑标量版，再向量化**：性能调优的基础是正确性，先确保标量版本通过测试
-2. **向量化循环的条件是连续的内存访问**：struct of arrays（SoA）比 array of structs（AoS）更适合 SIMD
-3. **不要过度优化小数据量**：向量化开销是固定常量，数据量小于 1000 个元素时标量版反而更快
-4. **用 `-fopt-info-vec` 检查编译器是否 auto-vectorize**：`g++ -O3 -fopt-info-vec-optimized file.cpp` 输出 vectorization 报告
-5. **对齐比 intrinsics 优先**：先尝试 `alignas` + `-O3`，编译器会自动 vectorize 很多简单循环
+1. **Get the scalar version right before vectorizing**: correctness first —
+   make the scalar path pass tests, then optimize
+2. **Vectorization wants contiguous memory**: struct-of-arrays (SoA) suits
+   SIMD far better than array-of-structs (AoS)
+3. **Don't over-optimize small inputs**: vectorization has fixed overhead;
+   below ~1000 elements the scalar version is often faster
+4. **Check auto-vectorization with `-fopt-info-vec`**:
+   `g++ -O3 -fopt-info-vec-optimized file.cpp` prints the vectorization report
+5. **Alignment before intrinsics**: try `alignas` + `-O3` first — the
+   compiler vectorizes many simple loops on its own
 
-## 总结
+## Summary
 
-手写 SIMD 的核心模式是 **"向量化循环 + 标量尾部"**，用 `i + 4 <= size` 保证向量化步长不超过边界。`alignas` 对齐内存是释放 performance 的第一步；intrinsics 是精细控制的手段，不是日常首选——大多数场景 `-O3` 就够用。
+The core pattern of hand-written SIMD is **"vectorized loop + scalar tail"**,
+with `i + 4 <= size` keeping the stride inside bounds. Aligned memory via
+`alignas` is step one; intrinsics are a precision tool, not the daily default —
+for most cases `-O3` is enough.
