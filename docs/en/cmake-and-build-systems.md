@@ -1,19 +1,25 @@
-# CMake 与构建系统 (CMake & Build Systems)
+# CMake & Build Systems
 
-## 为什么需要构建系统？
+## Why Do We Need a Build System?
 
-单个 `.cpp` 文件可以直接 `g++ main.cpp -o app`，但一个 C++ 项目有几十个源文件、头文件目录、依赖库、测试框架——必须用构建系统自动化。CMake 是 C++ 领域最流行的跨平台构建工具，用 `CMakeLists.txt` 描述构建目标，生成平台原生构建文件（Unix Makefile、Ninja、Visual Studio 等）。
+A single `.cpp` file can be compiled with `g++ main.cpp -o app`, but a real C++
+project has dozens of sources, header directories, third-party libraries, and a
+test framework — a build system must automate it. CMake is the most popular
+cross-platform build tool in the C++ world: you describe targets in
+`CMakeLists.txt`, and CMake generates the platform-native build files (Unix
+Makefiles, Ninja, Visual Studio solutions, …).
 
-> **核心思想**：`CMakeLists.txt` 声明"要构建什么"，CMake 生成"怎么构建它"。
+> **Core idea**: `CMakeLists.txt` declares *what* to build; CMake figures out
+> *how* to build it.
 
-## 最小项目
+## Minimal Project
 
 ```cmake
-cmake_minimum_required(VERSION 3.16)         # 最低 CMake 版本
-project(my_app LANGUAGES CXX)                  # 项目名 + 语言
+cmake_minimum_required(VERSION 3.16)         # minimum required CMake version
+project(my_app LANGUAGES CXX)                # project name + languages
 
-set(CMAKE_CXX_STANDARD 20)                     # C++ 标准
-set(CMAKE_CXX_STANDARD_REQUIRED ON)             # 强制要求标准，不满足则报错
+set(CMAKE_CXX_STANDARD 20)                   # C++ standard
+set(CMAKE_CXX_STANDARD_REQUIRED ON)          # error out if the standard is unavailable
 
 add_executable(my_app
     src/main.cpp
@@ -22,53 +28,54 @@ add_executable(my_app
 target_include_directories(my_app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 ```
 
-## Modern CMake：三个核心命令
+## Modern CMake: The Three Core Commands
 
-| 命令 | 作用 |
+| Command | Purpose |
 |---|---|
-| `target_include_directories()` | 设置目标的头文件搜索路径 |
-| `target_compile_options()` | 设置目标的编译选项 |
-| `target_link_libraries()` | 设置目标链接的库 |
+| `target_include_directories()` | header search paths for a target |
+| `target_compile_options()` | compile options for a target |
+| `target_link_libraries()` | libraries a target links against |
 
 ```cmake
 add_library(calc STATIC src/calc.cpp)
 target_include_directories(calc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(app src/main.cpp)
-target_link_libraries(app PRIVATE calc)          # PRIVATE: calc 仅 app 内部使用
+target_link_libraries(app PRIVATE calc)      # PRIVATE: calc is an implementation detail of app
 ```
 
-`PUBLIC` / `PRIVATE` / `INTERFACE` 决定依赖传播范围：
-- `PRIVATE`：只在当前目标有效
-- `PUBLIC`：当前目标和依赖它的目标都有效
-- `INTERFACE`：只在依赖目标有效（纯头文件库）
+`PUBLIC` / `PRIVATE` / `INTERFACE` control how requirements propagate:
 
-## 测试集成
+- `PRIVATE`: applies only to the current target
+- `PUBLIC`: applies to the current target *and* everything that depends on it
+- `INTERFACE`: applies only to consumers (header-only libraries)
+
+## Test Integration
 
 ```cmake
-enable_testing()                                # 启用测试
+enable_testing()                             # turn CTest on
 
 add_executable(calculator_tests
     tests/calculator_tests.cpp
 )
 target_link_libraries(calculator_tests PRIVATE calc)
 
-add_test(NAME CalculatorTests COMMAND calculator_tests)  # 注册到 CTest
+add_test(NAME CalculatorTests COMMAND calculator_tests)  # register with CTest
 
-# 构建并运行测试
+# build and run the tests
 # cmake -S . -B build -DBUILD_TESTING=ON
 # cmake --build build
 # ctest --test-dir build
 ```
 
-## 常用变量与生成器表达式
+## Common Variables and Generator Expressions
 
-| 变量/表达式 | 含义 |
+| Variable / expression | Meaning |
 |---|---|
-| `CMAKE_CURRENT_SOURCE_DIR` | 当前 `CMakeLists.txt` 所在目录 |
-| `$<TARGET_FILE:name>` | 目标文件的完整路径（生成器表达式） |
-| `$<BUILD_INTERFACE:...>` | 构建时展开的路径 |
-| `$<INSTALL_INTERFACE:...>` | 安装时展开的路径 |
+| `CMAKE_CURRENT_SOURCE_DIR` | directory of the current `CMakeLists.txt` |
+| `$<TARGET_FILE:name>` | full path of a target's file (generator expression) |
+| `$<BUILD_INTERFACE:...>` | path expanded at build time |
+| `$<INSTALL_INTERFACE:...>` | path expanded at install time |
 
 ```cmake
 target_include_directories(my_lib PUBLIC
@@ -77,32 +84,33 @@ target_include_directories(my_lib PUBLIC
 )
 ```
 
-## find_package：依赖管理
+## find_package: Dependency Management
 
 ```cmake
-# 查找已安装的库
-find_package(Threads REQUIRED)                    # 查找 Threads 库
+# locate already-installed libraries
+find_package(Threads REQUIRED)               # the Threads library
 target_link_libraries(app PRIVATE Threads::Threads)
 
-find_package(OpenSSL REQUIRED)                  # 查找 OpenSSL
+find_package(OpenSSL REQUIRED)               # OpenSSL
 target_link_libraries(app PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 ```
 
-## 子目录结构
+## Subdirectory Layout
 
 ```
 project/
-├── CMakeLists.txt          # 顶层入口
+├── CMakeLists.txt          # top-level entry point
 ├── src/
 │   └── CMakeLists.txt      # add_subdirectory(src)
 ├── include/
 │   └── CMakeLists.txt      # install(TARGETS ... EXPORT ...)
 ├── tests/
 │   └── CMakeLists.txt      # enable_testing() + add_test
-└── CMakeLists.txt.in       # CMake 工具链文件模板
+└── CMakeLists.txt.in       # toolchain file template
 ```
 
-顶层 `CMakeLists.txt`：
+Top-level `CMakeLists.txt`:
+
 ```cmake
 cmake_minimum_required(VERSION 3.16)
 project(my_project)
@@ -111,16 +119,18 @@ add_subdirectory(src)
 add_subdirectory(tests)
 ```
 
-## 完整示例：多目标项目
+## Complete Example: A Multi-Target Project
 
 ```cmake
 cmake_minimum_required(VERSION 3.16)
 project(key_value_store)
 
+find_package(Threads REQUIRED)               # kvs_server links Threads::Threads
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 库目标
+# library target
 set(LIB_SOURCES
     src/store/key_value_store.cpp
     src/protocol/protocol.cpp
@@ -129,25 +139,34 @@ set(LIB_SOURCES
 add_library(kvs_core STATIC ${LIB_SOURCES})
 target_include_directories(kvs_core PUBLIC src)
 
-# 可执行目标
+# executable target
 add_executable(kvs_server src/main.cpp)
 target_link_libraries(kvs_server PRIVATE kvs_core Threads::Threads)
 
-# 测试
+# tests
 enable_testing()
 add_executable(kvs_tests tests/kvs_tests.cpp)
 target_link_libraries(kvs_tests PRIVATE kvs_core)
 add_test(NAME KVSTests COMMAND kvs_tests)
 ```
 
-## 最佳实践
+## Best Practices
 
-1. **始终指定 `cmake_minimum_required(VERSION 3.16)` 以上**：3.16 是现代 CMake 的门槛
-2. **用 `target_*` 命令代替全局变量**：`include_directories()` / `link_directories()` 是旧风格，全局污染
-3. **`PRIVATE` 是默认值也是最安全的选择**：除非是纯头文件库，否则不用 `PUBLIC`
-4. **`enable_testing()` 放在 `project()` 之后**：`add_test()` 才能正确注册
-5. **用 `find_package` 管理外部依赖**：不要硬编码库路径
+1. **Always require `cmake_minimum_required(VERSION 3.16)` or newer**: 3.16 is
+   the threshold for modern CMake
+2. **Prefer `target_*` commands over global variables**:
+   `include_directories()` / `link_directories()` are the old style and
+   pollute everything
+3. **`PRIVATE` is both the default and the safest choice**: reach for `PUBLIC`
+   only with header-only libraries
+4. **Put `enable_testing()` after `project()`** so `add_test()` registers
+   correctly
+5. **Manage external dependencies with `find_package`**: never hard-code
+   library paths
 
-## 总结
+## Summary
 
-CMake 是 C++ 项目从"单文件编译"走向"多目标、跨平台、可测试项目"的标准工具。核心是理解 `target_*` 三件套（include、compile_options、link_libraries）和 `PUBLIC/PRIVATE/INTERFACE` 的传播语义。
+CMake is the standard step from "compiling one file" to "multi-target,
+cross-platform, testable C++ projects". The core is understanding the
+`target_*` trio (include directories, compile options, link libraries) and the
+propagation semantics of `PUBLIC` / `PRIVATE` / `INTERFACE`.

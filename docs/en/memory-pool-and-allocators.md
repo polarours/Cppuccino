@@ -1,27 +1,31 @@
-# 内存池与分配器 (Memory Pool & Allocators)
+# Memory Pool & Allocators
 
-## 什么是内存池？
+## What Is a Memory Pool?
 
-内存池（Memory Pool）是一种预分配固定大小内存块的机制，避免频繁调用 `new/delete` 带来的开销和碎片。池的分配和释放是 O(1) 的。
+A memory pool pre-allocates fixed-size blocks so you avoid the overhead and
+fragmentation of frequent `new`/`delete`. Allocation and deallocation are
+O(1).
 
-> **核心思想**：一次分配一大块（"池"），内部用链表或栈管理空闲块，按需取用。
+> **Core idea**: allocate one big chunk ("the pool") up front, keep the free
+> blocks on a list or stack inside it, and hand them out on demand.
 
-## 何时需要内存池
+## When You Need One
 
-- 高频分配/释放同类对象（网络包、游戏实体、树节点）
-- `new/delete` 成为性能瓶颈
-- 需要保证内存分配实时性（不允许系统调用延迟）
+- High-frequency allocate/free of same-sized objects (network packets, game
+  entities, tree nodes)
+- `new`/`delete` has become a bottleneck
+- Memory allocation must be real-time (no system-call latency allowed)
 
-## 三种分配器对比
+## Three Allocators Compared
 
 | | Memory Pool | Arena (Bump Allocator) | Slab Allocator |
 |---|---|---|---|
-| 块大小 | 固定 | 固定 | 固定 |
-| 释放粒度 | 单块归还 | 只能全reset | 单块归还 |
-| 碎片 | 无 | 无 | 极低 |
-| 适用场景 | 同类对象大量创建/销毁 | 短生命周期批次处理 | 多种尺寸规格 |
+| Block size | fixed | fixed | fixed |
+| Free granularity | single block | whole-arena reset only | single block |
+| Fragmentation | none | none | very low |
+| Fit | many same-type objects created/destroyed | short-lived batch work | multiple size classes |
 
-## 代码实现：Memory Pool
+## Implementation: Memory Pool
 
 ```cpp
 #include <cstddef>
@@ -47,7 +51,7 @@ public:
 
     void deallocate(void* ptr) {
         if (!ptr) return;
-        freeList_.push_back(ptr);  // 简单归还链表
+        freeList_.push_back(ptr);  // simple free list
     }
 
     std::size_t freeBlocks() const { return freeList_.size(); }
@@ -58,11 +62,11 @@ public:
 private:
     std::size_t blockSize_;
     std::vector<std::byte> memory_;
-    std::vector<void*> freeList_;   // 空闲块链表（用 vector 模拟）
+    std::vector<void*> freeList_;   // free list (a vector standing in)
 };
 ```
 
-## 代码实现：Arena（Bump Allocator）
+## Implementation: Arena (Bump Allocator)
 
 ```cpp
 #include <cstddef>
@@ -81,17 +85,17 @@ public:
         return ptr;
     }
 
-    void reset() { offset_ = 0; }  // 一次性释放全部——无需逐块追踪
+    void reset() { offset_ = 0; }  // free everything at once — no per-block tracking
 
     std::size_t used() const { return offset_; }
 
 private:
     std::vector<std::byte> memory_;
-    std::size_t offset_;   // bump 指针
+    std::size_t offset_;   // the bump pointer
 };
 ```
 
-## 代码实现：Slab Allocator
+## Implementation: Slab Allocator
 
 ```cpp
 #include <cstddef>
@@ -148,23 +152,35 @@ private:
 };
 ```
 
-完整可运行示例见 [memory-pool 项目](../../cpp-mastery-roadmap/35-stage35/memory-pool)、[arena-allocator 项目](../../cpp-mastery-roadmap/35-stage35/arena-allocator)、[slab-allocator 项目](../../cpp-mastery-roadmap/35-stage35/slab-allocator)。
+For full runnable examples, see the
+[memory-pool](../../cpp-mastery-roadmap/35-stage35/memory-pool),
+[arena-allocator](../../cpp-mastery-roadmap/35-stage35/arena-allocator), and
+[slab-allocator](../../cpp-mastery-roadmap/35-stage35/slab-allocator)
+projects.
 
-## 最佳实践
+## Best Practices
 
-1. **Pool 只管理同类对象**：不同尺寸/生命周期的对象不要混用同一个池
-2. **Arena 的 reset 必须在正确时机**：所有使用该 Arena 分配的对象都失效后才能 reset——通常配合批次处理或单帧
-3. **分配结果要做空检查**：三个分配器在耗尽时均返回 `nullptr`（Pool）或 `nullptr`（Arena），调用方必须处理
-4. **对齐是隐式约束**：`Arena::allocate` 接受对齐参数，默认 `alignof(std::max_align_t)`；小于自然对齐的请求按 8 或 16 字节对齐
+1. **A pool serves one object shape**: never mix sizes or lifetimes in the
+   same pool
+2. **Arena `reset()` only at the right moment**: every object allocated from
+   the arena must be dead first — typically batch-per-request or per-frame
+3. **Always check the result**: all three allocators return `nullptr` when
+   exhausted; callers must handle it
+4. **Alignment is a silent constraint**: `Arena::allocate` takes an alignment
+   argument defaulting to `alignof(std::max_align_t)`; requests smaller than
+   natural alignment round to 8 or 16 bytes
 
-## 与标准分配器的对比
+## Pool vs Standard Allocators
 
-| | new/delete | std::allocator | 内存池 |
+| | new/delete | std::allocator | Memory pool |
 |---|---|---|---|
-| 分配速度 | 慢（系统调用） | 中 | 快（O(1) 链表） |
-| 碎片 | 有 | 中 | 无 |
-| 适用规模 | 少量/一次性 | 标准容器 | 大量同类对象 |
+| Allocation speed | slow (system call) | medium | fast (O(1) list pop) |
+| Fragmentation | yes | medium | none |
+| Scale | few / one-off | standard containers | huge numbers of same-shaped objects |
 
-## 总结
+## Summary
 
-内存池通过预分配+内部管理，把分配成本从"系统调用"降为"指针弹栈"，是游戏引擎、网络服务器、高频交易等场景的标配基础设施。Arena 的 bump-only 模式尤其适合"用完即弃"的批次处理。
+A pool turns allocation cost from "system call" into "pointer pop" through
+pre-allocation plus internal bookkeeping — standard infrastructure in game
+engines, network servers, and high-frequency trading. The arena's bump-only
+model is especially good for discard-as-a-batch workloads.

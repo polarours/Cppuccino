@@ -1,93 +1,115 @@
-# C++20 Concepts 深入理解 (C++20 Concepts)
+# C++20 Concepts In-Depth (C++20 Concepts)
 
-## 什么是 Concepts？
+## What Are Concepts?
 
-Concepts 是 C++20 引入的编译期概念系统，它让你可以**显式声明**模板参数的类型约束，而不是隐式依赖"这个类型恰好能用 `operator+`"这样的运行时行为。
+Concepts are C++20's compile-time constraint system: you **explicitly
+declare** what a template parameter must support, instead of implicitly
+relying on runtime accidents like "this type happens to have `operator+`".
 
-> **核心思想**：把"类型要满足什么能力"从注释变成编译器能检查的契约。
+> **Core idea**: turn "what capabilities this type must have" from a comment
+> into a contract the compiler checks.
 
-## 基本概念语法
+## Basic Concept Syntax
 
 ```cpp
 #include <concepts>
+#include <iostream>
 
-// 自定义概念：可打印的类型
-template<typename T>
+// custom concept: printable types
+template <typename T>
 concept Printable = requires(T a) {
     { std::cout << a } -> std::convertible_to<std::ostream&>;
 };
 
-// 自定义概念：可加的类型
-template<typename T>
+// custom concept: addable types
+template <typename T>
 concept Addable = requires(T a, T b) {
     { a + b } -> std::same_as<T>;
 };
 
-// 组合概念
-template<typename T>
+// composed concept
+template <typename T>
 concept Number = std::integral<T> || std::floating_point<T>;
 ```
 
-- `requires` 子句定义一组要求
-- `{ expr } -> Concept` 表达返回值满足的概念
-- `std::convertible_to<A, B>` / `std::same_as<A, B>` 是标准库预定义的概念
+- a `requires` clause lists the requirements
+- `{ expr } -> Concept` asserts that the *result* satisfies a concept
+- `std::convertible_to<A, B>` / `std::same_as<A, B>` come from the standard
+  library
 
-## 概念用于函数模板
+## Concepts on Function Templates
 
 ```cpp
-// 只有满足 Number 的类型才能调用
-template<Number T>
+#include <concepts>
+
+template <typename T>
+concept Number = std::integral<T> || std::floating_point<T>;
+
+// only types satisfying Number may call this
+template <Number T>
 T add(T a, T b) {
     return a + b;
 }
 
-// 不满足时编译报错，错误信息清晰
 auto x = add(1, 2);       // OK
-auto y = add("a", "b");   // 编译错误：string 不满足 Number
+// auto y = add("a", "b"); // would fail: const char* does not satisfy Number
+// (the diagnostic reads: "constraints not satisfied for 'add' ... Number"
+//  — compile the line above uncommented to see it)
 ```
 
-对比没有 concept 的情况：
+Without a concept:
 
 ```cpp
-// 没有 constraint 时，错误在实例化时才出现，且信息晦涩
-template<typename T>
+// no constraint: the error only appears at instantiation, and it is opaque
+template <typename T>
 T add(T a, T b) { return a + b; }
 ```
 
-## 概念用于类模板
+## Concepts on Class Templates
 
 ```cpp
 #include <vector>
 #include <ranges>
+#include <utility>
 
-template<std::ranges::range R>
+template <std::ranges::range R>
 class ContainerWrapper {
 public:
     explicit ContainerWrapper(R r) : data_(std::move(r)) {}
-    
+
     auto begin() { return data_.begin(); }
     auto end()   { return data_.end(); }
-    
+
 private:
     R data_;
 };
 ```
 
-`std::ranges::range` 要求类型有 `begin()` 和 `end()`——编译器保证使用这个类模板的 R 一定是可遍历的。
+`std::ranges::range` requires the type to have `begin()` and `end()` — the
+compiler guarantees any `R` used with this class template is iterable.
 
-## 约束别名（Constrained Alias）
+## Constrained Aliases
 
 ```cpp
-template<Number T>
+#include <concepts>
+
+template <typename T>
+concept Number = std::integral<T> || std::floating_point<T>;
+
+template <Number T>
 using NumberRef = T&;
 
-NumberRef<int> x = 42;  // 等价于 int&，但加了约束
+int value = 42;
+NumberRef<int> x = value;  // same as int&, but constrained
 ```
 
-## Compound Requirements 与 `->` 追踪返回类型
+## Compound Requirements and Tracing Return Types with `->`
 
 ```cpp
-template<typename T>
+#include <concepts>
+#include <cstddef>
+
+template <typename T>
 concept ContainerLike = requires(T t) {
     typename T::value_type;
     typename T::iterator;
@@ -96,66 +118,91 @@ concept ContainerLike = requires(T t) {
 };
 ```
 
-- `requires` 子句可以有"compound requirement"：`{ expr } -> Concept;`
-- 不仅检查 `expr` 是否合法，还检查它的**返回值**是否满足 Concept
+- a `requires` clause may contain *compound requirements*:
+  `{ expr } -> Concept;`
+- these check that `expr` is valid **and** that its result satisfies the
+  concept
 
-## `requires` 子句的两种形式
+## Two Forms of `requires`
 
 ```cpp
-// 形式一：requires clause（跟在模板参数之后）
-template<Number T>
+#include <concepts>
+
+template <typename T>
+concept Number = std::integral<T> || std::floating_point<T>;
+
+// form 1: requires clause (after the template parameter list)
+template <Number T>
 T add(T a, T b);
 
-// 形式二：requires expression（嵌入概念定义）
-template<typename T>
+// form 2: requires expression (inside a concept definition)
+template <typename T>
 concept Addable = requires(T a, T b) {
     { a + b } -> std::same_as<T>;
 };
 ```
 
-也可以用在成员函数上：
+It also works on member functions:
 
 ```cpp
+#include <concepts>
+
+template <typename T>
+concept Number = std::integral<T> || std::floating_point<T>;
+
 class Calculator {
 public:
-    template<Number T>
+    template <Number T>
     T calculate(T a, T b) requires(true) {
         return a + b;
     }
 };
 ```
 
-## 标准库概念速查
+## Standard Library Concepts Cheat Sheet
 
-| 概念 | 要求 |
+| Concept | Requires |
 |---|---|
-| `std::integral<T>` | 整数类型 |
-| `std::floating_point<T>` | 浮点类型 |
-| `std::same_as<A, B>` | A 与 B 同一类型 |
-| `std::convertible_to<A, B>` | A 可隐式转换为 B |
-| `std::copyable<T>` | 可拷贝构造、可拷贝赋值、可析构 |
-| `std::movable<T>` | 可移动构造、可移动赋值、可析构 |
-| `std::ranges::range<T>` | 有 `begin()`/`end()` |
-| `std::random_access_range<T>` | 支持 `[]`、`<`、`-` |
+| `std::integral<T>` | an integral type |
+| `std::floating_point<T>` | a floating-point type |
+| `std::same_as<A, B>` | A and B are the same type |
+| `std::convertible_to<A, B>` | A implicitly converts to B |
+| `std::copyable<T>` | copy-constructible, copy-assignable, destructible |
+| `std::movable<T>` | move-constructible, move-assignable, destructible |
+| `std::ranges::range<T>` | has `begin()`/`end()` |
+| `std::random_access_range<T>` | supports `[]`, `<`, `-` |
 
-## 概念的可满足性测试
+## Testing Concept Satisfiability
 
 ```cpp
+#include <concepts>
+#include <ranges>
+#include <vector>
+
 static_assert(std::integral<int>);
 static_assert(!std::integral<double>);
 static_assert(std::ranges::range<std::vector<int>>);
 ```
 
-在编译期直接验证概念是否被正确定义。
+This verifies at compile time that a concept is defined the way you think.
 
-## 最佳实践
+## Best Practices
 
-1. **概念放在 header 里定义**：概念是模板声明的一部分，必须可见
-2. **用具体概念命名**：`HasToString` 比 `Stringable` 更清晰；`Addable` 比 `Numeric` 更具体
-3. **优先用 `requires` clause 而非 SFINAE**：编译错误信息更友好，诊断工具支持更好
-4. **概念要"精确且简洁"**：`IntegralOrFloat` 用 `std::integral || std::floating_point` 表达，不要自定义冗长概念
-5. **不要过度约束**：`requires std::size_t` 比 `requires T == std::size_t` 容易读
+1. **Define concepts in headers**: they are part of the template declaration
+   and must be visible
+2. **Name concretely**: `HasToString` beats `Stringable`; `Addable` is more
+   precise than `Numeric`
+3. **Prefer `requires` clauses over SFINAE**: friendlier diagnostics and better
+   tooling support
+4. **Keep concepts precise and small**: express `IntegralOrFloat` as
+   `std::integral || std::floating_point` instead of hand-rolling long lists
+5. **Don't over-constrain**: `requires std::size_t` reads better than
+   `requires T == std::size_t`
 
-## 总结
+## Summary
 
-Concepts 是 C++ 模板编程从"靠编译错误猜问题"走向"靠约束明确契约"的关键改进。它让 `template<typename T>` 变成 `template<Number T>`，编译错误从晦涩的类型推导失败变成"int 不满足 Number 概念"这样清晰的诊断。
+Concepts are C++ template programming's step from "guess the problem from
+compiler errors" to "state the contract with constraints". They turn
+`template<typename T>` into `template<Number T>`, so errors degrade from
+mysterious deduction failures into clear diagnostics like "int does not
+satisfy the concept Number".

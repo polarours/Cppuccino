@@ -99,6 +99,8 @@ project/
 cmake_minimum_required(VERSION 3.16)
 project(key_value_store)
 
+find_package(Threads REQUIRED)               # kvs_server links Threads::Threads
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
