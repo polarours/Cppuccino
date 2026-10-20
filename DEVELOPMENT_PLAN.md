@@ -199,7 +199,7 @@
 3. 与中文版章节骨架一一对应，代码块结构一致
 4. 修完一批跑一次全仓链接校验（0 坏链）
 
-**清单（进度 20/38，按行数从小到大；每批完成后勾掉）**：
+**清单（进度 23/38，按行数从小到大；每批完成后勾掉）**：
 
 - [x] service-locator-pattern.md (103L)
 - [x] delegation-pattern.md (106L)
@@ -221,10 +221,10 @@
 - [x] memory-pool-and-allocators.md (170L)
 - [x] testing-patterns.md (282L)
 - [x] adapter-pattern.md (421L)
-- [ ] chain-of-responsibility-pattern.md (446L)
-- [ ] bridge-pattern.md (462L)
+- [x] chain-of-responsibility-pattern.md (446L)
+- [x] bridge-pattern.md (462L)
 - [ ] flyweight-pattern.md (464L)
-- [ ] decorator-pattern.md (472L)
+- [x] decorator-pattern.md (472L)
 - [ ] template-method-pattern.md (472L)
 - [ ] state-pattern.md (475L)
 - [ ] facade-pattern.md (480L)
