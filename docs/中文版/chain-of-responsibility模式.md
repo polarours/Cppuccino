@@ -1,4 +1,4 @@
-# 责任链模式 (Chain of Responsibility Pattern)
+# 责任链模式
 
 ## 什么是责任链模式？
 
@@ -13,6 +13,14 @@
 假设我们有一个权限验证系统：
 
 ```cpp
+#include <string>
+
+// 检查所依赖的辅助函数（占位实现）
+bool isAuthenticated(const std::string&) { return true; }
+bool hasRole(const std::string&, const std::string&) { return true; }
+bool hasPermission(const std::string&, const std::string&) { return true; }
+bool isLocked(const std::string&) { return false; }
+
 // 问题：复杂的条件判断
 bool checkPermission(const std::string& user, const std::string& action) {
     if (!isAuthenticated(user)) {
@@ -33,6 +41,7 @@ bool checkPermission(const std::string& user, const std::string& action) {
 ```
 
 **问题**：
+
 1. 条件判断复杂
 2. 添加新的验证规则需要修改函数
 3. 难以测试单个验证规则
@@ -42,6 +51,12 @@ bool checkPermission(const std::string& user, const std::string& action) {
 使用责任链模式：
 
 ```cpp
+#include <memory>
+#include <string>
+
+bool isAuthenticated(const std::string&) { return true; }
+bool hasRole(const std::string&, const std::string&) { return true; }
+
 class Handler {
 public:
     virtual ~Handler() = default;
@@ -52,7 +67,7 @@ public:
         }
         return true;
     }
-    
+
 protected:
     std::unique_ptr<Handler> next_;
 };
@@ -79,6 +94,7 @@ public:
 ```
 
 **优点**：
+
 1. 解耦：请求发送者不需要知道处理者
 2. 可扩展：可以轻松添加新的处理者
 3. 灵活：可以动态改变链的顺序
@@ -120,14 +136,16 @@ public:
     void setNext(std::unique_ptr<LogHandler> handler) {
         next_ = std::move(handler);
     }
-    
+
     virtual bool handle(const std::string& request) {
         if (next_) {
             return next_->handle(request);
         }
         return true;
     }
-    
+
+    LogHandler* next() const { return next_.get(); }  // public view of the rest of the chain
+
 protected:
     std::unique_ptr<LogHandler> next_;
 };
@@ -193,11 +211,11 @@ public:
             tail_->setNext(std::move(handler));
         }
         tail_ = head_.get();
-        while (tail_->next_) {
-            tail_ = tail_->next_.get();
+        while (tail_->next()) {
+            tail_ = tail_->next();
         }
     }
-    
+
     bool process(const std::string& request) {
         std::cout << "Processing: " << request << "\n";
         bool result = head_ ? head_->handle(request) : true;
@@ -216,13 +234,13 @@ private:
 ```cpp
 int main() {
     RequestPipeline pipeline;
-    
+
     // 构建责任链
     pipeline.addHandler(std::make_unique<AuthHandler>());
     pipeline.addHandler(std::make_unique<PermissionHandler>());
     pipeline.addHandler(std::make_unique<RateLimitHandler>());
     pipeline.addHandler(std::make_unique<LoggingHandler>());
-    
+
     // 处理请求
     pipeline.process("normal_request");
     std::cout << "-------------------\n";
@@ -231,7 +249,7 @@ int main() {
     pipeline.process("forbidden_request");
     std::cout << "-------------------\n";
     pipeline.process("spam_request");
-    
+
     return 0;
 }
 ```
@@ -241,13 +259,18 @@ int main() {
 ### 使用 lambda 简化
 
 ```cpp
+#include <memory>
+#include <string>
+#include <functional>
+#include <iostream>
+
 class LambdaHandler {
 public:
     using HandlerFunc = std::function<bool(const std::string&)>;
-    
+
     LambdaHandler(HandlerFunc func, std::unique_ptr<LambdaHandler> next = nullptr)
         : func_(std::move(func)), next_(std::move(next)) {}
-    
+
     bool handle(const std::string& request) {
         if (!func_(request)) {
             return false;
@@ -260,56 +283,61 @@ private:
     std::unique_ptr<LambdaHandler> next_;
 };
 
-// 使用
-auto handler = std::make_unique<LambdaHandler>(
-    [](const std::string& req) {
-        std::cout << "[Auth] Checking...\n";
-        return req.find("unauthorized") == std::string::npos;
-    },
-    std::make_unique<LambdaHandler>(
+void demoLambda() {
+    auto handler = std::make_unique<LambdaHandler>(
         [](const std::string& req) {
-            std::cout << "[Permission] Checking...\n";
-            return req.find("forbidden") == std::string::npos;
-        }
-    )
-);
+            std::cout << "[Auth] Checking...\n";
+            return req.find("unauthorized") == std::string::npos;
+        },
+        std::make_unique<LambdaHandler>(
+            [](const std::string& req) {
+                std::cout << "[Permission] Checking...\n";
+                return req.find("forbidden") == std::string::npos;
+            }
+        )
+    );
+    (void)handler;
+}
 ```
 
-### 使用 variadic template
+### 使用 variadic constructor
 
 ```cpp
-template<typename... Handlers>
+#include <functional>
+#include <string>
+#include <vector>
+#include <utility>
+
+// 可变参数构造函数：把任意数量的 callable 折叠成一条链
 class Chain {
 public:
-    template<typename H, typename... Rest>
-    void add(H handler, Rest... rest) {
-        handlers_.push_back(std::make_unique<HandlerWrapper>(
-            std::move(handler), std::make_unique<Chain<Rest...>>(std::move(rest)...)
-        ));
+    using HandlerFunc = std::function<bool(const std::string&)>;
+
+    template <typename... Fs>
+    explicit Chain(Fs&&... fs) {
+        (steps_.push_back(HandlerFunc(std::forward<Fs>(fs))), ...);
     }
-    
+
     bool handle(const std::string& request) {
-        for (auto& h : handlers_) {
-            if (!h->handle(request)) {
-                return false;
+        for (auto& step : steps_) {
+            if (!step(request)) {
+                return false;   // 短路
             }
         }
         return true;
     }
 
 private:
-    struct HandlerWrapper {
-        std::function<bool(const std::string&)> func;
-        std::unique_ptr<HandlerWrapper> next;
-        
-        bool handle(const std::string& request) {
-            if (!func(request)) return false;
-            return next ? next->handle(request) : true;
-        }
-    };
-    
-    std::vector<std::unique_ptr<HandlerWrapper>> handlers_;
+    std::vector<HandlerFunc> steps_;
 };
+
+void demoVariadic() {
+    Chain chain(
+        [](const std::string& r) { return r.find("unauthorized") == std::string::npos; },
+        [](const std::string& r) { return r.find("forbidden") == std::string::npos; }
+    );
+    (void)chain.handle("ok_request");
+}
 ```
 
 ## 与相关模式的区别
@@ -328,13 +356,14 @@ private:
 class HandlerFactory {
 public:
     static std::unique_ptr<LogHandler> createChain() {
-        auto auth = std::make_unique<AuthHandler>();
-        auto permission = std::make_unique<PermissionHandler>();
+        // 从尾部开始构建：handler 被 move 之后不能再使用
         auto rateLimit = std::make_unique<RateLimitHandler>();
-        
+        auto permission = std::make_unique<PermissionHandler>();
+        auto auth = std::make_unique<AuthHandler>();
+
+        permission->setNext(std::move(rateLimit));
         auth->setNext(std::move(permission));
-        auth->next_->setNext(std::move(rateLimit));
-        
+
         return auth;
     }
 };
@@ -352,7 +381,7 @@ public:
         }
         return LogHandler::handle(request);
     }
-    
+
 private:
     virtual bool handleRequest(const std::string& request) = 0;
 };
@@ -361,10 +390,14 @@ private:
 ### 3. 使用中间件模式
 
 ```cpp
+#include <functional>
+#include <string>
+#include <iostream>
+
 class Middleware {
 public:
     using MiddlewareFunc = std::function<bool(const std::string&, std::function<bool()>)>;
-    
+
     static MiddlewareFunc logging() {
         return [](const std::string& request, std::function<bool()> next) {
             std::cout << "[Logging] Before: " << request << "\n";
@@ -373,7 +406,7 @@ public:
             return result;
         };
     }
-    
+
     static MiddlewareFunc auth() {
         return [](const std::string& request, std::function<bool()> next) {
             if (request.find("auth") != std::string::npos) {
@@ -390,31 +423,47 @@ public:
 ### 陷阱 1：链过长
 
 ```cpp
-// 不推荐：链太长，性能差
-handler1->setNext(std::make_unique<Handler2>());
-handler2->setNext(std::make_unique<Handler3>());
-// ... 10+ 个处理器
-
+// 不推荐：10+ 个处理器的链，既慢又难读
+// handler1->setNext(std::make_unique<Handler2>());
+// handler2->setNext(std::make_unique<Handler3>());
+// ...
+//
 // 推荐：保持链短，必要时拆分
-class AuthChain { ... };  // 认证链
-class PermissionChain { ... };  // 权限链
+// class AuthChain { /* ... */ };       // 认证链
+// class PermissionChain { /* ... */ }; // 权限链
 ```
 
 ### 陷阱 2：循环引用
 
 ```cpp
 // 危险：链形成环
-handlerA->setNext(handlerB);
-handlerB->setNext(handlerC);
-handlerC->setNext(handlerA);  // 循环！
-
-// 推荐：确保链是线性的
+// handlerA->setNext(std::move(handlerB));
+// handlerB->setNext(std::move(handlerC));
+// handlerC->setNext(std::move(handlerA));  // 循环！
+//
+// （最后这行用 unique_ptr 根本编译不过——这其实是好事；如果确实需要
+//  反向引用，用非拥有指针，并保持链严格线性）
 ```
 
 ### 陷阱 3：忘记终止链
 
 ```cpp
-// 不推荐：没有终止点
+#include <memory>
+#include <string>
+
+class LogHandler {  // 第 1 节的基类
+public:
+    virtual ~LogHandler() = default;
+    void setNext(std::unique_ptr<LogHandler> handler) { next_ = std::move(handler); }
+    virtual bool handle(const std::string& request) {
+        if (next_) return next_->handle(request);
+        return true;
+    }
+protected:
+    std::unique_ptr<LogHandler> next_;
+};
+
+// 不推荐：不转发——链在这里无声地结束了
 class BadHandler : public LogHandler {
 public:
     bool handle(const std::string& request) override {
@@ -423,7 +472,7 @@ public:
     }
 };
 
-// 推荐：确保链正确终止
+// 推荐：正确终止
 class GoodHandler : public LogHandler {
 public:
     bool handle(const std::string& request) override {
@@ -431,6 +480,9 @@ public:
         if (!result) return false;
         return LogHandler::handle(request);  // 传递给下一个
     }
+
+private:
+    bool process(const std::string& request) { return true; }  // 占位逻辑
 };
 ```
 

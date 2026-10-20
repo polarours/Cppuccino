@@ -1,47 +1,65 @@
-# 责任链模式 (Chain of Responsibility Pattern)
+# Chain of Responsibility Pattern
 
-## 什么是责任链模式？
+## What Is the Chain of Responsibility Pattern?
 
-责任链模式（Chain of Responsibility Pattern）是一种行为型设计模式，它将所有请求的处理者连成一条链，并沿着这条链传递请求，直到有对象处理它为止。
+Chain of Responsibility is a behavioral design pattern that links all request
+handlers into a chain and passes the request along it until some object
+handles it.
 
-> **核心思想**：将请求的发送者和接收者解耦，让多个对象都有机会处理请求。
+> **Core idea**: decouple the sender of a request from its receivers — let
+> several objects each get a chance to handle it.
 
-## 为什么需要责任链模式？
+## Why Do We Need It?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有一个权限验证系统：
+Consider a permission-checking system:
 
 ```cpp
-// 问题：复杂的条件判断
+#include <string>
+
+// stand-in helpers for the checks
+bool isAuthenticated(const std::string&) { return true; }
+bool hasRole(const std::string&, const std::string&) { return true; }
+bool hasPermission(const std::string&, const std::string&) { return true; }
+bool isLocked(const std::string&) { return false; }
+
+// Problem: a tangle of conditionals
 bool checkPermission(const std::string& user, const std::string& action) {
     if (!isAuthenticated(user)) {
-        return false;  // 未认证
+        return false;  // not authenticated
     }
     if (!hasRole(user, "admin") && action == "delete") {
-        return false;  // 无删除权限
+        return false;  // no delete permission
     }
     if (!hasPermission(user, action)) {
-        return false;  // 无操作权限
+        return false;  // no permission for this action
     }
     if (isLocked(user)) {
-        return false;  // 账户锁定
+        return false;  // account locked
     }
-    // ... 更多检查
+    // ... more checks
     return true;
 }
 ```
 
-**问题**：
-1. 条件判断复杂
-2. 添加新的验证规则需要修改函数
-3. 难以测试单个验证规则
+**The problems**:
 
-### 解决方案
+1. The conditionals are hard to read
+2. Adding a rule means editing the function
+3. Individual rules cannot be tested in isolation
 
-使用责任链模式：
+### Solution
+
+Use the chain of responsibility:
 
 ```cpp
+#include <memory>
+#include <string>
+
+bool isAuthenticated(const std::string&) { return true; }
+bool hasRole(const std::string&, const std::string&) { return true; }
+
 class Handler {
 public:
     virtual ~Handler() = default;
@@ -52,7 +70,7 @@ public:
         }
         return true;
     }
-    
+
 protected:
     std::unique_ptr<Handler> next_;
 };
@@ -78,12 +96,13 @@ public:
 };
 ```
 
-**优点**：
-1. 解耦：请求发送者不需要知道处理者
-2. 可扩展：可以轻松添加新的处理者
-3. 灵活：可以动态改变链的顺序
+**Benefits**:
 
-## 模式结构
+1. Decoupling: the sender never knows the handlers
+2. Extensible: new handlers plug in without touching existing ones
+3. Flexible: the order can change at runtime
+
+## Pattern Structure
 
 ```
                     ┌─────────────┐
@@ -94,19 +113,19 @@ public:
               ┌────────────┼────────────┐
               │            │            │
     ┌─────────▼───┐ ┌──────▼─────┐ ┌───▼────────┐
-    │  AuthHandler│ │ RoleHandler│ │PermissionH.│ ← 具体处理器
+    │  AuthHandler│ │ RoleHandler│ │PermissionH.│ ← concrete handlers
     └─────────────┘ └────────────┘ └────────────┘
            │               │               │
            └───────────────┼───────────────┘
                            │
                     ┌────────▼────────┐
-                    │    Client       │ ← 客户端
+                    │    Client       │ ← the client
                     └─────────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义处理器接口
+### 1. Define the Handler Interface
 
 ```cpp
 #include <memory>
@@ -120,20 +139,22 @@ public:
     void setNext(std::unique_ptr<LogHandler> handler) {
         next_ = std::move(handler);
     }
-    
+
     virtual bool handle(const std::string& request) {
         if (next_) {
             return next_->handle(request);
         }
         return true;
     }
-    
+
+    LogHandler* next() const { return next_.get(); }  // public view of the rest of the chain
+
 protected:
     std::unique_ptr<LogHandler> next_;
 };
 ```
 
-### 2. 实现具体处理器
+### 2. Implement the Concrete Handlers
 
 ```cpp
 class AuthHandler : public LogHandler {
@@ -181,7 +202,7 @@ public:
 };
 ```
 
-### 3. 构建责任链
+### 3. Build the Chain
 
 ```cpp
 class RequestPipeline {
@@ -193,11 +214,11 @@ public:
             tail_->setNext(std::move(handler));
         }
         tail_ = head_.get();
-        while (tail_->next_) {
-            tail_ = tail_->next_.get();
+        while (tail_->next()) {
+            tail_ = tail_->next();
         }
     }
-    
+
     bool process(const std::string& request) {
         std::cout << "Processing: " << request << "\n";
         bool result = head_ ? head_->handle(request) : true;
@@ -211,19 +232,19 @@ private:
 };
 ```
 
-### 4. 客户端使用
+### 4. Client Usage
 
 ```cpp
 int main() {
     RequestPipeline pipeline;
-    
-    // 构建责任链
+
+    // build the chain
     pipeline.addHandler(std::make_unique<AuthHandler>());
     pipeline.addHandler(std::make_unique<PermissionHandler>());
     pipeline.addHandler(std::make_unique<RateLimitHandler>());
     pipeline.addHandler(std::make_unique<LoggingHandler>());
-    
-    // 处理请求
+
+    // handle requests
     pipeline.process("normal_request");
     std::cout << "-------------------\n";
     pipeline.process("unauthorized_request");
@@ -231,23 +252,28 @@ int main() {
     pipeline.process("forbidden_request");
     std::cout << "-------------------\n";
     pipeline.process("spam_request");
-    
+
     return 0;
 }
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用 lambda 简化
+### With Lambdas
 
 ```cpp
+#include <memory>
+#include <string>
+#include <functional>
+#include <iostream>
+
 class LambdaHandler {
 public:
     using HandlerFunc = std::function<bool(const std::string&)>;
-    
+
     LambdaHandler(HandlerFunc func, std::unique_ptr<LambdaHandler> next = nullptr)
         : func_(std::move(func)), next_(std::move(next)) {}
-    
+
     bool handle(const std::string& request) {
         if (!func_(request)) {
             return false;
@@ -260,87 +286,93 @@ private:
     std::unique_ptr<LambdaHandler> next_;
 };
 
-// 使用
-auto handler = std::make_unique<LambdaHandler>(
-    [](const std::string& req) {
-        std::cout << "[Auth] Checking...\n";
-        return req.find("unauthorized") == std::string::npos;
-    },
-    std::make_unique<LambdaHandler>(
+void demoLambda() {
+    auto handler = std::make_unique<LambdaHandler>(
         [](const std::string& req) {
-            std::cout << "[Permission] Checking...\n";
-            return req.find("forbidden") == std::string::npos;
-        }
-    )
-);
+            std::cout << "[Auth] Checking...\n";
+            return req.find("unauthorized") == std::string::npos;
+        },
+        std::make_unique<LambdaHandler>(
+            [](const std::string& req) {
+                std::cout << "[Permission] Checking...\n";
+                return req.find("forbidden") == std::string::npos;
+            }
+        )
+    );
+    (void)handler;
+}
 ```
 
-### 使用 variadic template
+### With a Variadic Constructor
 
 ```cpp
-template<typename... Handlers>
+#include <functional>
+#include <string>
+#include <vector>
+#include <utility>
+
+// a variadic constructor folds any number of callables into one chain
 class Chain {
 public:
-    template<typename H, typename... Rest>
-    void add(H handler, Rest... rest) {
-        handlers_.push_back(std::make_unique<HandlerWrapper>(
-            std::move(handler), std::make_unique<Chain<Rest...>>(std::move(rest)...)
-        ));
+    using HandlerFunc = std::function<bool(const std::string&)>;
+
+    template <typename... Fs>
+    explicit Chain(Fs&&... fs) {
+        (steps_.push_back(HandlerFunc(std::forward<Fs>(fs))), ...);
     }
-    
+
     bool handle(const std::string& request) {
-        for (auto& h : handlers_) {
-            if (!h->handle(request)) {
-                return false;
+        for (auto& step : steps_) {
+            if (!step(request)) {
+                return false;   // short-circuit
             }
         }
         return true;
     }
 
 private:
-    struct HandlerWrapper {
-        std::function<bool(const std::string&)> func;
-        std::unique_ptr<HandlerWrapper> next;
-        
-        bool handle(const std::string& request) {
-            if (!func(request)) return false;
-            return next ? next->handle(request) : true;
-        }
-    };
-    
-    std::vector<std::unique_ptr<HandlerWrapper>> handlers_;
+    std::vector<HandlerFunc> steps_;
 };
+
+void demoVariadic() {
+    Chain chain(
+        [](const std::string& r) { return r.find("unauthorized") == std::string::npos; },
+        [](const std::string& r) { return r.find("forbidden") == std::string::npos; }
+    );
+    (void)chain.handle("ok_request");
+}
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
-|------|------|
-| **策略模式** | 策略模式选择一个算法；责任链传递请求给多个处理者 |
-| **命令模式** | 命令模式封装请求；责任链处理请求链 |
-| **观察者模式** | 观察者模式通知多个对象；责任链按顺序处理 |
+| Pattern | Difference |
+|---------|-----------|
+| **Strategy** | Strategy picks one algorithm; a chain passes the request to many handlers |
+| **Command** | Command encapsulates a request; a chain processes a sequence of handlers |
+| **Observer** | Observer notifies many objects; a chain processes them in order, stopping at the first that handles it |
 
-## 最佳实践
+## Best Practices
 
-### 1. 使用工厂构建链
+### 1. Build Chains with a Factory
 
 ```cpp
 class HandlerFactory {
 public:
     static std::unique_ptr<LogHandler> createChain() {
-        auto auth = std::make_unique<AuthHandler>();
-        auto permission = std::make_unique<PermissionHandler>();
+        // build tail-first: a handler must not be used after it was moved
         auto rateLimit = std::make_unique<RateLimitHandler>();
-        
+        auto permission = std::make_unique<PermissionHandler>();
+        auto auth = std::make_unique<AuthHandler>();
+
+        permission->setNext(std::move(rateLimit));
         auth->setNext(std::move(permission));
-        auth->next_->setNext(std::move(rateLimit));
-        
+
         return auth;
     }
 };
 ```
 
-### 2. 支持短路处理
+### 2. Support Short-Circuiting
 
 ```cpp
 class ShortCircuitHandler : public LogHandler {
@@ -348,23 +380,27 @@ public:
     bool handle(const std::string& request) override {
         bool result = handleRequest(request);
         if (!result) {
-            return false;  // 短路：不再传递给下一个
+            return false;  // short-circuit: do not forward to the next handler
         }
         return LogHandler::handle(request);
     }
-    
+
 private:
     virtual bool handleRequest(const std::string& request) = 0;
 };
 ```
 
-### 3. 使用中间件模式
+### 3. Use the Middleware Shape
 
 ```cpp
+#include <functional>
+#include <string>
+#include <iostream>
+
 class Middleware {
 public:
     using MiddlewareFunc = std::function<bool(const std::string&, std::function<bool()>)>;
-    
+
     static MiddlewareFunc logging() {
         return [](const std::string& request, std::function<bool()> next) {
             std::cout << "[Logging] Before: " << request << "\n";
@@ -373,7 +409,7 @@ public:
             return result;
         };
     }
-    
+
     static MiddlewareFunc auth() {
         return [](const std::string& request, std::function<bool()> next) {
             if (request.find("auth") != std::string::npos) {
@@ -385,62 +421,85 @@ public:
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：链过长
+### Trap 1: The Chain Gets Too Long
 
 ```cpp
-// 不推荐：链太长，性能差
-handler1->setNext(std::make_unique<Handler2>());
-handler2->setNext(std::make_unique<Handler3>());
-// ... 10+ 个处理器
-
-// 推荐：保持链短，必要时拆分
-class AuthChain { ... };  // 认证链
-class PermissionChain { ... };  // 权限链
+// Not recommended: a 10+ handler chain is slow and unreadable
+// handler1->setNext(std::make_unique<Handler2>());
+// handler2->setNext(std::make_unique<Handler3>());
+// ...
+//
+// Recommended: keep chains short and split them
+// class AuthChain { /* ... */ };       // authentication chain
+// class PermissionChain { /* ... */ }; // permission chain
 ```
 
-### 陷阱 2：循环引用
+### Trap 2: Cycles
 
 ```cpp
-// 危险：链形成环
-handlerA->setNext(handlerB);
-handlerB->setNext(handlerC);
-handlerC->setNext(handlerA);  // 循环！
-
-// 推荐：确保链是线性的
+// Danger: the chain forms a cycle
+// handlerA->setNext(std::move(handlerB));
+// handlerB->setNext(std::move(handlerC));
+// handlerC->setNext(std::move(handlerA));  // cycle!
+//
+// (with unique_ptr the last line would not even compile — which is your
+//  friend; if you must reference backwards, use a non-owning pointer and
+//  keep the chain strictly linear)
 ```
 
-### 陷阱 3：忘记终止链
+### Trap 3: Forgetting to Terminate the Chain
 
 ```cpp
-// 不推荐：没有终止点
+#include <memory>
+#include <string>
+
+class LogHandler {  // the base from section 1
+public:
+    virtual ~LogHandler() = default;
+    void setNext(std::unique_ptr<LogHandler> handler) { next_ = std::move(handler); }
+    virtual bool handle(const std::string& request) {
+        if (next_) return next_->handle(request);
+        return true;
+    }
+protected:
+    std::unique_ptr<LogHandler> next_;
+};
+
+// Not recommended: never forwards — the chain silently ends here
 class BadHandler : public LogHandler {
 public:
     bool handle(const std::string& request) override {
-        // 忘记调用 next_->handle()
+        // never calls next_->handle()
         return false;
     }
 };
 
-// 推荐：确保链正确终止
+// Recommended: forward correctly
 class GoodHandler : public LogHandler {
 public:
     bool handle(const std::string& request) override {
         bool result = process(request);
         if (!result) return false;
-        return LogHandler::handle(request);  // 传递给下一个
+        return LogHandler::handle(request);  // pass to the next handler
     }
+
+private:
+    bool process(const std::string& request) { return true; }  // stand-in logic
 };
 ```
 
-## 总结
+## Summary
 
-责任链模式的核心要点：
+The core points of the chain of responsibility pattern:
 
-- **适用场景**：多个对象处理请求、动态指定处理者、简化条件分支
-- **核心优点**：解耦、可扩展、灵活
-- **实现要点**：使用工厂构建链、支持短路、确保链正确终止
-- **常见陷阱**：链过长、循环引用、忘记终止
+- **When to use it**: many objects may handle a request, the handler should be
+  chosen at runtime, or deep conditional nesting must go
+- **Main benefits**: decoupling, extensibility, flexibility
+- **Implementation advice**: build chains with a factory, support
+  short-circuiting, make sure every chain terminates
+- **Common traps**: chains that are too long, cycles, forgetting to terminate
 
-> **记住**：责任链模式的关键是"顺序处理"——让请求沿着处理者链条传递，每个处理者都有机会处理或拒绝请求。
+> **Remember**: the key is *ordered processing* — the request travels along
+> the chain, and every handler gets a chance to handle or reject it.

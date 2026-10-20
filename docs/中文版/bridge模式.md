@@ -1,4 +1,4 @@
-# 桥接模式 (Bridge Pattern)
+# 桥接模式
 
 ## 什么是桥接模式？
 
@@ -33,6 +33,7 @@ class BlueRectangle : public Rectangle { /* ... */ };
 ```
 
 **问题**：
+
 1. 类数量随维度增加而指数增长
 2. 难以维护和扩展
 3. 违反单一职责原则
@@ -42,6 +43,8 @@ class BlueRectangle : public Rectangle { /* ... */ };
 使用桥接模式：
 
 ```cpp
+#include <memory>
+
 // 实现部分（颜色）
 class Color {
 public:
@@ -60,14 +63,14 @@ public:
 };
 
 // 抽象部分（形状）
-class Shape {
+class ColoredShape {
 public:
-    explicit Shape(std::unique_ptr<Color> color)
+    explicit ColoredShape(std::unique_ptr<Color> color)
         : color_(std::move(color)) {}
-    
-    virtual ~Shape() = default;
+
+    virtual ~ColoredShape() = default;
     virtual void draw() = 0;
-    
+
 protected:
     Color& getColor() const { return *color_; }
 
@@ -75,22 +78,22 @@ private:
     std::unique_ptr<Color> color_;
 };
 
-class Circle : public Shape {
+class ColoredCircle : public ColoredShape {
 public:
-    explicit Circle(std::unique_ptr<Color> color)
-        : Shape(std::move(color)) {}
-    
+    explicit ColoredCircle(std::unique_ptr<Color> color)
+        : ColoredShape(std::move(color)) {}
+
     void draw() override {
         getColor().apply();
         // 绘制圆形...
     }
 };
 
-class Rectangle : public Shape {
+class ColoredRectangle : public ColoredShape {
 public:
-    explicit Rectangle(std::unique_ptr<Color> color)
-        : Shape(std::move(color)) {}
-    
+    explicit ColoredRectangle(std::unique_ptr<Color> color)
+        : ColoredShape(std::move(color)) {}
+
     void draw() override {
         getColor().apply();
         // 绘制矩形...
@@ -99,6 +102,7 @@ public:
 ```
 
 **优点**：
+
 1. 解耦：抽象和实现独立变化
 2. 可扩展：可以独立添加新形状或新颜色
 3. 减少类数量：N 个形状 + M 个颜色 = N+M 个类
@@ -143,6 +147,9 @@ public:
 #include <iostream>
 #include <vector>
 
+#include <memory>
+#include <iostream>
+
 class Renderer {
 public:
     virtual ~Renderer() = default;
@@ -150,39 +157,39 @@ public:
     virtual void renderRectangle(double width, double height) = 0;
     virtual void renderLine(double x1, double y1, double x2, double y2) = 0;
 };
-```
 
-### 2. 实现具体渲染器
-
-```cpp
 class VectorRenderer : public Renderer {
 public:
     void renderCircle(double radius) override {
         std::cout << "Rendering vector circle with radius " << radius << "\n";
     }
-    
+
     void renderRectangle(double width, double height) override {
         std::cout << "Rendering vector rectangle " << width << "x" << height << "\n";
     }
-    
+
     void renderLine(double x1, double y1, double x2, double y2) override {
-        std::cout << "Rendering vector line from (" << x1 << "," << y1 
+        std::cout << "Rendering vector line from (" << x1 << "," << y1
                   << ") to (" << x2 << "," << y2 << ")\n";
     }
 };
+```
 
+### 2. 实现具体渲染器
+
+```cpp
 class RasterRenderer : public Renderer {
 public:
     void renderCircle(double radius) override {
         std::cout << "Rendering raster circle with radius " << radius << "\n";
     }
-    
+
     void renderRectangle(double width, double height) override {
         std::cout << "Rendering raster rectangle " << width << "x" << height << "\n";
     }
-    
+
     void renderLine(double x1, double y1, double x2, double y2) override {
-        std::cout << "Rendering raster line from (" << x1 << "," << y1 
+        std::cout << "Rendering raster line from (" << x1 << "," << y1
                   << ") to (" << x2 << "," << y2 << ")\n";
     }
 };
@@ -192,13 +199,13 @@ public:
     void renderCircle(double radius) override {
         std::cout << "Rendering PDF circle with radius " << radius << "\n";
     }
-    
+
     void renderRectangle(double width, double height) override {
         std::cout << "Rendering PDF rectangle " << width << "x" << height << "\n";
     }
-    
+
     void renderLine(double x1, double y1, double x2, double y2) override {
-        std::cout << "Rendering PDF line from (" << x1 << "," << y1 
+        std::cout << "Rendering PDF line from (" << x1 << "," << y1
                   << ") to (" << x2 << "," << y2 << ")\n";
     }
 };
@@ -211,10 +218,15 @@ class Shape {
 public:
     explicit Shape(std::unique_ptr<Renderer> renderer)
         : renderer_(std::move(renderer)) {}
-    
+
     virtual ~Shape() = default;
     virtual void draw() = 0;
-    
+
+    // 支持运行时切换实现
+    void setRenderer(std::unique_ptr<Renderer> renderer) {
+        renderer_ = std::move(renderer);
+    }
+
 protected:
     Renderer& getRenderer() const { return *renderer_; }
 
@@ -224,40 +236,40 @@ private:
 
 class Circle : public Shape {
 public:
-    explicit Circle(std::unique_ptr<Renderer> renderer, double radius)
+    Circle(std::unique_ptr<Renderer> renderer, double radius)
         : Shape(std::move(renderer)), radius_(radius) {}
-    
+
     void draw() override {
-        renderer_.get().renderCircle(radius_);
+        getRenderer().renderCircle(radius_);
     }
-    
+
     void setRadius(double radius) { radius_ = radius; }
     double getRadius() const { return radius_; }
 
 private:
-    double radius_;
+    double radius_ = 0.0;
 };
 
 class Rectangle : public Shape {
 public:
     Rectangle(std::unique_ptr<Renderer> renderer, double width, double height)
         : Shape(std::move(renderer)), width_(width), height_(height) {}
-    
+
     void draw() override {
-        renderer_.get().renderRectangle(width_, height_);
+        getRenderer().renderRectangle(width_, height_);
     }
-    
+
     void setSize(double width, double height) {
         width_ = width;
         height_ = height;
     }
-    
+
     double getWidth() const { return width_; }
     double getHeight() const { return height_; }
 
 private:
-    double width_;
-    double height_;
+    double width_ = 0.0;
+    double height_ = 0.0;
 };
 ```
 
@@ -269,27 +281,27 @@ int main() {
     auto vectorRenderer = std::make_unique<VectorRenderer>();
     auto rasterRenderer = std::make_unique<RasterRenderer>();
     auto pdfRenderer = std::make_unique<PDFRenderer>();
-    
+
     // 创建图形，使用不同的渲染器
     Circle vectorCircle(std::move(vectorRenderer), 5.0);
     Rectangle rasterRect(std::move(rasterRenderer), 10.0, 20.0);
     Circle pdfCircle(std::move(pdfRenderer), 8.0);
-    
+
     // 绘制
     std::cout << "=== Vector Graphics ===\n";
     vectorCircle.draw();
-    
+
     std::cout << "\n=== Raster Graphics ===\n";
     rasterRect.draw();
-    
+
     std::cout << "\n=== PDF Graphics ===\n";
     pdfCircle.draw();
-    
+
     // 动态切换渲染器
-    vectorCircle = Circle(std::make_unique<RasterRenderer>(), 5.0);
+    vectorCircle.setRenderer(std::make_unique<RasterRenderer>());
     std::cout << "\n=== Switched to Raster ===\n";
     vectorCircle.draw();
-    
+
     return 0;
 }
 ```
@@ -299,12 +311,15 @@ int main() {
 ### 使用智能指针管理
 
 ```cpp
+#include <memory>
+#include <utility>
+
+template <typename Renderer, typename... Args>
 class ManagedShape {
 public:
-    template<typename Renderer, typename... Args>
     explicit ManagedShape(Args&&... args)
         : renderer_(std::make_unique<Renderer>(std::forward<Args>(args)...)) {}
-    
+
     void setRenderer(std::unique_ptr<Renderer> renderer) {
         renderer_ = std::move(renderer);
     }
@@ -317,22 +332,26 @@ private:
 ### 使用模板桥接
 
 ```cpp
-template<typename Renderer>
+#include <utility>
+
+template <typename Renderer>
 class TemplatedShape {
 public:
     explicit TemplatedShape(Renderer renderer)
         : renderer_(std::move(renderer)) {}
-    
-    void draw() {
-        renderer_.render();
+
+    void drawCircle() {
+        renderer_.renderCircle(1.0);
     }
 
 private:
     Renderer renderer_;
 };
 
-// 使用
-TemplatedShape<VectorRenderer> shape(VectorRenderer());
+void demoTemplated() {
+    TemplatedShape<VectorRenderer> shape{VectorRenderer()};  // braces: avoid the vexing parse
+    shape.drawCircle();
+}
 ```
 
 ## 与相关模式的区别
@@ -340,7 +359,7 @@ TemplatedShape<VectorRenderer> shape(VectorRenderer());
 | 模式 | 区别 |
 |------|------|
 | **组合模式** | 组合模式树形结构；桥接模式分离抽象和实现 |
-| **适配器模式** | 适配器转换接口；桥接模式分离抽象和实现 |
+| **适配器模式** | 适配器转换接口；桥接模式分离两个变化维度 |
 | **装饰器模式** | 装饰器增强功能；桥接模式分离变化维度 |
 
 ## 最佳实践
@@ -348,14 +367,27 @@ TemplatedShape<VectorRenderer> shape(VectorRenderer());
 ### 1. 选择合适的桥接点
 
 ```cpp
+#include <memory>
+
 // 推荐：在抽象层桥接
-class Shape {
+class BridgedShape {
+public:
+    explicit BridgedShape(Renderer& renderer) : renderer_(renderer) {}
+
 protected:
     Renderer& renderer_;  // 桥接点
+
+    void draw() { renderer_.renderLine(0.0, 0.0, 1.0, 1.0); }
 };
 
 // 不推荐：在实现层桥接
-class Circle {
+class DirectShape {
+public:
+    explicit DirectShape(Renderer& renderer) : renderer_(renderer) {}
+
+    void draw() { renderer_.renderLine(0.0, 0.0, 1.0, 1.0); }
+
+private:
     Renderer& renderer_;  // 耦合太紧
 };
 ```
@@ -365,8 +397,8 @@ class Circle {
 ```cpp
 class ShapeFactory {
 public:
-    static std::unique_ptr<Shape> createCircle(double radius, 
-                                                std::unique_ptr<Renderer> renderer) {
+    static std::unique_ptr<Shape> createCircle(double radius,
+                                               std::unique_ptr<Renderer> renderer) {
         return std::make_unique<Circle>(std::move(renderer), radius);
     }
 };
@@ -375,16 +407,13 @@ public:
 ### 3. 支持运行时切换
 
 ```cpp
-class SwitchableShape : public Shape {
-public:
-    void setRenderer(std::unique_ptr<Renderer> renderer) {
-        renderer_ = std::move(renderer);
-    }
-    
-    void draw() override {
-        renderer_.get().render();
-    }
-};
+void demoSwitch() {
+    auto shape = std::make_unique<Circle>(std::make_unique<VectorRenderer>(), 5.0);
+    shape->draw();
+
+    shape->setRenderer(std::make_unique<PDFRenderer>());
+    shape->draw();  // 现在通过 PDF 实现渲染
+}
 ```
 
 ## 常见陷阱
@@ -404,6 +433,7 @@ class BridgeShape {
 public:
     void draw(Renderer& renderer) {
         // 过早桥接，增加复杂度
+        (void)renderer;
     }
 };
 
@@ -413,14 +443,27 @@ public:
 ### 陷阱 2：桥接对象过多
 
 ```cpp
-// 不推荐：每个形状都有独立的渲染器
+#include <memory>
+
+// 不推荐：每个形状都拥有独立渲染器
 class BadBridge {
-    std::unique_ptr<Renderer> renderer_;  // 每个对象都持有
+public:
+    explicit BadBridge(std::unique_ptr<Renderer> renderer)
+        : renderer_(std::move(renderer)) {}
+
+private:
+    std::unique_ptr<Renderer> renderer_;  // 每个对象一个渲染器
 };
 
-// 推荐：共享渲染器
+// 推荐：共享渲染器（非拥有引用，在构造函数中初始化）
 class GoodBridge {
-    Renderer& renderer_;  // 引用共享渲染器
+public:
+    explicit GoodBridge(Renderer& renderer) : renderer_(renderer) {}
+
+    void draw() { renderer_.renderLine(0.0, 0.0, 1.0, 1.0); }
+
+private:
+    Renderer& renderer_;  // 共享渲染器
 };
 ```
 
@@ -433,7 +476,7 @@ public:
     void setRenderer(Renderer* renderer) {
         renderer_ = renderer;  // 谁负责 delete？
     }
-    
+
 private:
     Renderer* renderer_ = nullptr;
 };
@@ -444,9 +487,9 @@ public:
     void setRenderer(std::unique_ptr<Renderer> renderer) {
         renderer_ = std::move(renderer);
     }
-    
+
 private:
-    std::unique_ptr<Renderer> renderer_;
+    std::unique_ptr<Renderer> renderer_ = nullptr;
 };
 ```
 
