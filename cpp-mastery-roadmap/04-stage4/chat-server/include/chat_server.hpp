@@ -56,6 +56,9 @@ private:
     std::map<std::string, std::set<std::string>> rooms_;
     std::map<std::string, std::set<std::string>> userRooms_;
     std::vector<std::thread> clientThreads_;
+    // Client sockets that are still being served. stop() shuts them down so
+    // that threads blocked in recv() wake up instead of hanging the join.
+    std::set<int> clientFds_;
 
     std::function<void(const Message&)> onMessage_;
     std::function<void(const std::string&)> onUserJoin_;

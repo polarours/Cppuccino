@@ -60,9 +60,22 @@ void ChatServer::start() {
 
 void ChatServer::stop() {
     running_ = false;
+
+    // shutdown() before close(): on Linux, close() does not wake a thread
+    // already blocked in accept(), so the accept loop would never observe
+    // running_ == false and the join below would hang forever.
     if (server_fd_ >= 0) {
-        close(server_fd_);
-        server_fd_ = -1;
+        shutdown(server_fd_, SHUT_RDWR);
+    }
+
+    // Same reasoning for the client threads: a thread blocked in recv() on an
+    // idle connection is not woken by running_ becoming false, so the socket
+    // itself has to be shut down.
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        for (int fd : clientFds_) {
+            shutdown(fd, SHUT_RDWR);
+        }
     }
 
     for (auto& thread : clientThreads_) {
@@ -71,15 +84,30 @@ void ChatServer::stop() {
         }
     }
     clientThreads_.clear();
+
+    if (server_fd_ >= 0) {
+        close(server_fd_);
+        server_fd_ = -1;
+    }
 }
 
 void ChatServer::handleClient(int client_fd) {
     char buffer[4096];
     std::string username;
 
+    // Register the socket so stop() can wake this thread if it is blocked.
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        clientFds_.insert(client_fd);
+    }
+
     // Expect first message to be username
     ssize_t bytes = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
     if (bytes <= 0) {
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            clientFds_.erase(client_fd);
+        }
         close(client_fd);
         return;
     }
@@ -101,7 +129,7 @@ void ChatServer::handleClient(int client_fd) {
     broadcast(joinMsg);
 
     std::string welcome = "Welcome, " + username + "! Commands: /join <room>, /leave <room>, /rooms, /users, /quit\n";
-    send(client_fd, welcome.c_str(), welcome.size(), 0);
+    send(client_fd, welcome.c_str(), welcome.size(), MSG_NOSIGNAL);
 
     while (running_) {
         bytes = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
@@ -137,6 +165,7 @@ void ChatServer::handleClient(int client_fd) {
         for (auto& [room, members] : userRooms_) {
             members.erase(username);
         }
+        clientFds_.erase(client_fd);
     }
 
     close(client_fd);
@@ -195,7 +224,7 @@ void ChatServer::broadcast(const Message& msg) {
     std::string formatted = "[" + msg.sender + "] " + msg.content + "\n";
 
     for (const auto& [user, fd] : users_) {
-        send(fd, formatted.c_str(), formatted.size(), 0);
+        send(fd, formatted.c_str(), formatted.size(), MSG_NOSIGNAL);
     }
 
     if (onMessage_) {
@@ -208,7 +237,7 @@ void ChatServer::sendToUser(const std::string& user, const Message& msg) {
     auto it = users_.find(user);
     if (it != users_.end()) {
         std::string formatted = "[" + msg.sender + "] " + msg.content + "\n";
-        send(it->second, formatted.c_str(), formatted.size(), 0);
+        send(it->second, formatted.c_str(), formatted.size(), MSG_NOSIGNAL);
     }
 }
 
@@ -221,7 +250,7 @@ void ChatServer::sendToRoom(const std::string& room, const Message& msg) {
     for (const auto& user : roomIt->second) {
         auto userIt = users_.find(user);
         if (userIt != users_.end()) {
-            send(userIt->second, formatted.c_str(), formatted.size(), 0);
+            send(userIt->second, formatted.c_str(), formatted.size(), MSG_NOSIGNAL);
         }
     }
 }

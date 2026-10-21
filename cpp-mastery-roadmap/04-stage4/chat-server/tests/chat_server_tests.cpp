@@ -1,5 +1,10 @@
 #include "chat_server.hpp"
 
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -195,6 +200,69 @@ void test_leave_nonexistent_room() {
     expect(rooms.empty(), "expected no rooms");
 }
 
+// Regression: stop() must terminate even though the accept loop and the
+// client handler are both blocked in a socket read. close() alone does not
+// wake a blocked accept()/recv() on Linux, so stop() has to shut the
+// sockets down explicitly. Without this, stop() hangs and never returns.
+void test_stop_terminates_with_blocked_accept() {
+    chat_server::ChatServer server(17013);
+
+    std::thread serverThread([&server]() {
+        server.start();
+    });
+
+    // Give the accept loop time to block.
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    std::atomic<bool> stopped{false};
+    std::thread stopper([&server, &stopped]() {
+        server.stop();
+        stopped = true;
+    });
+
+    // If stop() hangs, the join below never returns and the test times out
+    // instead of failing cleanly.
+    stopper.join();
+    expect(stopped.load(), "expected stop() to complete");
+
+    if (serverThread.joinable()) {
+        serverThread.join();
+    }
+}
+
+// Regression: a client that stays connected without sending anything leaves
+// its handler blocked in recv(). stop() must still return.
+void test_stop_terminates_with_idle_client() {
+    chat_server::ChatServer server(17014);
+
+    std::thread serverThread([&server]() {
+        server.start();
+    });
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    // Connect a client and leave it idle.
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    expect(fd >= 0, "expected socket creation to succeed");
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(17014);
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+
+    bool connected = connect(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == 0;
+    expect(connected, "expected client connect to succeed");
+    send(fd, "Alice\n", 6, MSG_NOSIGNAL);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    server.stop();
+    expect(!server.isRunning(), "expected server not running after stop");
+
+    if (serverThread.joinable()) {
+        serverThread.join();
+    }
+    close(fd);
+}
+
 } // namespace
 
 int main() {
@@ -238,6 +306,12 @@ int main() {
 
         test_leave_nonexistent_room();
         std::cout << "  test_leave_nonexistent_room: PASS\n";
+
+        test_stop_terminates_with_blocked_accept();
+        std::cout << "  test_stop_terminates_with_blocked_accept: PASS\n";
+
+        test_stop_terminates_with_idle_client();
+        std::cout << "  test_stop_terminates_with_idle_client: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "chat_server_tests failed: " << exception.what() << std::endl;
