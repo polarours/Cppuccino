@@ -14,11 +14,13 @@ Usage: python3 tools/check_examples.py [--jobs N]
 """
 import argparse
 import os
+import os
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -123,6 +125,35 @@ def check_one(path, workdir):
     return 'fail', 'no standard works -- ' + ' | '.join(errors)
 
 
+def declared_output(path):
+    """The binary name the header says the example produces."""
+    text = open(path, encoding='utf-8', errors='replace').read()
+    m = re.search(r'^//\s*Compile(?:\s+with)?:\s*(g\+\+.*)$', text, re.M)
+    if not m:
+        return None
+    out = re.search(r'-o\s+(\S+)', m.group(1))
+    return os.path.basename(out.group(1)) if out else None
+
+
+def check_output_collisions(sources, problems):
+    """Two examples must not write to the same output name.
+
+    Compiling both in the same directory would have the second silently
+    overwrite the first.
+    """
+    targets = defaultdict(list)
+    for path in sources:
+        name = declared_output(path)
+        if name:
+            targets[name].append(os.path.basename(path))
+    for name, files in sorted(targets.items()):
+        if len(files) > 1:
+            problems.append(
+                f'the examples {", ".join(sorted(files))} all write to '
+                f'./{name}')
+            print(f"  COLLISION  {name} <- {', '.join(sorted(files))}")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--jobs', '-j', type=int, default=os.cpu_count() or 2)
@@ -140,6 +171,8 @@ def main():
 
     workdir = tempfile.mkdtemp(prefix='cppuccino-examples-')
     failures = []
+    collisions = []
+    check_output_collisions(sources, collisions)
 
     try:
         with ThreadPoolExecutor(max_workers=args.jobs) as pool:
@@ -164,8 +197,11 @@ def main():
         print(f'\n{len(failures)} failure(s):')
         for name, detail in failures:
             print(f'  {name}: {detail}')
-        return 1
-    return 0
+    if collisions:
+        print(f'\n{len(collisions)} output name collision(s)')
+        for c in collisions:
+            print(f'  {c}')
+    return 1 if (failures or collisions) else 0
 
 
 if __name__ == '__main__':
