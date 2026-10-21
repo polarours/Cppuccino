@@ -1,6 +1,6 @@
-// examples/auto_decltype.cpp
+// examples/auto-decltype.cpp
 // Demonstrates auto, decltype, and decltype(auto) in C++.
-// Compile with: g++ -std=c++17 -o auto_decltype auto_decltype.cpp
+// Compile with: g++ -std=c++17 -o auto-decltype auto-decltype.cpp
 
 #include <iostream>
 #include <type_traits>

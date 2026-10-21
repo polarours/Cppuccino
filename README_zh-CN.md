@@ -98,6 +98,8 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
   校验每条相对链接和 `#锚点` 是否仍然有效
 - [tools/check_doc_examples.py](tools/check_doc_examples.py)：
   拼装每篇文档的完整示例，编译并运行
+- [tools/check_examples.py](tools/check_examples.py)：
+  按各文件头注释自己声明的编译命令，编译 `examples/` 下的每个独立示例
 - [tools/build_all_projects.py](tools/build_all_projects.py)：
   配置、构建并测试路线图里的每个项目
 

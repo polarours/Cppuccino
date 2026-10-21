@@ -1,6 +1,6 @@
-// examples/ownership_and_lifetime.cpp
+// examples/ownership-and-lifetime.cpp
 // Demonstrates different ownership semantics in C++17 and their impact on object lifetime.
-// Compile with: g++ -std=c++17 -o ownership_and_lifetime ownership_and_lifetime.cpp
+// Compile with: g++ -std=c++17 -o ownership-and-lifetime ownership-and-lifetime.cpp
 
 #include <iostream>
 #include <memory>

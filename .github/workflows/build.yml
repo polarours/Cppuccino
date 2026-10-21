@@ -48,6 +48,8 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Install the C++ toolchain
         run: |
@@ -65,4 +67,28 @@ jobs:
 
       - name: Report
         if: always()
-        run: echo "shard ${{ matrix.shard.id }} covered: ${{ matrix.shard.stages }}"
+        run: |
+          echo "shard ${{ matrix.shard.id }} covered ${{ matrix.shard.stages }}"
+
+  tinyshell:
+    name: tinyshell
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install the C++ toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends g++ cmake
+
+      - name: Configure, build and test
+        run: |
+          set -euo pipefail
+          build=$(mktemp -d)
+          cmake -S tinyshell -B "$build" -DBUILD_TESTING=ON
+          cmake --build "$build" -j 2
+          ctest --test-dir "$build" --output-on-failure

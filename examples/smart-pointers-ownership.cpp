@@ -1,4 +1,4 @@
-// examples/smart_pointers_ownership.cpp
+// examples/smart-pointers-ownership.cpp
 // Demonstrates unique_ptr, shared_ptr, weak_ptr, and ownership patterns.
 // Compile with: g++ -std=c++17 -o smart_pointers smart-pointers-ownership.cpp
 

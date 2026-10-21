@@ -1,6 +1,6 @@
-// examples/forwarding_references.cpp
+// examples/forwarding-references.cpp
 // Demonstrates forwarding references and perfect forwarding in C++.
-// Compile with: g++ -std=c++17 -o forwarding forwarding_references.cpp
+// Compile with: g++ -std=c++17 -o forwarding forwarding-references.cpp
 
 #include <iostream>
 #include <string>

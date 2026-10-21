@@ -1,6 +1,6 @@
-// examples/perfect_forwarding.cpp
+// examples/perfect-forwarding.cpp
 // Demonstrates forwarding references and perfect forwarding.
-// Compile with: g++ -std=c++17 -o perfect_forwarding perfect-forwarding.cpp
+// Compile with: g++ -std=c++17 -o perfect-forwarding perfect-forwarding.cpp
 
 #include <iostream>
 #include <memory>

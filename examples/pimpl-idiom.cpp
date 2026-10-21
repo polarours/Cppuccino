@@ -1,6 +1,6 @@
-// examples/pimpl_idiom.cpp
+// examples/pimpl-idiom.cpp
 // Demonstrates PImpl (Pointer to Implementation) idiom for ABI stability.
-// Compile with: g++ -std=c++17 -o pimpl_example pimpl_idiom.cpp
+// Compile with: g++ -std=c++17 -o pimpl_example pimpl-idiom.cpp
 
 #include <iostream>
 #include <memory>

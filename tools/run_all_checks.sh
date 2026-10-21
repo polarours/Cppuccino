@@ -44,6 +44,9 @@ run "documentation: relative links" \
 run "documentation: examples compile and run" \
     python3 tools/check_doc_examples.py
 
+run "examples: compile" \
+    python3 tools/check_examples.py
+
 if [ "$FULL" = "1" ]; then
     run "projects: configure, build and test" \
         python3 tools/build_all_projects.py

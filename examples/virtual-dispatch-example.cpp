@@ -1,6 +1,6 @@
-// examples/virtual_dispatch_example.cpp
+// examples/virtual-dispatch-example.cpp
 // Demonstrates virtual dispatch, polymorphism, and object model in C++.
-// Compile with: g++ -std=c++17 -o virtual_dispatch virtual_dispatch_example.cpp
+// Compile with: g++ -std=c++17 -o virtual_dispatch virtual-dispatch-example.cpp
 
 #include <iostream>
 #include <memory>

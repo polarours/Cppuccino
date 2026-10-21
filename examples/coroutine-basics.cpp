@@ -1,6 +1,6 @@
-// examples/coroutine_basics.cpp
+// examples/coroutine-basics.cpp
 // Demonstrates C++20 coroutine fundamentals.
-// Compile with: g++ -std=c++20 -fcoroutines -o coroutine_basics coroutine_basics.cpp
+// Compile with: g++ -std=c++20 -fcoroutines -o coroutine-basics coroutine-basics.cpp
 
 #include <iostream>
 #include <coroutine>

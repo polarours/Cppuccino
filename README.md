@@ -100,6 +100,9 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
   verifies that every relative link and `#anchor` still resolves
 - [tools/check_doc_examples.py](tools/check_doc_examples.py):
   assembles the complete example of every document, compiles it and runs it
+- [tools/check_examples.py](tools/check_examples.py):
+  compiles every standalone file in `examples/`, using the build command its
+  own header declares
 - [tools/build_all_projects.py](tools/build_all_projects.py):
   configures, builds and tests every project in the roadmap
 

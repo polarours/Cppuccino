@@ -1,4 +1,4 @@
-// examples/virtual_dispatch_and_slicing.cpp
+// examples/virtual-dispatch-and-slicing.cpp
 // Demonstrates virtual dispatch, object slicing, and polymorphism.
 // Compile with: g++ -std=c++17 -o virtual_dispatch virtual-dispatch-and-slicing.cpp
 

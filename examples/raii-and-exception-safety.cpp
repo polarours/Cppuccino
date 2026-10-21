@@ -1,6 +1,6 @@
-// examples/raii_and_exception_safety.cpp
+// examples/raii-and-exception-safety.cpp
 // Demonstrates RAII pattern and exception safety in C++.
-// Compile with: g++ -std=c++17 -o raii_example raii_and_exception_safety.cpp
+// Compile with: g++ -std=c++17 -o raii_example raii-and-exception-safety.cpp
 
 #include <iostream>
 #include <fstream>

@@ -1,4 +1,4 @@
-// examples/const_vs_nonconst.cpp
+// examples/const-vs-non-const.cpp
 // This example demonstrates the performance difference between const and non-const methods in C++.
 
 #include <iostream>

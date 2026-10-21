@@ -1,6 +1,6 @@
-// examples/rule_of_zero_three_five.cpp
+// examples/rule-of-zero-three-five.cpp
 // Demonstrates Rule of Zero, Three, and Five in C++.
-// Compile with: g++ -std=c++17 -o rule_of_3_5 rule_of_zero_three_five.cpp
+// Compile with: g++ -std=c++17 -o rule_of_3_5 rule-of-zero-three-five.cpp
 
 #include <iostream>
 #include <string>

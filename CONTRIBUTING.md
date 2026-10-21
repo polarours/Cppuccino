@@ -134,7 +134,8 @@ The individual checks can also be run on their own:
 |---------|-----------------|
 | `python3 tools/check_docs.py` | A file in `docs/en/` with an English filename but a Chinese body; the two halves of a document drifting apart |
 | `python3 tools/check_links.py` | A relative link or `#anchor` that no longer resolves |
-| `python3 tools/check_doc_examples.py` | A complete example that no longer compiles or runs |
+| `python3 tools/check_doc_examples.py` | A complete example inside a document that no longer compiles or runs |
+| `python3 tools/check_examples.py` | A standalone file in `examples/` that no longer compiles, or a header that no longer describes how to build it |
 | `python3 tools/build_all_projects.py` | A project that fails to configure, build or pass its tests |
 
 The first script is what catches a file that sits in `docs/en/` with an
@@ -149,10 +150,23 @@ The same scripts run in CI, so a green local run means a green CI run:
 
 - `.github/workflows/docs.yml` — the documentation checks, on every push
 - `.github/workflows/build.yml` — every project, split over ten shards that
-  are balanced by project count
+  are balanced by project count, plus the tinyshell submodule
 
 The shards are planned by `tools/plan_ci_shards.py`, so adding a project does
 not need a workflow edit.
+
+To make the checks binding, mark the following as required status checks in
+the repository settings under **Settings → Branches → Branch protection
+rules**:
+
+| Check | Job |
+|-------|-----|
+| `Documentation checks` | `docs` in the *Documentation* workflow |
+| `shard N` | `build` in the *Build* workflow, for every shard |
+| `tinyshell` | `tinyshell` in the *Build* workflow |
+
+The job names are fixed by the workflow files, so they can be typed in as
+they are.
 
 ---
 

@@ -1,6 +1,6 @@
-// examples/template_instantiation.cpp
+// examples/template-instantiation.cpp
 // Demonstrates template instantiation and two-phase lookup in C++.
-// Compile with: g++ -std=c++17 -o template_example template_instantiation.cpp
+// Compile with: g++ -std=c++20 -o template-instantiation template-instantiation.cpp
 
 #include <iostream>
 #include <vector>

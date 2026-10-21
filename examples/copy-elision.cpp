@@ -1,6 +1,6 @@
-// examples/copy_elision.cpp
+// examples/copy-elision.cpp
 // Demonstrates copy elision and prvalue materialization in C++.
-// Compile with: g++ -std=c++17 -o copy_elision copy_elision.cpp
+// Compile with: g++ -std=c++17 -o copy-elision copy-elision.cpp
 
 #include <iostream>
 #include <string>

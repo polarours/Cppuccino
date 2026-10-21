@@ -1,6 +1,6 @@
-// examples/noexcept_move.cpp
+// examples/noexcept-move.cpp
 // Demonstrates noexcept and move operations in C++.
-// Compile with: g++ -std=c++17 -o noexcept_move noexcept_move.cpp
+// Compile with: g++ -std=c++17 -o noexcept-move noexcept-move.cpp
 
 #include <iostream>
 #include <string>

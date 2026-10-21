@@ -22,7 +22,11 @@ ROADMAP = os.path.join(REPO, 'cpp-mastery-roadmap')
 
 
 def find_projects(stage=None):
-    """Every directory under the roadmap that carries a CMakeLists.txt."""
+    """Every directory under the roadmap that carries a CMakeLists.txt.
+
+    The tinyshell submodule is included as well: it is a project of this
+    repository even though it lives outside the roadmap.
+    """
     projects = []
     for dirpath, dirnames, filenames in os.walk(ROADMAP):
         dirnames[:] = [d for d in dirnames if d != 'build']
@@ -31,10 +35,12 @@ def find_projects(stage=None):
         rel = os.path.relpath(dirpath, ROADMAP)
         if stage and not rel.startswith(stage):
             continue
-        # A project that only holds sub-projects is not one itself.
-        if os.path.basename(dirpath) == 'cpp-mastery-roadmap':
-            continue
         projects.append(dirpath)
+
+    if not stage:
+        shell = os.path.join(REPO, 'tinyshell')
+        if os.path.isfile(os.path.join(shell, 'CMakeLists.txt')):
+            projects.append(shell)
     return sorted(projects)
 
 

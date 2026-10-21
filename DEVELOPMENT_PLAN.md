@@ -408,8 +408,21 @@ specification、memento、mediator、command），中英两版同步修订。
 所以本地跑绿了 CI 就一定跑绿，不存在"CI 才发现的问题"。分片计划由脚本
 算出，新增项目不需要改 workflow。
 
-**立刻查出的真问题**：`check_links.py` 增加了锚点校验后，查出 README 与
-README_zh-CN 里指向 `00-overview.md` 的 GoF 23 种模式链接**锚点写错了** ——
-实际标题是 `### Stage 8 Projects (08-stage8)`，锚点应为
-`#stage-8-projects-08-stage8`，而链接写成了 `#stage-8-projects-8-stage8`
-（少了一个 0）。此前的链接检查只验文件是否存在，不验锚点，所以一直没发现。
+**立刻查出的真问题**：
+
+1. `check_links.py` 增加了锚点校验后，查出 README 与 README_zh-CN 里指向
+   `00-overview.md` 的 GoF 23 种模式链接**锚点写错了** —— 实际标题是
+   `### Stage 8 Projects (08-stage8)`，锚点应为 `#stage-8-projects-08-stage8`，
+   而链接写成了 `#stage-8-projects-8-stage8`（少了一个 0）。此前的链接检查
+   只验文件是否存在，不验锚点，所以一直没发现。
+2. 补上 `examples/` 的编译检查后，查出 **17 个示例的头注释编译命令是坏的**：
+   文件名早已从下划线改成 kebab-case，头注释却还写着旧名字
+   （`g++ ... copy_elision.cpp`，而文件叫 `copy-elision.cpp`），照抄必然报
+   "no such file"；另有 `template-instantiation.cpp` 声明 `-std=c++17`，
+   但里面用了 `requires`（C++20 特性）。均已修正，86 条单行编译命令现已
+   逐条验证可执行。
+3. `tinyshell` 子模块此前**从未在任何 CI 里被构建过**，现已加入。
+
+**补上的 CI 覆盖漏洞**：加 CI 时发现两个洞 —— `examples/` 下 120 个独立示例
+一次都没被编译过，`tinyshell` 子模块也没被构建过。现已分别由
+`tools/check_examples.py` 和 build workflow 的 `tinyshell` job 覆盖。

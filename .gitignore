@@ -56,3 +56,7 @@ cmake-build-*
 
 # Files written by the example programs in docs/ and examples/
 database.txt
+
+# Binaries produced by compiling examples/ in place
+examples/*
+!examples/*.cpp

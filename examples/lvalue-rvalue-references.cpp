@@ -1,6 +1,6 @@
-// examples/lvalue_rvalue_references.cpp
+// examples/lvalue-rvalue-references.cpp
 // Demonstrates lvalue and rvalue references in C++.
-// Compile with: g++ -std=c++17 -o references lvalue_rvalue_references.cpp
+// Compile with: g++ -std=c++17 -o references lvalue-rvalue-references.cpp
 
 #include <iostream>
 #include <string>

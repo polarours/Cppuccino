@@ -1,6 +1,6 @@
-// examples/template_basics.cpp
+// examples/template-basics.cpp
 // Demonstrates function templates, class templates, and template specialization.
-// Compile with: g++ -std=c++17 -o template_basics template-basics.cpp
+// Compile with: g++ -std=c++17 -o template-basics template-basics.cpp
 
 #include <iostream>
 #include <string>
