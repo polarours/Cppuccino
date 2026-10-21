@@ -1,105 +1,111 @@
-# 代理模式 (Proxy Pattern)
+# Proxy Pattern
 
-## 什么是代理模式？
+## What Is the Proxy Pattern?
 
-代理模式（Proxy Pattern）是一种结构型设计模式，它提供了一个对象来代替另一个对象，并控制对原对象的访问。代理对象可以添加额外的逻辑，如延迟初始化、访问控制、日志记录等。
+The Proxy Pattern is a structural design pattern that provides an object that
+stands in for another one and controls access to it. The proxy can add extra
+logic — lazy initialization, access control, logging, and so on.
 
-> **核心思想**：通过代理对象控制对真实对象的访问，在访问前后添加额外逻辑。
+> **Core idea**: control access to the real object through a proxy, and run
+> additional logic before and after every access.
 
-## 为什么需要代理模式？
+## Why Do We Need It?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有一个图像加载系统，图像很大，加载很慢：
+Suppose we have an image loading system where the images are huge and slow to
+load:
 
 ```cpp
-// 问题：每次访问都加载图像
+// Problem: the image is loaded on every access
 class Image {
 public:
-    void display() {
-        loadFromFile("large_image.jpg");  // 很慢！
+    virtual void display() {
+        loadFromFile("large_image.jpg");  // very slow!
         render();
     }
-    
+
 private:
     void loadFromFile(const std::string& path) {
-        // 模拟耗时操作
+        // simulate a slow operation
         std::this_thread::sleep_for(std::chrono::seconds(2));
     }
-    
+
     void render() {
         std::cout << "Rendering image...\n";
     }
 };
 
-// 问题：用户立即看到空白
+// Problem: the user stares at a blank screen
 Image img;
-img.display();  // 需要等待2秒
+img.display();  // takes two seconds
 ```
 
-**问题**：
-1. 延迟加载导致用户体验差
-2. 无法控制访问
-3. 无法添加额外的逻辑
+**Problems**:
 
-### 解决方案
+1. Lazy loading hurts the user experience
+2. Access cannot be controlled
+3. Extra logic cannot be added
 
-使用代理模式：
+### Solution
+
+Use the proxy pattern:
 
 ```cpp
 class ImageProxy : public Image {
 public:
     explicit ImageProxy(const std::string& path) : path_(path), loaded_(false) {}
-    
+
     void display() override {
         if (!loaded_) {
-            loadRealImage();  // 延迟加载
+            loadRealImage();  // lazy loading
         }
         realImage_->display();
     }
-    
+
 private:
     void loadRealImage() {
         realImage_ = std::make_unique<RealImage>(path_);
         loaded_ = true;
     }
-    
+
     std::unique_ptr<RealImage> realImage_;
     std::string path_;
     bool loaded_;
 };
 ```
 
-**优点**：
-1. 延迟加载，提高性能
-2. 可以添加额外的控制逻辑
-3. 对用户透明
+**Benefits**:
 
-## 模式结构
+1. Lazy loading improves performance
+2. Extra control logic can be added
+3. Transparent to the user
+
+## Pattern Structure
 
 ```
                     ┌─────────────┐
                     │   Subject   │
-                    │  (接口)      │
+                    │  (interface)│
                     └──────┬──────┘
                            │
            ┌───────────────┼───────────────┐
            │               │               │
     ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
     │  RealObject │ │  Proxy      │ │  Virtual    │
-    │  (真实对象) │ │  (代理对象) │ │  (虚拟代理) │
+    │  (real)     │ │  (proxy)    │ │  (virtual)  │
     └─────────────┘ └─────────────┘ └─────────────┘
            │               │               │
            └───────────────┼───────────────┘
                            │
                     ┌────────▼────────┐
-                    │    Client       │ ← 客户端
+                    │    Client       │ ← client
                     └─────────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义主题接口
+### 1. Define the Subject Interface
 
 ```cpp
 #include <memory>
@@ -116,25 +122,25 @@ public:
 };
 ```
 
-### 2. 实现真实对象
+### 2. Implement the Real Object
 
 ```cpp
 class RealDataSource : public DataSource {
 public:
     explicit RealDataSource(const std::string& path) : path_(path) {}
-    
+
     std::string getData() override {
         std::cout << "Loading data from " << path_ << "...\n";
-        std::this_thread::sleep_for(std::chrono::seconds(1));  // 模拟延迟
+        std::this_thread::sleep_for(std::chrono::seconds(1));  // simulate latency
         return "Data from " + path_;
     }
-    
+
     void setData(const std::string& data) override {
         std::cout << "Saving data to " << path_ << "...\n";
         std::this_thread::sleep_for(std::chrono::seconds(1));
         data_ = data;
     }
-    
+
     std::string getPath() const { return path_; }
 
 private:
@@ -143,28 +149,28 @@ private:
 };
 ```
 
-### 3. 实现虚拟代理（延迟加载）
+### 3. Implement the Virtual Proxy (Lazy Loading)
 
 ```cpp
 class LazyProxy : public DataSource {
 public:
-    explicit LazyProxy(const std::string& path) 
+    explicit LazyProxy(const std::string& path)
         : path_(path), real_(nullptr) {}
-    
+
     std::string getData() override {
         if (!real_) {
             real_ = std::make_unique<RealDataSource>(path_);
         }
         return real_->getData();
     }
-    
+
     void setData(const std::string& data) override {
         if (!real_) {
             real_ = std::make_unique<RealDataSource>(path_);
         }
         real_->setData(data);
     }
-    
+
     bool isLoaded() const { return real_ != nullptr; }
 
 private:
@@ -173,32 +179,32 @@ private:
 };
 ```
 
-### 4. 实现保护代理（访问控制）
+### 4. Implement the Protection Proxy (Access Control)
 
 ```cpp
 class AccessProxy : public DataSource {
 public:
     AccessProxy(std::unique_ptr<RealDataSource> real, const std::string& user)
         : real_(std::move(real)), user_(user) {}
-    
+
     std::string getData() override {
         if (!canRead()) {
             throw std::runtime_error("Access denied for user: " + user_);
         }
         return real_->getData();
     }
-    
+
     void setData(const std::string& data) override {
         if (!canWrite()) {
             throw std::runtime_error("Write denied for user: " + user_);
         }
         real_->setData(data);
     }
-    
+
     bool canRead() const {
         return user_ == "admin" || user_ == "editor";
     }
-    
+
     bool canWrite() const {
         return user_ == "admin";
     }
@@ -209,14 +215,14 @@ private:
 };
 ```
 
-### 5. 实现缓存代理
+### 5. Implement the Cache Proxy
 
 ```cpp
 class CacheProxy : public DataSource {
 public:
     explicit CacheProxy(std::unique_ptr<RealDataSource> real)
         : real_(std::move(real)) {}
-    
+
     std::string getData() override {
         if (cache_.empty()) {
             cache_ = real_->getData();
@@ -226,18 +232,18 @@ public:
         }
         return cache_;
     }
-    
+
     void setData(const std::string& data) override {
         real_->setData(data);
-        cache_.clear();  // 失效缓存
+        cache_.clear();  // invalidate the cache
         std::cout << "[Cache] Cache invalidated\n";
     }
-    
+
     void clearCache() {
         cache_.clear();
         std::cout << "[Cache] Cache cleared\n";
     }
-    
+
     size_t cacheSize() const { return cache_.empty() ? 0 : 1; }
 
 private:
@@ -246,7 +252,7 @@ private:
 };
 ```
 
-### 6. 客户端使用
+### 6. Client Usage
 
 ```cpp
 int main() {
@@ -257,69 +263,69 @@ int main() {
         std::cout << "Data: " << proxy.getData() << "\n";
         std::cout << "Is loaded: " << proxy.isLoaded() << "\n";
     }
-    
+
     std::cout << "\n=== Access Proxy Demo ===\n";
     {
         auto real = std::make_unique<RealDataSource>("data.txt");
         AccessProxy adminProxy(std::move(real), "admin");
         AccessProxy readerProxy(std::make_unique<RealDataSource>("data.txt"), "reader");
-        
+
         try {
             std::cout << "Admin data: " << adminProxy.getData() << "\n";
         } catch (const std::exception& e) {
             std::cout << "Error: " << e.what() << "\n";
         }
-        
+
         try {
             std::cout << "Reader data: " << readerProxy.getData() << "\n";
         } catch (const std::exception& e) {
             std::cout << "Error: " << e.what() << "\n";
         }
     }
-    
+
     std::cout << "\n=== Cache Proxy Demo ===\n";
     {
         auto real = std::make_unique<RealDataSource>("data.txt");
         CacheProxy proxy(std::move(real));
-        
+
         std::cout << "First call: " << proxy.getData() << "\n";
         std::cout << "Second call: " << proxy.getData() << "\n";
         proxy.setData("new data");
         std::cout << "After update: " << proxy.getData() << "\n";
     }
-    
+
     return 0;
 }
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用模板代理
+### With a Template Proxy
 
 ```cpp
 template<typename T>
 class Proxy : public T {
 public:
-    using T::T;  // 继承构造函数
-    
+    using T::T;  // inherit constructors
+
     void logAccess(const std::string& method) const {
         std::cout << "[Proxy] Calling " << method << "\n";
     }
 };
 ```
 
-### 使用装饰器式代理
+### With a Decorator-Style Proxy
 
 ```cpp
 template<typename T>
 class LoggingProxy : public T {
 public:
     using T::T;
-    
+
     template<typename... Args>
-    auto invoke(const std::string& method, Args&&... args) 
+    auto invoke(const std::string& method, Args&&... args)
         -> decltype(std::declval<T&>().someMethod(std::forward<Args>(args)...)) {
-        
+
         std::cout << "[Logging] Calling " << method << "\n";
         auto result = std::invoke(&T::someMethod, *this, std::forward<Args>(args)...);
         std::cout << "[Logging] " << method << " returned\n";
@@ -328,7 +334,7 @@ public:
 };
 ```
 
-### 使用智能指针管理
+### Managing with Smart Pointers
 
 ```cpp
 class SmartProxy {
@@ -341,34 +347,34 @@ public:
 };
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
-|------|------|
-| **装饰器模式** | 装饰器增强功能；代理控制访问 |
-| **适配器模式** | 适配器转换接口；代理控制访问 |
-| **外观模式** | 外观简化接口；代理控制访问 |
+| Pattern | Difference |
+|---------|-----------|
+| **Decorator** | A decorator adds behavior; a proxy controls access |
+| **Adapter** | An adapter converts an interface; a proxy controls access |
+| **Facade** | A facade simplifies an interface; a proxy controls access |
 
-## 最佳实践
+## Best Practices
 
-### 1. 使用组合而非继承
+### 1. Prefer Composition over Inheritance
 
 ```cpp
-// 推荐：使用组合
+// Recommended: use composition
 class Proxy {
 public:
     explicit Proxy(std::shared_ptr<RealObject> real)
         : real_(std::move(real)) {}
-    
+
 private:
     std::shared_ptr<RealObject> real_;
 };
 
-// 不推荐：使用继承（限制了类的层次）
+// Not recommended: use inheritance (it pins down the class hierarchy)
 class Proxy : public RealObject { ... };
 ```
 
-### 2. 使用弱引用避免循环依赖
+### 2. Use Weak References to Avoid Cycles
 
 ```cpp
 class ObserverProxy {
@@ -376,7 +382,7 @@ public:
     void observe(std::weak_ptr<Subject> subject) {
         subject_ = subject;
     }
-    
+
     void update() {
         if (auto subject = subject_.lock()) {
             subject->notify();
@@ -388,7 +394,7 @@ private:
 };
 ```
 
-### 3. 支持多层代理
+### 3. Support Multi-Layer Proxies
 
 ```cpp
 class MultiProxy {
@@ -396,7 +402,7 @@ public:
     void addProxy(std::shared_ptr<Proxy> proxy) {
         proxies_.push_back(std::move(proxy));
     }
-    
+
     std::string process() {
         std::string result = "original";
         for (const auto& proxy : proxies_) {
@@ -410,30 +416,30 @@ private:
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：代理泄漏
+### Trap 1: Proxy Leaks
 
 ```cpp
-// 不推荐：忘记释放代理
+// Not recommended: forgetting to release the proxy
 void process() {
     Proxy* proxy = new Proxy(real);
     proxy->process();
-    // 忘记 delete proxy;
+    // forgot delete proxy;
 }
 
-// 推荐：使用智能指针
+// Recommended: use a smart pointer
 void process() {
     auto proxy = std::make_unique<Proxy>(real);
     proxy->process();
-    // 自动释放
+    // released automatically
 }
 ```
 
-### 陷阱 2：代理链过长
+### Trap 2: Proxy Chains Getting Too Long
 
 ```cpp
-// 不推荐：代理嵌套过多
+// Not recommended: nesting proxies too deeply
 auto proxy1 = std::make_shared<Proxy1>(
     std::make_shared<Proxy2>(
         std::make_shared<Proxy3>(
@@ -442,7 +448,7 @@ auto proxy1 = std::make_shared<Proxy1>(
     )
 );
 
-// 推荐：使用代理工厂统一管理
+// Recommended: use a proxy factory to keep them under control
 class ProxyFactory {
 public:
     static std::shared_ptr<RealObject> create() {
@@ -456,15 +462,15 @@ public:
 };
 ```
 
-### 陷阱 3：线程安全问题
+### Trap 3: Thread Safety
 
 ```cpp
-// 不推荐：非线程安全
+// Not recommended: not thread safe
 class ThreadUnsafeProxy {
 public:
     void process() {
         if (!real_) {
-            real_ = createReal();  // 可能多线程竞争
+            real_ = createReal();  // possible race between threads
         }
         real_->process();
     }
@@ -473,7 +479,7 @@ private:
     RealObject* real_ = nullptr;
 };
 
-// 推荐：使用线程安全的延迟初始化
+// Recommended: thread-safe lazy initialization
 class ThreadSafeProxy {
 public:
     void process() {
@@ -489,13 +495,15 @@ private:
 };
 ```
 
-## 总结
+## Summary
 
-代理模式的核心要点：
+The key points of the proxy pattern:
 
-- **适用场景**：延迟加载、访问控制、缓存、日志记录
-- **核心优点**：控制访问、添加逻辑、对用户透明
-- **实现要点**：使用智能指针、支持多层代理、线程安全
-- **常见陷阱**：代理泄漏、链过长、线程安全
+- **When to use it**: lazy loading, access control, caching, logging
+- **Main benefits**: controlled access, extra logic, transparent to users
+- **Implementation advice**: smart pointers, multi-layer proxies, thread safety
+- **Common traps**: proxy leaks, over-long chains, thread safety
 
-> **记住**：代理模式的关键是"控制访问"——通过代理对象控制对真实对象的访问，添加额外的逻辑而不修改原始类。
+> **Remember**: the key of the proxy pattern is *controlling access* — a proxy
+> guards access to the real object and adds extra logic without modifying the
+> original class.

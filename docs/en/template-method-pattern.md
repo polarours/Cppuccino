@@ -1,63 +1,71 @@
-# 模板方法模式 (Template Method Pattern)
+# Template Method Pattern
 
-## 什么是模板方法模式？
+## What Is the Template Method Pattern?
 
-模板方法模式（Template Method Pattern）是一种行为型设计模式，它定义了一个算法的骨架，而将一些步骤延迟到子类中。模板方法使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。
+The Template Method Pattern is a behavioral design pattern that defines the
+skeleton of an algorithm and defers some of its steps to subclasses. A template
+method lets subclasses redefine particular steps of an algorithm without
+changing the algorithm's structure.
 
-> **核心思想**：在父类中定义算法框架，允许子类重写某些步骤而不改变算法结构。
+> **Core idea**: define the algorithm's framework in the base class and let
+> subclasses override individual steps without changing the algorithm's
+> structure.
 
-## 为什么需要模板方法模式？
+## Why Do We Need It?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有一个数据处理系统，需要支持多种格式（CSV、JSON、XML）：
+Suppose we have a data-processing system that has to support several formats
+(CSV, JSON, XML):
 
 ```cpp
-// 问题：每个处理函数都有相同的步骤，但细节不同
+// Problem: every processing function repeats the same steps, only the details differ
 void processCSV(const std::string& file) {
     openFile(file);
-    validateData();  // CSV 特定的验证
-    transformData(); // CSV 特定的转换
+    validateData();  // CSV-specific validation
+    transformData(); // CSV-specific transformation
     saveOutput();
 }
 
 void processJSON(const std::string& file) {
     openFile(file);
-    validateData();  // JSON 特定的验证
-    transformData(); // JSON 特定的转换
+    validateData();  // JSON-specific validation
+    transformData(); // JSON-specific transformation
     saveOutput();
 }
 
 void processXML(const std::string& file) {
     openFile(file);
-    validateData();  // XML 特定的验证
-    transformData(); // XML 特定的转换
+    validateData();  // XML-specific validation
+    transformData(); // XML-specific transformation
     saveOutput();
 }
 ```
 
-**问题**：
-1. 重复代码：每个函数都有相同的步骤
-2. 难以维护：修改算法结构需要修改所有函数
-3. 容易出错：可能忘记某个步骤
+**Problems**:
 
-### 解决方案
+1. Duplicated code: every function repeats the same steps
+2. Hard to maintain: changing the algorithm's structure means changing every
+   function
+3. Error-prone: it is easy to forget one of the steps
 
-使用模板方法模式：
+### Solution
+
+Use the template method pattern:
 
 ```cpp
 class DataProcessor {
 public:
     void process(const std::string& file) {
-        openFile(file);           // 具体方法
-        if (validateData()) {     // 钩子方法
-            transformData();      // 抽象方法（子类实现）
+        openFile(file);           // concrete method
+        if (validateData()) {     // hook method
+            transformData();      // abstract method (implemented by subclasses)
             saveOutput();
         }
     }
     
 protected:
-    virtual void transformData() = 0;  // 子类必须实现
+    virtual void transformData() = 0;  // subclasses must implement it
     
 private:
     void openFile(const std::string& file);
@@ -67,43 +75,45 @@ private:
 
 class CSVProcessor : public DataProcessor {
 protected:
-    void transformData() override { /* CSV 特定转换 */ }
+    void transformData() override { /* CSV-specific transformation */ }
 };
 
 class JSONProcessor : public DataProcessor {
 protected:
-    void transformData() override { /* JSON 特定转换 */ }
+    void transformData() override { /* JSON-specific transformation */ }
 };
 ```
 
-**优点**：
-1. 代码复用：公共逻辑只写一次
-2. 易于维护：修改算法结构只改父类
-3. 强制结构：子类必须实现特定步骤
+**Benefits**:
 
-## 模式结构
+1. Code reuse: the common logic is written once
+2. Easy to maintain: changing the algorithm's structure only touches the base
+   class
+3. Enforced structure: subclasses must implement the specific steps
+
+## Pattern Structure
 
 ```
-                    ┌─────────────┐
-                    │  AbstractClass │
-                    │ (模板方法)    │
-                    └──────┬──────┘
+                    ┌──────────────────┐
+                    │  AbstractClass   │
+                    │ (template method)│
+                    └──────┬───────────┘
                            │
               ┌────────────┼────────────┐
               │            │            │
     ┌─────────▼───┐ ┌──────▼─────┐ ┌───▼────────┐
-    │ Primitive   │ │  Abstract   │ │   Hook     │ ← 方法类型
+    │ Primitive   │ │  Abstract   │ │   Hook     │ ← method types
     │ Operation   │ │ Operation   │ │  Method    │
-    └─────────────┘ └─────────────┘ └────────────┘
+    └─────────────┘ └────────────┘ └────────────┘
            │               │               │
     ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-    │ ConcreteA   │ │ ConcreteB   │ │  Optional   │ ← 具体实现
-    └─────────────┘ └─────────────┘ └─────────────┘
+    │ ConcreteA   │ │ ConcreteB   │ │  Optional   │ ← concrete implementations
+    └─────────────┘ └────────────┘ └────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义抽象类
+### 1. Define the Abstract Class
 
 ```cpp
 #include <memory>
@@ -115,7 +125,7 @@ class Game {
 public:
     virtual ~Game() = default;
     
-    // 模板方法：定义游戏流程
+    // template method: defines the flow of a game
     void playOneGame() {
         initialize();
         startPlay();
@@ -123,12 +133,12 @@ public:
     }
     
 protected:
-    // 钩子方法：允许子类自定义
+    // hook methods: subclasses may customize them
     virtual void initialize() = 0;
     virtual void startPlay() = 0;
     virtual void endPlay() = 0;
     
-    // 具体方法：公共逻辑
+    // concrete method: common logic
     void showScore() const {
         std::cout << "Final score: " << score_ << "\n";
     }
@@ -142,7 +152,7 @@ private:
 };
 ```
 
-### 2. 实现具体游戏
+### 2. Implement the Concrete Games
 
 ```cpp
 class Football : public Game {
@@ -184,14 +194,14 @@ protected:
 };
 ```
 
-### 3. 带钩子方法的模板
+### 3. A Template with Hook Methods
 
 ```cpp
 class OrderProcessor {
 public:
     void processOrder(const std::string& order) {
         validateOrder(order);
-        if (shouldApplyDiscount(order)) {  // 钩子方法
+        if (shouldApplyDiscount(order)) {  // hook method
             applyDiscount(order);
         }
         calculateTotal(order);
@@ -201,7 +211,7 @@ public:
     
 protected:
     virtual bool shouldApplyDiscount(const std::string& order) {
-        return false;  // 默认不应用折扣
+        return false;  // no discount by default
     }
     
     virtual void applyDiscount(const std::string& order) {
@@ -227,9 +237,9 @@ protected:
 };
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用 lambda 简化
+### Simplifying with Lambdas
 
 ```cpp
 class LambdaProcessor {
@@ -250,7 +260,7 @@ private:
     std::function<void()> cleanup_;
 };
 
-// 使用
+// Usage
 LambdaProcessor processor;
 processor.setInit([]() { std::cout << "Initializing...\n"; });
 processor.setExecute([]() { std::cout << "Executing...\n"; });
@@ -258,7 +268,7 @@ processor.setCleanup([]() { std::cout << "Cleaning up...\n"; });
 processor.process();
 ```
 
-### 使用 CRTP
+### Using CRTP
 
 ```cpp
 template<typename Derived>
@@ -279,22 +289,22 @@ public:
 };
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
-|------|------|
-| **策略模式** | 策略模式替换整个算法；模板方法扩展部分步骤 |
-| **工厂方法** | 工厂方法创建对象；模板方法定义算法流程 |
-| **状态模式** | 状态模式根据状态改变行为；模板方法固定算法结构 |
+| Pattern | Difference |
+|---------|-----------|
+| **Strategy** | Strategy replaces the whole algorithm; template method extends part of the steps |
+| **Factory Method** | Factory method creates objects; template method defines the flow of the algorithm |
+| **State** | State changes the behavior based on the state; template method fixes the structure of the algorithm |
 
-## 最佳实践
+## Best Practices
 
-### 1. 使用访问控制
+### 1. Use Access Control
 
 ```cpp
 class Processor {
 public:
-    // 模板方法：公共接口
+    // template method: public interface
     void process() {
         step1();
         step2();
@@ -302,25 +312,25 @@ public:
     }
     
 protected:
-    // 钩子方法：子类可重写
-    virtual void step2() { /* 默认实现 */ }
+    // hook method: subclasses may override it
+    virtual void step2() { /* default implementation */ }
     
 private:
-    // 具体方法：子类不能访问
+    // concrete method: not visible to subclasses
     void step1() { /* ... */ }
     void step3() { /* ... */ }
 };
 ```
 
-### 2. 避免在模板方法中使用虚函数
+### 2. Avoid Virtual Calls in the Template Method
 
 ```cpp
-// 不推荐：在模板方法中调用虚函数可能导致问题
+// Not recommended: calling a virtual function in the template method can cause problems
 class BadProcessor {
 public:
     void process() {
         init();
-        execute();  // 虚函数调用
+        execute();  // virtual call
         cleanup();
     }
     
@@ -328,10 +338,10 @@ protected:
     virtual void execute() = 0;
 };
 
-// 推荐：使用 final 关键字防止重写
+// Recommended: use the final keyword to prevent overriding
 class GoodProcessor {
 public:
-    void process() final {  // 禁止子类重写
+    void process() final {  // subclasses cannot override it
         init();
         execute();
         cleanup();
@@ -342,17 +352,17 @@ protected:
 };
 ```
 
-### 3. 使用钩子方法提供默认行为
+### 3. Provide Defaults with Hook Methods
 
 ```cpp
 class ReportGenerator {
 public:
     void generate() {
         prepareData();
-        if (shouldIncludeCharts()) {  // 钩子
+        if (shouldIncludeCharts()) {  // hook
             generateCharts();
         }
-        if (shouldIncludeSummary()) {  // 钩子
+        if (shouldIncludeSummary()) {  // hook
             generateSummary();
         }
         exportReport();
@@ -370,12 +380,12 @@ private:
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：过多的虚函数
+### Trap 1: Too Many Virtual Functions
 
 ```cpp
-// 不推荐：太多虚函数，难以维护
+// Not recommended: too many virtual functions, hard to maintain
 class OverEngineered {
 public:
     virtual void step1() = 0;
@@ -383,27 +393,27 @@ public:
     virtual void step3() = 0;
     virtual void step4() = 0;
     virtual void step5() = 0;
-    // ... 20+ 个虚函数
+    // ... 20+ virtual functions
 };
 
-// 推荐：只将必要的步骤设为虚函数
+// Recommended: make only the necessary steps virtual
 class Minimal {
 public:
     void process() {
         prepare();
-        if (needCustomStep()) customStep();  // 只有这一步需要虚函数
+        if (needCustomStep()) customStep();  // only this step needs to be virtual
         finalize();
     }
     
 protected:
-    virtual void customStep() { /* 默认实现 */ }
+    virtual void customStep() { /* default implementation */ }
 };
 ```
 
-### 陷阱 2：破坏封装性
+### Trap 2: Breaking Encapsulation
 
 ```cpp
-// 不推荐：子类可以访问私有方法
+// Not recommended: subclasses can reach the private methods
 class LeakyBase {
 public:
     void process() {
@@ -412,11 +422,11 @@ public:
     }
     
 protected:
-    // 不应该暴露给子类
+    // should not be exposed to subclasses
     void step1() { /* ... */ }
 };
 
-// 推荐：使用保护方法只暴露必要的接口
+// Recommended: use protected methods to expose only the necessary interface
 class EncapsulatedBase {
 public:
     void process() final {
@@ -425,22 +435,22 @@ public:
     }
     
 protected:
-    virtual void doStep2() { /* 子类可以重写 */ }
+    virtual void doStep2() { /* subclasses can override it */ }
     
 private:
-    void doStep1() { /* 子类不能访问 */ }
+    void doStep1() { /* subclasses cannot access it */ }
 };
 ```
 
-### 陷阱 3：虚函数调用开销
+### Trap 3: Virtual Call Overhead
 
 ```cpp
-// 不推荐：在性能敏感代码中使用大量虚函数
+// Not recommended: lots of virtual functions in performance-critical code
 class SlowProcessor {
 public:
     void process() {
         for (int i = 0; i < 1000000; ++i) {
-            tinyStep();  // 虚函数调用开销
+            tinyStep();  // virtual call overhead
         }
     }
     
@@ -448,25 +458,30 @@ protected:
     virtual void tinyStep() { /* ... */ }
 };
 
-// 推荐：使用 CRTP 避免虚函数调用
+// Recommended: use CRTP to avoid virtual calls
 template<typename Derived>
 class FastProcessor {
 public:
     void process() {
         for (int i = 0; i < 1000000; ++i) {
-            static_cast<Derived*>(this)->tinyStep();  // 静态绑定
+            static_cast<Derived*>(this)->tinyStep();  // static binding
         }
     }
 };
 ```
 
-## 总结
+## Summary
 
-模板方法模式的核心要点：
+The key points of the template method pattern:
 
-- **适用场景**：算法结构固定、部分步骤可变、需要代码复用
-- **核心优点**：代码复用、易于维护、强制结构
-- **实现要点**：使用访问控制、避免过度虚函数、使用钩子方法
-- **常见陷阱**：过多虚函数、破坏封装、虚函数调用开销
+- **When to use it**: a fixed algorithm structure, some steps vary, code reuse
+  is needed
+- **Main benefits**: code reuse, easy to maintain, enforced structure
+- **Implementation advice**: use access control, avoid too many virtual
+  functions, use hook methods
+- **Common traps**: too many virtual functions, broken encapsulation, virtual
+  call overhead
 
-> **记住**：模板方法模式的关键是"定义骨架"——在父类中定义算法框架，让子类决定具体步骤的实现。
+> **Remember**: the key of the template method pattern is *defining the
+> skeleton* — put the algorithm's framework in the base class and let the
+> subclasses decide how the individual steps are implemented.

@@ -1,19 +1,22 @@
-# 外观模式 (Facade Pattern)
+# Facade Pattern
 
-## 什么是外观模式？
+## What Is the Facade Pattern?
 
-外观模式（Facade Pattern）是一种结构型设计模式，它为子系统中的一组接口提供一个一致的界面，外观模式定义了一个高层接口，这个接口使得这一子系统更加容易使用。
+The Facade Pattern is a structural design pattern that provides a unified
+interface for a set of interfaces within a subsystem. It defines a
+higher-level interface that makes the subsystem easier to use.
 
-> **核心思想**：通过提供一个简化的接口来隐藏子系统的复杂性。
+> **Core idea**: hide the complexity of the subsystem behind a simplified
+> interface.
 
-## 为什么需要外观模式？
+## Why Do We Need It?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有一个复杂的媒体播放系统：
+Suppose we have a complex media playback system:
 
 ```cpp
-// 问题：客户端需要了解太多细节
+// Problem: the client has to know too many details
 class AudioCodec {
 public:
     void decode(const std::string& file);
@@ -44,7 +47,7 @@ public:
     void stop();
 };
 
-// 客户端使用很复杂
+// Using it directly is complicated
 void playMovie(const std::string& movie) {
     AudioCodec audio;
     VideoCodec video;
@@ -62,14 +65,15 @@ void playMovie(const std::string& movie) {
 }
 ```
 
-**问题**：
-1. 客户端需要了解太多子系统细节
-2. 使用复杂，容易出错
-3. 难以维护
+**Problems**:
 
-### 解决方案
+1. The client needs to know too many subsystem details
+2. Usage is complicated and error-prone
+3. Hard to maintain
 
-使用外观模式：
+### Solution
+
+Use the facade pattern:
 
 ```cpp
 class MediaFacade {
@@ -103,39 +107,40 @@ private:
     Speaker speaker_;
 };
 
-// 客户端使用简单
+// Using it is simple
 MediaFacade media;
 media.play("movie.mp4");
 ```
 
-**优点**：
-1. 简化接口：客户端只需调用外观
-2. 解耦：客户端不依赖子系统
-3. 易于使用：隐藏了复杂性
+**Benefits**:
 
-## 模式结构
+1. Simplified interface: the client only talks to the facade
+2. Decoupling: the client does not depend on the subsystems
+3. Easy to use: the complexity is hidden
+
+## Pattern Structure
 
 ```
                     ┌─────────────┐
                     │   Facade    │
-                    │  (外观)      │
+                    │ (simplified)│
                     └──────┬──────┘
                            │
               ┌────────────┼────────────┐
               │            │            │
     ┌─────────▼───┐ ┌──────▼─────┐ ┌───▼────────┐
-    │  SubSystem1 │ │ SubSystem2 │ │ SubSystem3 │ ← 子系统
+    │  SubSystem1 │ │ SubSystem2 │ │ SubSystem3 │ ← subsystems
     │   (Audio)   │ │  (Video)   │ │ (Subtitle) │
     └─────────────┘ └────────────┘ └────────────┘
                            │
                     ┌────────▼────────┐
-                    │    Client       │ ← 客户端
+                    │    Client       │ ← client
                     └─────────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义子系统
+### 1. Define the Subsystems
 
 ```cpp
 #include <memory>
@@ -143,7 +148,7 @@ media.play("movie.mp4");
 #include <iostream>
 #include <vector>
 
-// 音频子系统
+// the audio subsystem
 class AudioDecoder {
 public:
     void decode(const std::string& file) {
@@ -159,7 +164,7 @@ public:
     }
 };
 
-// 视频子系统
+// the video subsystem
 class VideoDecoder {
 public:
     void decode(const std::string& file) {
@@ -175,7 +180,7 @@ public:
     }
 };
 
-// 字幕子系统
+// the subtitle subsystem
 class SubtitleRenderer {
 public:
     void load(const std::string& file) {
@@ -191,7 +196,7 @@ public:
     }
 };
 
-// 扬声器子系统
+// the speaker subsystem
 class Speaker {
 public:
     void play() {
@@ -208,7 +213,7 @@ public:
 };
 ```
 
-### 2. 实现外观类
+### 2. Implement the Facade Class
 
 ```cpp
 class MediaFacade {
@@ -222,12 +227,12 @@ public:
     void play(const std::string& movie) {
         std::cout << "=== Playing: " << movie << " ===\n";
         
-        // 解码
+        // decode
         audio_->decode(movie);
         video_->decode(movie);
         subtitle_->load(movie + ".srt");
         
-        // 播放
+        // play
         audio_->play();
         video_->play();
         subtitle_->render();
@@ -257,31 +262,31 @@ private:
 };
 ```
 
-### 3. 客户端使用
+### 3. Client Usage
 
 ```cpp
 int main() {
     MediaFacade media;
     
-    // 播放电影
+    // play the movie
     media.play("movie.mp4");
     
-    // 暂停
+    // pause
     media.pause();
     
-    // 继续播放
+    // resume playback
     media.play("movie.mp4");
     
-    // 停止
+    // stop
     media.stop();
     
     return 0;
 }
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用模板外观
+### With a Template Facade
 
 ```cpp
 template<typename... SubSystems>
@@ -289,11 +294,11 @@ class GenericFacade {
 public:
     template<typename T, typename... Args>
     void registerSubsystem(Args&&... args) {
-        // 注册子系统
+        // register the subsystem
     }
     
     void performOperation() {
-        // 执行操作
+        // perform the operation
     }
 
 private:
@@ -301,7 +306,7 @@ private:
 };
 ```
 
-### 使用 builder 模式
+### With the Builder Pattern
 
 ```cpp
 class MediaBuilder {
@@ -326,20 +331,20 @@ private:
 };
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
-|------|------|
-| **适配器模式** | 适配器转换接口；外观简化接口 |
-| **代理模式** | 代理控制访问；外观简化接口 |
-| **工厂模式** | 工厂创建对象；外观提供统一接口 |
+| Pattern | Difference |
+|---------|-----------|
+| **Adapter** | An adapter converts an interface; a facade simplifies one |
+| **Proxy** | A proxy controls access; a facade simplifies an interface |
+| **Factory** | A factory creates objects; a facade provides a unified interface |
 
-## 最佳实践
+## Best Practices
 
-### 1. 保持外观简单
+### 1. Keep the Facade Simple
 
 ```cpp
-// 推荐：外观只做简单的封装
+// Recommended: the facade only wraps things simply
 class SimpleFacade {
 public:
     void doSomething() {
@@ -348,22 +353,22 @@ public:
     }
 };
 
-// 不推荐：外观包含太多逻辑
+// Not recommended: the facade contains too much logic
 class ComplexFacade {
 public:
     void doSomething() {
-        // 太多业务逻辑...
+        // too much business logic...
         if (condition1) {
             // ...
         } else if (condition2) {
             // ...
         }
-        // 太多逻辑，应该拆分成多个外观
+        // too much logic — it should be split into several facades
     }
 };
 ```
 
-### 2. 支持多个外观
+### 2. Support Multiple Facades
 
 ```cpp
 class SimpleMediaFacade {
@@ -385,7 +390,7 @@ public:
 };
 ```
 
-### 3. 使用依赖注入
+### 3. Use Dependency Injection
 
 ```cpp
 class MediaFacade {
@@ -407,12 +412,12 @@ private:
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：God Facade
+### Trap 1: God Facade
 
 ```cpp
-// 不推荐：外观包含所有功能
+// Not recommended: the facade contains every feature
 class GodFacade {
 public:
     void playMovie() { /* ... */ }
@@ -420,26 +425,26 @@ public:
     void recordVideo() { /* ... */ }
     void editPhoto() { /* ... */ }
     void processAudio() { /* ... */ }
-    // 太多功能，难以维护
+    // too many features — hard to maintain
 };
 
-// 推荐：拆分成多个外观
+// Recommended: split it into several facades
 class MediaPlayerFacade { ... };
 class PhotoEditorFacade { ... };
 class AudioProcessorFacade { ... };
 ```
 
-### 陷阱 2：暴露子系统细节
+### Trap 2: Exposing Subsystem Details
 
 ```cpp
-// 不推荐：暴露子系统
+// Not recommended: exposing the subsystems
 class BadFacade {
 public:
-    AudioDecoder& getAudio() { return *audio_; }  // 暴露内部
-    VideoDecoder& getVideo() { return *video_; }  // 暴露内部
+    AudioDecoder& getAudio() { return *audio_; }  // exposes the internals
+    VideoDecoder& getVideo() { return *video_; }  // exposes the internals
 };
 
-// 推荐：只暴露需要的接口
+// Recommended: expose only the interface you need
 class GoodFacade {
 public:
     void play() { audio_->play(); video_->play(); }
@@ -447,18 +452,18 @@ public:
 };
 ```
 
-### 陷阱 3：过度使用外观
+### Trap 3: Overusing the Facade
 
 ```cpp
-// 不推荐：为简单操作也创建外观
+// Not recommended: creating a facade even for a simple operation
 class SimpleOperation {
 public:
     void doWork() {
-        // 简单操作，不需要外观
+        // a simple operation — no facade needed
     }
 };
 
-class SimpleFacade {  // 过度设计
+class SimpleFacade {  // over-engineering
 public:
     void doWork() {
         operation_.doWork();
@@ -468,13 +473,16 @@ private:
 };
 ```
 
-## 总结
+## Summary
 
-外观模式的核心要点：
+The key points of the facade pattern:
 
-- **适用场景**：子系统复杂、需要简化接口、解耦客户端
-- **核心优点**：简化使用、隐藏复杂性、降低耦合
-- **实现要点**：保持简单、支持多个外观、使用依赖注入
-- **常见陷阱**：God Facade、暴露细节、过度使用
+- **When to use it**: complex subsystems, a need to simplify the interface,
+  decoupling the client
+- **Main benefits**: simpler usage, hidden complexity, lower coupling
+- **Implementation advice**: stay simple, support multiple facades, use
+  dependency injection
+- **Common traps**: god facades, exposing details, overuse
 
-> **记住**：外观模式的关键是"简化接口"——为复杂的子系统提供一个简单的接口，让客户端更容易使用。
+> **Remember**: the key of the facade pattern is *simplifying the interface* —
+> give a complex subsystem a simple interface so the client is easy to use.

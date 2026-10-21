@@ -1,50 +1,54 @@
-# 原型模式 (Prototype Pattern)
+# Prototype Pattern
 
-## 什么是原型模式？
+## What Is the Prototype Pattern?
 
-原型模式（Prototype Pattern）是一种创建型设计模式，它通过复制现有的对象来创建新对象，而不是通过 new 关键字创建。当直接创建对象的代价较大时，可以使用原型模式。
+The Prototype Pattern is a creational design pattern that creates new objects
+by copying existing ones instead of going through the `new` keyword. It is
+useful when creating an object directly is expensive.
 
-> **核心思想**：通过克隆原型来创建新对象，避免重复的初始化开销。
+> **Core idea**: create new objects by cloning a prototype, avoiding the
+> repeated cost of initialization.
 
-## 为什么需要原型模式？
+## Why Do We Need It?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有一个复杂的图形对象，创建开销很大：
+Suppose we have a complex graph object that is expensive to create:
 
 ```cpp
-// 问题：每次创建都需要重新初始化
+// Problem: every creation has to initialize everything again
 class ComplexGraph {
 public:
     ComplexGraph() {
-        // 初始化复杂的图形数据
+        // initialize the complex graph data
         loadFromFile("huge_graph.dat");
         computeLayout();
         buildRenderingTree();
     }
     
     ComplexGraph(const ComplexGraph& other) {
-        // 深拷贝所有数据
+        // deep-copy all the data
         data_ = other.data_;
         layout_ = other.layout_;
         // ...
     }
 };
 
-// 需要创建多个类似的对象
+// We need several similar objects
 auto graph1 = std::make_unique<ComplexGraph>();
-auto graph2 = std::make_unique<ComplexGraph>(*graph1);  // 拷贝
-auto graph3 = std::make_unique<ComplexGraph>(*graph1);  // 拷贝
+auto graph2 = std::make_unique<ComplexGraph>(*graph1);  // copy
+auto graph3 = std::make_unique<ComplexGraph>(*graph1);  // copy
 ```
 
-**问题**：
-1. 创建成本高
-2. 初始化复杂
-3. 需要多次拷贝
+**Problems**:
 
-### 解决方案
+1. Creation is expensive
+2. Initialization is complicated
+3. Many copies are needed
 
-使用原型模式：
+### Solution
+
+Use the prototype pattern:
 
 ```cpp
 class Prototype {
@@ -60,7 +64,7 @@ public:
     }
 };
 
-// 使用
+// usage
 auto prototype = std::make_unique<ComplexGraph>();
 prototype->loadFromFile("huge_graph.dat");
 
@@ -68,34 +72,35 @@ auto copy1 = prototype->clone();
 auto copy2 = prototype->clone();
 ```
 
-**优点**：
-1. 避免重复初始化
-2. 运行时决定创建类型
-3. 简化创建过程
+**Benefits**:
 
-## 模式结构
+1. Avoids repeated initialization
+2. The type to create is decided at runtime
+3. Simplifies the creation process
+
+## Pattern Structure
 
 ```
                     ┌─────────────┐
                     │  Prototype  │
-                    │  (原型)      │
+                    │ (abstract)  │
                     └──────┬──────┘
                            │
               ┌────────────▼────────────┐
-              │     ConcretePrototype   │ ← 具体原型
+              │     ConcretePrototype   │ ← concrete prototype
               │   (ComplexGraph)        │
               └────────────┬────────────┘
                            │ clone()
                            │
               ┌────────────▼────────────┐
-              │      Client             │ ← 客户端
-              │  (使用 clone 创建新对象) │
+              │      Client             │ ← client
+              │  (uses clone to create) │
               └─────────────────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义原型接口
+### 1. Define the Prototype Interface
 
 ```cpp
 #include <memory>
@@ -122,7 +127,7 @@ protected:
 };
 ```
 
-### 2. 实现具体原型
+### 2. Implement the Concrete Prototypes
 
 ```cpp
 class TextDocument : public Document {
@@ -189,7 +194,7 @@ private:
 };
 ```
 
-### 3. 实现原型管理器
+### 3. Implement the Prototype Registry
 
 ```cpp
 class PrototypeRegistry {
@@ -221,13 +226,13 @@ private:
 };
 ```
 
-### 4. 客户端使用
+### 4. Client Usage
 
 ```cpp
 int main() {
     PrototypeRegistry registry;
     
-    // 注册原型
+    // register the prototypes
     auto textProto = std::make_shared<TextDocument>();
     textProto->setContent("Original text content");
     textProto->setFontSize(14);
@@ -245,10 +250,10 @@ int main() {
     sheetProto->addCell(1, 1, "World");
     registry.registerPrototype("Spreadsheet", sheetProto);
     
-    // 列出可用的原型
+    // list the available prototypes
     registry.listTypes();
     
-    // 创建克隆
+    // create a clone
     auto doc1 = registry.create("Text");
     doc1->setContent("Modified text content");
     std::cout << "\nCreated: " << doc1->getType() << "\n";
@@ -259,9 +264,10 @@ int main() {
     
     auto doc3 = registry.create("Spreadsheet");
     std::cout << "\nCreated: " << doc3->getType() << "\n";
-    std::cout << "Cell(0,0): " << doc3->getCell(0, 0) << "\n";
+    auto sheetClone = std::static_pointer_cast<SpreadsheetDocument>(doc3);
+    std::cout << "Cell(0,0): " << sheetClone->getCell(0, 0) << "\n";
     
-    // 深拷贝验证
+    // verify the deep copy
     auto textClone = std::static_pointer_cast<TextDocument>(doc1);
     std::cout << "\nFont size: " << textClone->getFontSize() << "\n";
     
@@ -269,9 +275,9 @@ int main() {
 }
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用 CRTP 简化克隆
+### Simplifying Cloning with CRTP
 
 ```cpp
 template<typename Derived>
@@ -283,11 +289,11 @@ public:
 };
 
 class MyDocument : public Cloneable<MyDocument> {
-    // 自动获得 clone() 方法
+    // gets the clone() method for free
 };
 ```
 
-### 使用工厂函数
+### Using a Factory Function
 
 ```cpp
 template<typename T>
@@ -295,11 +301,11 @@ std::shared_ptr<T> clonePrototype(const std::shared_ptr<T>& prototype) {
     return std::make_shared<T>(*prototype);
 }
 
-// 使用
+// usage
 auto clone = clonePrototype<TextDocument>(textProto);
 ```
 
-### 使用自定义克隆策略
+### Using a Custom Clone Strategy
 
 ```cpp
 class CustomCloneable {
@@ -323,17 +329,17 @@ private:
 };
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
-|------|------|
-| **工厂模式** | 工厂创建新对象；原型通过克隆创建 |
-| **建造者模式** | 建造者逐步构建；原型通过复制创建 |
-| **单例模式** | 单例只有一个实例；原型可以创建多个克隆 |
+| Pattern | Difference |
+|---------|-----------|
+| **Factory** | A factory creates a new object; a prototype creates one by copying |
+| **Builder** | A builder assembles step by step; a prototype creates by copying |
+| **Singleton** | A singleton has one instance; a prototype can produce many clones |
 
-## 最佳实践
+## Best Practices
 
-### 1. 实现深拷贝
+### 1. Implement Deep Copies
 
 ```cpp
 class DeepCloneable {
@@ -341,16 +347,16 @@ public:
     virtual std::shared_ptr<DeepCloneable> clone() const = 0;
     
 protected:
-    // 确保拷贝是深拷贝
+    // make sure the copy is a deep copy
     DeepCloneable(const DeepCloneable& other) 
-        : data_(other.data_) {}  // 深拷贝
+        : data_(other.data_) {}  // deep copy
     
 private:
     std::vector<int> data_;
 };
 ```
 
-### 2. 使用对象池缓存克隆
+### 2. Cache Clones in an Object Pool
 
 ```cpp
 class CloneCache {
@@ -372,7 +378,7 @@ private:
 };
 ```
 
-### 3. 支持部分克隆
+### 3. Support Partial Cloning
 
 ```cpp
 class PartialCloneable {
@@ -400,25 +406,25 @@ private:
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：浅拷贝问题
+### Trap 1: The Shallow Copy Problem
 
 ```cpp
-// 不推荐：浅拷贝可能导致悬垂指针
+// Not recommended: a shallow copy can leave dangling pointers
 class BadPrototype {
 public:
     std::unique_ptr<BadPrototype> clone() const {
         auto clone = std::make_unique<BadPrototype>(*this);
-        clone->data_ = data_;  // 浅拷贝指针
+        clone->data_ = data_;  // shallow copy of the pointer
         return clone;
     }
     
 private:
-    int* data_ = nullptr;  // 需要深拷贝
+    int* data_ = nullptr;  // needs a deep copy
 };
 
-// 推荐：深拷贝或智能指针
+// Recommended: deep copy or smart pointers
 class GoodPrototype {
 public:
     std::unique_ptr<GoodPrototype> clone() const {
@@ -426,20 +432,20 @@ public:
     }
     
 private:
-    std::unique_ptr<int[]> data_;  // 自动深拷贝
+    std::unique_ptr<int[]> data_;  // deep copy for free
 };
 ```
 
-### 陷阱 2：循环引用
+### Trap 2: Reference Cycles
 
 ```cpp
-// 危险：循环引用导致内存泄漏
+// Danger: a reference cycle causes a memory leak
 class Node {
 public:
     std::shared_ptr<Node> clone() const {
         auto clone = std::make_shared<Node>(*this);
         if (parent_) {
-            clone->parent_ = parent_->clone();  // 循环引用
+            clone->parent_ = parent_->clone();  // reference cycle
         }
         return clone;
     }
@@ -449,19 +455,19 @@ private:
 };
 ```
 
-### 陷阱 3：忘记实现 clone()
+### Trap 3: Forgetting to Implement clone()
 
 ```cpp
-// 不推荐：忘记实现 clone()
+// Not recommended: forgetting to implement clone()
 class IncompletePrototype {
 public:
     virtual std::shared_ptr<IncompletePrototype> clone() const {
-        // 忘记实现！
+        // forgot to implement it!
         return nullptr;
     }
 };
 
-// 推荐：使用 CRTP 强制实现
+// Recommended: use CRTP to make the implementation mandatory
 template<typename Derived>
 class Cloneable {
 public:
@@ -471,13 +477,18 @@ public:
 };
 ```
 
-## 总结
+## Summary
 
-原型模式的核心要点：
+The key points of the prototype pattern:
 
-- **适用场景**：创建成本高、需要动态创建类型、需要缓存对象
-- **核心优点**：避免重复初始化、支持运行时多态、简化创建
-- **实现要点**：深拷贝、使用智能指针、考虑缓存
-- **常见陷阱**：浅拷贝、循环引用、未实现 clone()
+- **When to use it**: expensive creation, a need to create types dynamically,
+  a need to cache objects
+- **Main benefits**: avoids repeated initialization, supports runtime
+  polymorphism, simplifies creation
+- **Implementation advice**: deep copies, smart pointers, consider caching
+- **Common traps**: shallow copies, reference cycles, an unimplemented
+  `clone()`
 
-> **记住**：原型模式的关键是"克隆"——通过复制现有对象来创建新对象，避免重复的初始化开销。
+> **Remember**: the key of the prototype pattern is *cloning* — create new
+> objects by copying existing ones, so the repeated cost of initialization
+> disappears.

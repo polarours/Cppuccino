@@ -224,7 +224,8 @@ public:
         if (history_.size() > 1) {
             history_.pop();
         }
-        return history_.top();
+        // history_.top() 是 unique_ptr，解引用后返回备忘录本身
+        return *history_.top();
     }
     
     bool canUndo() const {

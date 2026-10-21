@@ -1,19 +1,22 @@
-# 建造者模式 (Builder Pattern)
+# Builder Pattern
 
-## 什么是建造者模式？
+## What Is the Builder Pattern?
 
-建造者模式（Builder Pattern）是一种创建型设计模式，它将复杂对象的构建过程与其表示分离，使得同样的构建过程可以创建不同的表示。
+The Builder Pattern is a creational design pattern that separates the
+construction of a complex object from its representation, so that the same
+construction process can create different representations.
 
-> **核心思想**：将对象的构建步骤封装到建造者中，通过逐步构建来创建复杂对象。
+> **Core idea**: encapsulate the construction steps of an object inside a
+> builder, creating complex objects through step-by-step assembly.
 
-## 为什么需要建造者模式？
+## Why Do We Need It?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有一个 Pizza 对象，有很多可选参数：
+Suppose we have a `Pizza` object with many optional parameters:
 
 ```cpp
-// 问题：构造函数参数过多
+// Problem: too many constructor parameters
 class Pizza {
 public:
     Pizza(bool cheese, bool pepperoni, bool mushrooms, 
@@ -25,21 +28,22 @@ public:
 private:
     bool cheese_;
     bool pepperoni_;
-    // ... 10+ 个参数
+    // ... 10+ parameters
 };
 
-// 调用时难以阅读
+// Hard to read at the call site
 Pizza p(true, false, true, false, true, false, false, false, false, 14, true, false);
 ```
 
-**问题**：
-1. 参数过多导致构造函数难以使用
-2. 参数顺序容易混淆
-3. 难以验证参数合法性
+**Problems**:
 
-### 解决方案
+1. Too many parameters make the constructor hard to use
+2. The parameter order is easy to mix up
+3. Parameter validity is hard to verify
 
-使用建造者模式：
+### Solution
+
+Use the builder pattern:
 
 ```cpp
 class PizzaBuilder {
@@ -48,7 +52,7 @@ public:
     PizzaBuilder& thinCrust() { thinCrust_ = true; return *this; }
     PizzaBuilder& addCheese() { cheese_ = true; return *this; }
     PizzaBuilder& addPepperoni() { pepperoni_ = true; return *this; }
-    // ... 其他方法
+    // ... other methods
     
     Pizza build() const {
         validate();
@@ -63,7 +67,7 @@ private:
     // ...
 };
 
-// 使用清晰易读
+// Clear and readable at the call site
 Pizza p = PizzaBuilder()
     .size(14)
     .thinCrust()
@@ -72,43 +76,44 @@ Pizza p = PizzaBuilder()
     .build();
 ```
 
-**优点**：
-1. 可读性好：方法调用清晰表达意图
-2. 可验证：可以在 build() 时验证参数
-3. 灵活：可以创建不同配置的 object
-4. 支持不可变对象：build() 后对象不可修改
+**Benefits**:
 
-## 模式结构
+1. Readable: each method call expresses the intent clearly
+2. Verifiable: the parameters can be validated in `build()`
+3. Flexible: objects with different configurations can be created
+4. Supports immutable objects: the object cannot be modified after `build()`
+
+## Pattern Structure
 
 ```
                     ┌─────────────┐
                     │  Director   │
-                    │  (导演)      │
+                    │   (director)│
                     └──────┬──────┘
                            │ uses
                            │
               ┌────────────▼────────────┐
-              │       Builder           │ ← 抽象建造者
+              │       Builder           │ ← abstract builder
               │   (PizzaBuilder)        │
               └────────────┬────────────┘
                            │
            ┌───────────────┼───────────────┐
            │               │               │
     ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-    │  Hawaiian   │ │  Vegetarian │ │  MeatLover  │ ← 具体建造者
+    │  Hawaiian   │ │  Vegetarian │ │  MeatLover  │ ← concrete builders
     └──────┬──────┘ └──────┬──────┘ └──────┬──────┘
            │               │               │
            └───────────────┼───────────────┘
                            │
               ┌────────────▼────────────┐
-              │        Product          │ ← 产品
+              │        Product          │ ← the product
               │        (Pizza)          │
               └─────────────────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义产品
+### 1. Define the Product
 
 ```cpp
 #include <memory>
@@ -150,7 +155,7 @@ private:
 };
 ```
 
-### 2. 定义抽象建造者
+### 2. Define the Abstract Builder
 
 ```cpp
 class PizzaBuilder {
@@ -166,7 +171,7 @@ public:
 };
 ```
 
-### 3. 实现具体建造者
+### 3. Implement the Concrete Builders
 
 ```cpp
 class HawaiianPizzaBuilder : public PizzaBuilder {
@@ -248,13 +253,13 @@ private:
 };
 ```
 
-### 4. 实现导演类
+### 4. Implement the Director Class
 
 ```cpp
 class Waiter {
 public:
-    Pizza construct(const PizzaBuilder& builder) {
-        // 导演控制建造过程
+    Pizza construct(PizzaBuilder& builder) {
+        // the director controls the construction process
         return builder.size(14)
                     .thinCrust()
                     .cheese()
@@ -266,11 +271,11 @@ public:
 };
 ```
 
-### 5. 客户端使用
+### 5. Client Usage
 
 ```cpp
 int main() {
-    // 直接创建
+    // created directly
     HawaiianPizzaBuilder hawaiian;
     auto pizza1 = hawaiian.size(14)
                           .thinCrust()
@@ -280,7 +285,7 @@ int main() {
                           .build();
     pizza1.display();
     
-    // 通过导演创建
+    // created through the director
     Waiter waiter;
     VegetarianPizzaBuilder veggie;
     auto pizza2 = waiter.construct(veggie);
@@ -290,9 +295,9 @@ int main() {
 }
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用流式 API
+### With a Fluent API
 
 ```cpp
 class ModernPizzaBuilder {
@@ -321,12 +326,12 @@ private:
 };
 ```
 
-### 使用静态方法
+### With Static Factory Methods
 
 ```cpp
 class PizzaBuilder {
 public:
-    // 静态工厂方法
+    // static factory method
     static ModernPizzaBuilder hawaiian() {
         return ModernPizzaBuilder()
             .cheese()
@@ -354,37 +359,37 @@ public:
     }
 };
 
-// 使用
+// usage
 auto pizza = PizzaBuilder::hawaiian().size(14).thinCrust().build();
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
-|------|------|
-| **工厂模式** | 工厂创建完整对象；建造者逐步构建对象 |
-| **抽象工厂** | 抽象工厂创建产品族；建造者关注单个对象构建 |
-| **原型模式** | 原型通过克隆创建；建造者通过步骤构建 |
+| Pattern | Difference |
+|---------|-----------|
+| **Factory Method** | The factory creates a complete object; the builder assembles it step by step |
+| **Abstract Factory** | The abstract factory creates a family of products; the builder focuses on assembling a single object |
+| **Prototype** | The prototype creates by cloning; the builder creates through steps |
 
-## 最佳实践
+## Best Practices
 
-### 1. 使用不可变对象
+### 1. Use Immutable Objects
 
 ```cpp
 class Pizza {
 public:
-    // 所有成员都是 const
+    // every member is const
     const double size_;
     const bool thinCrust_;
     // ...
     
 private:
-    Pizza(...) = default;  // 私有构造函数
-    friend class PizzaBuilder;  // 只允许建造者创建
+    Pizza(...) = default;  // private constructor
+    friend class PizzaBuilder;  // only the builder may create it
 };
 ```
 
-### 2. 验证参数
+### 2. Validate Parameters
 
 ```cpp
 Pizza build() const {
@@ -399,38 +404,38 @@ Pizza build() const {
 }
 ```
 
-### 3. 支持可选参数
+### 3. Support Optional Parameters
 
 ```cpp
 class PizzaBuilder {
 public:
     PizzaBuilder& size(double s) { size_ = s; return *this; }
     PizzaBuilder& thinCrust() { thinCrust_ = true; return *this; }
-    // 可选参数
+    // optional parameters
     PizzaBuilder& extraCheese() { extraCheese_ = true; return *this; }
     PizzaBuilder& garlicButter() { garlicButter_ = true; return *this; }
     
-    // 有默认值
+    // with a default value
     PizzaBuilder& sauce(const std::string& s = "Tomato") { 
         sauce_ = s; return *this; 
     }
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：建造者过于复杂
+### Trap 1: The Builder Is Too Complex
 
 ```cpp
-// 不推荐：建造者包含过多逻辑
+// Not recommended: the builder contains too much logic
 class ComplexBuilder {
 public:
-    PizzaBuilder& step1() { /* 复杂逻辑 */ return *this; }
-    PizzaBuilder& step2() { /* 复杂逻辑 */ return *this; }
-    // ... 50+ 个步骤
+    PizzaBuilder& step1() { /* complex logic */ return *this; }
+    PizzaBuilder& step2() { /* complex logic */ return *this; }
+    // ... 50+ steps
 };
 
-// 推荐：保持简单
+// Recommended: keep it simple
 class SimpleBuilder {
 public:
     PizzaBuilder& size(double s) { size_ = s; return *this; }
@@ -440,30 +445,30 @@ public:
 };
 ```
 
-### 陷阱 2：忘记调用 build()
+### Trap 2: Forgetting to Call build()
 
 ```cpp
-// 不推荐：忘记 build()
+// Not recommended: forgetting build()
 PizzaBuilder builder;
-builder.size(14).cheese();  // 忘记 build()！
+builder.size(14).cheese();  // forgot build()!
 
-// 推荐：使用作用域或RAII
+// Recommended: use a scope or RAII
 auto pizza = PizzaBuilder{}.size(14).cheese().build();
 ```
 
-### 陷阱 3：建造者状态泄露
+### Trap 3: Leaking Builder State
 
 ```cpp
-// 不推荐：建造者状态可以被修改
+// Not recommended: the builder state can be modified
 class BadBuilder {
 public:
-    void setCheese(bool c) { cheese_ = c; }  // 暴露内部状态
+    void setCheese(bool c) { cheese_ = c; }  // exposes the internal state
     
 private:
     bool cheese_ = false;
 };
 
-// 推荐：只暴露建造接口
+// Recommended: expose only the building interface
 class GoodBuilder {
 public:
     GoodBuilder& cheese() { cheese_ = true; return *this; }
@@ -473,13 +478,17 @@ private:
 };
 ```
 
-## 总结
+## Summary
 
-建造者模式的核心要点：
+The key points of the builder pattern:
 
-- **适用场景**：对象参数多、构建过程复杂、需要多种表示
-- **核心优点**：可读性好、可验证、支持不可变对象
-- **实现要点**：使用流式 API、验证参数、支持可选参数
-- **常见陷阱**：过于复杂、忘记 build()、状态泄露
+- **When to use it**: the object has many parameters, the construction
+  process is complex, or several representations are needed
+- **Main benefits**: readable, verifiable, supports immutable objects
+- **Implementation advice**: use a fluent API, validate the parameters,
+  support optional parameters
+- **Common traps**: too much complexity, forgetting `build()`, leaking state
 
-> **记住**：建造者模式的关键是"分步构建"——将复杂对象的构建分解为多个简单步骤，使构建过程清晰可控。
+> **Remember**: the key of the builder pattern is *"step-by-step construction"*
+> — break the construction of a complex object into several simple steps so
+> the process stays clear and controllable.

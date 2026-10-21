@@ -128,8 +128,12 @@ public:
 #include <iostream>
 #include <vector>
 #include <functional>
+#include <cmath>
 
-class Shape;  // 前向声明
+class Shape;      // 前向声明
+class Circle;     // 前向声明
+class Rectangle;  // 前向声明
+class Triangle;   // 前向声明
 
 class Visitor {
 public:

@@ -1,19 +1,22 @@
-# 命令模式 (Command Pattern)
+# Command Pattern
 
-## 什么是命令模式？
+## What Is the Command Pattern?
 
-命令模式（Command Pattern）是一种行为型设计模式，它将请求封装成对象，从而允许使用不同的请求对客户端进行参数化，支持请求排队、记录日志、撤销操作等。
+The Command Pattern is a behavioral design pattern that encapsulates a request
+as an object. This lets you parameterize a client with different requests, and
+supports queuing requests, logging them, undoing operations, and so on.
 
-> **核心思想**：将动作的请求者与执行者解耦，通过命令对象传递动作。
+> **Core idea**: decouple the requester of an action from the executor of it,
+> and pass the action around as a command object.
 
-## 为什么需要命令模式？
+## Why Do We Need the Command Pattern?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有一个远程控制系统：
+Suppose we have a remote control system:
 
 ```cpp
-// 问题：硬编码的遥控器逻辑
+// Problem: hard-coded remote control logic
 class RemoteControl {
 public:
     void pressButton(int button) {
@@ -24,23 +27,23 @@ public:
         } else if (button == 3) {
             fan.on();
         }
-        // 每增加一个设备就要修改这个类
+        // Every new device means editing this class
     }
 };
 ```
 
-**问题**：
-1. 违反开闭原则：添加新设备需要修改遥控器
-2. 耦合度高：遥控器知道所有设备
-3. 无法撤销：没有状态保存
-4. 无法记录历史：无法回放操作
+**Problems**:
+1. It violates the open-closed principle: adding a device means modifying the remote
+2. High coupling: the remote knows every device
+3. No undo: no state is kept
+4. No history: operations cannot be replayed
 
-### 解决方案
+### Solution
 
-使用命令模式：
+Use the command pattern:
 
 ```cpp
-// 抽象命令接口
+// Abstract command interface
 class Command {
 public:
     virtual ~Command() = default;
@@ -48,11 +51,11 @@ public:
     virtual void undo() = 0;
 };
 
-// 具体命令
+// Concrete command
 class LightOnCommand : public Command {
 public:
     explicit LightOnCommand(Light& light) : light_(light) {}
-    
+
     void execute() override { light_.on(); }
     void undo() override { light_.off(); }
 
@@ -60,18 +63,18 @@ private:
     Light& light_;
 };
 
-// 遥控器
+// The remote control
 class RemoteControl {
 public:
     void setCommand(int slot, std::unique_ptr<Command> command) {
         commands_[slot] = std::move(command);
     }
-    
+
     void pressButton(int slot) {
         commands_[slot]->execute();
         history_.push_back(commands_[slot].get());
     }
-    
+
     void undoLast() {
         if (!history_.empty()) {
             history_.back()->undo();
@@ -85,43 +88,42 @@ private:
 };
 ```
 
-**优点**：
-1. 解耦：遥控器不直接操作设备
-2. 可扩展：添加新命令无需修改遥控器
-3. 支持撤销：每个命令可以记录历史
-4. 支持排队：可以批量执行命令
-5. 支持日志：可以记录所有操作
+**Benefits**:
+1. Decoupling: the remote does not drive the devices directly
+2. Extensibility: a new command needs no change to the remote
+3. Undo is supported: every command can record history
+4. Queuing is supported: commands can be executed in batches
+5. Logging is supported: every operation can be recorded
 
-## 模式结构
+## Pattern Structure
 
 ```
                     ┌─────────────┐
                     │  Invoker    │
-                    │  (遥控器)    │
                     └──────┬──────┘
                            │
               ┌────────────▼────────────┐
-              │       Command           │ ← 抽象命令接口
+              │       Command           │ ← abstract command interface
               │    (execute/undo)       │
               └────────────┬────────────┘
                            │
            ┌───────────────┼───────────────┐
            │               │               │
     ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-    │  LightOn    │ │  LightOff   │ │   FanOn     │ ← 具体命令
+    │  LightOn    │ │  LightOff   │ │   FanOn     │ ← concrete commands
     └──────┬──────┘ └──────┬──────┘ └──────┬──────┘
            │               │               │
            └───────────────┼───────────────┘
                            │
               ┌────────────▼────────────┐
-              │       Receiver          │ ← 接收者（设备）
+              │       Receiver          │ ← receiver (the device)
               │   (Light, Fan, TV...)   │
               └─────────────────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义抽象命令
+### 1. Define the Abstract Command
 
 ```cpp
 #include <memory>
@@ -137,10 +139,10 @@ public:
 };
 ```
 
-### 2. 实现具体命令
+### 2. Implement the Concrete Commands
 
 ```cpp
-// 设备类
+// The devices
 class Light {
 public:
     void on() { std::cout << "Light is ON\n"; }
@@ -159,11 +161,11 @@ public:
     void off() { std::cout << "TV is OFF\n"; }
 };
 
-// 具体命令：开灯
+// Concrete command: turn the light on
 class LightOnCommand : public Command {
 public:
     explicit LightOnCommand(Light& light) : light_(light) {}
-    
+
     void execute() override { light_.on(); }
     void undo() override { light_.off(); }
 
@@ -171,11 +173,11 @@ private:
     Light& light_;
 };
 
-// 具体命令：关灯
+// Concrete command: turn the light off
 class LightOffCommand : public Command {
 public:
     explicit LightOffCommand(Light& light) : light_(light) {}
-    
+
     void execute() override { light_.off(); }
     void undo() override { light_.on(); }
 
@@ -183,11 +185,11 @@ private:
     Light& light_;
 };
 
-// 具体命令：开风扇
+// Concrete command: turn the fan on
 class FanOnCommand : public Command {
 public:
     explicit FanOnCommand(Fan& fan) : fan_(fan) {}
-    
+
     void execute() override { fan_.on(); }
     void undo() override { fan_.off(); }
 
@@ -196,26 +198,26 @@ private:
 };
 ```
 
-### 3. 实现命令宏
+### 3. Implement a Command Macro
 
 ```cpp
-// 使用宏简化命令定义
-#define DECLARE_COMMAND(class_name, receiver_type, action) \
+// Use a macro to shorten the command definition
+#define DECLARE_COMMAND(class_name, receiver_type, on_action, off_action) \
 class class_name : public Command { \
 public: \
     explicit class_name(receiver_type& receiver) : receiver_(receiver) {} \
-    void execute() override { receiver_.action(); } \
-    void undo() override { receiver_.action##_off(); } \
+    void execute() override { receiver_.on_action(); } \
+    void undo() override { receiver_.off_action(); } \
 private: \
     receiver_type& receiver_; \
 };
 
-// 使用宏
-DECLARE_COMMAND(LightOnCmd, Light, on)
-DECLARE_COMMAND(FanOnCmd, Fan, on)
+// Using the macro
+DECLARE_COMMAND(LightOnCmd, Light, on, off)
+DECLARE_COMMAND(FanOnCmd, Fan, on, off)
 ```
 
-### 4. 实现命令队列
+### 4. Implement a Command Queue
 
 ```cpp
 class CommandQueue {
@@ -223,13 +225,13 @@ public:
     void enqueue(std::unique_ptr<Command> command) {
         queue_.push_back(std::move(command));
     }
-    
+
     void executeAll() {
         for (auto& cmd : queue_) {
             cmd->execute();
         }
     }
-    
+
     void executeAndRecord() {
         for (auto& cmd : queue_) {
             cmd->execute();
@@ -243,7 +245,7 @@ private:
 };
 ```
 
-### 5. 实现宏命令
+### 5. Implement a Macro Command
 
 ```cpp
 class MacroCommand : public Command {
@@ -251,13 +253,13 @@ public:
     void addCommand(std::unique_ptr<Command> command) {
         commands_.push_back(std::move(command));
     }
-    
+
     void execute() override {
         for (auto& cmd : commands_) {
             cmd->execute();
         }
     }
-    
+
     void undo() override {
         for (auto it = commands_.rbegin(); it != commands_.rend(); ++it) {
             (*it)->undo();
@@ -269,48 +271,48 @@ private:
 };
 ```
 
-### 6. 客户端使用
+### 6. Client Usage
 
 ```cpp
 int main() {
     Light light;
     Fan fan;
-    
+
     LightOnCommand lightOn(light);
     LightOffCommand lightOff(light);
     FanOnCommand fanOn(fan);
-    
-    // 执行命令
+
+    // Execute a command
     lightOn.execute();
-    lightOn.execute();  // 多次执行
+    lightOn.execute();  // executed more than once
     lightOff.execute();
-    
-    // 撤销操作
+
+    // Undo an operation
     lightOn.execute();
     lightOn.undo();
-    
-    // 宏命令
+
+    // Macro command
     MacroCommand partyMode;
     partyMode.addCommand(std::make_unique<LightOnCommand>(light));
     partyMode.addCommand(std::make_unique<FanOnCommand>(fan));
     partyMode.execute();
-    
+
     return 0;
 }
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用 std::function
+### Using std::function
 
 ```cpp
 class ModernCommand {
 public:
     using Action = std::function<void()>;
-    
+
     ModernCommand(Action execute, Action undo)
         : execute_(std::move(execute)), undo_(std::move(undo)) {}
-    
+
     void execute() { execute_(); }
     void undo() { undo_(); }
 
@@ -319,14 +321,14 @@ private:
     Action undo_;
 };
 
-// 使用 lambda
+// Using a lambda
 ModernCommand lightOnCmd(
     [&light]() { light.on(); },
     [&light]() { light.off(); }
 );
 ```
 
-### 使用模板命令
+### Using a Template Command
 
 ```cpp
 template<typename Receiver, typename Action>
@@ -334,36 +336,36 @@ class TemplateCommand : public Command {
 public:
     TemplateCommand(Receiver& receiver, Action action)
         : receiver_(receiver), action_(std::move(action)) {}
-    
+
     void execute() override { action_(receiver_); }
-    void undo() override { /* 需要undo action */ }
+    void undo() override { /* an undo action is needed here */ }
 
 private:
     Receiver& receiver_;
     Action action_;
 };
 
-// 使用
-TemplateCommand<Light, void(Light&)> lightOnCmd(light, 
+// Using it
+TemplateCommand<Light, void(Light&)> lightOnCmd(light,
     [](Light& l) { l.on(); });
 ```
 
-## 变体与扩展
+## Variants and Extensions
 
-### 变体 1：请求日志
+### Variant 1: Request Logging
 
 ```cpp
 class LoggingCommand : public Command {
 public:
     LoggingCommand(std::unique_ptr<Command> command, const std::string& name)
         : command_(std::move(command)), name_(name) {}
-    
+
     void execute() override {
         std::cout << "Executing: " << name_ << "\n";
         command_->execute();
         log_(name_ + " executed at " + currentTime());
     }
-    
+
     void undo() override {
         command_->undo();
         log_(name_ + " undone at " + currentTime());
@@ -375,7 +377,7 @@ private:
 };
 ```
 
-### 变体 2：命令重放
+### Variant 2: Command Replay
 
 ```cpp
 class ReplayCommand : public Command {
@@ -383,7 +385,7 @@ public:
     void addSnapshot(Snapshot snapshot) {
         snapshots_.push_back(snapshot);
     }
-    
+
     void execute() override {
         for (const auto& snap : snapshots_) {
             restoreState(snap);
@@ -395,7 +397,7 @@ private:
 };
 ```
 
-### 变体 3：并发命令
+### Variant 3: Concurrent Commands
 
 ```cpp
 class ConcurrentCommand : public Command {
@@ -403,7 +405,7 @@ public:
     void addCommand(std::unique_ptr<Command> command) {
         commands_.push_back(std::move(command));
     }
-    
+
     void execute() override {
         std::vector<std::thread> threads;
         for (auto& cmd : commands_) {
@@ -421,27 +423,27 @@ private:
 };
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
+| Pattern | Difference |
 |------|------|
-| **策略模式** | 策略模式封装算法；命令模式封装请求 |
-| **备忘录模式** | 备忘录保存状态；命令模式执行动作并支持撤销 |
-| **迭代器模式** | 迭代器遍历集合；命令封装单个请求 |
+| **Strategy Pattern** | The strategy pattern encapsulates an algorithm; the command pattern encapsulates a request |
+| **Memento Pattern** | The memento saves state; the command pattern performs an action and supports undo |
+| **Iterator Pattern** | The iterator walks a collection; the command wraps a single request |
 
-## 最佳实践
+## Best Practices
 
-### 1. 使用智能指针管理命令
+### 1. Manage Commands with Smart Pointers
 
 ```cpp
-// 推荐：使用 unique_ptr
+// Recommended: use unique_ptr
 std::unique_ptr<Command> cmd = std::make_unique<LightOnCommand>(light);
 
-// 不推荐：裸指针
+// Not recommended: a raw pointer
 Command* cmd = new LightOnCommand(light);
 ```
 
-### 2. 确保撤销操作的一致性
+### 2. Keep Undo Consistent
 
 ```cpp
 class ConsistentCommand : public Command {
@@ -450,7 +452,7 @@ public:
         beforeState_ = saveState();
         performAction();
     }
-    
+
     void undo() override {
         restoreState(beforeState_);
     }
@@ -460,7 +462,7 @@ private:
 };
 ```
 
-### 3. 考虑命令的幂等性
+### 3. Consider Command Idempotency
 
 ```cpp
 class IdempotentCommand : public Command {
@@ -471,7 +473,7 @@ public:
             executed_ = true;
         }
     }
-    
+
     void undo() override {
         if (executed_) {
             doUndo();
@@ -484,52 +486,52 @@ private:
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：撤销操作不可逆
+### Trap 1: Irreversible Undo
 
 ```cpp
-// 问题：某些操作无法撤销
+// Problem: some operations cannot be undone
 class DeleteFileCommand : public Command {
 public:
     void execute() override {
         std::remove(filename_.c_str());
     }
-    
+
     void undo() override {
-        // 无法恢复已删除的文件！
+        // A deleted file cannot be recovered!
     }
 };
 
-// 推荐：确保可撤销
+// Recommended: make sure it can be undone
 class SafeDeleteCommand : public Command {
 public:
     void execute() override {
-        moveToTrash(filename_);  // 移到回收站而非删除
+        moveToTrash(filename_);  // move to the trash instead of deleting
     }
-    
+
     void undo() override {
         restoreFromTrash(filename_);
     }
 };
 ```
 
-### 陷阱 2：命令对象生命周期
+### Trap 2: Command Object Lifetime
 
 ```cpp
-// 问题：命令持有悬垂引用
+// Problem: the command holds a dangling reference
 class BadCommand : public Command {
 public:
-    explicit BadCommand(Light& light) : light_(light) {}  // 危险！
+    explicit BadCommand(Light& light) : light_(light) {}  // dangerous!
 
 private:
-    Light& light_;  // 引用可能悬垂
+    Light& light_;  // the reference may dangle
 };
 
-// 推荐：使用智能指针或值传递
+// Recommended: use a smart pointer or pass by value
 class GoodCommand : public Command {
 public:
-    explicit GoodCommand(std::shared_ptr<Light> light) 
+    explicit GoodCommand(std::shared_ptr<Light> light)
         : light_(std::move(light)) {}
 
 private:
@@ -537,16 +539,16 @@ private:
 };
 ```
 
-### 陷阱 3：命令队列内存泄漏
+### Trap 3: Memory Leak in a Command Queue
 
 ```cpp
-// 问题：命令执行后未释放
+// Problem: the command is not released after it runs
 class Queue : public Command {
 public:
     void execute() override {
         for (auto& cmd : queue_) {
             cmd->execute();
-            // 未释放 cmd，导致内存泄漏
+            // cmd is never released, so the memory leaks
         }
     }
 
@@ -554,14 +556,14 @@ private:
     std::vector<Command*> queue_;
 };
 
-// 推荐：使用 unique_ptr 自动管理
+// Recommended: use unique_ptr so ownership is automatic
 class SafeQueue : public Command {
 public:
     void execute() override {
         for (auto& cmd : queue_) {
             cmd->execute();
         }
-        queue_.clear();  // 自动释放
+        queue_.clear();  // released automatically
     }
 
 private:
@@ -569,13 +571,16 @@ private:
 };
 ```
 
-## 总结
+## Summary
 
-命令模式的核心要点：
+The key points of the command pattern:
 
-- **适用场景**：需要撤销/重做、请求排队、日志记录、宏命令
-- **核心优点**：解耦、可扩展、支持撤销、支持日志
-- **实现要点**：使用智能指针、确保可撤销、考虑生命周期
-- **常见陷阱**：不可撤销操作、悬垂引用、内存泄漏
+- **When to use it**: undo/redo, request queuing, logging, macro commands
+- **Core benefits**: decoupling, extensibility, undo support, logging
+- **Implementation notes**: use smart pointers, make sure it can be undone, mind
+  the lifetime
+- **Common traps**: irreversible operations, dangling references, memory leaks
 
-> **记住**：命令模式的关键是"封装请求"——将请求封装成对象，使请求可以像其他对象一样被传递、存储和操作。
+> **Remember**: the essence of the command pattern is "encapsulating the request" —
+> turning a request into an object so it can be passed, stored, and manipulated like
+> any other object.

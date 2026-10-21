@@ -1,52 +1,57 @@
-# 享元模式 (Flyweight Pattern)
+# Flyweight Pattern
 
-## 什么是享元模式？
+## What Is the Flyweight Pattern?
 
-享元模式（Flyweight Pattern）是一种结构型设计模式，它通过共享技术来有效地支持大量细粒度的对象，避免对象间共享状态导致的内存开销。
+The Flyweight Pattern is a structural design pattern that supports a large
+number of fine-grained objects efficiently by sharing them, so that shared
+state is not duplicated in memory over and over.
 
-> **核心思想**：将对象的状态分为内部状态和外部状态，内部状态共享，外部状态由客户端管理。
+> **Core idea**: split an object's state into an intrinsic part and an
+> extrinsic part — the intrinsic state is shared, the extrinsic state is managed
+> by the client.
 
-## 为什么需要享元模式？
+## Why Do We Need It?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有一个文本编辑器，需要显示大量字符：
+Suppose we have a text editor that has to display a large number of characters:
 
 ```cpp
-// 问题：每个字符都是一个独立对象，内存开销大
+// Problem: every character is a separate object, so the memory overhead is large
 class Character {
 public:
     Character(char glyph, Font font) 
         : glyph_(glyph), font_(font) {}
     
     void draw(int x, int y) {
-        // 使用 glyph_ 和 font_ 绘制字符
-        // 同时需要位置 (x, y)
+        // draw the character with glyph_ and font_
+        // the position (x, y) is needed as well
     }
     
 private:
-    char glyph_;      // 内部状态：可共享
-    Font font_;       // 内部状态：可共享
-    int x_;           // 外部状态：不可共享
-    int y_;           // 外部状态：不可共享
+    char glyph_;      // intrinsic state: shareable
+    Font font_;       // intrinsic state: shareable
+    int x_;           // extrinsic state: not shareable
+    int y_;           // extrinsic state: not shareable
 };
 
-// 创建 1000 个 'A' 字符
+// create 1000 'A' characters
 std::vector<Character> characters;
 for (int i = 0; i < 1000; ++i) {
     characters.push_back(Character('A', Font("Arial", 12)));
 }
-// 内存开销：1000 个独立对象
+// memory overhead: 1000 separate objects
 ```
 
-**问题**：
-1. 大量相同字符浪费内存
-2. 内部状态重复存储
-3. 难以维护
+**Problems**:
 
-### 解决方案
+1. Many identical characters waste memory
+2. The intrinsic state is stored again and again
+3. Hard to maintain
 
-使用享元模式：
+### Solution
+
+Use the flyweight pattern:
 
 ```cpp
 class Flyweight {
@@ -61,13 +66,13 @@ public:
         : glyph_(glyph), font_(font) {}
     
     void draw(int x, int y) override {
-        // 使用共享的 glyph_ 和 font_
-        // 位置 (x, y) 由客户端传递
+        // use the shared glyph_ and font_
+        // the position (x, y) is passed in by the client
     }
     
 private:
-    char glyph_;  // 内部状态：共享
-    Font font_;   // 内部状态：共享
+    char glyph_;  // intrinsic state: shared
+    Font font_;   // intrinsic state: shared
 };
 
 class FlyweightFactory {
@@ -85,46 +90,47 @@ private:
 };
 ```
 
-**优点**：
-1. 节省内存：相同字符共享对象
-2. 提高效率：减少对象创建开销
-3. 易于维护：集中管理共享对象
+**Benefits**:
 
-## 模式结构
+1. Saves memory: identical characters share one object
+2. Improves efficiency: fewer objects have to be created
+3. Easy to maintain: the shared objects are managed in one place
+
+## Pattern Structure
 
 ```
                     ┌─────────────┐
                     │  Flyweight  │
-                    │  (享元)      │
+                    │  (shared)   │
                     └──────┬──────┘
                            │
            ┌───────────────┼───────────────┐
            │               │               │
     ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-    │  Char 'A'   │ │  Char 'B'   │ │  Char 'C'   │ ← 具体享元
+    │  Char 'A'   │ │  Char 'B'   │ │  Char 'C'   │ ← concrete flyweights
     └──────┬──────┘ └──────┬──────┘ └──────┬──────┘
            │               │               │
            └───────────────┼───────────────┘
                            │
               ┌────────────▼────────────┐
-              │    FlyweightFactory     │ ← 享元工厂
+              │    FlyweightFactory     │ ← flyweight factory
               └────────────┬────────────┘
                            │
                     ┌────────▼────────┐
-                    │    Client       │ ← 客户端
+                    │    Client       │ ← client
                     └─────────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义享元接口
+### 1. Define the Flyweight Interface
 
 ```cpp
 #include <memory>
 #include <string>
 #include <iostream>
 #include <map>
-#include <unordered_map>
+#include <vector>
 
 class Character {
 public:
@@ -138,12 +144,12 @@ protected:
     explicit Character(char glyph, const std::string& font)
         : glyph_(glyph), font_(font) {}
     
-    char glyph_;      // 内部状态
-    std::string font_; // 内部状态
+    char glyph_;      // intrinsic state
+    std::string font_; // intrinsic state
 };
 ```
 
-### 2. 实现具体享元
+### 2. Implement the Concrete Flyweights
 
 ```cpp
 class LatinCharacter : public Character {
@@ -169,7 +175,7 @@ public:
 };
 ```
 
-### 3. 实现享元工厂
+### 3. Implement the Flyweight Factory
 
 ```cpp
 class CharacterFactory {
@@ -183,7 +189,7 @@ public:
         auto key = std::make_pair(glyph, font);
         auto it = characters_.find(key);
         if (it == characters_.end()) {
-            // 创建新享元
+            // create a new flyweight
             if (glyph >= '0' && glyph <= '9') {
                 characters_[key] = std::make_unique<DigitCharacter>(glyph, font);
             } else {
@@ -200,11 +206,11 @@ public:
 private:
     CharacterFactory() = default;
     
-    std::unordered_map<std::pair<char, std::string>, std::unique_ptr<Character>> characters_;
+    std::map<std::pair<char, std::string>, std::unique_ptr<Character>> characters_;
 };
 ```
 
-### 4. 客户端使用
+### 4. Client Usage
 
 ```cpp
 class TextEditor {
@@ -236,7 +242,7 @@ private:
 int main() {
     TextEditor editor;
     
-    // 插入大量字符
+    // insert a large number of characters
     std::string text = "Hello World! This is a flyweight example.";
     int x = 0, y = 0;
     
@@ -261,19 +267,19 @@ int main() {
 }
 ```
 
-## 内部状态与外部状态
+## Intrinsic State and Extrinsic State
 
-### 内部状态（Intrinsic State）
+### Intrinsic State
 
-- 在对象内共享，不随环境改变
-- 可以存储在享元对象中
-- 示例：字符的 glyph、字体、颜色
+- Shared inside the object, does not change with the environment
+- Can be stored in the flyweight object
+- Examples: a character's glyph, font, color
 
-### 外部状态（Extrinsic State）
+### Extrinsic State
 
-- 随环境改变而改变
-- 不能共享，由客户端管理
-- 示例：字符的位置、大小、旋转角度
+- Changes when the environment changes
+- Cannot be shared, the client manages it
+- Examples: a character's position, size, rotation angle
 
 ```cpp
 class ExtrinsicState {
@@ -289,13 +295,13 @@ private:
     int x_, y_, size_;
 };
 
-// 客户端管理外部状态
+// the client manages the extrinsic state
 std::vector<std::pair<Character*, ExtrinsicState>> renderList;
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用智能指针
+### Using Smart Pointers
 
 ```cpp
 class ModernFlyweightFactory {
@@ -320,7 +326,7 @@ private:
 };
 ```
 
-### 使用对象池优化
+### Optimizing with an Object Pool
 
 ```cpp
 template<typename T>
@@ -346,27 +352,27 @@ private:
 };
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
-|------|------|
-| **单例模式** | 单例只有一个实例；享元有多个共享实例 |
-| **对象池** | 对象池复用对象；享元共享状态 |
-| **缓存** | 缓存存储结果；享元共享对象 |
+| Pattern | Difference |
+|---------|-----------|
+| **Singleton** | A singleton has one instance; a flyweight has many shared instances |
+| **Object pool** | An object pool reuses objects; a flyweight shares state |
+| **Cache** | A cache stores results; a flyweight shares objects |
 
-## 最佳实践
+## Best Practices
 
-### 1. 选择合适的共享粒度
+### 1. Choose the Right Sharing Granularity
 
 ```cpp
-// 过于细粒度：每个字符一个享元
-class CharFlyweight { ... };  // 1000 个字符 -> 1000 个享元
+// Too fine-grained: one flyweight per character
+class CharFlyweight { ... };  // 1000 characters -> 1000 flyweights
 
-// 合适粒度：每个字体+大小一个享元
-class FontFlyweight { ... };  // 10 种字体 -> 10 个享元
+// The right granularity: one flyweight per font + size
+class FontFlyweight { ... };  // 10 fonts -> 10 flyweights
 ```
 
-### 2. 考虑线程安全
+### 2. Consider Thread Safety
 
 ```cpp
 class ThreadSafeFactory {
@@ -381,13 +387,13 @@ private:
 };
 ```
 
-### 3. 支持状态变更
+### 3. Support State Changes
 
 ```cpp
 class UpdatableFlyweight {
 public:
     void updateState(const State& newState) {
-        // 通知所有使用此享元的客户端
+        // notify every client that uses this flyweight
         for (auto* observer : observers_) {
             observer->onStateChange(newState);
         }
@@ -398,38 +404,38 @@ private:
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：共享状态不一致
+### Trap 1: Inconsistent Shared State
 
 ```cpp
-// 不推荐：共享状态被修改
+// Not recommended: the shared state gets modified
 class BadFlyweight {
 public:
     void modifyState() {
-        state_ = newState;  // 影响所有共享此享元的对象
+        state_ = newState;  // affects every object that shares this flyweight
     }
     
 private:
     State state_;
 };
 
-// 推荐：内部状态不可变
+// Recommended: the intrinsic state is immutable
 class GoodFlyweight {
 public:
-    // 不提供修改内部状态的方法
+    // no method for modifying the intrinsic state
 };
 ```
 
-### 陷阱 2：外部状态管理复杂
+### Trap 2: Complex Extrinsic State Management
 
 ```cpp
-// 不推荐：外部状态分散管理
-std::map<int, int> positions;  // 位置
-std::map<int, int> sizes;      // 大小
-std::map<int, std::string> fonts;  // 字体
+// Not recommended: the extrinsic state is scattered around
+std::map<int, int> positions;  // positions
+std::map<int, int> sizes;      // sizes
+std::map<int, std::string> fonts;  // fonts
 
-// 推荐：封装外部状态
+// Recommended: encapsulate the extrinsic state
 struct CharacterState {
     int x, y;
     int size;
@@ -438,27 +444,31 @@ struct CharacterState {
 std::map<int, CharacterState> states;
 ```
 
-### 陷阱 3：过度使用享元
+### Trap 3: Overusing the Flyweight
 
 ```cpp
-// 不推荐：简单对象也使用享元
+// Not recommended: even simple objects become flyweights
 class SimplePoint : public Flyweight {
-    // 过于简单，不值得共享
+    // too simple to be worth sharing
 };
 
-// 推荐：只在有大量重复对象时使用
+// Recommended: use a flyweight only when there are many repeated objects
 class FontCharacter : public Flyweight {
-    // 大量字符共享字体，值得使用享元
+    // many characters share a font, so a flyweight pays off
 };
 ```
 
-## 总结
+## Summary
 
-享元模式的核心要点：
+The key points of the flyweight pattern:
 
-- **适用场景**：大量细粒度对象、内部状态可共享、内存敏感
-- **核心优点**：节省内存、提高效率、易于维护
-- **实现要点**：区分内外状态、线程安全、合适共享粒度
-- **常见陷阱**：状态不一致、外部状态复杂、过度使用
+- **When to use it**: many fine-grained objects, shareable intrinsic state,
+  memory sensitivity
+- **Main benefits**: saves memory, improves efficiency, easy to maintain
+- **Implementation advice**: separate intrinsic and extrinsic state, thread
+  safety, the right sharing granularity
+- **Common traps**: inconsistent state, complex extrinsic state, overuse
 
-> **记住**：享元模式的关键是"共享状态"——将可共享的状态提取到共享对象中，让大量对象共用同一份状态。
+> **Remember**: the key of the flyweight pattern is *sharing state* — pull the
+> shareable state out into shared objects, so that many objects use one and the
+> same copy of it.

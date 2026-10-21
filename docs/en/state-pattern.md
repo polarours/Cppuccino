@@ -1,36 +1,39 @@
-# 状态模式 (State Pattern)
+# State Pattern
 
-## 什么是状态模式？
+## What Is the State Pattern?
 
-状态模式（State Pattern）是一种行为型设计模式，它允许一个对象在其内部状态改变时改变它的行为。对象看起来似乎修改了它的类。
+The State Pattern is a behavioral design pattern that lets an object change its
+behavior when its internal state changes — the object appears to change its
+class.
 
-> **核心思想**：将状态封装到独立的类中，让对象在运行时根据状态改变行为。
+> **Core idea**: encapsulate each state in its own class, so the object can
+> change its behavior at runtime, based on the state it is in.
 
-## 为什么需要状态模式？
+## Why Do We Need It?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有一个订单处理系统：
+Suppose we have an order-processing system:
 
 ```cpp
-// 问题：大量的条件判断
+// Problem: a pile of conditional branches
 class Order {
 public:
     void process() {
         if (status_ == "PENDING") {
-            // 处理待处理订单
+            // handle a pending order
             pay();
             status_ = "PAID";
         } else if (status_ == "PAID") {
-            // 处理已支付订单
+            // handle a paid order
             ship();
             status_ = "SHIPPED";
         } else if (status_ == "SHIPPED") {
-            // 处理已发货订单
+            // handle a shipped order
             deliver();
             status_ = "DELIVERED";
         }
-        // 更多状态...
+        // more states...
     }
 
 private:
@@ -41,14 +44,15 @@ private:
 };
 ```
 
-**问题**：
-1. 条件分支过多
-2. 添加新状态需要修改现有代码
-3. 状态逻辑分散，难以维护
+**Problems**:
 
-### 解决方案
+1. Too many conditional branches
+2. Adding a new state means changing existing code
+3. The state logic is scattered everywhere and hard to maintain
 
-使用状态模式：
+### Solution
+
+Use the state pattern:
 
 ```cpp
 class OrderState {
@@ -61,16 +65,16 @@ public:
 
 class PendingState : public OrderState {
 public:
-    void pay() override { /* 处理支付 */ }
-    void ship() override { /* 不允许发货 */ }
-    void deliver() override { /* 不允许配送 */ }
+    void pay() override { /* handle the payment */ }
+    void ship() override { /* shipping is not allowed */ }
+    void deliver() override { /* delivery is not allowed */ }
 };
 
 class PaidState : public OrderState {
 public:
-    void pay() override { /* 已支付 */ }
-    void ship() override { /* 处理发货 */ }
-    void deliver() override { /* 不允许配送 */ }
+    void pay() override { /* already paid */ }
+    void ship() override { /* handle the shipment */ }
+    void deliver() override { /* delivery is not allowed */ }
 };
 
 class Order {
@@ -88,34 +92,35 @@ private:
 };
 ```
 
-**优点**：
-1. 消除条件分支
-2. 易于添加新状态
-3. 状态逻辑清晰
+**Benefits**:
 
-## 模式结构
+1. Eliminates the conditional branches
+2. Makes new states easy to add
+3. Keeps the state logic clear
+
+## Pattern Structure
 
 ```
                     ┌─────────────┐
                     │   Context   │
-                    │  (订单)      │
+                    │   (order)   │
                     └──────┬──────┘
                            │
               ┌────────────┼────────────┐
               │            │            │
     ┌─────────▼───┐ ┌──────▼─────┐ ┌───▼────────┐
-    │  State      │ │  State     │ │   State    │ ← 抽象状态
-    │  (接口)     │ │  (接口)    │ │  (接口)    │
+    │  State      │ │  State     │ │   State    │ ← abstract state
+    │ (interface) │ │ (interface)│ │ (interface)│
     └─────────────┘ └────────────┘ └────────────┘
            │               │               │
     ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-    │  Pending    │ │   Paid      │ │  Shipped   │ ← 具体状态
-    └─────────────┘ └─────────────┘ └─────────────┘
+    │  Pending    │ │   Paid      │ │  Shipped   │ ← concrete states
+    └─────────────┘ └────────────┘ └────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义状态接口
+### 1. Define the State Interface
 
 ```cpp
 #include <memory>
@@ -130,13 +135,13 @@ public:
 };
 ```
 
-### 2. 实现具体状态
+### 2. Implement the Concrete States
 
 ```cpp
 class RedState : public TrafficLightState {
 public:
     void handle() override {
-        std::cout << "红灯停止！等待绿 lights...\n";
+        std::cout << "Red light! Stop and wait for the green light...\n";
     }
     
     std::string getStateName() const override {
@@ -147,7 +152,7 @@ public:
 class YellowState : public TrafficLightState {
 public:
     void handle() override {
-        std::cout << "黄灯准备！即将变绿...\n";
+        std::cout << "Yellow light! Get ready, turning green soon...\n";
     }
     
     std::string getStateName() const override {
@@ -158,7 +163,7 @@ public:
 class GreenState : public TrafficLightState {
 public:
     void handle() override {
-        std::cout << "绿灯通行！\n";
+        std::cout << "Green light! Go!\n";
     }
     
     std::string getStateName() const override {
@@ -167,7 +172,7 @@ public:
 };
 ```
 
-### 3. 实现上下文
+### 3. Implement the Context
 
 ```cpp
 class TrafficLight {
@@ -192,7 +197,7 @@ private:
 };
 ```
 
-### 4. 状态转换
+### 4. State Transitions
 
 ```cpp
 class Order {
@@ -203,27 +208,27 @@ public:
     
     void pay() {
         if (auto* pending = dynamic_cast<PendingState*>(state_.get())) {
-            std::cout << "处理支付...\n";
+            std::cout << "Processing payment...\n";
             setState(std::make_unique<PaidState>());
         }
     }
     
     void ship() {
         if (auto* paid = dynamic_cast<PaidState*>(state_.get())) {
-            std::cout << "处理发货...\n";
+            std::cout << "Processing shipment...\n";
             setState(std::make_unique<ShippedState>());
         }
     }
     
     void deliver() {
         if (auto* shipped = dynamic_cast<ShippedState*>(state_.get())) {
-            std::cout << "处理配送...\n";
+            std::cout << "Processing delivery...\n";
             setState(std::make_unique<DeliveredState>());
         }
     }
     
     void showStatus() const {
-        std::cout << "订单状态: " << state_->getStateName() << "\n";
+        std::cout << "Order status: " << state_->getStateName() << "\n";
     }
 
 private:
@@ -235,9 +240,9 @@ private:
 };
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用 lambda 简化
+### Simplifying with Lambdas
 
 ```cpp
 class LambdaState {
@@ -253,7 +258,7 @@ private:
 };
 ```
 
-### 使用状态机
+### Using a State Machine
 
 ```cpp
 template<typename StateType>
@@ -278,7 +283,7 @@ private:
 };
 ```
 
-### 使用 CRTP
+### Using CRTP
 
 ```cpp
 template<typename Derived>
@@ -302,23 +307,23 @@ protected:
 
 class RedLightState : public StateBase<RedLightState> {
 public:
-    void doEnter() { std::cout << "进入红灯状态\n"; }
-    void doExit() { std::cout << "退出红灯状态\n"; }
-    void doHandle() { std::cout << "红灯停止\n"; }
+    void doEnter() { std::cout << "Entering the red light state\n"; }
+    void doExit() { std::cout << "Leaving the red light state\n"; }
+    void doHandle() { std::cout << "Red light: stop\n"; }
 };
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
-|------|------|
-| **策略模式** | 策略模式由客户端选择策略；状态模式由对象内部管理状态 |
-| **状态 vs 状态机** | 状态机明确定义状态转换；状态模式更灵活 |
-| **状态 vs 命令** | 命令封装请求；状态封装当前状态 |
+| Pattern | Difference |
+|---------|-----------|
+| **Strategy** | The client picks the strategy; the state pattern lets the object manage its state internally |
+| **State vs state machine** | A state machine defines the transitions explicitly; the state pattern is more flexible |
+| **State vs command** | Command encapsulates a request; state encapsulates the current state |
 
-## 最佳实践
+## Best Practices
 
-### 1. 使用枚举表示状态
+### 1. Represent States with an Enum
 
 ```cpp
 enum class OrderStatus {
@@ -341,7 +346,7 @@ private:
 };
 ```
 
-### 2. 使用状态转换表
+### 2. Use a Transition Table
 
 ```cpp
 class StateTransitionTable {
@@ -363,7 +368,7 @@ private:
 };
 ```
 
-### 3. 支持复合状态
+### 3. Support Composite States
 
 ```cpp
 class CompositeState : public State {
@@ -389,17 +394,17 @@ private:
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：状态转换错误
+### Trap 1: Wrong State Transitions
 
 ```cpp
-// 不推荐：允许非法转换
+// Not recommended: illegal transitions are allowed
 void pay() {
-    state_->pay();  // 任何状态都可以支付
+    state_->pay();  // any state can pay
 }
 
-// 推荐：只允许合法转换
+// Recommended: only allow legal transitions
 void pay() {
     if (auto* pending = dynamic_cast<PendingState*>(state_.get())) {
         pending->pay();
@@ -408,16 +413,16 @@ void pay() {
 }
 ```
 
-### 陷阱 2：状态对象过多
+### Trap 2: Too Many State Objects
 
 ```cpp
-// 不推荐：每个状态都创建一个类
+// Not recommended: one class per state
 class State1 { ... };
 class State2 { ... };
 class State3 { ... };
-// 可能有几十个状态类
+// there may be dozens of state classes
 
-// 推荐：使用 lambda 或策略组合
+// Recommended: use lambdas or combine strategies
 class SimpleState {
 public:
     explicit SimpleState(std::function<void()> enter,
@@ -436,14 +441,14 @@ private:
 };
 ```
 
-### 陷阱 3：忘记清理状态
+### Trap 3: Forgetting to Clean Up the State
 
 ```cpp
-// 不推荐：状态对象可能泄漏
+// Not recommended: the state object may leak
 class BadContext {
 public:
     void setState(State* state) {
-        delete state_;  // 忘记清理旧状态
+        delete state_;  // delete the old state before replacing it
         state_ = state;
     }
     
@@ -451,7 +456,7 @@ private:
     State* state_ = nullptr;
 };
 
-// 推荐：使用智能指针
+// Recommended: use smart pointers
 class GoodContext {
 public:
     void setState(std::unique_ptr<State> state) {
@@ -463,13 +468,18 @@ private:
 };
 ```
 
-## 总结
+## Summary
 
-状态模式的核心要点：
+The key points of the state pattern:
 
-- **适用场景**：对象行为依赖状态、状态转换复杂、需要消除条件分支
-- **核心优点**：消除条件判断、易于扩展、状态清晰
-- **实现要点**：使用智能指针、支持状态转换、避免非法转换
-- **常见陷阱**：状态转换错误、状态对象过多、内存泄漏
+- **When to use it**: object behavior depends on the state, state transitions
+  are complex, conditional branches have to go
+- **Main benefits**: eliminates conditional branches, easy to extend, the state
+  logic stays clear
+- **Implementation advice**: use smart pointers, support state transitions,
+  reject illegal transitions
+- **Common traps**: wrong transitions, too many state objects, memory leaks
 
-> **记住**：状态模式的关键是"状态封装"——将每个状态封装到独立的类中，让对象在状态改变时自动改变行为。
+> **Remember**: the key of the state pattern is *encapsulating state* — give
+> every state its own class, so the object changes its behavior automatically
+> when its state changes.

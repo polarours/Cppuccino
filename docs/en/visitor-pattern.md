@@ -1,25 +1,29 @@
-# 访问者模式 (Visitor Pattern)
+# Visitor Pattern
 
-## 什么是访问者模式？
+## What Is the Visitor Pattern?
 
-访问者模式（Visitor Pattern）是一种行为型设计模式，它允许你定义一个新操作，而不用改变被操作对象的类。访问者模式使得可以在不修改现有类层次结构的情况下，向已有类层次结构添加新操作。
+The Visitor Pattern is a behavioral design pattern that lets you define a new
+operation without changing the classes of the objects it operates on. It lets
+you add new operations to an existing class hierarchy without modifying it.
 
-> **核心思想**：将数据结构与数据操作分离，使可以在不修改数据结构的情况下定义新的操作。
+> **Core idea**: separate the data structure from the operations on it, so new
+> operations can be defined without changing the data structure.
 
-## 为什么需要访问者模式？
+## Why Do We Need It?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有一个图形编辑程序，需要支持多种图形（圆形、矩形、三角形）和多种操作（绘制、保存、打印）：
+Suppose we have a graphics editor that must support several shapes (circle,
+rectangle, triangle) and several operations (draw, save, print):
 
 ```cpp
-// 问题：添加新操作需要修改所有类
+// Problem: adding a new operation means changing every class
 class Shape {
 public:
     virtual ~Shape() = default;
     virtual void draw() = 0;
     virtual void save() = 0;
-    virtual void print() = 0;  // 添加新操作需要修改所有类
+    virtual void print() = 0;  // adding a new operation means changing every class
 };
 
 class Circle : public Shape {
@@ -37,17 +41,18 @@ public:
 };
 ```
 
-**问题**：
-1. 添加新操作需要修改所有类
-2. 违反开闭原则
-3. 类职责过重
+**Problems**:
 
-### 解决方案
+1. Adding a new operation means changing every class
+2. Violates the open-closed principle
+3. The classes carry too many responsibilities
 
-使用访问者模式：
+### Solution
+
+Use the visitor pattern:
 
 ```cpp
-class Shape;  // 前向声明
+class Shape;  // forward declaration
 
 class Visitor {
 public:
@@ -70,7 +75,7 @@ public:
     }
 };
 
-// 新操作只需新增 Visitor 子类
+// a new operation only needs a new Visitor subclass
 class DrawVisitor : public Visitor {
 public:
     void visitCircle(const Circle& circle) override {
@@ -85,42 +90,43 @@ public:
 };
 ```
 
-**优点**：
-1. 易于添加新操作
-2. 符合开闭原则
-3. 集中管理操作逻辑
+**Benefits**:
 
-## 模式结构
+1. Easy to add new operations
+2. Complies with the open-closed principle
+3. Keeps the operation logic in one place
+
+## Pattern Structure
 
 ```
                     ┌─────────────┐
                     │  Visitor    │
-                    │  (访问者)    │
+                    │ (interface) │
                     └──────┬──────┘
                            │
            ┌───────────────┼───────────────┐
            │               │               │
     ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-    │ DrawVisitor │ │ SaveVisitor │ │PrintVisitor │ ← 具体访问者
+    │ DrawVisitor │ │ SaveVisitor │ │PrintVisitor │ ← concrete visitors
     └──────┬──────┘ └──────┬──────┘ └──────┬──────┘
            │               │               │
            └───────────────┼───────────────┘
                            │
               ┌────────────▼────────────┐
-              │     Element             │ ← 元素接口
+              │     Element             │ ← element interface
               │   (accept/visit)        │
               └────────────┬────────────┘
                            │
            ┌───────────────┼───────────────┐
            │               │               │
     ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-    │   Circle    │ │ Rectangle   │ │  Triangle   │ ← 具体元素
+    │   Circle    │ │ Rectangle   │ │  Triangle   │ ← concrete elements
     └─────────────┘ └─────────────┘ └─────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义访问者接口
+### 1. Define the Visitor Interface
 
 ```cpp
 #include <memory>
@@ -128,8 +134,12 @@ public:
 #include <iostream>
 #include <vector>
 #include <functional>
+#include <cmath>
 
-class Shape;  // 前向声明
+class Shape;      // forward declaration
+class Circle;     // forward declaration
+class Rectangle;  // forward declaration
+class Triangle;   // forward declaration
 
 class Visitor {
 public:
@@ -140,7 +150,7 @@ public:
 };
 ```
 
-### 2. 定义元素接口
+### 2. Define the Element Interface
 
 ```cpp
 class Shape {
@@ -151,7 +161,7 @@ public:
 };
 ```
 
-### 3. 实现具体元素
+### 3. Implement the Concrete Elements
 
 ```cpp
 class Circle : public Shape {
@@ -206,7 +216,7 @@ private:
 };
 ```
 
-### 4. 实现具体访问者
+### 4. Implement the Concrete Visitors
 
 ```cpp
 class DrawVisitor : public Visitor {
@@ -266,7 +276,7 @@ private:
 };
 ```
 
-### 5. 客户端使用
+### 5. Client Usage
 
 ```cpp
 int main() {
@@ -275,21 +285,21 @@ int main() {
     shapes.push_back(std::make_unique<Rectangle>(4.0, 6.0));
     shapes.push_back(std::make_unique<Triangle>(3.0, 4.0, 5.0));
     
-    // 绘制所有图形
+    // draw all the shapes
     DrawVisitor drawVisitor;
     std::cout << "=== Drawing ===\n";
     for (const auto& shape : shapes) {
         shape->accept(drawVisitor);
     }
     
-    // 保存所有图形
+    // save all the shapes
     SaveVisitor saveVisitor;
     std::cout << "\n=== Saving ===\n";
     for (const auto& shape : shapes) {
         shape->accept(saveVisitor);
     }
     
-    // 计算总面积
+    // compute the total area
     AreaVisitor areaVisitor;
     std::cout << "\n=== Area Calculation ===\n";
     for (const auto& shape : shapes) {
@@ -301,9 +311,9 @@ int main() {
 }
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用 lambda 简化
+### Simplifying with Lambdas
 
 ```cpp
 class LambdaVisitor {
@@ -327,7 +337,7 @@ private:
 };
 ```
 
-### 使用 CRTP
+### Using CRTP
 
 ```cpp
 template<typename Derived>
@@ -354,17 +364,17 @@ public:
 };
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
-|------|------|
-| **策略模式** | 策略模式切换算法；访问者模式添加新操作 |
-| **迭代器模式** | 迭代器遍历集合；访问者执行操作 |
-| **命令模式** | 命令封装请求；访问者定义操作 |
+| Pattern | Difference |
+|---------|-----------|
+| **Strategy** | Strategy switches algorithms; the visitor adds new operations |
+| **Iterator** | An iterator traverses a collection; a visitor performs operations |
+| **Command** | A command encapsulates a request; a visitor defines operations |
 
-## 最佳实践
+## Best Practices
 
-### 1. 使用双重分派
+### 1. Use Double Dispatch
 
 ```cpp
 class Visitor;
@@ -383,12 +393,12 @@ public:
 class Circle : public Element {
 public:
     void accept(Visitor& visitor) override {
-        visitor.visitCircle(*this);  // 双重分派
+        visitor.visitCircle(*this);  // double dispatch
     }
 };
 ```
 
-### 2. 支持状态访问者
+### 2. Support Stateful Visitors
 
 ```cpp
 class StatefulVisitor : public Visitor {
@@ -405,7 +415,7 @@ private:
 };
 ```
 
-### 3. 使用不可变访问者
+### 3. Use Immutable Visitors
 
 ```cpp
 class ImmutableVisitor {
@@ -416,36 +426,36 @@ public:
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：破坏封装性
+### Trap 1: Breaking Encapsulation
 
 ```cpp
-// 不推荐：访问者需要访问私有成员
+// Not recommended: the visitor needs access to private members
 class BadVisitor : public Visitor {
 public:
     void visitCircle(const Circle& circle) override {
-        std::cout << circle.radius_;  // 访问私有成员！
+        std::cout << circle.radius_;  // accessing a private member!
     }
 };
 
-// 推荐：通过公共接口访问
+// Recommended: go through the public interface
 class GoodVisitor : public Visitor {
 public:
     void visitCircle(const Circle& circle) override {
-        std::cout << circle.getRadius();  // 通过公共方法
+        std::cout << circle.getRadius();  // through a public method
     }
 };
 ```
 
-### 陷阱 2：访问者过于复杂
+### Trap 2: An Overly Complex Visitor
 
 ```cpp
-// 不推荐：访问者承担过多责任
+// Not recommended: the visitor takes on too many responsibilities
 class BadVisitor : public Visitor {
 public:
     void visitCircle(const Circle& circle) override {
-        // 太多逻辑
+        // too much logic
         calculateArea(circle);
         saveToFile(circle);
         sendNotification(circle);
@@ -453,32 +463,38 @@ public:
     }
 };
 
-// 推荐：每个访问者只做一件事
+// Recommended: one visitor, one job
 class AreaVisitor : public Visitor { ... };
 class SaveVisitor : public Visitor { ... };
 ```
 
-### 陷阱 3：忘记实现 visit 方法
+### Trap 3: Forgetting to Implement the visit Methods
 
 ```cpp
-// 不推荐：忘记实现某些 visit 方法
+// Not recommended: forgetting some of the visit methods
 class IncompleteVisitor : public Visitor {
 public:
     void visitCircle(const Circle& circle) override { /* ... */ }
     void visitRectangle(const Rectangle& rect) override { /* ... */ }
-    // 忘记 visitTriangle！
+    // forgot visitTriangle!
 };
 
-// 推荐：使用 IDE 自动生成或静态检查
+// Recommended: let the IDE generate them, or use a static check
 ```
 
-## 总结
+## Summary
 
-访问者模式的核心要点：
+The key points of the visitor pattern:
 
-- **适用场景**：数据结构稳定、操作频繁变化、需要添加新操作
-- **核心优点**：易于扩展、符合开闭原则、操作集中
-- **实现要点**：双重分派、访问公共接口、保持单一职责
-- **常见陷阱**：破坏封装、过于复杂、忘记实现
+- **When to use it**: a stable data structure, operations that change often, a
+  need to add new operations
+- **Main benefits**: easy to extend, complies with the open-closed principle,
+  operations stay centralized
+- **Implementation advice**: double dispatch, go through the public
+  interface, keep the single-responsibility principle
+- **Common traps**: broken encapsulation, excessive complexity, forgotten
+  implementations
 
-> **记住**：访问者模式的关键是"操作与数据结构分离"——在不修改数据结构的情况下添加新操作。
+> **Remember**: the key of the visitor pattern is *separating operations from
+> the data structure* — add new operations without changing the data
+> structure.

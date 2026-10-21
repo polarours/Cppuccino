@@ -1,19 +1,23 @@
-# 抽象工厂模式 (Abstract Factory Pattern)
+# Abstract Factory Pattern
 
-## 什么是抽象工厂模式？
+## What Is the Abstract Factory Pattern?
 
-抽象工厂模式（Abstract Factory Pattern）是一种创建型设计模式，它提供一个接口来创建一系列相关或依赖的对象，而无需指定它们具体的类。
+The Abstract Factory Pattern is a creational design pattern that provides an
+interface for creating a series of related or dependent objects without
+specifying their concrete classes.
 
-> **核心思想**：将工厂方法模式进一步抽象，创建一个工厂来创建其他工厂。
+> **Core idea**: abstract the factory method pattern one step further — create
+> a factory that creates other factories.
 
-## 为什么需要抽象工厂模式？
+## Why Do We Need It?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有一个游戏开发系统，需要创建不同类型的角色：
+Suppose we have a game development system that needs to create different kinds
+of characters:
 
 ```cpp
-// 问题：每个角色类型需要不同的工厂
+// Problem: every character type needs its own factory
 class CharacterFactory {
 public:
     virtual Warrior* createWarrior() = 0;
@@ -21,7 +25,7 @@ public:
     virtual Healer* createHealer() = 0;
 };
 
-// 人类角色工厂
+// factory for human characters
 class HumanFactory : public CharacterFactory {
 public:
     Warrior* createWarrior() override { return new HumanWarrior(); }
@@ -29,7 +33,7 @@ public:
     Healer* createHealer() override { return new HumanHealer(); }
 };
 
-// 兽人角色工厂
+// factory for orc characters
 class OrcFactory : public CharacterFactory {
 public:
     Warrior* createWarrior() override { return new OrcWarrior(); }
@@ -38,17 +42,18 @@ public:
 };
 ```
 
-**问题**：
-1. 需要为每种角色类型创建工厂
-2. 添加新角色类型需要修改所有工厂
-3. 难以创建相关的对象族
+**Problems**:
 
-### 解决方案
+1. A separate factory has to be written for every character type
+2. Adding a new character type means modifying every factory
+3. It is hard to create related families of objects
 
-使用抽象工厂模式：
+### Solution
+
+Use the abstract factory pattern:
 
 ```cpp
-// 抽象产品族
+// abstract product family
 class Warrior {
 public:
     virtual ~Warrior() = default;
@@ -61,7 +66,7 @@ public:
     virtual std::string castSpell() = 0;
 };
 
-// 抽象工厂
+// abstract factory
 class CharacterFactory {
 public:
     virtual ~CharacterFactory() = default;
@@ -69,7 +74,7 @@ public:
     virtual std::unique_ptr<Mage> createMage() = 0;
 };
 
-// 具体工厂
+// concrete factory
 class HumanFactory : public CharacterFactory {
 public:
     std::unique_ptr<Warrior> createWarrior() override {
@@ -90,7 +95,7 @@ public:
     }
 };
 
-// 客户端使用
+// client usage
 void playGame(CharacterFactory& factory) {
     auto warrior = factory.createWarrior();
     auto mage = factory.createMage();
@@ -100,41 +105,42 @@ void playGame(CharacterFactory& factory) {
 }
 ```
 
-**优点**：
-1. 确保相关产品一起创建
-2. 易于切换产品族
-3. 符合开闭原则
+**Benefits**:
 
-## 模式结构
+1. Guarantees that related products are created together
+2. Makes it easy to switch to another product family
+3. Complies with the open-closed principle
+
+## Pattern Structure
 
 ```
                     ┌─────────────┐
-                    │AbstractFactory│
-                    │  (抽象工厂)   │
+                    │  Abstract   │
+                    │   Factory   │
                     └──────┬──────┘
                            │
            ┌───────────────┼───────────────┐
            │               │               │
     ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-    │HumanFactory │ │OrcFactory   │ │ElfFactory   │ ← 具体工厂
+    │HumanFactory │ │OrcFactory   │ │ElfFactory   │ ← concrete factories
     └──────┬──────┘ └──────┬──────┘ └──────┬──────┘
            │               │               │
            └───────────────┼───────────────┘
                            │
               ┌────────────▼────────────┐
-              │      AbstractProduct    │ ← 抽象产品
+              │      AbstractProduct     │ ← abstract product
               └────────────┬────────────┘
                            │
            ┌───────────────┼───────────────┐
            │               │               │
     ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-    │HumanWarrior │ │OrcWarrior   │ │ElfWarrior   │ ← 具体产品
+    │HumanWarrior │ │OrcWarrior   │ │ElfWarrior   │ ← concrete products
     └─────────────┘ └─────────────┘ └─────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义抽象产品
+### 1. Define the Abstract Products
 
 ```cpp
 #include <memory>
@@ -156,10 +162,10 @@ public:
 };
 ```
 
-### 2. 实现具体产品族
+### 2. Implement the Concrete Product Families
 
 ```cpp
-// Windows 风格组件
+// Windows-style widgets
 class WindowsButton : public Button {
 public:
     std::string render() const override {
@@ -182,7 +188,7 @@ public:
     }
 };
 
-// Mac 风格组件
+// Mac-style widgets
 class MacButton : public Button {
 public:
     std::string render() const override {
@@ -206,7 +212,7 @@ public:
 };
 ```
 
-### 3. 定义抽象工厂
+### 3. Define the Abstract Factory
 
 ```cpp
 class GUIFactory {
@@ -217,7 +223,7 @@ public:
 };
 ```
 
-### 4. 实现具体工厂
+### 4. Implement the Concrete Factories
 
 ```cpp
 class WindowsFactory : public GUIFactory {
@@ -243,7 +249,7 @@ public:
 };
 ```
 
-### 5. 客户端使用
+### 5. Client Usage
 
 ```cpp
 class Application {
@@ -274,14 +280,14 @@ private:
 };
 
 int main() {
-    // 使用 Windows 风格
+    // Windows style
     auto winApp = Application(std::make_unique<WindowsFactory>());
     winApp.render();
     winApp.handleClick();
     
     std::cout << "\n";
     
-    // 使用 Mac 风格
+    // Mac style
     auto macApp = Application(std::make_unique<MacFactory>());
     macApp.render();
     macApp.handleClick();
@@ -290,9 +296,9 @@ int main() {
 }
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用工厂注册表
+### With a Factory Registry
 
 ```cpp
 class FactoryRegistry {
@@ -315,7 +321,7 @@ private:
 };
 ```
 
-### 使用模板简化
+### Simplifying with Templates
 
 ```cpp
 template<typename ButtonType, typename CheckboxType>
@@ -330,25 +336,25 @@ public:
     }
 };
 
-// 使用
+// usage
 using WindowsGUIFactory = TypedGUIFactory<WindowsButton, WindowsCheckbox>;
 using MacGUIFactory = TypedGUIFactory<MacButton, MacCheckbox>;
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
-|------|------|
-| **工厂方法** | 工厂方法创建单个产品；抽象工厂创建产品族 |
-| **建造者模式** | 建造者逐步构建复杂对象；抽象工厂创建相关产品族 |
-| **单例模式** | 单例确保唯一实例；抽象工厂创建对象族 |
+| Pattern | Difference |
+|---------|-----------|
+| **Factory Method** | The factory method creates a single product; the abstract factory creates a family of products |
+| **Builder Pattern** | The builder assembles a complex object step by step; the abstract factory creates a family of related products |
+| **Singleton** | The singleton guarantees a single instance; the abstract factory creates families of objects |
 
-## 最佳实践
+## Best Practices
 
-### 1. 使用工厂方法替代
+### 1. Use a Factory Method Instead
 
 ```cpp
-// 如果只需要创建一种产品，使用工厂方法
+// If you only need to create one product, use a factory method
 class SimpleFactory {
 public:
     static std::unique_ptr<Button> createButton() {
@@ -356,15 +362,15 @@ public:
     }
 };
 
-// 如果需要创建产品族，使用抽象工厂
-class ComplexFactory {
+// If you need to create a family of products, use an abstract factory
+class ComplexFactory : public GUIFactory {
 public:
     virtual std::unique_ptr<Button> createButton() = 0;
     virtual std::unique_ptr<Checkbox> createCheckbox() = 0;
 };
 ```
 
-### 2. 支持产品变体
+### 2. Support Product Variants
 
 ```cpp
 class ThemedButton : public Button {
@@ -380,7 +386,7 @@ private:
 };
 ```
 
-### 3. 使用依赖注入
+### 3. Use Dependency Injection
 
 ```cpp
 class DIContainer {
@@ -404,16 +410,16 @@ private:
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：工厂过于复杂
+### Trap 1: The Factory Is Too Complex
 
 ```cpp
-// 不推荐：工厂包含过多逻辑
-class BadFactory {
+// Not recommended: the factory contains too much logic
+class BadFactory : public GUIFactory {
 public:
     std::unique_ptr<Button> createButton() override {
-        // 太多逻辑...
+        // too much logic...
         if (condition1) {
             return std::make_unique<WindowsButton>();
         } else if (condition2) {
@@ -423,8 +429,8 @@ public:
     }
 };
 
-// 推荐：工厂只做创建
-class GoodFactory {
+// Recommended: the factory only creates
+class GoodFactory : public GUIFactory {
 public:
     std::unique_ptr<Button> createButton() override {
         return std::make_unique<WindowsButton>();
@@ -432,40 +438,40 @@ public:
 };
 ```
 
-### 陷阱 2：违反开闭原则
+### Trap 2: Violating the Open-Closed Principle
 
 ```cpp
-// 不推荐：添加新产品需要修改工厂
-class OldFactory {
+// Not recommended: adding a new product requires modifying the factory
+class OldFactory : public GUIFactory {
 public:
     std::unique_ptr<Button> createButton() override {
         return std::make_unique<WindowsButton>();
     }
-    // 添加新产品需要修改这里
+    // adding a new product requires changing this
 };
 
-// 推荐：通过继承扩展
+// Recommended: extend through inheritance
 class NewButtonFactory : public GUIFactory {
-    // 添加新产品
+    // add the new product here
 };
 ```
 
-### 陷阱 3：忘记管理生命周期
+### Trap 3: Forgetting to Manage the Lifecycle
 
 ```cpp
-// 不推荐：手动管理内存
+// Not recommended: manual memory management
 class BadApplication {
 public:
     BadApplication(GUIFactory* factory) : factory_(factory) {
-        button_ = factory_->createButton();  // 返回裸指针
+        button_ = factory_->createButton();  // returns a raw pointer
     }
     
 private:
     GUIFactory* factory_;
-    Button* button_;  // 谁负责 delete？
+    Button* button_;  // who is responsible for the delete?
 };
 
-// 推荐：使用智能指针
+// Recommended: use smart pointers
 class GoodApplication {
 public:
     explicit GoodApplication(std::unique_ptr<GUIFactory> factory)
@@ -479,13 +485,19 @@ private:
 };
 ```
 
-## 总结
+## Summary
 
-抽象工厂模式的核心要点：
+The key points of the abstract factory pattern:
 
-- **适用场景**：需要创建相关产品族、多种产品变体、需要解耦创建过程
-- **核心优点**：确保相关产品一起创建、易于切换产品族、符合开闭原则
-- **实现要点**：使用智能指针、保持工厂简单、支持依赖注入
-- **常见陷阱**：工厂过于复杂、违反开闭原则、生命周期管理
+- **When to use it**: related product families have to be created, several
+  product variants are needed, or the creation process must be decoupled
+- **Main benefits**: guarantees that related products are created together,
+  easy to switch product families, complies with the open-closed principle
+- **Implementation advice**: use smart pointers, keep the factory simple,
+  support dependency injection
+- **Common traps**: the factory is too complex, violating the open-closed
+  principle, lifecycle management
 
-> **记住**：抽象工厂模式的关键是"产品族创建"——通过一个接口创建一系列相关对象，确保它们可以一起工作。
+> **Remember**: the key of the abstract factory pattern is *"product family
+> creation"* — create a series of related objects through a single interface
+> so that they are guaranteed to work together.

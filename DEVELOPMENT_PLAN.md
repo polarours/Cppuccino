@@ -191,6 +191,11 @@
 > **2026-10-21 复核**：下列 15 篇未勾选文档经脚本复核确认正文**仍为中文**
 > （此前一轮统计因把代码块内的拉丁字符计入正文，误判为已完成）。当前
 > `docs/en/` 67 篇中，52 篇正文已是英文，15 篇待译，即下方清单。
+>
+> **2026-10-21 完成**：15 篇已全部译为英文（38/38）。`docs/en/` 现有 67 篇
+> 全部为英文正文，`docs/中文版/` 67 篇全部为中文，标题骨架 15/15 一一对应。
+> 翻译过程中修掉了 12 处真实代码缺陷（见第八阶段），中英两版均已修正且
+> 可编译运行。
 
 **问题**：`docs/en/` 62 篇中 38 篇（34 篇纯中文 + 4 篇中英混合）正文不是英文，
 其中 32 篇与 `docs/中文版/` 对应文件**逐字节相同**（中文副本，从未翻译），合计
@@ -203,7 +208,7 @@
 3. 与中文版章节骨架一一对应，代码块结构一致
 4. 修完一批跑一次全仓链接校验（0 坏链）
 
-**清单（进度 23/38，按行数从小到大；每批完成后勾掉）**：
+**清单（进度 38/38，按行数从小到大；每批完成后勾掉）**：
 
 - [x] service-locator-pattern.md (103L)
 - [x] delegation-pattern.md (106L)
@@ -227,22 +232,22 @@
 - [x] adapter-pattern.md (421L)
 - [x] chain-of-responsibility-pattern.md (446L)
 - [x] bridge-pattern.md (462L)
-- [ ] flyweight-pattern.md (464L)
+- [x] flyweight-pattern.md (464L)
 - [x] decorator-pattern.md (472L)
-- [ ] template-method-pattern.md (472L)
-- [ ] state-pattern.md (475L)
-- [ ] facade-pattern.md (480L)
-- [ ] prototype-pattern.md (483L)
-- [ ] visitor-pattern.md (484L)
-- [ ] builder-pattern.md (485L)
-- [ ] iterator-pattern.md (487L)
-- [ ] abstract-factory-pattern.md (491L)
-- [ ] composite-pattern.md (494L)
-- [ ] proxy-pattern.md (501L)
-- [ ] specification-pattern.md (504L)
-- [ ] memento-pattern.md (511L)
-- [ ] mediator-pattern.md (520L)
-- [ ] command-pattern.md (581L)
+- [x] template-method-pattern.md (472L)
+- [x] state-pattern.md (475L)
+- [x] facade-pattern.md (480L)
+- [x] prototype-pattern.md (483L)
+- [x] visitor-pattern.md (484L)
+- [x] builder-pattern.md (485L)
+- [x] iterator-pattern.md (487L)
+- [x] abstract-factory-pattern.md (491L)
+- [x] composite-pattern.md (494L)
+- [x] proxy-pattern.md (501L)
+- [x] specification-pattern.md (504L)
+- [x] memento-pattern.md (511L)
+- [x] mediator-pattern.md (520L)
+- [x] command-pattern.md (581L)
 
 **规则**：翻译时保留章节骨架与代码块结构（代码注释译为英文）；不删除、不移动
 中文版；每完成一篇把清单勾掉（进度以第六阶段勾选数为准；"当前状态"表按文件数
@@ -283,9 +288,43 @@
 
 | 类型 | 英文 | 中文 | 总计 | 备注 |
 |------|------|------|------|------|
-| 学习文档 | 67 | 67 | 134 | 其中 52 篇英文正文已就绪，15 篇仍是中文（见第六阶段清单） |
+| 学习文档 | 67 | 67 | 134 | 英文正文 67 篇全部就绪（第六阶段 38/38） |
 | 陷阱文章 | 37 | 37 | 74 | 正文均为英文/中文 |
 | 示例代码 | - | - | 120 | 全部可编译 |
 | 项目练习 | - | - | 150 | 全部构建通过、ctest 全绿 |
 | 测试函数 | - | - | 855 | 全部通过 |
 
+
+## 第八阶段：第六阶段收尾——15 篇设计模式文档译为英文（2026-10-21）
+
+**范围**：第六阶段剩余的 15 篇（flyweight、template-method、state、facade、
+prototype、visitor、builder、iterator、abstract-factory、composite、proxy、
+specification、memento、mediator、command），中英两版同步修订。
+
+**做法**：按行数分 5 批并行处理。每篇要求：
+
+1. 正文与代码注释全部译为英文，ASCII 图标签一并翻译；
+2. 标题层级、数量、顺序与中文版 1:1 对应；
+3. 代码块结构与行数保持不变（除修复缺陷所必需）；
+4. 「完整示例」（含 `int main()`）必须能编译**并实际运行**；
+   示意性片段（引用未定义 `T`、用 `...` 占位等）保持原样，与既有基线一致。
+
+**顺带修掉的 13 处真实代码缺陷**（中英两版均已修正）：
+
+| 文档 | 缺陷 |
+|------|------|
+| builder | `construct(const PizzaBuilder&)` 调用非 const 成员，整个示例无法编译 |
+| iterator | `virtual currentItem() const = 0;` 缺返回类型；`SafeIterator` 缺 `list_` 成员；用 `make_unique<Iterator>` 实例化抽象类且与既有变量重名 |
+| abstract-factory | 4 个工厂用 `override` 却没有继承基类 |
+| flyweight | `std::unordered_map` 无 `std::pair` 哈希（C++20）；漏 `#include <vector>` |
+| state | 字符串被中英混杂污染；注释与代码行为矛盾 |
+| memento | `undo()` 返回 `unique_ptr` 而非引用，示例无法编译 |
+| mediator | `User::send()` 查自己那张从未填充的表，聊天示例**静默不投递任何消息** |
+| command | `DECLARE_COMMAND` 宏用 `action##_off` 拼出 `on_off`，展开即非法；`undo()` 语义反了 |
+| specification | 组合规格缺前置声明；`shared_from_this()` 在依赖基类中需 `this->`；黑名单规格与数值规格类型不匹配却参与 `and_` 组合 |
+| prototype | `Document` 无 `getCell()`，克隆后调用的是基类接口 |
+| visitor | `Circle` / `Rectangle` / `Triangle` 缺前置声明，示例无法编译 |
+| composite | `ComponentBase` 缺公共基类，`Composite` 无法同时持有叶节点和组合节点；`Node` / `SafeNode` 缺 `enable_shared_from_this` 却调用 `shared_from_this()` |
+
+**验证**：中英两版各 15 篇，13 篇含可运行示例的**全部编译并运行通过**；
+15/15 标题骨架一一对应；全仓相对链接 0 坏链；150 个项目 ctest 全绿。

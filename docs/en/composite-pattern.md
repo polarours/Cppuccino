@@ -1,19 +1,22 @@
-# 组合模式 (Composite Pattern)
+# Composite Pattern
 
-## 什么是组合模式？
+## What Is the Composite Pattern?
 
-组合模式（Composite Pattern）是一种结构型设计模式，它将对象组合成树形结构以表示"部分-整体"的层次结构。组合模式使得客户端对单个对象和组合对象的使用具有一致性。
+The Composite Pattern is a structural design pattern that assembles objects
+into a tree structure to represent "part-whole" hierarchies. It lets clients
+treat a single object and a composite object uniformly.
 
-> **核心思想**：让客户端统一处理单个对象和组合对象，无需区分它们。
+> **Core idea**: let clients handle single objects and composite objects
+> alike, without having to distinguish between them.
 
-## 为什么需要组合模式？
+## Why Do We Need It?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有一个图形编辑程序，需要处理各种形状：
+Suppose we have a graphics editor that has to handle all kinds of shapes:
 
 ```cpp
-// 问题：需要分别处理单个形状和形状组
+// Problem: single shapes and shape groups must be handled separately
 class Shape {
 public:
     virtual void draw() = 0;
@@ -30,22 +33,23 @@ public:
     void draw() override { /* ... */ }
 };
 
-// 处理形状列表时的问题
+// The problem shows up when handling a list of shapes
 void drawAll(const std::vector<Shape*>& shapes) {
     for (auto* shape : shapes) {
-        shape->draw();  // 需要区分是单个形状还是组
+        shape->draw();  // must tell single shapes and groups apart
     }
 }
 ```
 
-**问题**：
-1. 需要分别处理单个对象和组合对象
-2. 客户端代码复杂
-3. 难以递归处理
+**Problems**:
 
-### 解决方案
+1. Single objects and composite objects must be handled separately
+2. Client code becomes complicated
+3. Recursive processing is hard
 
-使用组合模式：
+### Solution
+
+Use the composite pattern:
 
 ```cpp
 class Component {
@@ -64,11 +68,11 @@ public:
             child->draw();
         }
     }
-    
+
     void add(Component* component) override {
         children_.push_back(component);
     }
-    
+
     void remove(Component* component) override {
         children_.erase(
             std::remove(children_.begin(), children_.end(), component),
@@ -82,28 +86,29 @@ private:
 
 class Leaf : public Component {
 public:
-    void draw() override { /* 绘制单个形状 */ }
+    void draw() override { /* draws a single shape */ }
 };
 ```
 
-**优点**：
-1. 统一接口：客户端无需区分单个对象和组合对象
-2. 递归处理：可以任意层次组合
-3. 易于扩展：可以轻松添加新类型
+**Benefits**:
 
-## 模式结构
+1. Uniform interface: clients never distinguish single objects from composite ones
+2. Recursive processing: components can be combined at any depth
+3. Easy to extend: new component types are trivial to add
+
+## Pattern Structure
 
 ```
                     ┌─────────────┐
                     │  Component  │
-                    │  (组件)      │
+                    │  (element)  │
                     └──────┬──────┘
                            │
            ┌───────────────┼───────────────┐
            │               │               │
     ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-    │  Leaf       │ │  Leaf       │ │  Composite  │ ← 组合对象
-    │  (叶子)     │ │  (叶子)     │ │  (容器)     │
+    │  Leaf       │ │  Leaf       │ │  Composite  │ ← composite
+    │  (leaf)     │ │  (leaf)     │ │  (composite)│
     └─────────────┘ └─────────────┘ └──────┬──────┘
                                            │
                         ┌──────────────────┼──────────────────┐
@@ -113,9 +118,9 @@ public:
                  └─────────────┘   └─────────────┘   └─────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义组件接口
+### 1. Define the Component Interface
 
 ```cpp
 #include <memory>
@@ -129,29 +134,29 @@ public:
     virtual ~FileSystemComponent() = default;
     virtual void display(int indent = 0) = 0;
     virtual size_t getSize() = 0;
-    
-    // 组合操作
+
+    // composite operations
     virtual void add(FileSystemComponent* component) {}
     virtual void remove(FileSystemComponent* component) {}
     virtual FileSystemComponent* getChild(int index) { return nullptr; }
-    
+
     virtual std::string getName() const = 0;
 };
 ```
 
-### 2. 实现叶子节点
+### 2. Implement the Leaf Node
 
 ```cpp
 class File : public FileSystemComponent {
 public:
     File(const std::string& name, size_t size)
         : name_(name), size_(size) {}
-    
+
     void display(int indent = 0) override {
         std::string prefix(indent * 2, ' ');
         std::cout << prefix << "[FILE] " << name_ << " (" << size_ << " bytes)\n";
     }
-    
+
     size_t getSize() override { return size_; }
     std::string getName() const override { return name_; }
 
@@ -161,40 +166,40 @@ private:
 };
 ```
 
-### 3. 实现组合节点
+### 3. Implement the Composite Node
 
 ```cpp
 class Directory : public FileSystemComponent {
 public:
     explicit Directory(const std::string& name) : name_(name) {}
-    
+
     void add(FileSystemComponent* component) override {
         children_.push_back(component);
     }
-    
+
     void remove(FileSystemComponent* component) override {
         children_.erase(
             std::remove(children_.begin(), children_.end(), component),
             children_.end()
         );
     }
-    
+
     FileSystemComponent* getChild(int index) override {
         if (index >= 0 && index < static_cast<int>(children_.size())) {
             return children_[index];
         }
         return nullptr;
     }
-    
+
     void display(int indent = 0) override {
         std::string prefix(indent * 2, ' ');
         std::cout << prefix << "[DIR] " << name_ << "\n";
-        
+
         for (auto* child : children_) {
             child->display(indent + 1);
         }
     }
-    
+
     size_t getSize() override {
         size_t total = 0;
         for (auto* child : children_) {
@@ -202,7 +207,7 @@ public:
         }
         return total;
     }
-    
+
     std::string getName() const override { return name_; }
     size_t getChildCount() const { return children_.size(); }
 
@@ -212,47 +217,47 @@ private:
 };
 ```
 
-### 4. 客户端使用
+### 4. Client Usage
 
 ```cpp
 int main() {
-    // 创建文件系统结构
+    // create the file system structure
     Directory root("root");
     Directory docs("documents");
     Directory images("images");
     File readme("readme.txt", 1024);
     File photo("photo.jpg", 2048000);
     File logo("logo.png", 51200);
-    
-    // 构建目录树
+
+    // build the directory tree
     root.add(&docs);
     root.add(&images);
     docs.add(&readme);
     images.add(&photo);
     images.add(&logo);
-    
-    // 显示结构
+
+    // display the structure
     std::cout << "=== File System ===\n";
     root.display();
-    
-    // 获取大小
+
+    // collect the sizes
     std::cout << "\n=== Sizes ===\n";
     std::cout << "Root size: " << root.getSize() << " bytes\n";
     std::cout << "Docs size: " << docs.getSize() << " bytes\n";
     std::cout << "Images size: " << images.getSize() << " bytes\n";
-    
-    // 访问子元素
+
+    // reach the children
     std::cout << "\n=== Children ===\n";
     std::cout << "Root has " << root.getChildCount() << " children\n";
     std::cout << "Images has " << images.getChildCount() << " children\n";
-    
+
     return 0;
 }
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用智能指针
+### With Smart Pointers
 
 ```cpp
 class Component {
@@ -273,7 +278,7 @@ public:
     void add(std::unique_ptr<Component> component) {
         children_.push_back(std::move(component));
     }
-    
+
     void operation() override {
         for (auto& child : children_) {
             child->operation();
@@ -285,13 +290,21 @@ private:
 };
 ```
 
-### 使用 CRTP 简化实现
+### Simplifying with CRTP
 
 ```cpp
-template<typename Derived>
-class ComponentBase {
+// the common base lets a leaf and a composite share one container
+class Component {
 public:
-    void operation() {
+    virtual ~Component() = default;
+    virtual void operation() = 0;
+};
+
+// CRTP: operation() dispatches to the derived type
+template<typename Derived>
+class ComponentBase : public Component {
+public:
+    void operation() override {
         static_cast<Derived*>(this)->doOperation();
     }
 };
@@ -305,10 +318,10 @@ public:
 
 class Composite : public ComponentBase<Composite> {
 public:
-    void add(std::shared_ptr<ComponentBase<Composite>> child) {
+    void add(std::shared_ptr<Component> child) {
         children_.push_back(std::move(child));
     }
-    
+
     void doOperation() {
         for (auto& child : children_) {
             child->operation();
@@ -316,31 +329,31 @@ public:
     }
 
 private:
-    std::vector<std::shared_ptr<ComponentBase<Composite>>> children_;
+    std::vector<std::shared_ptr<Component>> children_;
 };
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
-|------|------|
-| **装饰器模式** | 装饰器增强功能；组合管理层次结构 |
-| **迭代器模式** | 迭代器遍历集合；组合表示层次结构 |
-| **适配器模式** | 适配器转换接口；组合统一接口 |
+| Pattern | Difference |
+|---------|-----------|
+| **Decorator** | A decorator adds behavior; a composite manages a hierarchy |
+| **Iterator** | An iterator traverses a collection; a composite represents a hierarchy |
+| **Adapter** | An adapter converts an interface; a composite unifies an interface |
 
-## 最佳实践
+## Best Practices
 
-### 1. 使用透明接口
+### 1. Use a Transparent Interface
 
 ```cpp
-// 推荐：所有组件都支持 add/remove
+// Recommended: every component supports add/remove
 class TransparentComponent {
 public:
-    virtual void add(Component* c) {}  // 叶子节点忽略
-    virtual void remove(Component* c) {}  // 叶子节点忽略
+    virtual void add(Component* c) {}  // leaves ignore it
+    virtual void remove(Component* c) {}  // leaves ignore it
 };
 
-// 不推荐：在叶子节点抛出异常
+// Not recommended: throwing from a leaf
 class OpaqueLeaf : public Component {
 public:
     void add(Component* c) override {
@@ -349,7 +362,7 @@ public:
 };
 ```
 
-### 2. 使用访问者模式
+### 2. Combine with the Visitor Pattern
 
 ```cpp
 class Visitor {
@@ -364,13 +377,13 @@ public:
     void visit(File* file) override {
         totalSize += file->getSize();
     }
-    
+
     void visit(Directory* dir) override {
         for (auto* child : dir->getChildren()) {
             child->accept(this);
         }
     }
-    
+
     size_t getTotalSize() const { return totalSize; }
 
 private:
@@ -378,19 +391,19 @@ private:
 };
 ```
 
-### 3. 支持部分操作
+### 3. Support Partial Operations
 
 ```cpp
 class PartialComposite {
 public:
-    // 只在组合节点支持
+    // supported on composite nodes only
     void addChild(std::unique_ptr<Component> child) {
         if (isComposite()) {
             children_.push_back(std::move(child));
         }
     }
-    
-    // 检查是否是组合节点
+
+    // check whether this is a composite node
     bool isComposite() const { return true; }
     bool isLeaf() const { return false; }
 
@@ -399,26 +412,26 @@ private:
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：循环引用
+### Trap 1: Reference Cycles
 
 ```cpp
-// 危险：组件互相引用
-class Node {
+// Danger: the components reference each other
+class Node : public std::enable_shared_from_this<Node> {
 public:
     void addChild(std::shared_ptr<Node> child) {
         children_.push_back(child);
-        child->parent_ = shared_from_this();  // 循环引用！
+        child->parent_ = shared_from_this();  // reference cycle!
     }
 
 private:
     std::vector<std::shared_ptr<Node>> children_;
-    std::shared_ptr<Node> parent_;  // 应该用 weak_ptr
+    std::shared_ptr<Node> parent_;  // should be a weak_ptr
 };
 
-// 推荐：使用弱引用
-class SafeNode {
+// Recommended: use a weak reference
+class SafeNode : public std::enable_shared_from_this<SafeNode> {
 public:
     void addChild(std::shared_ptr<SafeNode> child) {
         children_.push_back(child);
@@ -427,25 +440,25 @@ public:
 
 private:
     std::vector<std::shared_ptr<SafeNode>> children_;
-    std::weak_ptr<SafeNode> parent_;  // 避免循环引用
+    std::weak_ptr<SafeNode> parent_;  // avoids the reference cycle
 };
 ```
 
-### 陷阱 2：内存泄漏
+### Trap 2: Memory Leaks
 
 ```cpp
-// 不推荐：裸指针管理
+// Not recommended: raw pointer management
 class BadComposite {
 public:
     void add(Component* component) {
-        children_.push_back(component);  // 谁负责 delete？
+        children_.push_back(component);  // who deletes it?
     }
 
 private:
-    std::vector<Component*> children_;  // 可能泄漏
+    std::vector<Component*> children_;  // may leak
 };
 
-// 推荐：智能指针管理
+// Recommended: smart pointer management
 class GoodComposite {
 public:
     void add(std::unique_ptr<Component> component) {
@@ -457,10 +470,10 @@ private:
 };
 ```
 
-### 陷阱 3：操作不一致
+### Trap 3: Inconsistent Operations
 
 ```cpp
-// 不推荐：叶子节点和组合节点行为不一致
+// Not recommended: leaves and composites behave differently
 class Leaf {
 public:
     void operation() { /* ... */ }
@@ -468,27 +481,31 @@ public:
 
 class Composite {
 public:
-    void operation() { 
+    void operation() {
         for (auto* child : children_) {
             child->operation();
         }
     }
 };
 
-// 推荐：使用统一的接口
+// Recommended: use a uniform interface
 class Component {
 public:
     virtual void operation() = 0;
 };
 ```
 
-## 总结
+## Summary
 
-组合模式的核心要点：
+The key points of the composite pattern:
 
-- **适用场景**：树形结构、部分-整体层次、需要统一处理
-- **核心优点**：统一接口、递归处理、易于扩展
-- **实现要点**：透明接口、使用智能指针、避免循环引用
-- **常见陷阱**：循环引用、内存泄漏、操作不一致
+- **When to use it**: tree structures, part-whole hierarchies, a need for
+  uniform handling
+- **Main benefits**: a uniform interface, recursive processing, easy extension
+- **Implementation advice**: a transparent interface, smart pointers, no
+  reference cycles
+- **Common traps**: reference cycles, memory leaks, inconsistent operations
 
-> **记住**：组合模式的关键是"统一处理"——让客户端可以统一地处理单个对象和组合对象，无需关心它们的区别。
+> **Remember**: the key of the composite pattern is *uniform handling* —
+> clients process single objects and composite objects the same way, without
+> caring about the difference.

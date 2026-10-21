@@ -1,36 +1,39 @@
-# 备忘录模式 (Memento Pattern)
+# Memento Pattern
 
-## 什么是备忘录模式？
+## What Is the Memento Pattern?
 
-备忘录模式（Memento Pattern）是一种行为型设计模式，它允许在不暴露对象实现细节的前提下，保存和恢复对象的前一个状态。
+The Memento Pattern is a behavioral design pattern that allows you to save and
+restore the previous state of an object without exposing its implementation
+details.
 
-> **核心思想**：保存对象的内部状态，以便在需要时恢复到该状态，同时保持封装性。
+> **Core idea**: capture the internal state of an object so it can be restored
+> later, while keeping the encapsulation intact.
 
-## 为什么需要备忘录模式？
+## Why Do We Need the Memento Pattern?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有一个文本编辑器，需要支持撤销操作：
+Suppose we have a text editor that needs to support undo:
 
 ```cpp
-// 问题：如何保存和恢复编辑器状态？
+// Problem: how do we save and restore the editor state?
 class TextEditor {
 public:
     void setTypeface(const std::string& typeface) {
         typeface_ = typeface;
     }
-    
+
     void setSize(int size) {
         size_ = size;
     }
-    
+
     void insertText(const std::string& text) {
         content_ += text;
     }
-    
-    // 如何保存状态？
-    // 如何恢复状态？
-    
+
+    // How do we save the state?
+    // How do we restore the state?
+
 private:
     std::string typeface_;
     int size_ = 12;
@@ -38,22 +41,22 @@ private:
 };
 ```
 
-**问题**：
-1. 需要保存多个历史状态
-2. 直接暴露内部状态破坏封装
-3. 难以实现撤销/重做功能
+**Problems**:
+1. Several history states have to be kept
+2. Exposing the internal state directly breaks encapsulation
+3. Undo/redo is hard to implement
 
-### 解决方案
+### Solution
 
-使用备忘录模式：
+Use the memento pattern:
 
 ```cpp
-// 备忘录：保存状态
+// Memento: holds the state
 class EditorMemento {
 public:
     EditorMemento(const std::string& typeface, int size, const std::string& content)
         : typeface_(typeface), size_(size), content_(content) {}
-    
+
     std::string getTypeface() const { return typeface_; }
     int getSize() const { return size_; }
     std::string getContent() const { return content_; }
@@ -64,19 +67,19 @@ private:
     std::string content_;
 };
 
-// 发起人：创建和恢复备忘录
+// Originator: creates and restores mementos
 class TextEditor {
 public:
     std::unique_ptr<EditorMemento> save() const {
         return std::make_unique<EditorMemento>(typeface_, size_, content_);
     }
-    
+
     void restore(const EditorMemento& memento) {
         typeface_ = memento.getTypeface();
         size_ = memento.getSize();
         content_ = memento.getContent();
     }
-    
+
     void setTypeface(const std::string& typeface) { typeface_ = typeface; }
     void setSize(int size) { size_ = size; }
     void insertText(const std::string& text) { content_ += text; }
@@ -87,17 +90,17 @@ private:
     std::string content_;
 };
 
-// 负责人：管理备忘录
+// Caretaker: manages the mementos
 class Caretaker {
 public:
     void addMemento(std::unique_ptr<EditorMemento> memento) {
         memos_.push_back(std::move(memento));
     }
-    
+
     EditorMemento& getMemento(size_t index) {
         return *memos_[index];
     }
-    
+
     size_t size() const { return memos_.size(); }
 
 private:
@@ -105,38 +108,37 @@ private:
 };
 ```
 
-**优点**：
-1. 保持封装：内部状态不暴露
-2. 支持撤销：可以保存多个状态
-3. 简化发起人：不需要知道如何保存
+**Benefits**:
+1. Encapsulation is preserved: the internal state is never exposed
+2. Undo is supported: several states can be kept
+3. The originator stays simple: it does not need to know how to save
 
-## 模式结构
+## Pattern Structure
 
 ```
                     ┌─────────────┐
                     │  Caretaker  │
-                    │  (负责人)    │
                     └──────┬──────┘
                            │ manages
                            │
               ┌────────────▼────────────┐
-              │     Memento             │ ← 备忘录
+              │     Memento             │ ← memento
               │   (EditorMemento)       │
               └────────────┬────────────┘
                            │
               ┌────────────▼────────────┐
-              │      Originator         │ ← 发起人
+              │      Originator         │ ← originator
               │     (TextEditor)        │
               └─────────────────────────┘
                            │
                     ┌────────▼────────┐
-                    │    Client       │ ← 客户端
+                    │    Client       │ ← client
                     └─────────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义备忘录
+### 1. Define the Memento
 
 ```cpp
 #include <memory>
@@ -149,7 +151,7 @@ class GameMemento {
 public:
     GameMemento(int health, int level, const std::string& position)
         : health_(health), level_(level), position_(position) {}
-    
+
     int getHealth() const { return health_; }
     int getLevel() const { return level_; }
     std::string getPosition() const { return position_; }
@@ -161,41 +163,41 @@ private:
 };
 ```
 
-### 2. 定义发起人
+### 2. Define the Originator
 
 ```cpp
 class Game {
 public:
     Game(const std::string& name) : name_(name), health_(100), level_(1), position_("start") {}
-    
+
     std::unique_ptr<GameMemento> save() const {
         return std::make_unique<GameMemento>(health_, level_, position_);
     }
-    
+
     void restore(const GameMemento& memento) {
         health_ = memento.getHealth();
         level_ = memento.getLevel();
         position_ = memento.getPosition();
     }
-    
+
     void move(const std::string& newPos) {
         position_ = newPos;
         std::cout << name_ << " moved to " << position_ << "\n";
     }
-    
+
     void fight() {
         health_ -= 10;
         std::cout << name_ << " fought, health: " << health_ << "\n";
     }
-    
+
     void levelUp() {
         level_++;
         std::cout << name_ << " leveled up to " << level_ << "\n";
     }
-    
+
     void showState() const {
-        std::cout << name_ << ": health=" << health_ 
-                  << ", level=" << level_ 
+        std::cout << name_ << ": health=" << health_
+                  << ", level=" << level_
                   << ", position=" << position_ << "\n";
     }
 
@@ -207,7 +209,7 @@ private:
 };
 ```
 
-### 3. 定义负责人
+### 3. Define the Caretaker
 
 ```cpp
 class SaveManager {
@@ -215,22 +217,23 @@ public:
     void addMemento(std::unique_ptr<GameMemento> memento) {
         history_.push(std::move(memento));
     }
-    
+
     GameMemento& getLatest() {
         return *history_.top();
     }
-    
+
     GameMemento& undo() {
         if (history_.size() > 1) {
             history_.pop();
         }
-        return history_.top();
+        // history_.top() is a unique_ptr, so dereference it to return the memento.
+        return *history_.top();
     }
-    
+
     bool canUndo() const {
         return history_.size() > 1;
     }
-    
+
     size_t historySize() const {
         return history_.size();
     }
@@ -240,47 +243,47 @@ private:
 };
 ```
 
-### 4. 客户端使用
+### 4. Client Usage
 
 ```cpp
 int main() {
     Game player("Hero");
     SaveManager saveManager;
-    
-    // 初始状态
+
+    // Initial state
     player.showState();
-    
-    // 保存初始状态
+
+    // Save the initial state
     saveManager.addMemento(player.save());
-    
-    // 游戏进行
+
+    // Gameplay
     player.move("forest");
     player.fight();
     player.showState();
-    
-    // 保存进度
+
+    // Save progress
     saveManager.addMemento(player.save());
-    
+
     player.levelUp();
     player.move("castle");
     player.showState();
-    
-    // 保存更多进度
+
+    // Save more progress
     saveManager.addMemento(player.save());
-    
+
     std::cout << "\n=== Undo to previous state ===\n";
     player.restore(saveManager.undo());
     player.showState();
-    
+
     std::cout << "\n=== History size: " << saveManager.historySize() << " ===\n";
-    
+
     return 0;
 }
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用快照模式
+### Using a Snapshot Manager
 
 ```cpp
 class SnapshotManager {
@@ -289,7 +292,7 @@ public:
     void save(const T& state, const std::string& name) {
         snapshots_[name] = serialize(state);
     }
-    
+
     template<typename T>
     T restore(const std::string& name) const {
         return deserialize<T>(snapshots_.at(name));
@@ -297,29 +300,29 @@ public:
 
 private:
     std::map<std::string, std::string> snapshots_;
-    
+
     template<typename T>
     std::string serialize(const T& state) {
-        // 使用 JSON 或 protobuf 序列化
+        // Serialize with JSON or protobuf
         return "{}";
     }
-    
+
     template<typename T>
     T deserialize(const std::string& data) {
-        // 反序列化
+        // Deserialize
         return T();
     }
 };
 ```
 
-### 使用版本控制
+### Using Version Control
 
 ```cpp
 class VersionedMemento {
 public:
     VersionedMemento(int version, const std::string& data)
         : version_(version), data_(data) {}
-    
+
     int getVersion() const { return version_; }
     const std::string& getData() const { return data_; }
 
@@ -333,11 +336,11 @@ public:
     void addVersion(std::unique_ptr<VersionedMemento> memento) {
         versions_.push_back(std::move(memento));
     }
-    
+
     VersionedMemento& getLatest() {
         return *versions_.back();
     }
-    
+
     VersionedMemento& getByVersion(int version) {
         for (const auto& v : versions_) {
             if (v->getVersion() == version) {
@@ -352,48 +355,48 @@ private:
 };
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
+| Pattern | Difference |
 |------|------|
-| **命令模式** | 命令模式支持撤销；备忘录模式保存状态 |
-| **原型模式** | 原型模式克隆对象；备忘录模式保存状态快照 |
-| **状态模式** | 状态模式改变行为；备忘录模式保存历史状态 |
+| **Command Pattern** | The command pattern supports undo; the memento pattern saves state |
+| **Prototype Pattern** | The prototype pattern clones an object; the memento pattern saves a state snapshot |
+| **State Pattern** | The state pattern changes behavior; the memento pattern saves history states |
 
-## 最佳实践
+## Best Practices
 
-### 1. 使用深拷贝
+### 1. Use a Deep Copy
 
 ```cpp
 class Memento {
 public:
     Memento(const State& state) {
-        // 深拷贝
+        // Deep copy
         data_ = std::make_shared<StateData>(*state.getData());
     }
-    
+
 private:
     std::shared_ptr<StateData> data_;
 };
 ```
 
-### 2. 支持多撤销
+### 2. Support Multiple Undo Steps
 
 ```cpp
 class MultiUndoManager {
 public:
     void addMemento(std::unique_ptr<Memento> memento) {
-        future_.clear();  // 清除未来状态
+        future_.clear();  // drop the future states
         past_.push_back(std::move(memento));
     }
-    
+
     void undo() {
         if (!past_.empty()) {
             future_.push_back(std::move(past_.back()));
             past_.pop_back();
         }
     }
-    
+
     void redo() {
         if (!future_.empty()) {
             past_.push_back(std::move(future_.back()));
@@ -407,22 +410,22 @@ private:
 };
 ```
 
-### 3. 使用增量保存
+### 3. Save Incrementally
 
 ```cpp
 class IncrementalMemento {
 public:
     void applyChange(const std::function<void(State&)>& change) {
-        // 保存变化前的状态
+        // Save the state before the change
         changes_.push_back(change);
     }
-    
+
     void undo() {
         if (!changes_.empty()) {
-            // 反向应用最后一个变化
+            // Apply the last change in reverse
             auto change = std::move(changes_.back());
             changes_.pop_back();
-            // 应用反向操作...
+            // Apply the inverse operation...
         }
     }
 
@@ -431,23 +434,23 @@ private:
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：内存泄漏
+### Trap 1: Memory Leak
 
 ```cpp
-// 不推荐：存储原始指针
+// Not recommended: store a raw pointer
 class BadManager {
 public:
     void addMemento(Memento* memento) {
-        memos_.push_back(memento);  // 忘记 delete
+        memos_.push_back(memento);  // the delete is forgotten
     }
 
 private:
     std::vector<Memento*> memos_;
 };
 
-// 推荐：使用智能指针
+// Recommended: use a smart pointer
 class GoodManager {
 public:
     void addMemento(std::unique_ptr<Memento> memento) {
@@ -459,53 +462,54 @@ private:
 };
 ```
 
-### 陷阱 2：状态不一致
+### Trap 2: Inconsistent State
 
 ```cpp
-// 不推荐：备忘录和原对象状态不同步
+// Not recommended: the memento and the original object drift apart
 class InconsistentMemento {
 public:
-    InconsistentMemento(const Game& game) 
-        : health_(game.getHealth()) {}  // 浅拷贝
-    
-    int health_;  // 不随原对象变化
+    InconsistentMemento(const Game& game)
+        : health_(game.getHealth()) {}  // shallow copy
+
+    int health_;  // does not follow the original object
 };
 
-// 推荐：创建时快照状态
+// Recommended: snapshot the state on creation
 class ConsistentMemento {
 public:
-    ConsistentMemento(const Game& game) 
+    ConsistentMemento(const Game& game)
         : health_(game.getHealth()),
           level_(game.getLevel()),
           position_(game.getPosition()) {}
 };
 ```
 
-### 陷阱 3：过度保存
+### Trap 3: Saving Too Often
 
 ```cpp
-// 不推荐：每次操作都保存
+// Not recommended: save on every operation
 void operation() {
-    mementoManager.save(currentState);  // 太频繁
+    mementoManager.save(currentState);  // far too frequent
     doSomething();
 }
 
-// 推荐：只在关键状态保存
+// Recommended: save only at meaningful checkpoints
 void operation() {
     doSomething();
     if (isCheckpoint()) {
-        mementoManager.save(currentState);  // 关键节点
+        mementoManager.save(currentState);  // only at key points
     }
 }
 ```
 
-## 总结
+## Summary
 
-备忘录模式的核心要点：
+The key points of the memento pattern:
 
-- **适用场景**：需要撤销/重做、保存历史状态、保持封装
-- **核心优点**：保持封装、支持撤销、简化发起人
-- **实现要点**：深拷贝、智能指针管理、关键节点保存
-- **常见陷阱**：内存泄漏、状态不一致、过度保存
+- **When to use it**: undo/redo, keeping history states, preserving encapsulation
+- **Core benefits**: preserves encapsulation, supports undo, simplifies the originator
+- **Implementation notes**: deep copy, smart pointer ownership, save at checkpoints
+- **Common traps**: memory leaks, inconsistent state, saving too often
 
-> **记住**：备忘录模式的关键是"状态快照"——在不暴露内部细节的情况下保存和恢复对象状态。
+> **Remember**: the essence of the memento pattern is the "state snapshot" — saving
+> and restoring an object's state without exposing its internal details.

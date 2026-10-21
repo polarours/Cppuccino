@@ -127,6 +127,12 @@ bool result = spec->isSatisfiedBy(order);
 #include <iostream>
 #include <vector>
 #include <string>
+#include <algorithm>
+
+// 组合规范在 Specification<T> 中被引用，因此需要提前声明
+template<typename T> class AndSpecification;
+template<typename T> class OrSpecification;
+template<typename T> class NotSpecification;
 
 template<typename T>
 class Specification {
@@ -135,18 +141,18 @@ public:
     virtual bool isSatisfiedBy(const T& item) const = 0;
     
     // 组合操作
-    std::unique_ptr<Specification<T>> and_(
-        const std::unique_ptr<Specification<T>>& other) const {
-        return std::make_unique<AndSpecification<T>>(shared_from_this(), other);
+    std::shared_ptr<Specification<T>> and_(
+        const std::shared_ptr<const Specification<T>>& other) const {
+        return std::make_shared<AndSpecification<T>>(getSelf(), other);
     }
     
-    std::unique_ptr<Specification<T>> or_(
-        const std::unique_ptr<Specification<T>>& other) const {
-        return std::make_unique<OrSpecification<T>>(shared_from_this(), other);
+    std::shared_ptr<Specification<T>> or_(
+        const std::shared_ptr<const Specification<T>>& other) const {
+        return std::make_shared<OrSpecification<T>>(getSelf(), other);
     }
     
-    std::unique_ptr<Specification<T>> not_() const {
-        return std::make_unique<NotSpecification<T>>(shared_from_this());
+    std::shared_ptr<Specification<T>> not_() const {
+        return std::make_shared<NotSpecification<T>>(getSelf());
     }
 
 protected:
@@ -162,7 +168,7 @@ class AndSpecification : public Specification<T>,
                           public std::enable_shared_from_this<AndSpecification<T>> {
 public:
     AndSpecification(std::shared_ptr<const Specification<T>> left,
-                     std::unique_ptr<Specification<T>> right)
+                     std::shared_ptr<const Specification<T>> right)
         : left_(left), right_(std::move(right)) {}
     
     bool isSatisfiedBy(const T& item) const override {
@@ -173,12 +179,13 @@ public:
 
 protected:
     std::shared_ptr<const Specification<T>> getSelf() const override {
-        return shared_from_this();
+        // this-> 是必需的：shared_from_this() 来自依赖基类
+        return this->shared_from_this();
     }
 
 private:
     std::shared_ptr<const Specification<T>> left_;
-    std::unique_ptr<Specification<T>> right_;
+    std::shared_ptr<const Specification<T>> right_;
 };
 
 template<typename T>
@@ -186,7 +193,7 @@ class OrSpecification : public Specification<T>,
                          public std::enable_shared_from_this<OrSpecification<T>> {
 public:
     OrSpecification(std::shared_ptr<const Specification<T>> left,
-                    std::unique_ptr<Specification<T>> right)
+                    std::shared_ptr<const Specification<T>> right)
         : left_(left), right_(std::move(right)) {}
     
     bool isSatisfiedBy(const T& item) const override {
@@ -197,12 +204,13 @@ public:
 
 protected:
     std::shared_ptr<const Specification<T>> getSelf() const override {
-        return shared_from_this();
+        // this-> 是必需的：shared_from_this() 来自依赖基类
+        return this->shared_from_this();
     }
 
 private:
     std::shared_ptr<const Specification<T>> left_;
-    std::unique_ptr<Specification<T>> right_;
+    std::shared_ptr<const Specification<T>> right_;
 };
 
 template<typename T>
@@ -220,7 +228,8 @@ public:
 
 protected:
     std::shared_ptr<const Specification<T>> getSelf() const override {
-        return shared_from_this();
+        // this-> 是必需的：shared_from_this() 来自依赖基类
+        return this->shared_from_this();
     }
 
 private:
@@ -246,7 +255,8 @@ public:
 
 protected:
     std::shared_ptr<const Specification<int>> getSelf() const override {
-        return shared_from_this();
+        // this-> 是必需的：shared_from_this() 来自依赖基类
+        return this->shared_from_this();
     }
 
 private:
@@ -269,7 +279,8 @@ public:
 
 protected:
     std::shared_ptr<const Specification<int>> getSelf() const override {
-        return shared_from_this();
+        // this-> 是必需的：shared_from_this() 来自依赖基类
+        return this->shared_from_this();
     }
 
 private:
@@ -294,7 +305,8 @@ public:
 
 protected:
     std::shared_ptr<const Specification<std::string>> getSelf() const override {
-        return shared_from_this();
+        // this-> 是必需的：shared_from_this() 来自依赖基类
+        return this->shared_from_this();
     }
 
 private:
@@ -312,17 +324,21 @@ int main() {
     auto blacklistSpec = std::make_shared<NotInBlacklistSpecification>(
         std::vector<std::string>{"bad_customer_1", "bad_customer_2"});
     
-    // 组合规范
-    auto complexSpec = totalSpec->and_(countSpec->or_(blacklistSpec));
+    // 组合规范——同一条链上的规范必须使用相同的元素类型
+    auto complexSpec = totalSpec->and_(countSpec->or_(totalSpec));
     
     // 验证
     std::cout << "=== Testing ===\n";
     complexSpec->isSatisfiedBy(150);
     
     // 简单规范组合
-    auto simpleSpec = totalSpec->and_(blacklistSpec);
+    auto simpleSpec = totalSpec->and_(countSpec);
     std::cout << "\n=== Simple Test ===\n";
     simpleSpec->isSatisfiedBy(50);
+    
+    // 黑名单规范作用于客户名，因此单独验证
+    std::cout << "\n=== Blacklist Test ===\n";
+    blacklistSpec->isSatisfiedBy("bad_customer_1");
     
     return 0;
 }
@@ -400,8 +416,14 @@ public:
 ### 2. 支持缓存结果
 
 ```cpp
+#include <map>
+
+template<typename T>
 class CachedSpecification : public Specification<T> {
 public:
+    explicit CachedSpecification(std::unique_ptr<Specification<T>> spec)
+        : spec_(std::move(spec)) {}
+
     bool isSatisfiedBy(const T& item) const override {
         auto it = cache_.find(item);
         if (it != cache_.end()) {
@@ -421,14 +443,21 @@ private:
 ### 3. 支持调试输出
 
 ```cpp
+template<typename T>
 class DebugSpecification : public Specification<T> {
 public:
+    explicit DebugSpecification(std::unique_ptr<Specification<T>> spec)
+        : spec_(std::move(spec)) {}
+
     bool isSatisfiedBy(const T& item) const override {
         std::cout << "[Debug] Checking: " << item << "\n";
         bool result = spec_->isSatisfiedBy(item);
         std::cout << "[Debug] Result: " << (result ? "PASS" : "FAIL") << "\n";
         return result;
     }
+
+private:
+    std::unique_ptr<Specification<T>> spec_;
 };
 ```
 

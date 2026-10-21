@@ -1,19 +1,22 @@
-# 迭代器模式 (Iterator Pattern)
+# Iterator Pattern
 
-## 什么是迭代器模式？
+## What Is the Iterator Pattern?
 
-迭代器模式（Iterator Pattern）是一种行为型设计模式，它提供一种方法顺序访问一个聚合对象中各个元素，而又不暴露该对象的内部表示。
+The Iterator Pattern is a behavioral design pattern that provides a way to
+access the elements of an aggregate object sequentially without exposing the
+object's internal representation.
 
-> **核心思想**：将遍历逻辑从集合中分离出来，使遍历算法可以独立于容器变化。
+> **Core idea**: separate the traversal logic from the collection, so that
+> traversal algorithms can evolve independently of the container.
 
-## 为什么需要迭代器模式？
+## Why Do We Need It?
 
-### 问题场景
+### Problem Scenario
 
-假设我们有多种数据结构需要遍历：
+Suppose we have several data structures that all need to be traversed:
 
 ```cpp
-// 问题：每个容器都有相同的遍历逻辑，但实现不同
+// Problem: each container repeats the same traversal logic, but differently
 std::vector<int> vec = {1, 2, 3, 4, 5};
 for (size_t i = 0; i < vec.size(); ++i) {
     std::cout << vec[i] << " ";
@@ -30,14 +33,15 @@ for (auto it = mp.begin(); it != mp.end(); ++it) {
 }
 ```
 
-**问题**：
-1. 遍历逻辑重复
-2. 客户端需要了解容器内部结构
-3. 难以统一处理不同类型的容器
+**Problems**:
 
-### 解决方案
+1. The traversal logic is duplicated
+2. The client has to know the internal structure of the container
+3. Different container types are hard to handle uniformly
 
-使用迭代器模式：
+### Solution
+
+Use the iterator pattern:
 
 ```cpp
 class Iterator {
@@ -46,7 +50,7 @@ public:
     virtual void first() = 0;
     virtual void next() = 0;
     virtual bool isDone() const = 0;
-    virtual currentItem() const = 0;
+    virtual std::string currentItem() const = 0;
 };
 
 class Aggregate {
@@ -55,7 +59,7 @@ public:
     virtual Iterator* createIterator() const = 0;
 };
 
-// 客户端统一使用迭代器
+// the client uses the iterator uniformly
 void printAll(Iterator* iterator) {
     for (iterator->first(); !iterator->isDone(); iterator->next()) {
         std::cout << iterator->currentItem() << " ";
@@ -64,40 +68,41 @@ void printAll(Iterator* iterator) {
 }
 ```
 
-**优点**：
-1. 统一接口：不同容器使用相同的遍历方式
-2. 解耦：客户端不依赖具体容器
-3. 可扩展：可以添加新的遍历策略
+**Benefits**:
 
-## 模式结构
+1. Uniform interface: different containers are traversed in the same way
+2. Decoupling: the client does not depend on a concrete container
+3. Extensible: new traversal strategies can be added
+
+## Pattern Structure
 
 ```
                     ┌─────────────┐
                     │  Iterator   │
-                    │  (迭代器)    │
+                    │  (iterator) │
                     └──────┬──────┘
                            │
            ┌───────────────┼───────────────┐
            │               │               │
     ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
-    │  ListIter   │ │ VectorIter  │ │  MapIter    │ ← 具体迭代器
+    │  ListIter   │ │ VectorIter  │ │  MapIter    │ ← concrete iterators
     └──────┬──────┘ └──────┬──────┘ └──────┬──────┘
            │               │               │
            └───────────────┼───────────────┘
                            │
               ┌────────────▼────────────┐
-              │      Aggregate          │ ← 聚合对象
+              │      Aggregate          │ ← the aggregate
               │   (Container)           │
               └────────────┬────────────┘
                            │
                     ┌────────▼────────┐
-                    │    Client       │ ← 客户端
+                    │    Client       │ ← the client
                     └─────────────────┘
 ```
 
-## 代码实现
+## Implementation
 
-### 1. 定义迭代器接口
+### 1. Define the Iterator Interface
 
 ```cpp
 #include <memory>
@@ -117,7 +122,7 @@ public:
 };
 ```
 
-### 2. 定义聚合接口
+### 2. Define the Aggregate Interface
 
 ```cpp
 class Aggregate {
@@ -127,10 +132,10 @@ public:
 };
 ```
 
-### 3. 实现具体迭代器
+### 3. Implement the Concrete Iterators
 
 ```cpp
-// 列表迭代器
+// list iterator
 class ListIterator : public Iterator {
 public:
     explicit ListIterator(const std::list<std::string>& list)
@@ -157,7 +162,7 @@ private:
     std::list<std::string>::const_iterator current_;
 };
 
-// 向量迭代器
+// vector iterator
 class VectorIterator : public Iterator {
 public:
     explicit VectorIterator(const std::vector<std::string>& vec)
@@ -184,7 +189,7 @@ private:
     size_t index_;
 };
 
-// 地图迭代器
+// map iterator
 class MapIterator : public Iterator {
 public:
     explicit MapIterator(const std::map<int, std::string>& map)
@@ -216,10 +221,10 @@ private:
 };
 ```
 
-### 4. 实现具体聚合
+### 4. Implement the Concrete Aggregates
 
 ```cpp
-// 字符串集合
+// a collection of strings
 class StringCollection : public Aggregate {
 public:
     void add(const std::string& item) {
@@ -234,7 +239,7 @@ private:
     std::vector<std::string> items_;
 };
 
-// 书籍集合
+// a collection of books
 class BookCollection : public Aggregate {
 public:
     void addBook(int id, const std::string& title) {
@@ -250,7 +255,7 @@ private:
 };
 ```
 
-### 5. 客户端使用
+### 5. Client Usage
 
 ```cpp
 void printAll(Aggregate* collection) {
@@ -263,7 +268,7 @@ void printAll(Aggregate* collection) {
 }
 
 int main() {
-    // 使用字符串集合
+    // a collection of strings
     StringCollection collection;
     collection.add("Apple");
     collection.add("Banana");
@@ -272,7 +277,7 @@ int main() {
     std::cout << "Fruits: ";
     printAll(&collection);
     
-    // 使用书籍集合
+    // a collection of books
     BookCollection bookCollection;
     bookCollection.addBook(1, "C++ Primer");
     bookCollection.addBook(2, "Design Patterns");
@@ -285,9 +290,9 @@ int main() {
 }
 ```
 
-## 现代 C++ 实现
+## Modern C++ Implementations
 
-### 使用 range-based for
+### With Range-Based for
 
 ```cpp
 class RangeIterable {
@@ -309,14 +314,14 @@ public:
     Iterator end() const { return Iterator(10, 10); }
 };
 
-// 使用 range-based for
+// usage with range-based for
 RangeIterable range;
 for (int x : range) {
     std::cout << x << " ";
 }
 ```
 
-### 使用 STL 迭代器
+### With STL Iterators
 
 ```cpp
 template<typename Container>
@@ -327,7 +332,7 @@ void printContainer(const Container& container) {
     std::cout << "\n";
 }
 
-// 或使用 C++11 range-based for
+// or use the C++11 range-based for
 template<typename Container>
 void printContainerModern(const Container& container) {
     for (const auto& item : container) {
@@ -337,7 +342,7 @@ void printContainerModern(const Container& container) {
 }
 ```
 
-### 使用自定义迭代器适配器
+### With a Custom Iterator Adapter
 
 ```cpp
 template<typename InputIt, typename TransformFn>
@@ -359,28 +364,33 @@ private:
 };
 ```
 
-## 与相关模式的区别
+## How It Differs from Related Patterns
 
-| 模式 | 区别 |
-|------|------|
-| **迭代器 vs STL** | STL 迭代器更强大，支持更多操作 |
-| **迭代器 vs range** | C++11 range-based for 更简洁 |
-| **迭代器 vs 访问者** | 访问者访问数据，迭代器遍历数据 |
+| Pattern | Difference |
+|---------|-----------|
+| **Iterator vs STL** | STL iterators are stronger and support more operations |
+| **Iterator vs range** | The C++11 range-based for is more concise |
+| **Iterator vs Visitor** | The visitor accesses data; the iterator traverses data |
 
-## 最佳实践
+## Best Practices
 
-### 1. 使用智能指针管理迭代器
+### 1. Manage Iterators with Smart Pointers
 
 ```cpp
 class SafeIterator {
 public:
+    explicit SafeIterator(const std::list<std::string>& list) : list_(list) {}
+
     std::unique_ptr<Iterator> createIterator() const {
         return std::make_unique<ListIterator>(list_);
     }
+
+private:
+    const std::list<std::string>& list_;
 };
 ```
 
-### 2. 支持双向迭代
+### 2. Support Bidirectional Iteration
 
 ```cpp
 class BidirectionalIterator : public Iterator {
@@ -391,7 +401,7 @@ public:
 };
 ```
 
-### 3. 使用常量迭代器
+### 3. Use Constant Iterators
 
 ```cpp
 class ConstIterator : public Iterator {
@@ -411,56 +421,56 @@ private:
 };
 ```
 
-## 常见陷阱
+## Common Traps
 
-### 陷阱 1：迭代器失效
+### Trap 1: Iterator Invalidation
 
 ```cpp
-// 不推荐：迭代器可能失效
+// Not recommended: the iterator may be invalidated
 std::vector<int> vec = {1, 2, 3, 4, 5};
 auto it = vec.begin();
-vec.push_back(6);  // 可能导致重新分配，迭代器失效！
-std::cout << *it << "\n";  // 未定义行为
+vec.push_back(6);  // may reallocate — the iterator is invalidated!
+std::cout << *it << "\n";  // undefined behavior
 
-// 推荐：使用索引或重新获取迭代器
+// Recommended: use an index, or reacquire the iterator
 for (size_t i = 0; i < vec.size(); ++i) {
     std::cout << vec[i] << "\n";
 }
 ```
 
-### 陷阱 2：内存泄漏
+### Trap 2: Memory Leaks
 
 ```cpp
-// 不推荐：忘记删除迭代器
+// Not recommended: forgetting to delete the iterator
 Iterator* iter = collection->createIterator();
 iter->first();
 while (!iter->isDone()) {
     std::cout << iter->currentItem() << " ";
     iter->next();
 }
-delete iter;  // 必须手动删除
+delete iter;  // must be deleted manually
 
-// 推荐：使用智能指针
-auto iter = std::make_unique<Iterator>(collection->createIterator());
+// Recommended: use smart pointers
+std::unique_ptr<Iterator> owned(collection->createIterator());
 ```
 
-### 陷阱 3：迭代器与容器耦合
+### Trap 3: Iterators Coupled to the Container
 
 ```cpp
-// 不推荐：迭代器依赖容器内部结构
+// Not recommended: the iterator depends on the container's internals
 class BadIterator {
 public:
     explicit BadIterator(std::vector<int>& vec) : vec_(vec), index_(0) {}
     
     void next() { ++index_; }
-    int current() { return vec_[index_]; }  // 直接访问内部
+    int current() { return vec_[index_]; }  // reaches into the internals directly
     
 private:
-    std::vector<int>& vec_;  // 依赖具体容器
+    std::vector<int>& vec_;  // depends on a concrete container
     int index_;
 };
 
-// 推荐：迭代器独立于容器
+// Recommended: the iterator is independent of the container
 class GoodIterator {
 public:
     explicit GoodIterator(const ItemType* begin, const ItemType* end)
@@ -475,13 +485,18 @@ private:
 };
 ```
 
-## 总结
+## Summary
 
-迭代器模式的核心要点：
+The key points of the iterator pattern:
 
-- **适用场景**：需要统一遍历接口、隐藏容器内部结构、支持多种遍历策略
-- **核心优点**：解耦、统一接口、易于扩展
-- **实现要点**：使用智能指针、支持双向迭代、避免迭代器失效
-- **常见陷阱**：迭代器失效、内存泄漏、过度耦合
+- **When to use it**: a uniform traversal interface is needed, the internals
+  of the container must stay hidden, or several traversal strategies are
+  required
+- **Main benefits**: decoupling, a uniform interface, easy to extend
+- **Implementation advice**: use smart pointers, support bidirectional
+  iteration, avoid iterator invalidation
+- **Common traps**: iterator invalidation, memory leaks, tight coupling
 
-> **记住**：迭代器模式的关键是"统一遍历"——提供一种统一的方式遍历不同类型的集合，而无需暴露其内部结构。
+> **Remember**: the key of the iterator pattern is *"uniform traversal"* —
+> provide one way to walk over collections of different types without
+> exposing their internal structure.
