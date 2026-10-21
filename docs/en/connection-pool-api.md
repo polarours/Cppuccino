@@ -75,4 +75,4 @@ g++ -std=c++17 -pthread -Wall -Wextra -Werror -Icpp-mastery-roadmap/06-stage6/co
 
 Correct accounting makes the capacity limit meaningful; mutexes alone do not establish correct resource ownership.
 
-[Project source](../cpp-mastery-roadmap/06-stage6/connection-pool/) · [Concurrent example](../examples/connection-pool-concurrency.cpp)
+[Project source](../../cpp-mastery-roadmap/06-stage6/connection-pool/) · [Concurrent example](../../examples/connection-pool-concurrency.cpp)

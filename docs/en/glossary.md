@@ -223,25 +223,28 @@ A variable that stores the memory address of another variable.
 **Predicate**
 A function that returns a boolean value, used for filtering or condition checking.
 
-## Q
+## R
 
 **RAII (Resource Acquisition Is Initialization)**
 Idiom where resource lifetime is bound to object lifetime. Resources are acquired in constructor, released in destructor.
-
-**Rule of Zero**
-Design principle: if a class manages no resources, don't declare any special member functions.
-
-**Rule of Three**
-If a class needs a custom destructor, copy constructor, or copy assignment operator, it likely needs all three.
-
-**Rule of Five**
-Extension of Rule of Three: if you define any of destructor, copy constructor, copy assignment, move constructor, or move assignment, consider defining all five.
 
 **Range (C++20)**
 A concept representing a sequence of elements that can be iterated over. Used with range-based for loops and range adaptors.
 
 **Range Adaptor (C++20)**
 A function object that transforms a range into another range, like `filter` or `transform`.
+
+**Regular Expression**
+An expression that matches patterns inside strings. Built from literals, metacharacters and quantifiers.
+
+**Rule of Five**
+Extension of Rule of Three: if you define any of destructor, copy constructor, copy assignment, move constructor, or move assignment, consider defining all five.
+
+**Rule of Three**
+If a class needs a custom destructor, copy constructor, or copy assignment operator, it likely needs all three.
+
+**Rule of Zero**
+Design principle: if a class manages no resources, don't declare any special member functions.
 
 ## S
 

@@ -19,7 +19,7 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
 | 陷阱 | 74 篇（37 英文 + 37 中文） |
 | 示例 | 120 个可运行示例 |
 | 项目 | 150 个项目，横跨 43 个阶段 |
-| 测试 | 848（全部通过） |
+| 测试 | 855（全部通过） |
 
 ## 从这里开始
 
@@ -81,6 +81,12 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
   以概念为中心的文章，通常一篇只讲一个核心问题
 - [pitfalls/en](pitfalls/en) 和 [pitfalls/中文版](pitfalls/中文版)：
   高频错误、错误假设，以及适合 code review 的风险清单
+- 项目 API 参考：
+  [术语表](docs/en/glossary.md)、
+  [Chat 服务器](docs/en/chat-server-api.md)、
+  [Simple 数据库](docs/en/simple-db-api.md)、
+  [任务调度器](docs/en/task-scheduler-api.md)、
+  [连接池](docs/en/connection-pool-api.md)
 
 ### 示例
 

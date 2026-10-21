@@ -20,7 +20,7 @@ public learning resource.
 | Pitfalls | 74 articles (37 en + 37 zh) |
 | Examples | 120 runnable examples |
 | Projects | 150 projects across 43 stages |
-| Tests | 848 (all passing) |
+| Tests | 855 (all passing) |
 
 ## Start Here
 
@@ -82,6 +82,12 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
   Concept-focused essays, usually one idea per document
 - [pitfalls/en](pitfalls/en) and [pitfalls/中文版](pitfalls/中文版):
   Common mistakes, invalid assumptions, and review-oriented notes
+- Project API references:
+  [Glossary](docs/en/glossary.md),
+  [Chat Server](docs/en/chat-server-api.md),
+  [Simple Database](docs/en/simple-db-api.md),
+  [Task Scheduler](docs/en/task-scheduler-api.md),
+  [Connection Pool](docs/en/connection-pool-api.md)
 
 ### Examples
 
