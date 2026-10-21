@@ -114,6 +114,8 @@ Practice:
   error handling
 - See [student-management/v2](01-beginner/student-management/v2) for an
   example of these improvements
+- [student-management/v3](01-beginner/student-management/v3) takes it further
+  with a borrowing ownership model built on `std::string_view` parameters
 
 ## Stage 2: References, Move, and Value Categories
 
@@ -188,6 +190,14 @@ Practice:
   probabilistic ordered set with randomized levels
 - [csv-parser](03-advanced/csv-parser/README.md):
   RFC-4180 quoting rules with roundtrip formatting
+- [smart-pointer](03-advanced/smart-pointer/README.md):
+  own implementation of unique_ptr, shared_ptr and weak_ptr
+- [static-init-demo](03-advanced/static-init-demo/README.md):
+  the static initialization order fiasco and the function-scope static fix
+- [event-loop](03-advanced/event-loop/README.md):
+  event loop for asynchronous programming
+- [http-parser](03-advanced/http-parser/README.md):
+  HTTP request and response parser
 - [base64-codec](03-advanced/base64-codec/README.md):
   RFC 4648 encode/decode with strict padding validation
 
@@ -213,6 +223,10 @@ Projects:
   prefix tree with word/prefix counts and lexicographic enumeration
 - [union-find](02-intermediate/union-find/README.md):
   DSU with iterative path compression and union by rank
+- [copy-move-demo](02-intermediate/copy-move-demo/README.md):
+  prints every copy and move operation, so the chosen constructor is visible
+- [reference-binding-demo](02-intermediate/reference-binding-demo/README.md):
+  reference binding rules, the basis for move semantics and forwarding
 - [binary-heap](02-intermediate/binary-heap/README.md):
   array-backed heap with comparator ordering and bottom-up heapify
 
@@ -279,6 +293,8 @@ The goal is to make those gaps visible and then close them deliberately.
   thread-safe circular buffer for producer-consumer patterns
 - [blocking-queue](06-stage6/blocking-queue/README.md):
   bounded MPMC queue with dual condition variables and close semantics
+- [producer-consumer-demo](06-stage6/producer-consumer-demo/README.md):
+  the producer-consumer pattern on top of the ring-buffer project
 
 
 ### Stage 7 Projects (07-stage7)
