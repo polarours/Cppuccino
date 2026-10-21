@@ -50,6 +50,9 @@ run "examples: compile" \
 run "statistics: the READMEs agree with the repository" \
     python3 tools/check_stats.py
 
+run "projects: the READMEs agree with their twin and their build" \
+    python3 tools/check_project_readmes.py
+
 if [ "$FULL" = "1" ]; then
     run "projects: configure, build and test" \
         python3 tools/build_all_projects.py

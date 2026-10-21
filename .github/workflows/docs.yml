@@ -70,3 +70,6 @@ jobs:
 
       - name: Statistics agree with the repository
         run: python3 tools/check_stats.py
+
+      - name: Project READMEs agree with their twin and their build
+        run: python3 tools/check_project_readmes.py

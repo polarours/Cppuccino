@@ -236,6 +236,74 @@ def code_blocks(path):
     return re.findall(r'```cpp\n(.*?)```', text, re.S)
 
 
+def unbalanced(src):
+    """The leftover brace/paren/bracket depth of a code block.
+
+    A block that does not balance was cut short, which is easy to do when an
+    example is edited and is worth reporting. String and character literals
+    are respected, and a C++14 digit separator is not mistaken for the start
+    of a character literal.
+    """
+    depth = {'{': 0, '(': 0, '[': 0}
+    closing = {'}': '{', ')': '(', ']': '['}
+    i, n = 0, len(src)
+    in_string = in_char = in_line = in_block = False
+    last_digit = False
+    while i < n:
+        c = src[i]
+        if in_line:
+            in_line = c != '\n'
+            i += 1
+            continue
+        if in_block:
+            if c == '*' and i + 1 < n and src[i + 1] == '/':
+                in_block = False
+                i += 2
+                continue
+            i += 1
+            continue
+        if in_string:
+            if c == '\\':
+                i += 2
+                continue
+            in_string = c != '"'
+            i += 1
+            continue
+        if in_char:
+            if c == '\\':
+                i += 2
+                continue
+            in_char = c != "'"
+            i += 1
+            continue
+        if c == '/' and i + 1 < n and src[i + 1] == '/':
+            in_line = True
+            i += 2
+            continue
+        if c == '/' and i + 1 < n and src[i + 1] == '*':
+            in_block = True
+            i += 2
+            continue
+        if c == '"':
+            in_string = True
+            last_digit = False
+            i += 1
+            continue
+        if c == "'":
+            if not (last_digit and i + 1 < n and src[i + 1].isdigit()):
+                in_char = True
+            last_digit = False
+            i += 1
+            continue
+        if c in depth:
+            depth[c] += 1
+        elif c in closing:
+            depth[closing[c]] -= 1
+        last_digit = c.isdigit()
+        i += 1
+    return depth
+
+
 def code_signature(path):
     """Structural fingerprint of a document: its tokenised code blocks.
 
@@ -348,6 +416,33 @@ def compare_documents(en_path, zh_path, root, problems, label):
             print(f"  CODE      {rel_en}: block(s) {drifted} differ from {rel_zh}")
 
 
+def check_code_blocks(root, problems):
+    """Every code block must have balanced braces.
+
+    A block that does not balance was cut short. This runs over every file
+    rather than over the paired ones: a document that has drifted far enough
+    to lose its partner would otherwise escape every check.
+    """
+    print('\n== code block check ==')
+    files = []
+    for pattern in ('docs/en/*.md', 'docs/中文版/*.md',
+                    'pitfalls/en/*.md', 'pitfalls/中文版/*.md'):
+        files += glob.glob(os.path.join(root, pattern))
+    checked = 0
+    for path in sorted(files):
+        for index, block in enumerate(code_blocks(path)):
+            checked += 1
+            depth = unbalanced(block)
+            if any(v != 0 for v in depth.values()):
+                problems.append(
+                    f'code block {index + 1} is not balanced: '
+                    f'{os.path.relpath(path, root)}')
+                print(f"  UNBALANCED {os.path.relpath(path, root)} "
+                      f"block {index + 1}: {depth}")
+    print(f"  {checked} code block(s) checked")
+    return checked
+
+
 def check_pairs(root, problems):
     en_files = sorted(glob.glob(os.path.join(root, 'docs/en/*.md')))
     zh_files = sorted(glob.glob(os.path.join(root, 'docs/中文版/*.md')))
@@ -441,6 +536,7 @@ def main():
     if not args.language_only:
         check_pairs(args.repo, problems)
         check_pitfall_pairs(args.repo, problems)
+        check_code_blocks(args.repo, problems)
 
     print()
     if problems:
