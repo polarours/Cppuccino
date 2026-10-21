@@ -100,7 +100,7 @@ Config global_config{
 In the code above, the initialization of `global_config` depends on `global_logger`. Because they live in different translation units (`config.cpp` and `logger.cpp`), the C++ standard does **not** guarantee their initialization order.
 
 - **Case A**: the linker initializes `logger.cpp` first, then `config.cpp`. The program runs normally — `global_logger` has already been constructed, so calling `log` on it is safe.
-- **Case B**: the linker initializes `config.cpp` first. At that point `global_logger` has not been constructed yet, and its memory may hold an uninitialized region (or zero-initialized bytes). Calling `global_logger.log()` is **undefined behavior (Undefined Behavior, UB)**, which typically shows up as a segmentation fault (Segmentation Fault) or as subtle memory corruption.
+- **Case B**: the linker initializes `config.cpp` first. At that point `global_logger` has not been constructed yet, and its memory may hold an uninitialized region (or zero-initialized bytes). Calling `global_logger.log()` is **undefined behavior (UB)**, which typically shows up as a segmentation fault or as subtle memory corruption.
 
 These non-deterministic crashes caused by cross-translation-unit dependencies between static objects are the classic Static Initialization Order Fiasco (SIOF).
 
@@ -177,7 +177,7 @@ The C++ standard specifies that a function-local static object is initialized **
 
 ### 4.2 Constant Initialization and `constexpr`
 
-If a static object can be initialized at compile time, it undergoes **constant initialization**, which happens before any **dynamic initialization** (Dynamic Initialization, i.e. run-time initialization).
+If a static object can be initialized at compile time, it undergoes **constant initialization**, which happens before any **dynamic initialization** (i.e. run-time initialization).
 
 If we declare the object as `constexpr`, the compiler forces it to be initialized at compile time, which makes it completely immune to SIOF.
 
