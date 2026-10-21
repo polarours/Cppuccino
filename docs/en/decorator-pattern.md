@@ -290,7 +290,7 @@ class TemplatedDecorator : public T {
 public:
     using T::T;  // inherit constructors
 
-    std::string describe() const {
+    std::string describe() const override {
         return static_cast<const T&>(*this).describe() + " (decorated)";
     }
 };

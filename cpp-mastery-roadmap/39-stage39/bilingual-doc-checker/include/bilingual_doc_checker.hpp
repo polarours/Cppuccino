@@ -79,6 +79,9 @@ std::vector<CodeBlock> extractCodeBlocks(const std::string& markdown);
 //
 // Comments are recognised in both // and /* */ form, and string literals are
 // respected so that a "//" inside a string is not mistaken for a comment.
+//
+// The comparison runs on token sequences rather than on text, so that
+// "template<typename T>" and "template <typename T>" compare equal.
 bool codeEquivalent(const std::string& a, const std::string& b);
 
 // Compare two code blocks the way a translation pair should match.

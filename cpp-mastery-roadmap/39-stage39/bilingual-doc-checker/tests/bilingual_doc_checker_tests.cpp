@@ -147,6 +147,17 @@ void test_code_equivalent_respects_string_literals() {
            "different url differs");
 }
 
+void test_code_equivalent_ignores_token_spacing() {
+    // "template<typename T>" and "template <typename T>" are the same code.
+    expect(codeEquivalent("template<typename T> struct S {};",
+                           "template <typename T> struct S {};"),
+           "spacing around a template argument list is not a difference");
+    expect(codeEquivalent("a  <<  b", "a<<b"), "spacing around an operator");
+    expect(!codeEquivalent("template<typename T> struct S {};",
+                            "template<typename U> struct S {};"),
+           "a different template parameter is a difference");
+}
+
 void test_code_equivalent_ignoring_strings() {
     // A translated document prints its messages in its own language, so the
     // message text may differ while the program stays the same.
@@ -223,6 +234,7 @@ int main() {
         test_headings_inside_code_block_ignored();
         test_extract_code_blocks();
         test_code_equivalent_ignores_comments();
+        test_code_equivalent_ignores_token_spacing();
         test_code_equivalent_respects_string_literals();
         test_code_equivalent_ignoring_strings();
         test_compare_pair_clean();

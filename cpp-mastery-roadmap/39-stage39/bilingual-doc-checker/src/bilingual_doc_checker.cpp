@@ -192,6 +192,84 @@ std::string blankStrings(const std::string& src) {
 
 // Collapse whitespace so that formatting differences do not count as code
 // differences.
+// Split C++ source into tokens.
+//
+// Whitespace is dropped, so "template<typename T>" and "template <typename
+// T>" produce the same token sequence. Multi-character operators are kept
+// together so that "<<" never looks like two "<".
+std::vector<std::string> tokenize(const std::string& src) {
+    static const char* kMultiCharOps[] = {
+        "<<=", ">>=", "->*", "...", "::", "->", "++", "--", "<<", ">>",
+        "<=", ">=", "==", "!=", "&&", "||", "+=", "-=", "*=", "/=", "%=",
+        "&=", "|=", "^=", ".*",
+    };
+    std::vector<std::string> tokens;
+    std::size_t i = 0;
+    const std::size_t n = src.size();
+    while (i < n) {
+        char c = src[i];
+        if (std::isspace(static_cast<unsigned char>(c))) {
+            ++i;
+            continue;
+        }
+        if (std::isalpha(static_cast<unsigned char>(c)) || c == '_') {
+            std::size_t start = i;
+            while (i < n && (std::isalnum(static_cast<unsigned char>(src[i])) ||
+                             src[i] == '_')) {
+                ++i;
+            }
+            tokens.push_back(src.substr(start, i - start));
+            continue;
+        }
+        if (std::isdigit(static_cast<unsigned char>(c))) {
+            std::size_t start = i;
+            while (i < n && (std::isalnum(static_cast<unsigned char>(src[i])) ||
+                             src[i] == '.')) {
+                ++i;
+            }
+            tokens.push_back(src.substr(start, i - start));
+            continue;
+        }
+        if (c == '"' || c == '\'') {
+            char quote = c;
+            std::string token(1, quote);
+            ++i;
+            while (i < n) {
+                if (src[i] == '\\' && i + 1 < n) {
+                    token += src[i];
+                    token += src[i + 1];
+                    i += 2;
+                    continue;
+                }
+                token += src[i];
+                if (src[i] == quote) {
+                    ++i;
+                    break;
+                }
+                ++i;
+            }
+            tokens.push_back(token);
+            continue;
+        }
+        bool matched = false;
+        for (const char* op : kMultiCharOps) {
+            std::size_t len = std::char_traits<char>::length(op);
+            if (src.compare(i, len, op) == 0) {
+                tokens.push_back(std::string(op, len));
+                i += len;
+                matched = true;
+                break;
+            }
+        }
+        if (matched) continue;
+        tokens.push_back(std::string(1, c));
+        ++i;
+    }
+    return tokens;
+}
+
+// Collapse whitespace so that formatting differences do not count as code
+// differences.
 std::string normalizeWhitespace(const std::string& s) {
     std::string out;
     bool pendingSpace = false;
@@ -358,13 +436,12 @@ std::vector<CodeBlock> extractCodeBlocks(const std::string& markdown) {
 }
 
 bool codeEquivalent(const std::string& a, const std::string& b) {
-    return normalizeWhitespace(stripComments(a)) ==
-           normalizeWhitespace(stripComments(b));
+    return tokenize(stripComments(a)) == tokenize(stripComments(b));
 }
 
 bool codeEquivalentIgnoringStrings(const std::string& a, const std::string& b) {
-    return normalizeWhitespace(blankStrings(stripComments(a))) ==
-           normalizeWhitespace(blankStrings(stripComments(b)));
+    return tokenize(blankStrings(stripComments(a))) ==
+           tokenize(blankStrings(stripComments(b)));
 }
 
 std::vector<Issue> comparePair(const std::string& enPath,

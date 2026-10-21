@@ -137,13 +137,74 @@ def strip_comments(src):
     return ''.join(out)
 
 
+MULTI_CHAR_OPS = (
+    '<<=', '>>=', '->*', '...', '::', '->', '++', '--', '<<', '>>',
+    '<=', '>=', '==', '!=', '&&', '||', '+=', '-=', '*=', '/=', '%=',
+    '&=', '|=', '^=', '.*',
+)
+
+
+def tokenize(src):
+    """Split C++ source into tokens.
+
+    Whitespace is dropped, so "template<typename T>" and "template
+    <typename T>" produce the same token sequence. Multi-character operators
+    are kept together so that "<<" never looks like two "<".
+    """
+    tokens = []
+    i, n = 0, len(src)
+    while i < n:
+        c = src[i]
+        if c.isspace():
+            i += 1
+            continue
+        if c.isalpha() or c == '_':
+            start = i
+            while i < n and (src[i].isalnum() or src[i] == '_'):
+                i += 1
+            tokens.append(src[start:i])
+            continue
+        if c.isdigit():
+            start = i
+            while i < n and (src[i].isalnum() or src[i] == '.'):
+                i += 1
+            tokens.append(src[start:i])
+            continue
+        if c in '"\'':
+            quote = c
+            token = quote
+            i += 1
+            while i < n:
+                if src[i] == '\\' and i + 1 < n:
+                    token += src[i:i + 2]
+                    i += 2
+                    continue
+                token += src[i]
+                if src[i] == quote:
+                    i += 1
+                    break
+                i += 1
+            tokens.append(token)
+            continue
+        for op in MULTI_CHAR_OPS:
+            if src.startswith(op, i):
+                tokens.append(op)
+                i += len(op)
+                break
+        else:
+            tokens.append(c)
+            i += 1
+    return tokens
+
+
 def normalize_code(src, drop_strings=False):
+    """Token sequence of a code block, as the comparison actually uses it."""
     s = strip_comments(src)
     if drop_strings:
         # A translated document prints its messages in its own language, so
         # the message text may differ while the program stays the same.
-        s = re.sub(r'"(\\.|[^"\\])*"', '"..."', s)
-    return re.sub(r'\s+', ' ', s).strip()
+        s = re.sub(r'"(\\.|[^"\\])*"', '""', s)
+    return tokenize(s)
 
 
 def code_blocks(path):
@@ -152,7 +213,7 @@ def code_blocks(path):
 
 
 def code_signature(path):
-    """Structural fingerprint of a document: its normalised code blocks.
+    """Structural fingerprint of a document: its tokenised code blocks.
 
     String literal contents are blanked out, so a translated document still
     matches its twin even though it prints its messages in another language.
@@ -160,7 +221,7 @@ def code_signature(path):
     blocks = code_blocks(path)
     if not blocks:
         return None
-    return tuple(normalize_code(b, True) for b in blocks)
+    return tuple(tuple(normalize_code(b, True)) for b in blocks)
 
 
 def headings(path):
@@ -222,12 +283,23 @@ def check_pairs(root, problems):
         if sig is not None:
             by_signature[sig].append(f)
 
+    # Fallback for documents that carry no code block at all (a glossary or a
+    # build-system note): their heading skeleton is the only signal left.
+    by_headings = defaultdict(list)
+    for f in zh_files:
+        by_headings[tuple(level for level, _ in headings(f))].append(f)
+
     print('\n== pair check ==')
     paired = 0
     unverifiable = []
     for f in en_files:
         sig = code_signature(f)
         cands = by_signature.get(sig, []) if sig is not None else []
+        if len(cands) != 1:
+            key = tuple(level for level, _ in headings(f))
+            fallback = by_headings.get(key, [])
+            if len(fallback) == 1:
+                cands = fallback
         if len(cands) != 1:
             unverifiable.append(os.path.relpath(f, root))
             continue

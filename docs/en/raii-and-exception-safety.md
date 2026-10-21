@@ -160,7 +160,6 @@ Illustrative pattern:
 
 ```cpp
 #include <vector>
-#include <utility>
 
 class Buffer {
 public:
@@ -236,9 +235,8 @@ std::mutex m;
 int shared_value = 0;
 
 void update() {
-    std::lock_guard<std::mutex> g(m);
-    // if exception is thrown later, lock is still released
-    ++shared_value;
+    std::lock_guard<std::mutex> guard(m);
+    ++shared_value; // the lock is still released if an exception is thrown later
 }
 ```
 

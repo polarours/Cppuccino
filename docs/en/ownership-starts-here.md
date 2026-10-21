@@ -63,56 +63,103 @@ Understanding ownership requires understanding object lifetime. Lifetime include
 
 Ownership determines who is responsible for managing these lifetime stages. Incorrect ownership management often leads to dangling pointers, memory leaks, double-free problems, etc.
 
-For example:
-```cpp
-std::unique_ptr<int> ptr1(new int(42)); // ptr1 owns the resource
-std::unique_ptr<int> ptr2 = std::move(ptr1); // Ownership transferred to ptr2
-// ptr1 no longer owns the resource and can't be used anymore
-```
-
 More specific code can be found in [ownership_and_lifetime.cpp](../../examples/ownership-and-lifetime.cpp).
 
 > More in-depth content about lifetime will be discussed in detail in subsequent chapters, tentatively titled **Ownership & Lifetime**.
 
-### Ownership and Concurrency
+## Best Practices for Ownership
 
-In multithreaded environments, ownership management becomes more complex. Incorrect ownership management can lead to data races, deadlocks, etc.
-In concurrent contexts, ownership issues often directly amplify into memory model problems.
-We know that concurrent programming usually needs to focus on three things:
-1. Ensuring atomicity
-2. Ensuring visibility
-3. Ensuring ordering
+### 1. Prefer Unique Ownership
 
-Ownership management directly affects the implementation of these principles. For example, when using `std::shared_ptr`, the increment and decrement of reference counts must be atomic operations to prevent data races.
+```cpp
+std::unique_ptr<int> p = std::make_unique<int>(42);
+```
 
-> More specific concurrent ownership management content will be discussed in detail in subsequent chapters, tentatively titled **Ownership & Concurrency**.
+`std::unique_ptr` is the safest and most efficient form of ownership. It states plainly "I own this object", and it prevents accidental sharing.
 
-### Ownership and Performance
-In C++, ownership is not a zero-cost abstraction. Different ownership models introduce different levels of runtime overhead during object construction, copying, destruction, and cross-thread usage.
+### 2. Use std::string_view for Non-owning References
 
-- `std::unique_ptr` has very low overhead because it only needs to manage a pointer.
-- `std::shared_ptr` needs to maintain a reference count, adding additional memory and computational overhead.
+```cpp
+void process(std::string_view data);
+```
 
-> More in-depth content about performance will be discussed in detail in subsequent chapters, tentatively titled **Ownership & Performance**.
+`std::string_view` provides non-owning access to a string and avoids an unnecessary copy.
 
-### Ownership and Interface Design
+### 3. Avoid Raw Pointer Ownership
 
-Ownership management is a core consideration in C++ API design. A good interface design should clearly express the ownership semantics of resources, avoiding unclear responsibility divisions.
+```cpp
+// Not recommended: the ownership of a raw pointer is unclear
+int* p = new int(42);
 
-For example, the ownership semantics of function parameters and return values should be clear:
-- Passing `std::unique_ptr` indicates ownership transfer.
-- Passing raw pointers or references indicates non-owning observation.
+// Recommended: use a smart pointer to make ownership explicit
+auto p = std::make_unique<int>(42);
+```
 
-> Ownership design at the interface level often determines the overall system's security and maintainability.
-> More in-depth content on this topic will be discussed in subsequent chapters, tentatively titled **Ownership & API Design**.
+### 4. Make the Ownership Semantics of an Interface Explicit
+
+```cpp
+// Returning a unique_ptr: ownership transfer
+std::unique_ptr<Foo> createFoo();
+
+// Returning a const reference: non-owning observation
+const Foo& getFoo();
+
+// Taking a unique_ptr by value: ownership acquisition
+void takeOwnership(std::unique_ptr<Foo> foo);
+```
+
+## Ownership and RAII
+
+RAII (Resource Acquisition Is Initialization) is the core pattern of ownership management in C++. Its central idea is:
+
+> **The lifetime of a resource is bound to the lifetime of an object.**
+
+```cpp
+class FileHandle {
+    std::FILE* fp_;
+public:
+    explicit FileHandle(const char* filename) : fp_(std::fopen(filename, "r")) {}
+    ~FileHandle() { if (fp_) std::fclose(fp_); }
+    // No copy, move allowed
+    FileHandle(const FileHandle&) = delete;
+    FileHandle& operator=(const FileHandle&) = delete;
+    FileHandle(FileHandle&&) = default;
+    FileHandle& operator=(FileHandle&&) = default;
+};
+```
+
+Through RAII we can turn resource management into object management, and let constructors and destructors manage the lifetime of a resource automatically.
+
+## Ownership and Concurrency
+
+Ownership matters especially in concurrent programming.
+
+### Thread Ownership
+
+When an object is handed to another thread, ownership has to be transferred explicitly:
+
+```cpp
+void worker(std::unique_ptr<Data> data);
+std::thread t(worker, std::make_unique<Data>(...));
+t.join();
+```
+
+### Shared Ownership
+
+When several threads need to reach the same object, consider shared ownership:
+
+```cpp
+std::shared_ptr<Data> sharedData = std::make_shared<Data>();
+std::thread t1([](std::shared_ptr<Data> d) { /* ... */ }, sharedData);
+std::thread t2([](std::shared_ptr<Data> d) { /* ... */ }, sharedData);
+```
 
 ## Summary
 
-Ownership is not a specific feature of C++, but rather a relationship of responsibility that runs through the entire process of object creation, usage, and destruction.
-C++ will not decide who owns an object for you, but forces you to be clear about this issue through its type system and semantic rules.
+Ownership is a core concept of C++. Understanding it helps us:
+- Write safer and clearer code
+- Avoid the common memory errors
+- Design better APIs
+- Manage resources more effectively
 
-When we begin to examine code from the perspective of "who is responsible for the lifetime",
-Many seemingly scattered issues — the timing of `delete`, the state of moved objects, the cost of `shared_ptr`, data security in concurrency — will naturally fall into place.
-
-Understanding ownership is the starting point for understanding modern C++.
-And truly mastering it often means you've started thinking about code in engineering terms rather than just syntactic ones.
+> **Remember: whoever is responsible owns it. Wherever ownership is unclear, bugs are waiting to happen.**
