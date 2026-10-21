@@ -1,0 +1,13 @@
+version: 2
+
+updates:
+  # The workflows pin their actions by major version. Dependabot keeps those
+  # versions current and opens a pull request when one is outdated.
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - ci

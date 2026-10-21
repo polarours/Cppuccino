@@ -70,16 +70,26 @@ Cppuccino/
 
 ### Project Convention
 
-Each project follows this structure:
+Every project has these, without exception:
+
 ```
 project-name/
 ├── CMakeLists.txt            # Build system
 ├── README.md                 # English documentation
 ├── README.zh-CN.md           # Chinese documentation
-├── include/                  # Header files
-├── src/                      # Implementation files
 └── tests/                    # Test files
 ```
+
+Most projects also split the sources:
+```
+├── include/                  # Header files
+└── src/                      # Implementation files
+```
+
+A small demo project may keep its sources flat, or group them into
+subdirectories of its own, as long as it stays self-contained. The
+`student-management` versions, `copy-move-demo` and `producer-consumer-demo`
+are flat; `key-value-store` groups its sources by concern.
 
 - Use C++17 unless the project specifically needs C++20/23
 - Tests use a simple `expect()` function (no external framework)
