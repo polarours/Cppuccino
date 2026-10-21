@@ -1,0 +1,68 @@
+name: Build
+
+# Configure, build and test every project in the roadmap.
+#
+# The projects are independent of each other, so the work is split over a
+# matrix of shards. The shards are balanced by project count, because the
+# stages are very uneven: 02-intermediate holds seven projects while most
+# stages hold three or four.
+#
+# Each shard reports which stages it covered, so a failure still points at
+# the stage that broke.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    name: Discover stages
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.plan.outputs.shards }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Plan the shards
+        id: plan
+        run: |
+          shards=$(python3 tools/plan_ci_shards.py --shards 10)
+          echo "shards=$shards" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: shard ${{ matrix.shard }}
+    needs: discover
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.discover.outputs.shards) }}
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Install the C++ toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends g++ cmake
+
+      - name: Configure, build and test
+        run: |
+          set -euo pipefail
+          for stage in ${{ join(matrix.shard.stages, ' ') }}; do
+            echo "::group::$stage"
+            python3 tools/build_all_projects.py --stage "$stage" --jobs 2
+            echo "::endgroup::"
+          done
+
+      - name: Report
+        if: always()
+        run: echo "shard ${{ matrix.shard.id }} covered: ${{ matrix.shard.stages }}"

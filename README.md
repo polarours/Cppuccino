@@ -91,15 +91,21 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
 
 ### Tooling
 
+- [tools/run_all_checks.sh](tools/run_all_checks.sh):
+  one entry point for every repository check, the same one CI runs
 - [tools/check_docs.py](tools/check_docs.py):
   verifies that every document is written in the right language, and that the
   English and Chinese halves agree on their heading skeleton and code
+- [tools/check_links.py](tools/check_links.py):
+  verifies that every relative link and `#anchor` still resolves
 - [tools/check_doc_examples.py](tools/check_doc_examples.py):
   assembles the complete example of every document, compiles it and runs it
+- [tools/build_all_projects.py](tools/build_all_projects.py):
+  configures, builds and tests every project in the roadmap
 
 ```bash
-python3 tools/check_docs.py
-python3 tools/check_doc_examples.py
+tools/run_all_checks.sh          # documentation checks
+tools/run_all_checks.sh --full   # and every project build
 ```
 
 ### Examples
@@ -186,7 +192,7 @@ python3 tools/check_doc_examples.py
 
 #### Stages 8–27: Design Patterns
 
-- [GoF 23 patterns](cpp-mastery-roadmap/00-overview.md#stage-8-projects-8-stage8):
+- [GoF 23 patterns](cpp-mastery-roadmap/00-overview.md#stage-8-projects-08-stage8):
   All 23 Gang-of-Four patterns + Specification
 - **Command pattern variants**: command-history, command-logger, command-memento, command-router, command-snapshot, command-translator, command-validator
 - **Observer pattern variants**: observer-bus, observer-buffer, observer-debouncer, observer-filter-chain, observer-mediator, observer-subscription, observer-throttler

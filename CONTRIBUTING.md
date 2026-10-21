@@ -117,23 +117,42 @@ g++ -std=c++17 examples/example-name.cpp -o /tmp/example && /tmp/example
 
 ### Repository Checks
 
-Two scripts keep the documentation honest. Run them before opening a pull
-request that touches `docs/`, `pitfalls/` or `examples/`:
+The scripts under `tools/` keep the repository honest. Run them before
+opening a pull request that touches `docs/`, `pitfalls/` or `examples/`:
 
 ```bash
-# Every document is written in the right language, and the English and
-# Chinese halves agree on their heading skeleton and code.
-python3 tools/check_docs.py
+# Everything the CI runs for the documentation set.
+tools/run_all_checks.sh
 
-# The complete example of every document compiles and runs.
-python3 tools/check_doc_examples.py
+# Add the project builds and tests.
+tools/run_all_checks.sh --full
 ```
+
+The individual checks can also be run on their own:
+
+| Command | What it catches |
+|---------|-----------------|
+| `python3 tools/check_docs.py` | A file in `docs/en/` with an English filename but a Chinese body; the two halves of a document drifting apart |
+| `python3 tools/check_links.py` | A relative link or `#anchor` that no longer resolves |
+| `python3 tools/check_doc_examples.py` | A complete example that no longer compiles or runs |
+| `python3 tools/build_all_projects.py` | A project that fails to configure, build or pass its tests |
 
 The first script is what catches a file that sits in `docs/en/` with an
 English filename but a Chinese body. The second one catches an example that
 no longer compiles. Both are backed by the
 [bilingual-doc-checker](cpp-mastery-roadmap/39-stage39/bilingual-doc-checker/)
 project.
+
+### Continuous Integration
+
+The same scripts run in CI, so a green local run means a green CI run:
+
+- `.github/workflows/docs.yml` — the documentation checks, on every push
+- `.github/workflows/build.yml` — every project, split over ten shards that
+  are balanced by project count
+
+The shards are planned by `tools/plan_ci_shards.py`, so adding a project does
+not need a workflow edit.
 
 ---
 

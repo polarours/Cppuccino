@@ -1,0 +1,51 @@
+name: Documentation
+
+# Fast checks on the documentation set. They run on every push and pull
+# request, because they take under a minute and catch the failure modes that
+# are easiest to introduce and hardest to notice by eye:
+#
+#   - a file in docs/en/ whose body is still Chinese
+#   - the English and Chinese halves of a document drifting apart
+#   - a relative link or anchor that no longer resolves
+#   - a complete example that no longer compiles
+#
+# The same scripts run locally through tools/run_all_checks.sh, so a green
+# local run means a green CI run.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    name: Documentation checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install the C++ compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends g++
+
+      - name: Language and bilingual parity
+        run: python3 tools/check_docs.py
+
+      - name: Relative links
+        run: python3 tools/check_links.py
+
+      - name: Examples compile and run
+        run: python3 tools/check_doc_examples.py

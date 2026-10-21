@@ -90,14 +90,20 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
 
 ### 工具
 
+- [tools/run_all_checks.sh](tools/run_all_checks.sh)：
+  所有仓库检查的统一入口，CI 跑的就是它
 - [tools/check_docs.py](tools/check_docs.py)：
   校验每篇文档是否用正确的语言书写，以及中英两半的标题骨架与代码是否一致
+- [tools/check_links.py](tools/check_links.py)：
+  校验每条相对链接和 `#锚点` 是否仍然有效
 - [tools/check_doc_examples.py](tools/check_doc_examples.py)：
   拼装每篇文档的完整示例，编译并运行
+- [tools/build_all_projects.py](tools/build_all_projects.py)：
+  配置、构建并测试路线图里的每个项目
 
 ```bash
-python3 tools/check_docs.py
-python3 tools/check_doc_examples.py
+tools/run_all_checks.sh          # 文档检查
+tools/run_all_checks.sh --full   # 外加全部项目构建
 ```
 
 ### 示例
@@ -184,7 +190,7 @@ python3 tools/check_doc_examples.py
 
 #### 第八至二十七阶段：设计模式
 
-- [GoF 23 种模式](cpp-mastery-roadmap/00-overview.md#stage-8-projects-8-stage8)：
+- [GoF 23 种模式](cpp-mastery-roadmap/00-overview.md#stage-8-projects-08-stage8)：
   全部 23 种 GoF 模式 + Specification
 - **命令模式变体**：command-history, command-logger, command-memento, command-router, command-snapshot, command-translator, command-validator
 - **观察者模式变体**：observer-bus, observer-buffer, observer-debouncer, observer-filter-chain, observer-mediator, observer-subscription, observer-throttler

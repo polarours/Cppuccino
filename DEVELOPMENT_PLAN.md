@@ -386,3 +386,30 @@ specification、memento、mediator、command），中英两版同步修订。
 
 **结果**：`docs/en` 67 篇与 `docs/中文版` 67 篇**全部 67 对配对成功**，
 语言检查、标题骨架、代码块数量与内容全部一致，0 问题。
+
+## 第十一阶段：把检查挂进 CI（2026-10-21）
+
+**动机**：第九、十阶段的检查只在本地手动跑过一次。文档类的失效（英文名
+中文正文、中英两半漂移、链接失效、示例编不过）恰恰是最容易引入、又最
+不容易被肉眼发现的 —— 没人会逐篇翻 134 篇文档，但 CI 可以每次都翻。
+
+**产出**：
+
+| 文件 | 作用 |
+|------|------|
+| `.github/workflows/docs.yml` | 文档检查，每次 push 都跑 |
+| `.github/workflows/build.yml` | 全部项目构建+测试，按 10 个分片并行 |
+| `tools/run_all_checks.sh` | 本地与 CI 的统一入口 |
+| `tools/check_links.py` | 相对链接与锚点校验 |
+| `tools/build_all_projects.py` | 逐个配置、构建、测试全部项目 |
+| `tools/plan_ci_shards.py` | 按项目数把阶段均衡分到分片 |
+
+**设计要点**：CI 跑的就是本地那几个脚本（`tools/run_all_checks.sh`），
+所以本地跑绿了 CI 就一定跑绿，不存在"CI 才发现的问题"。分片计划由脚本
+算出，新增项目不需要改 workflow。
+
+**立刻查出的真问题**：`check_links.py` 增加了锚点校验后，查出 README 与
+README_zh-CN 里指向 `00-overview.md` 的 GoF 23 种模式链接**锚点写错了** ——
+实际标题是 `### Stage 8 Projects (08-stage8)`，锚点应为
+`#stage-8-projects-08-stage8`，而链接写成了 `#stage-8-projects-8-stage8`
+（少了一个 0）。此前的链接检查只验文件是否存在，不验锚点，所以一直没发现。
