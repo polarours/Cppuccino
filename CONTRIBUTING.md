@@ -42,8 +42,8 @@ Cppuccino/
 │   ├── 02-intermediate/      # Stage 2: Intermediate projects
 │   ├── 03-advanced/          # Stage 3: Advanced projects
 │   ├── 04-stage4/            # Stage 4: More practice
-│   ├── ...                   # Stages 5-40
-│   └── 40-stage40/           # Stage 40: C++23 features
+│   ├── ...                   # Stages 5-43
+│   └── 43-stage43/           # Stage 43: CI/CD and tooling
 └── tinyshell/                # Unix shell implementation
 ```
 

@@ -20,6 +20,9 @@ import tempfile
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# The compiler to use; CXX follows the usual convention.
+CXX = os.environ.get('CXX', 'g++')
+
 # Per-process scratch directory: two checker runs must not clobber each
 # other's intermediate files.
 WORKDIR = tempfile.mkdtemp(prefix='doc-ex-check-')
@@ -144,7 +147,7 @@ def check(path):
     exe = os.path.join(WORKDIR, 'example')
 
     api = api_project_for(path)
-    base_cmd = ['g++', '-pthread', '-o', exe]
+    base_cmd = [CXX, '-pthread', '-o', exe]
     if api:
         proj, sources = api
         base_cmd.append(f'-I{os.path.join(REPO, proj)}/include')

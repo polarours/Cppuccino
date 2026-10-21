@@ -86,6 +86,18 @@ def anchors_of(path):
     return out
 
 
+def submodule_paths(root):
+    """The directories that are git submodules of this repository."""
+    paths = set()
+    gitmodules = os.path.join(root, '.gitmodules')
+    if os.path.isfile(gitmodules):
+        for line in open(gitmodules, encoding='utf-8'):
+            m = re.match(r'\s*path\s*=\s*(.+?)\s*$', line)
+            if m:
+                paths.add(m.group(1))
+    return paths
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('root', nargs='?', default=os.getcwd())
@@ -100,8 +112,16 @@ def main():
             if name.endswith('.md'):
                 md_files.append(os.path.join(dirpath, name))
 
+    submodules = submodule_paths(root)
+    # A submodule that was not checked out holds no files, so a link into it
+    # cannot be verified. Those are reported separately instead of as broken.
+    unpopulated = {p for p in submodules
+                    if not os.path.isfile(os.path.join(root, p, 'CMakeLists.txt'))
+                    and not os.path.isfile(os.path.join(root, p, 'README.md'))}
+
     anchor_cache = {}
     broken = []
+    unverified = []
     total = 0
 
     for path in sorted(md_files):
@@ -131,6 +151,13 @@ def main():
             else:
                 resolved = os.path.normpath(os.path.join(os.path.dirname(path), raw))
             if not os.path.exists(resolved):
+                # Is the target inside a submodule that was not checked out?
+                inside = [s for s in unpopulated
+                          if resolved.startswith(os.path.join(root, s) + os.sep)]
+                if inside:
+                    unverified.append((os.path.relpath(path, root), target,
+                                       inside[0]))
+                    continue
                 broken.append((os.path.relpath(path, root), target,
                                'file not found'))
                 continue
@@ -142,6 +169,11 @@ def main():
                                    'anchor not found'))
 
     print(f'checked {total} relative link(s) in {len(md_files)} markdown file(s)')
+    if unverified:
+        print(f'\n{len(unverified)} link(s) point into a submodule that was not '
+              'checked out, so they could not be verified:')
+        for source, target, submodule in unverified:
+            print(f'  {source} -> {target}  (inside {submodule})')
     if broken:
         print(f'\n{len(broken)} broken link(s):')
         for source, target, reason in broken:

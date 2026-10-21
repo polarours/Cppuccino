@@ -426,3 +426,66 @@ specification、memento、mediator、command），中英两版同步修订。
 **补上的 CI 覆盖漏洞**：加 CI 时发现两个洞 —— `examples/` 下 120 个独立示例
 一次都没被编译过，`tinyshell` 子模块也没被构建过。现已分别由
 `tools/check_examples.py` 和 build workflow 的 `tinyshell` job 覆盖。
+
+## 第十二阶段：陷阱文章对齐与仓库卫生（2026-10-21）
+
+**背景**：前几阶段只覆盖了 `docs/`，`pitfalls/` 这 37 篇陷阱文章从未做过双语
+一致性检查 —— 和当初 `docs/en/` 里的 15 篇是同一类风险。
+
+**做法**：陷阱文章的中文文件名是翻译（`悬垂指针` 对 `dangling-pointer`），
+没有可匹配的拼写；结构指纹在两篇文章用了相似示例时又会配错。因此改为
+**显式配对表** `tools/pitfall_pairs.tsv`，37 对逐条人工确认。
+
+**查出的 11 处真实漂移**（全部已修）：
+
+| 文档 | 问题 |
+|------|------|
+| `dangling-pointer` | 中文版把 `createInt` 定义了两次（重定义，编不过）；对 `int` 调用 `doSomething()`；用 `fopen` 却没 include `<cstdio>` |
+| `object-slicing` | 5 个代码块各自漂移，其中一整段示例被挪了位置 |
+| `throwing-from-destructor` | 中文版缺一节（英文版有"显式调用析构函数"），导致后面编号整体错位 |
+| `iterator-invalidation` | 中文版缺 `v.reserve()` 那个代码块 |
+| `signed-integer-overflow-assumptions` | 中文版缺 `Checked<T>` 那个代码块 |
+| `implicit-conversions` | 占位类型名写成中文 `目标类型`，英文版是 `TargetType` |
+| `static-initialization-order-fiasco` | 中英是**两篇不同的文章**，英文版按中文版重译 |
+| `dangling-string-view` | 中文版缺两节、编号错位、一个代码块漂移 |
+
+**顺带发现工具自己的一个真 bug**：词法分析器把 C++14 数字分隔符
+`1'000'000` 里的 `'` 当成字符字面量的开头，于是把后面全部内容（包括注释）
+当成字面量吞掉 —— 凡是用了数字分隔符的文档都会被误报"代码不同"。
+C++ 库和 Python 脚本都修了，并补了回归测试。
+
+**仓库卫生**：
+
+- `tools/check_stats.py`：重新计算 README 里的每个数字并与仓库实际比对。
+  这些数字漂移过好几次，每次都要人工重数才能发现；现在是检查项。
+- `producer-consumer-demo` 只有 1 个测试，低于约定的 3 个，补到 3 个。
+- `00-overview.md` 漏登记 8 个项目，已补齐，**151 个项目现在全部在册**。
+- CONTRIBUTING 里"所有项目都有 include/ + src/"的说法对 6 个扁平布局的小项目
+  不成立，改成说明哪些是硬性要求、哪些是小型 demo 的自由选择。
+- 新增 PR 模板与 dependabot 配置。
+- 示例检查器识别"编译器太旧"（不认识 `-std=c++26`）与"代码坏了"的区别，
+  前者跳过、后者失败；CI 优先安装 g++-14 以便真的检查 C++26 的例子。
+
+### 顺带查出的一个子模块问题
+
+`tinyshell` 子模块指向的 commit `687250f` **只在本地存在**：
+
+```
+$ git fetch --depth 1 origin 687250fb997684b464290037516fbf6e9f65cd6e
+fatal: remote error: upload-pack: not our ref 687250fb997684b464290037516fbf6e9f65cd6e
+```
+
+远端 `polarours/tinyshell` 只有 `main` 分支，且只含最早的 "Initial commit"
+（LICENSE + README.md）；完整的 shell 实现停在本地从未推送的 `v1` 分支上。
+父仓库记录的指针因此指向一个别人拿不到的 commit —— **全新 clone 会拉不到
+tinyshell 的代码**。
+
+这会让 CI 的 `submodules: true` 直接失败，所以做了两件事：
+
+1. workflow 里的子模块拉取改为 `continue-on-error`，tinyshell 那个 job 在子模块
+   不可用时打印提示后正常结束，而不是让整个 workflow 变红。
+2. 链接检查器识别"指向未 checkout 的子模块"的链接，单独报告为**无法验证**，
+   而不是误报成坏链。
+
+**这需要仓库作者自己决定**：把 `v1` 推上去（`git push origin v1`），或者把父
+仓库的指针改到远端已有的 commit。

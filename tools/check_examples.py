@@ -46,6 +46,10 @@ DECL_RE = re.compile(r'^\s*//.*\bcompile\b', re.IGNORECASE)
 # Standards tried, in order, for an example that does not declare one.
 FALLBACK_STANDARDS = ['20', '23', '26']
 
+# The compiler to use. CXX follows the usual convention, so a CI job can
+# point at a newer toolchain without changing this script.
+CXX = os.environ.get('CXX', 'g++')
+
 
 def declared_standard(path):
     """The -std= flag the header declares, or None when it declares none."""
@@ -65,7 +69,7 @@ def compile_commands(path, standard, workdir):
     """The g++ command line for one example."""
     name = os.path.basename(path)
     binary = os.path.join(workdir, name[:-4])
-    cmd = ['g++', f'-std=c++{standard}', '-o', binary, path]
+    cmd = [CXX, f'-std=c++{standard}', '-o', binary, path]
 
     project = PROJECT_DEPENDENT.get(name)
     if project:
@@ -76,8 +80,18 @@ def compile_commands(path, standard, workdir):
     return cmd
 
 
+# The compiler rejecting the -std= flag means the toolchain is too old for
+# the example, which is not a defect in the example.
+TOOLCHAIN_TOO_OLD = ('unrecognized command-line option',
+                      'invalid value', 'unknown argument')
+
+
+def too_old(stderr):
+    return any(marker in stderr for marker in TOOLCHAIN_TOO_OLD)
+
+
 def check_one(path, workdir):
-    """Return (ok, detail)."""
+    """Return (status, detail). status is 'ok', 'skip' or 'fail'."""
     name = os.path.basename(path)
     standard = declared_standard(path)
 
@@ -85,27 +99,38 @@ def check_one(path, workdir):
         cmd = compile_commands(path, standard, workdir)
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode == 0:
-            return True, f'ok (-std=c++{standard})'
+            return 'ok', f'ok (-std=c++{standard})'
+        if too_old(result.stderr):
+            return 'skip', (f'the toolchain has no -std=c++{standard}, '
+                            'so this example was not checked')
         first = next((l for l in result.stderr.splitlines() if ' error:' in l),
                      result.stderr.splitlines()[0] if result.stderr else '?')
-        return False, f'failed with the declared -std=c++{standard}: {first.strip()[:110]}'
+        return 'fail', f'failed with the declared -std=c++{standard}: {first.strip()[:110]}'
 
     errors = []
     for candidate in FALLBACK_STANDARDS:
         cmd = compile_commands(path, candidate, workdir)
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode == 0:
-            return True, f'ok (-std=c++{candidate})'
+            return 'ok', f'ok (-std=c++{candidate})'
+        if too_old(result.stderr):
+            continue
         first = next((l for l in result.stderr.splitlines() if ' error:' in l),
                      result.stderr.splitlines()[0] if result.stderr else '?')
         errors.append(f'{candidate}: {first.strip()[:80]}')
-    return False, 'no standard works -- ' + ' | '.join(errors)
+    if not errors:
+        return 'skip', 'the toolchain supports none of the standards this example needs'
+    return 'fail', 'no standard works -- ' + ' | '.join(errors)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--jobs', '-j', type=int, default=os.cpu_count() or 2)
     args = parser.parse_args()
+
+    if shutil.which(CXX) is None:
+        print(f'the compiler {CXX!r} was not found')
+        return 1
 
     sources = sorted(os.path.join(EXAMPLES, name)
                      for name in os.listdir(EXAMPLES) if name.endswith('.cpp'))
@@ -121,10 +146,12 @@ def main():
             results = list(pool.map(
                 lambda p: (p, check_one(p, workdir)), sources))
 
-        for path, (ok, detail) in results:
+        for path, (status, detail) in results:
             name = os.path.basename(path)
-            if ok:
+            if status == 'ok':
                 print(f'  {name:<48} {detail}')
+            elif status == 'skip':
+                print(f'  {name:<48} SKIP {detail}')
             else:
                 print(f'  {name:<48} FAIL {detail}')
                 failures.append((name, detail))

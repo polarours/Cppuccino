@@ -30,8 +30,13 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v4
-        with:
-          submodules: true
+
+      - name: Fetch the tinyshell submodule
+        # The pinned submodule commit is not on the submodule's remote yet, so
+        # this must not fail the run. The link checker reports the links into
+        # an unpopulated submodule separately.
+        continue-on-error: true
+        run: git submodule update --init --recursive
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -41,7 +46,15 @@ jobs:
       - name: Install the C++ compiler
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends g++
+          sudo apt-get install -y --no-install-recommends g++ cmake
+          # One example needs a C++26 library header (<inplace_vector>), which
+          # the runner's default compiler does not ship. Use a newer one when
+          # it is available; the checker skips what the toolchain cannot build.
+          if apt-cache show g++-14 >/dev/null 2>&1; then
+            sudo apt-get install -y --no-install-recommends g++-14
+            echo "CXX=g++-14" >> "$GITHUB_ENV"
+            echo "CC=gcc-14" >> "$GITHUB_ENV"
+          fi
 
       - name: Language and bilingual parity
         run: python3 tools/check_docs.py
