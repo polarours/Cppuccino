@@ -152,7 +152,7 @@ Holder make_holder() {
 
 ```cpp
 std::string make_name() {
-    return "name";
+    return std::string("name");
 }
 ```
 
@@ -176,16 +176,27 @@ void log_line(std::string_view msg);
 
 ## 11. 成员存储风险
 
-长期对象中存储 `string_view` 是高风险设计。
+除非所有者的生命周期明确且被强制保证，
+否则不要在长生命周期对象里保存 `string_view`。
 
-除非类型本身就是“借用视图类型”，
-否则默认成员应使用 `std::string`。
+高风险示例：
 
-存 view 时必须在接口契约中明确所有者与寿命关系。
+1. 配置注册表保存了指向临时解析缓冲区的视图；
+2. 缓存键是指向请求级字符串的视图；
+3. 事件载荷中的视图跨越了线程边界。
 
 ---
 
-## 12. API 文档模板（建议固定）
+## 12. 类设计规则
+
+若类需要在调用边界之外继续持有文本，默认成员使用 `std::string`。
+
+只有当类被明确设计为非拥有型视图类型，
+且构造函数与文档把生命周期前置条件写清楚时，才使用 `string_view` 成员。
+
+---
+
+## 13. API 文档模板（建议固定）
 
 任何涉及 `string_view` 的公开 API，建议文档明确：
 
@@ -198,7 +209,7 @@ void log_line(std::string_view msg);
 
 ---
 
-## 13. `substr` 链式视图注意点
+## 14. `substr` 链式视图注意点
 
 `string_view::substr` 返回的仍是视图，不分配新存储。
 它不会改变原始生命周期约束。
@@ -207,7 +218,7 @@ void log_line(std::string_view msg);
 
 ---
 
-## 14. 与 `std::string` 变更操作的关系
+## 15. 与 `std::string` 变更操作的关系
 
 若 view 指向某个 `std::string`，
 而该字符串后续发生可能重分配的修改，view 可能失效。
@@ -219,7 +230,7 @@ void log_line(std::string_view msg);
 
 ---
 
-## 15. 并发语境
+## 16. 并发语境
 
 `string_view` 拷贝很便宜，但底层数据不是拷贝。
 若其他线程销毁或修改 owner，消费者线程视图可能瞬间失效。
@@ -228,24 +239,33 @@ void log_line(std::string_view msg);
 
 ---
 
-## 16. 异步边界策略
+## 17. 异步边界策略
 
-跨线程队列、任务系统、回调缓存等边界，
-默认应把借用数据转换为拥有数据：
+在异步管线中，回调可能在远离捕获点的地方执行。
+跨队列边界传递借用视图，是高频故障来源。
+
+异步边界上的安全默认做法：
+
+1. 转换为拥有型 `std::string`；
+2. 再向下游传递。
+
+---
+
+## 18. 更安全的转换边界模式
 
 ```cpp
 void enqueue(std::string s);
 
 void enqueue_view(std::string_view sv) {
-    enqueue(std::string(sv));
+    enqueue(std::string(sv)); // 所有权边界显式化
 }
 ```
 
-这会有一次拷贝成本，但能换来可证明正确性。
+这会带来一次拷贝成本，但消除了生命周期歧义。
 
 ---
 
-## 17. 性能与安全权衡
+## 19. 性能与安全权衡
 
 `string_view` 的性能收益是真实的，
 但悬垂缺陷的代价通常远高于一次合理拷贝。
@@ -258,7 +278,7 @@ void enqueue_view(std::string_view sv) {
 
 ---
 
-## 18. 工具与检测
+## 20. 工具与检测
 
 可辅助发现问题的工具：
 
@@ -270,7 +290,7 @@ void enqueue_view(std::string_view sv) {
 
 ---
 
-## 19. 典型反模式
+## 21. 典型反模式
 
 1. 返回由临时 `std::string` 构造的 `string_view`；
 2. 将参数 `string_view` 直接存为成员；
@@ -280,7 +300,7 @@ void enqueue_view(std::string_view sv) {
 
 ---
 
-## 20. 旧代码治理建议
+## 22. 旧代码治理建议
 
 1. 检索所有 `string_view` 返回类型；
 2. 审查 `string_view` 成员字段；
@@ -290,7 +310,7 @@ void enqueue_view(std::string_view sv) {
 
 ---
 
-## 21. 代码评审清单
+## 23. 代码评审清单
 
 - [ ] 该 view 是否可能超过底层存储寿命？
 - [ ] 返回 view 是否绑定到稳定存储？
@@ -303,7 +323,7 @@ void enqueue_view(std::string_view sv) {
 
 ---
 
-## 22. 实务建议汇总
+## 24. 实务建议汇总
 
 1. 跨作用域返回默认 `std::string`；
 2. `string_view` 优先用于“只读且不存储”的参数；
@@ -313,7 +333,7 @@ void enqueue_view(std::string_view sv) {
 
 ---
 
-## 23. 总结
+## 25. 总结
 
 `std::string_view` 的价值在于零拷贝视图能力，
 其风险也来自同一特性：不拥有内存。
