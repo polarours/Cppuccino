@@ -81,7 +81,7 @@ This is legal for UB-free assumptions.
 
 ## 4. Real-World Bug Shapes
 
-## 4.1 Range checks written after arithmetic
+### 4.1 Range checks written after arithmetic
 
 ```cpp
 int add_bad(int a, int b) {

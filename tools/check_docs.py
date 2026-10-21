@@ -89,10 +89,12 @@ def strip_comments(src):
     out = []
     i, n = 0, len(src)
     in_str = in_chr = False
+    last_was_digit = False
     while i < n:
         c = src[i]
         if in_str:
             out.append(c)
+            last_was_digit = c.isdigit()
             if c == '\\' and i + 1 < n:
                 out.append(src[i + 1])
                 i += 2
@@ -103,6 +105,7 @@ def strip_comments(src):
             continue
         if in_chr:
             out.append(c)
+            last_was_digit = c.isdigit()
             if c == '\\' and i + 1 < n:
                 out.append(src[i + 1])
                 i += 2
@@ -114,11 +117,21 @@ def strip_comments(src):
         if c == '"':
             in_str = True
             out.append(c)
+            last_was_digit = False
             i += 1
             continue
         if c == "'":
+            # A C++14 digit separator, as in 1'000'000, is not a character
+            # literal. Treating it as one would swallow the rest of the
+            # file, comments included.
+            if last_was_digit and i + 1 < n and src[i + 1].isdigit():
+                out.append(c)
+                last_was_digit = False
+                i += 1
+                continue
             in_chr = True
             out.append(c)
+            last_was_digit = False
             i += 1
             continue
         if c == '/' and i + 1 < n and src[i + 1] == '/':
@@ -131,8 +144,10 @@ def strip_comments(src):
                 i += 1
             i += 2
             out.append(' ')
+            last_was_digit = False
             continue
         out.append(c)
+        last_was_digit = c.isdigit()
         i += 1
     return ''.join(out)
 
@@ -166,8 +181,17 @@ def tokenize(src):
             continue
         if c.isdigit():
             start = i
-            while i < n and (src[i].isalnum() or src[i] == '.'):
-                i += 1
+            while i < n:
+                if src[i].isdigit() or src[i] == '.':
+                    i += 1
+                elif src[i] == "'" and i + 1 < n and src[i + 1].isdigit():
+                    # A C++14 digit separator, as in 1'000'000. It must not
+                    # be mistaken for the start of a character literal.
+                    i += 1
+                elif src[i].isalpha() or src[i] == '_':
+                    i += 1
+                else:
+                    break
             tokens.append(src[start:i])
             continue
         if c in '"\'':
@@ -248,6 +272,28 @@ def title(path):
     return m.group(1).strip() if m else ''
 
 
+def load_pair_map(root, relative_path):
+    """Read an "english<TAB>chinese" mapping file.
+
+    Returns a dict from the English file name to the Chinese file name, or
+    an empty dict when the file does not exist.
+    """
+    path = os.path.join(root, relative_path)
+    if not os.path.isfile(path):
+        return {}
+    pairs = {}
+    for line in open(path, encoding='utf-8'):
+        line = line.strip()
+        if not line or line.startswith('#'):
+            continue
+        parts = line.split('\t')
+        if len(parts) != 2:
+            parts = line.split()
+        if len(parts) == 2:
+            pairs[parts[0].strip()] = parts[1].strip()
+    return pairs
+
+
 # --------------------------------------------------------------------------
 # checks
 # --------------------------------------------------------------------------
@@ -255,22 +301,51 @@ def title(path):
 def check_language(root, problems):
     en_files = sorted(glob.glob(os.path.join(root, 'docs/en/*.md')))
     zh_files = sorted(glob.glob(os.path.join(root, 'docs/中文版/*.md')))
+    pit_en = sorted(glob.glob(os.path.join(root, 'pitfalls/en/*.md')))
+    pit_zh = sorted(glob.glob(os.path.join(root, 'pitfalls/中文版/*.md')))
 
     print('== language check ==')
-    for f in en_files:
+    for f in en_files + pit_en:
         verdict, zh, en = classify(open(f, encoding='utf-8').read())
         if verdict == 'zh':
             problems.append(f'EN body is Chinese: {os.path.relpath(f, root)}')
             print(f"  EN->ZH  {os.path.relpath(f, root)} "
                   f"({zh} chinese lines vs {en} english lines)")
-    for f in zh_files:
+    for f in zh_files + pit_zh:
         verdict, zh, en = classify(open(f, encoding='utf-8').read())
         if verdict == 'en':
             problems.append(f'ZH body is English: {os.path.relpath(f, root)}')
             print(f"  ZH->EN  {os.path.relpath(f, root)} "
                   f"({en} english lines vs {zh} chinese lines)")
     print(f"  {len(en_files)} english docs, {len(zh_files)} chinese docs checked")
-    return len(en_files), len(zh_files)
+    print(f"  {len(pit_en)} english pitfalls, {len(pit_zh)} chinese pitfalls checked")
+    return len(en_files) + len(pit_en), len(zh_files) + len(pit_zh)
+
+
+def compare_documents(en_path, zh_path, root, problems, label):
+    """Compare one pair and record every difference."""
+    en_h, zh_h = headings(en_path), headings(zh_path)
+    rel_en = os.path.relpath(en_path, root)
+    rel_zh = os.path.relpath(zh_path, root)
+
+    if len(en_h) != len(zh_h):
+        problems.append(f'{label} heading count differs: {rel_en} vs {rel_zh}')
+        print(f"  HEADINGS  {rel_en}: {len(en_h)} vs {len(zh_h)} in {rel_zh}")
+    elif [l for l, _ in en_h] != [l for l, _ in zh_h]:
+        problems.append(f'{label} heading levels differ: {rel_en} vs {rel_zh}')
+        print(f"  LEVELS    {rel_en}: levels differ from {rel_zh}")
+
+    en_code = code_blocks(en_path)
+    zh_code = code_blocks(zh_path)
+    if len(en_code) != len(zh_code):
+        problems.append(f'{label} code block count differs: {rel_en} vs {rel_zh}')
+        print(f"  BLOCKS    {rel_en}: {len(en_code)} vs {len(zh_code)} in {rel_zh}")
+    else:
+        drifted = [i for i, (a, b) in enumerate(zip(en_code, zh_code))
+                   if normalize_code(a, True) != normalize_code(b, True)]
+        if drifted:
+            problems.append(f'{label} code differs: {rel_en} vs {rel_zh}')
+            print(f"  CODE      {rel_en}: block(s) {drifted} differ from {rel_zh}")
 
 
 def check_pairs(root, problems):
@@ -304,37 +379,54 @@ def check_pairs(root, problems):
             unverifiable.append(os.path.relpath(f, root))
             continue
         paired += 1
-        zh = cands[0]
-
-        en_h, zh_h = headings(f), headings(zh)
-        rel_en = os.path.relpath(f, root)
-        if len(en_h) != len(zh_h):
-            problems.append(f'heading count differs: {rel_en} vs {os.path.basename(zh)}')
-            print(f"  HEADINGS  {rel_en}: {len(en_h)} vs {len(zh_h)} "
-                  f"in {os.path.basename(zh)}")
-        elif [l for l, _ in en_h] != [l for l, _ in zh_h]:
-            problems.append(f'heading levels differ: {rel_en} vs {os.path.basename(zh)}')
-            print(f"  LEVELS    {rel_en}: levels differ from {os.path.basename(zh)}")
-
-        en_code = code_blocks(f)
-        zh_code = code_blocks(zh)
-        if len(en_code) != len(zh_code):
-            problems.append(f'code block count differs: {rel_en} vs {os.path.basename(zh)}')
-            print(f"  BLOCKS    {rel_en}: {len(en_code)} vs {len(zh_code)} "
-                  f"in {os.path.basename(zh)}")
-        else:
-            drifted = [i for i, (a, b) in enumerate(zip(en_code, zh_code))
-                       if normalize_code(a, True) != normalize_code(b, True)]
-            if drifted:
-                problems.append(f'code differs: {rel_en} vs {os.path.basename(zh)}')
-                print(f"  CODE      {rel_en}: block(s) {drifted} differ "
-                      f"from {os.path.basename(zh)}")
+        compare_documents(f, cands[0], root, problems, 'docs')
 
     print(f"  {paired}/{len(en_files)} pairs verified")
     if unverifiable:
         print(f"  {len(unverifiable)} doc(s) could not be matched (not a failure):")
         for name in unverifiable:
             print(f"    {name}")
+    return paired
+
+
+def check_pitfall_pairs(root, problems):
+    """Compare the pitfall pairs listed in tools/pitfall_pairs.tsv.
+
+    The pitfall articles are paired by hand rather than by structure: the
+    Chinese filenames are translations, so there is no shared spelling to
+    match on, and a structural fallback pairs the wrong files when two
+    articles happen to use similar examples.
+    """
+    pairs = load_pair_map(root, os.path.join('tools', 'pitfall_pairs.tsv'))
+    print('\n== pair check: pitfalls ==')
+    if not pairs:
+        print('  no pair map found, skipped')
+        return 0
+
+    paired = 0
+    for en_name, zh_name in sorted(pairs.items()):
+        en_path = os.path.join(root, 'pitfalls/en', en_name)
+        zh_path = os.path.join(root, 'pitfalls/中文版', zh_name)
+        if not os.path.isfile(en_path) or not os.path.isfile(zh_path):
+            problems.append(f'pitfall pair missing a file: {en_name} / {zh_name}')
+            print(f"  MISSING  {en_name} / {zh_name}")
+            continue
+        paired += 1
+        compare_documents(en_path, zh_path, root, problems, 'pitfalls')
+
+    # The map has to cover every file on both sides.
+    en_names = {os.path.basename(f)
+                for f in glob.glob(os.path.join(root, 'pitfalls/en/*.md'))}
+    zh_names = {os.path.basename(f)
+                for f in glob.glob(os.path.join(root, 'pitfalls/中文版/*.md'))}
+    for name in sorted(en_names - set(pairs)):
+        problems.append(f'pitfall not in the pair map: {name}')
+        print(f"  UNMAPPED  {name}")
+    for name in sorted(zh_names - set(pairs.values())):
+        problems.append(f'pitfall not in the pair map: {name}')
+        print(f"  UNMAPPED  {name}")
+
+    print(f"  {paired}/{len(pairs)} pairs verified")
     return paired
 
 
@@ -348,6 +440,7 @@ def main():
     check_language(args.repo, problems)
     if not args.language_only:
         check_pairs(args.repo, problems)
+        check_pitfall_pairs(args.repo, problems)
 
     print()
     if problems:

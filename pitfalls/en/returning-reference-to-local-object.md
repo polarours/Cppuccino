@@ -148,7 +148,7 @@ auto bad_lambda() {
 
 ## 5. Correct Patterns
 
-## 5.1 Return by value (default choice)
+### 5.1 Return by value (default choice)
 
 ```cpp
 std::string good() {

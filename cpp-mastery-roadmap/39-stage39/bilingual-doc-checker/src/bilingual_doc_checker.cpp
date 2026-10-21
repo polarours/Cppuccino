@@ -115,7 +115,15 @@ std::string stripComments(const std::string& src) {
             continue;
         }
         if (c == '\'') {
-            inChar = true;
+            // A C++14 digit separator, as in 1'000'000, is not a character
+            // literal. Treating it as one would swallow the rest of the
+            // file, comments included.
+            bool afterDigit = !out.empty() &&
+                              std::isdigit(static_cast<unsigned char>(out.back()));
+            if (!(afterDigit && i + 1 < n &&
+                  std::isdigit(static_cast<unsigned char>(src[i + 1])))) {
+                inChar = true;
+            }
             out.push_back(c);
             ++i;
             continue;
@@ -179,7 +187,15 @@ std::string blankStrings(const std::string& src) {
             continue;
         }
         if (c == '\'') {
-            inChar = true;
+            // A C++14 digit separator, as in 1'000'000, is not a character
+            // literal. Treating it as one would swallow the rest of the
+            // file, comments included.
+            bool afterDigit = !out.empty() &&
+                              std::isdigit(static_cast<unsigned char>(out.back()));
+            if (!(afterDigit && i + 1 < n &&
+                  std::isdigit(static_cast<unsigned char>(src[i + 1])))) {
+                inChar = true;
+            }
             out.push_back(c);
             ++i;
             continue;
@@ -223,9 +239,17 @@ std::vector<std::string> tokenize(const std::string& src) {
         }
         if (std::isdigit(static_cast<unsigned char>(c))) {
             std::size_t start = i;
-            while (i < n && (std::isalnum(static_cast<unsigned char>(src[i])) ||
-                             src[i] == '.')) {
-                ++i;
+            while (i < n) {
+                if (std::isalnum(static_cast<unsigned char>(src[i])) || src[i] == '.') {
+                    ++i;
+                } else if (src[i] == '\'' && i + 1 < n &&
+                           std::isdigit(static_cast<unsigned char>(src[i + 1]))) {
+                    // A C++14 digit separator, as in 1'000'000. It must not
+                    // be mistaken for the start of a character literal.
+                    ++i;
+                } else {
+                    break;
+                }
             }
             tokens.push_back(src.substr(start, i - start));
             continue;

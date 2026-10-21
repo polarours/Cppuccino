@@ -147,6 +147,17 @@ void test_code_equivalent_respects_string_literals() {
            "different url differs");
 }
 
+void test_code_equivalent_handles_digit_separators() {
+    // A C++14 digit separator is not a character literal. Reading it as one
+    // would swallow the rest of the file, comments included, and make two
+    // identical programs look different.
+    const char* a = "for (int i = 0; i < 100'000; ++i) { ++counter; }";
+    const char* b = "for (int i = 0; i < 100'000; ++i) { ++counter; }";
+    expect(codeEquivalent(a, b), "digit separators compare equal");
+    expect(codeEquivalent("int x = 1'000; // note", "int x = 1'000;"),
+           "a comment after a digit separator is still a comment");
+}
+
 void test_code_equivalent_ignores_token_spacing() {
     // "template<typename T>" and "template <typename T>" are the same code.
     expect(codeEquivalent("template<typename T> struct S {};",
@@ -234,6 +245,7 @@ int main() {
         test_headings_inside_code_block_ignored();
         test_extract_code_blocks();
         test_code_equivalent_ignores_comments();
+        test_code_equivalent_handles_digit_separators();
         test_code_equivalent_ignores_token_spacing();
         test_code_equivalent_respects_string_literals();
         test_code_equivalent_ignoring_strings();

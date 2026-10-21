@@ -1,0 +1,45 @@
+# English to Chinese file mapping for the pitfall articles.
+#
+# The pitfall articles are paired by hand rather than by structure. The
+# Chinese filenames are translations ("悬垂指针" for "dangling-pointer"), so
+# there is no shared spelling to match on, and the structural fallback pairs
+# the wrong files when two articles happen to use similar examples.
+#
+# One line per pair: the English file name, a tab, the Chinese file name.
+broken-double-checked-locking.md	双重检查锁定失效.md
+const-correctness-pitfalls.md	const正确性陷阱.md
+const-object-move-trap.md	从const对象移动陷阱.md
+dangling-lambda-captures.md	Lambda捕获悬垂引用.md
+dangling-pointer.md	悬垂指针.md
+dangling-string-view.md	string-view-悬垂问题.md
+data-race.md	数据竞态.md
+deadlock.md	死锁.md
+deleting-through-non-virtual-base.md	通过非虚基类指针删除对象.md
+double-free.md	双重释放.md
+fold-expression-errors.md	折叠表达式错误.md
+implicit-conversions.md	隐式转换.md
+iterator-invalidation-pitfalls.md	迭代器失效陷阱.md
+iterator-invalidation.md	迭代器失效.md
+livelock.md	活锁.md
+macro-pitfalls.md	宏陷阱.md
+memory-fragmentation.md	内存碎片.md
+memory-leak.md	内存泄漏.md
+memory-order-pitfalls.md	内存序陷阱.md
+moving-from-const-object.md	对const对象使用move.md
+narrowing-conversions.md	窄化转换.md
+object-lifetime-and-destruction-order-pitfalls.md	对象生命周期与析构顺序陷阱.md
+object-slicing.md	对象切片.md
+priority-inversion.md	优先级反转.md
+returning-reference-to-local-object.md	返回局部对象引用.md
+sfinae-misuse.md	SFINAE误用.md
+signed-integer-overflow-assumptions.md	有符号整数溢出假设.md
+stack-overflow.md	栈溢出.md
+static-initialization-order-fiasco.md	静态初始化顺序问题.md
+template-deduction-pitfalls.md	模板参数推导陷阱.md
+template-specialization-pitfalls.md	模板特化陷阱.md
+the-myth-of-thread-safety.md	线程安全的迷思.md
+thread-leak.md	线程泄漏.md
+thread-safety-composition-fallacy.md	线程安全迷思.md
+throwing-from-destructor.md	析构函数抛出异常.md
+uninitialized-members.md	未初始化成员变量.md
+use-after-move.md	移动后使用.md
