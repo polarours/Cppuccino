@@ -18,6 +18,7 @@ tools/run_all_checks.sh --full   # 外加全部项目的构建与测试
 | `check_examples.py` | `examples/` 下编不过的独立示例，或头注释已经描述不准构建方式的示例 |
 | `check_stats.py` | README 里已经和仓库实际对不上的统计数字 |
 | `check_project_readmes.py` | 项目 README 与它的中英另一半脱节，或写了项目并不构建的可执行文件 |
+| `check_overview_parity.py` | 中英两份路线图索引列出的阶段或项目不一致 |
 | `check_docs.py` | 代码块被截断，导致花括号不配平 |
 | `build_all_projects.py` | 配置、构建或测试失败的项目 |
 

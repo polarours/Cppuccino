@@ -53,6 +53,9 @@ run "statistics: the READMEs agree with the repository" \
 run "projects: the READMEs agree with their twin and their build" \
     python3 tools/check_project_readmes.py
 
+run "roadmap: the two indexes describe the same thing" \
+    python3 tools/check_overview_parity.py
+
 if [ "$FULL" = "1" ]; then
     run "projects: configure, build and test" \
         python3 tools/build_all_projects.py

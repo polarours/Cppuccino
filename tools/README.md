@@ -19,6 +19,7 @@ tools/run_all_checks.sh --full   # and every project build and test
 | `check_examples.py` | A standalone file in `examples/` that no longer compiles, or a header that no longer describes how to build it |
 | `check_stats.py` | A statistic in the READMEs that no longer matches the repository |
 | `check_project_readmes.py` | A project README that drifted from its twin, or that names a binary the project does not build |
+| `check_overview_parity.py` | The two roadmap indexes listing different stages or different projects |
 | `check_docs.py` | A code block that was cut short, so its braces do not balance |
 | `build_all_projects.py` | A project that fails to configure, build or pass its tests |
 
