@@ -91,6 +91,8 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
 
 ### Tooling
 
+See [tools/README.md](tools/README.md) for what each check does and why.
+
 - [tools/run_all_checks.sh](tools/run_all_checks.sh):
   one entry point for every repository check, the same one CI runs
 - [tools/check_docs.py](tools/check_docs.py):
