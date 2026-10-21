@@ -54,6 +54,10 @@ cmake-build-*
 # WorkBuddy assistant working memory (not part of the project source)
 .workbuddy/
 
+# Python bytecode from the tools
+__pycache__/
+*.pyc
+
 # Files written by the example programs in docs/ and examples/
 database.txt
 
