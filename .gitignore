@@ -53,3 +53,6 @@ cmake-build-*
 
 # WorkBuddy assistant working memory (not part of the project source)
 .workbuddy/
+
+# Files written by the example programs in docs/ and examples/
+database.txt

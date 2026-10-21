@@ -598,6 +598,8 @@ The goal is to make those gaps visible and then close them deliberately.
   relative link validation with lexical path normalization
 - [text-diff](39-stage39/text-diff/README.md):
   LCS line diff with unified-style rendering and similarity score
+- [bilingual-doc-checker](39-stage39/bilingual-doc-checker/README.md):
+  language detection and heading/code parity between the English and Chinese halves
 
 ### Stage 40 Projects (40-stage40) — C++23 Features
 

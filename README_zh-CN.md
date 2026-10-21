@@ -18,7 +18,7 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
 | 文档 | 134 篇（67 英文 + 67 中文） |
 | 陷阱 | 74 篇（37 英文 + 37 中文） |
 | 示例 | 120 个可运行示例 |
-| 项目 | 150 个项目，横跨 43 个阶段 |
+| 项目 | 151 个项目，横跨 43 个阶段 |
 | 测试 | 855（全部通过） |
 
 ## 从这里开始
@@ -87,6 +87,18 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
   [Simple 数据库](docs/en/simple-db-api.md)、
   [任务调度器](docs/en/task-scheduler-api.md)、
   [连接池](docs/en/connection-pool-api.md)
+
+### 工具
+
+- [tools/check_docs.py](tools/check_docs.py)：
+  校验每篇文档是否用正确的语言书写，以及中英两半的标题骨架与代码是否一致
+- [tools/check_doc_examples.py](tools/check_doc_examples.py)：
+  拼装每篇文档的完整示例，编译并运行
+
+```bash
+python3 tools/check_docs.py
+python3 tools/check_doc_examples.py
+```
 
 ### 示例
 

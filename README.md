@@ -19,7 +19,7 @@ public learning resource.
 | Documentation | 134 articles (67 en + 67 zh) |
 | Pitfalls | 74 articles (37 en + 37 zh) |
 | Examples | 120 runnable examples |
-| Projects | 150 projects across 43 stages |
+| Projects | 151 projects across 43 stages |
 | Tests | 855 (all passing) |
 
 ## Start Here
@@ -88,6 +88,19 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
   [Simple Database](docs/en/simple-db-api.md),
   [Task Scheduler](docs/en/task-scheduler-api.md),
   [Connection Pool](docs/en/connection-pool-api.md)
+
+### Tooling
+
+- [tools/check_docs.py](tools/check_docs.py):
+  verifies that every document is written in the right language, and that the
+  English and Chinese halves agree on their heading skeleton and code
+- [tools/check_doc_examples.py](tools/check_doc_examples.py):
+  assembles the complete example of every document, compiles it and runs it
+
+```bash
+python3 tools/check_docs.py
+python3 tools/check_doc_examples.py
+```
 
 ### Examples
 

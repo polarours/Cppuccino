@@ -60,8 +60,9 @@ using TaskId = std::size_t;
 
 ```cpp
 #include "task_scheduler.hpp"
-#include <iostream>
 #include <chrono>
+#include <iostream>
+#include <thread>
 
 using namespace task_scheduler;
 using Clock = std::chrono::steady_clock;
@@ -88,6 +89,7 @@ int main() {
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
     // 取消任务
+    scheduler.cancel(id1);
     scheduler.cancel(id2);
     scheduler.cancel(id3);
 

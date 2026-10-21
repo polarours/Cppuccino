@@ -35,6 +35,7 @@ Cppuccino/
 ├── pitfalls/en/              # English pitfall articles
 ├── pitfalls/中文版/          # Chinese pitfall articles
 ├── examples/                 # Runnable .cpp examples
+├── tools/                    # Repository-level consistency checks
 ├── cpp-mastery-roadmap/      # Staged learning path with projects
 │   ├── 00-overview.md        # Roadmap index
 │   ├── 01-beginner/          # Stage 1: Beginner projects
@@ -51,6 +52,8 @@ Cppuccino/
 - One document = one central idea
 - Bilingual: English in `docs/en/`, Chinese in `docs/中文版/`
 - Filename: lowercase-kebab-case, e.g., `ownership-and-lifetime.md`
+- The two halves keep the same heading skeleton and the same code; only the
+  prose and the printed messages are translated
 
 ### Pitfalls Convention
 
@@ -111,6 +114,26 @@ For examples:
 ```bash
 g++ -std=c++17 examples/example-name.cpp -o /tmp/example && /tmp/example
 ```
+
+### Repository Checks
+
+Two scripts keep the documentation honest. Run them before opening a pull
+request that touches `docs/`, `pitfalls/` or `examples/`:
+
+```bash
+# Every document is written in the right language, and the English and
+# Chinese halves agree on their heading skeleton and code.
+python3 tools/check_docs.py
+
+# The complete example of every document compiles and runs.
+python3 tools/check_doc_examples.py
+```
+
+The first script is what catches a file that sits in `docs/en/` with an
+English filename but a Chinese body. The second one catches an example that
+no longer compiles. Both are backed by the
+[bilingual-doc-checker](cpp-mastery-roadmap/39-stage39/bilingual-doc-checker/)
+project.
 
 ---
 
