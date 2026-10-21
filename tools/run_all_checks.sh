@@ -47,6 +47,9 @@ run "documentation: examples compile and run" \
 run "examples: compile" \
     python3 tools/check_examples.py
 
+run "statistics: the READMEs agree with the repository" \
+    python3 tools/check_stats.py
+
 if [ "$FULL" = "1" ]; then
     run "projects: configure, build and test" \
         python3 tools/build_all_projects.py

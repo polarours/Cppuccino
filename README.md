@@ -20,7 +20,7 @@ public learning resource.
 | Pitfalls | 74 articles (37 en + 37 zh) |
 | Examples | 120 runnable examples |
 | Projects | 151 projects across 43 stages |
-| Tests | 873 (all passing) |
+| Tests | 876 (all passing) |
 
 ## Start Here
 
@@ -103,6 +103,8 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
 - [tools/check_examples.py](tools/check_examples.py):
   compiles every standalone file in `examples/`, using the build command its
   own header declares
+- [tools/check_stats.py](tools/check_stats.py):
+  verifies that the statistics in the READMEs still match the repository
 - [tools/build_all_projects.py](tools/build_all_projects.py):
   configures, builds and tests every project in the roadmap
 

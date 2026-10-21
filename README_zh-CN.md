@@ -19,7 +19,7 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
 | 陷阱 | 74 篇（37 英文 + 37 中文） |
 | 示例 | 120 个可运行示例 |
 | 项目 | 151 个项目，横跨 43 个阶段 |
-| 测试 | 873（全部通过） |
+| 测试 | 876（全部通过） |
 
 ## 从这里开始
 
@@ -100,6 +100,8 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
   拼装每篇文档的完整示例，编译并运行
 - [tools/check_examples.py](tools/check_examples.py)：
   按各文件头注释自己声明的编译命令，编译 `examples/` 下的每个独立示例
+- [tools/check_stats.py](tools/check_stats.py)：
+  校验 README 里的统计数字是否仍与仓库实际一致
 - [tools/build_all_projects.py](tools/build_all_projects.py)：
   配置、构建并测试路线图里的每个项目
 

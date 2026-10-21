@@ -54,3 +54,6 @@ jobs:
 
       - name: Standalone examples compile
         run: python3 tools/check_examples.py
+
+      - name: Statistics agree with the repository
+        run: python3 tools/check_stats.py

@@ -146,6 +146,7 @@ The individual checks can also be run on their own:
 | `python3 tools/check_links.py` | A relative link or `#anchor` that no longer resolves |
 | `python3 tools/check_doc_examples.py` | A complete example inside a document that no longer compiles or runs |
 | `python3 tools/check_examples.py` | A standalone file in `examples/` that no longer compiles, or a header that no longer describes how to build it |
+| `python3 tools/check_stats.py` | A statistic in the READMEs that no longer matches the repository |
 | `python3 tools/build_all_projects.py` | A project that fails to configure, build or pass its tests |
 
 The first script is what catches a file that sits in `docs/en/` with an
