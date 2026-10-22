@@ -1,3 +1,7 @@
+// examples/std-filesystem-cpp20.cpp
+// Demonstrates std::filesystem for paths, directories and iteration.
+// Compile with: g++ -std=c++17 -o std_filesystem_cpp20 std-filesystem-cpp20.cpp
+
 #include <iostream>
 #include <filesystem>
 #include <fstream>

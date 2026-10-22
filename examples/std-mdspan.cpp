@@ -1,3 +1,7 @@
+// examples/std-mdspan.cpp
+// Demonstrates the C++23 std::mdspan multidimensional view.
+// Compile with: g++ -std=c++23 -o std_mdspan std-mdspan.cpp
+
 #include <mdspan>
 #include <vector>
 #include <iostream>

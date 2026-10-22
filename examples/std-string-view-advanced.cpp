@@ -1,3 +1,7 @@
+// examples/std-string-view-advanced.cpp
+// Demonstrates advanced std::string_view: trimming, splitting and lifetime rules.
+// Compile with: g++ -std=c++17 -o std_string_view_advanced std-string-view-advanced.cpp
+
 #include <string_view>
 #include <string>
 #include <iostream>

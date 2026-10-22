@@ -533,3 +533,33 @@ tinyshell 的代码**。
 
 **新增检查** `tools/check_overview_parity.py`：比较两份索引的标题骨架与项目
 链接集合，任何一边少列一个项目都会被报出来。
+
+## 第十五阶段：示例头注释统一（2026-10-22）
+
+**问题**：120 个示例里有 **32 个**不符合仓库自己的头注释约定 —— 27 个完全没有
+头注释，4 个写的是中文，1 个缺编译命令。约定是：
+
+```cpp
+// examples/<文件名>.cpp
+// <一句话说明这个示例演示什么>
+// Compile with: g++ -std=c++NN -o <名字> <文件名>.cpp
+```
+
+读者是照着第二行复制命令的，所以**缺了标准号就等于缺了关键信息** ——
+`std-flat-map`、`std-expected`、`std-mdspan` 需要 C++23，
+`std-format`、`std-jthread`、`std-latch-barrier`、`std-source-location`、
+`std-bit-cpp20`、`std-ranges-advanced` 等需要 C++20。照 `c++17` 编会得到一堆
+看不懂的报错。
+
+**处理**：给 32 个示例补上符合约定的头注释，标准号是逐个探测出来的
+（依次试 c++17 / c++20 / c++23 / c++26，取第一个能编过的）。同时把
+44 个 `// Compile:` 统一成 `// Compile with:`。
+
+**顺带修掉一个真实冲突**：`virtual-dispatch-and-slicing.cpp` 和
+`virtual-dispatch-example.cpp` 都声明 `-o virtual_dispatch`，在同一个目录里
+编译时后者会静默覆盖前者。前者现在输出 `virtual_dispatch_slicing`。
+
+**新增检查**（`tools/check_examples.py`）：
+
+- 每个示例都有符合约定的头注释，且注释是英文的
+- 没有两个示例写同一个输出文件名

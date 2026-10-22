@@ -1,7 +1,7 @@
 // examples/active-record-demo.cpp
 // Demonstrates the Active Record Pattern: each object knows how to persist
 // itself (object + row + data access in one class).
-// Compile: g++ -std=c++20 -Wall -Wextra -o active-record-demo active-record-demo.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o active-record-demo active-record-demo.cpp
 
 #include <iostream>
 #include <map>

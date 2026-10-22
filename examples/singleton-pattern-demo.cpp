@@ -1,6 +1,6 @@
 // examples/singleton-pattern-demo.cpp
 // Demonstrates Meyers' Singleton and thread-safe Logger/Config singletons.
-// Compile: g++ -std=c++20 -o singleton-pattern-demo singleton-pattern-demo.cpp -lpthread
+// Compile with: g++ -std=c++20 -o singleton-pattern-demo singleton-pattern-demo.cpp -lpthread
 
 #include <iostream>
 #include <mutex>

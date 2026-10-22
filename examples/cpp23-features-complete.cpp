@@ -1,4 +1,7 @@
-// C++23 特性完整示例
+// examples/cpp23-features-complete.cpp
+// Demonstrates the C++23 features used across this repository.
+// Compile with: g++ -std=c++23 -o cpp23_features_complete cpp23-features-complete.cpp
+
 #include <iostream>
 #include <print>
 #include <concepts>

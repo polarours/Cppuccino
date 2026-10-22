@@ -1,6 +1,6 @@
 // examples/adapter-pattern-demo.cpp
 // Demonstrates Adapter Pattern: VlcPlayer + Mp3Player adapted to MediaPlayer interface.
-// Compile: g++ -std=c++20 -o adapter-pattern-demo adapter-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o adapter-pattern-demo adapter-pattern-demo.cpp
 
 #include <iostream>
 #include <memory>

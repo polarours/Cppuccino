@@ -1,6 +1,6 @@
 // examples/flyweight-pattern-demo.cpp
 // Demonstrates Flyweight Pattern: Shared fonts in text editor.
-// Compile: g++ -std=c++20 -o flyweight-pattern-demo flyweight-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o flyweight-pattern-demo flyweight-pattern-demo.cpp
 
 #include <functional>
 #include <iostream>

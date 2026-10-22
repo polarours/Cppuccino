@@ -1,3 +1,7 @@
+// examples/std-flat-map.cpp
+// Demonstrates the C++23 std::flat_map and std::flat_set.
+// Compile with: g++ -std=c++23 -o std_flat_map std-flat-map.cpp
+
 #include <flat_map>
 #include <flat_set>
 #include <iostream>

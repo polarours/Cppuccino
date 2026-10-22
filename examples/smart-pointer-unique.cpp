@@ -1,3 +1,7 @@
+// examples/smart-pointer-unique.cpp
+// Demonstrates std::unique_ptr for exclusive ownership.
+// Compile with: g++ -std=c++17 -o smart_pointer_unique smart-pointer-unique.cpp
+
 #include <memory>
 #include <string>
 #include <iostream>

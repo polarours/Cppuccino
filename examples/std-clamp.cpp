@@ -1,3 +1,7 @@
+// examples/std-clamp.cpp
+// Demonstrates std::clamp for restricting a value to a range.
+// Compile with: g++ -std=c++17 -o std_clamp std-clamp.cpp
+
 #include <algorithm>
 #include <iostream>
 

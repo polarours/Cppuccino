@@ -1,3 +1,7 @@
+// examples/sfinae-type-traits.cpp
+// Demonstrates SFINAE-based type traits and custom detection idioms.
+// Compile with: g++ -std=c++17 -o sfinae_type_traits sfinae-type-traits.cpp
+
 #include <iostream>
 #include <string>
 #include <type_traits>

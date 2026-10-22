@@ -1,6 +1,6 @@
 // examples/memento-pattern-demo.cpp
 // Demonstrates Memento Pattern: Editor + History for undo/redo.
-// Compile: g++ -std=c++20 -o memento-pattern-demo memento-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o memento-pattern-demo memento-pattern-demo.cpp
 
 #include <functional>
 #include <iostream>

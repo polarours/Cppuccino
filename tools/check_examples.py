@@ -128,11 +128,46 @@ def check_one(path, workdir):
 def declared_output(path):
     """The binary name the header says the example produces."""
     text = open(path, encoding='utf-8', errors='replace').read()
-    m = re.search(r'^//\s*Compile(?:\s+with)?:\s*(g\+\+.*)$', text, re.M)
+    m = re.search(r'^//\s*Compile(?:\s+with)?\s*:\s*(g\+\+.*)$', text, re.M)
     if not m:
         return None
     out = re.search(r'-o\s+(\S+)', m.group(1))
     return os.path.basename(out.group(1)) if out else None
+
+
+def check_header_convention(sources, problems):
+    """Every example must carry the header the repository uses.
+
+    The first line names the file, the second says what it demonstrates, and
+    the third gives the command to build it. A reader copies that command, so
+    it has to say which standard the file needs: several of them need C++20
+    or C++23.
+    """
+    for path in sources:
+        name = os.path.basename(path)
+        text = open(path, encoding='utf-8', errors='replace').read()
+        lines = text.splitlines()
+        if not lines or not lines[0].startswith('//'):
+            problems.append(f'{name}: no header comment')
+            print(f"  NO HEADER  {name}")
+            continue
+        if lines[0].strip() != f'// examples/{name}':
+            problems.append(f'{name}: the header does not name the file')
+            print(f"  HEADER     {name}: {lines[0].strip()!r}")
+        # The description may wrap over several lines, so the compile command
+        # is looked for anywhere in the leading comment block.
+        header_lines = []
+        for line in lines:
+            if not line.startswith('//'):
+                break
+            header_lines.append(line)
+        if not any(re.match(r'^//\s*Compile (with|\+ run)\s*:', l)
+                   for l in header_lines):
+            problems.append(f'{name}: the header has no compile command')
+            print(f"  HEADER     {name}: no compile command")
+        if re.search(r'[\u4e00-\u9fff]', '\n'.join(header_lines)):
+            problems.append(f'{name}: the header is not in English')
+            print(f"  HEADER     {name}: the header is not in English")
 
 
 def check_output_collisions(sources, problems):
@@ -173,6 +208,7 @@ def main():
     failures = []
     collisions = []
     check_output_collisions(sources, collisions)
+    check_header_convention(sources, collisions)
 
     try:
         with ThreadPoolExecutor(max_workers=args.jobs) as pool:

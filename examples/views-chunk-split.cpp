@@ -1,7 +1,7 @@
 // examples/views-chunk-split.cpp
 // Demonstrates C++23 views::chunk and views::split: batch and tokenize
 // ranges lazily without manual index bookkeeping.
-// Compile: g++ -std=c++23 -Wall -Wextra -o views-chunk-split views-chunk-split.cpp
+// Compile with: g++ -std=c++23 -Wall -Wextra -o views-chunk-split views-chunk-split.cpp
 
 #include <iostream>
 #include <ranges>

@@ -1,7 +1,7 @@
 // examples/inplace-vector.cpp
 // Demonstrates std::inplace_vector (C++26): a vector with inline storage -
 // no heap allocation, fixed capacity, same interface as std::vector.
-// Compile: g++ -std=c++26 -Wall -Wextra -o inplace-vector inplace-vector.cpp
+// Compile with: g++ -std=c++26 -Wall -Wextra -o inplace-vector inplace-vector.cpp
 
 #include <inplace_vector>
 #include <iostream>

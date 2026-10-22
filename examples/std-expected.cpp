@@ -1,3 +1,7 @@
+// examples/std-expected.cpp
+// Demonstrates std::expected for returning either a value or an error.
+// Compile with: g++ -std=c++23 -o std_expected std-expected.cpp
+
 #include <expected>
 #include <string>
 #include <iostream>

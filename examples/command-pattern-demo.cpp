@@ -1,6 +1,6 @@
 // examples/command-pattern-demo.cpp
 // Demonstrates Command Pattern with TextEditor, InsertCommand, CommandHistory (undo/redo).
-// Compile: g++ -std=c++20 -o command-pattern-demo command-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o command-pattern-demo command-pattern-demo.cpp
 
 #include <iostream>
 #include <memory>

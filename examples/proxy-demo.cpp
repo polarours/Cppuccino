@@ -1,7 +1,7 @@
 // examples/proxy-demo.cpp
 // Demonstrates the Proxy Pattern: a surrogate controlling access to a
 // real object (lazy loading + access logging).
-// Compile: g++ -std=c++20 -Wall -Wextra -o proxy-demo proxy-demo.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o proxy-demo proxy-demo.cpp
 
 #include <iostream>
 #include <memory>

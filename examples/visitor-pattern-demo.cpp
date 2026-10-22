@@ -1,6 +1,6 @@
 // examples/visitor-pattern-demo.cpp
 // Demonstrates Visitor Pattern: double dispatch for Shapes.
-// Compile: g++ -std=c++20 -o visitor-pattern-demo visitor-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o visitor-pattern-demo visitor-pattern-demo.cpp
 
 #include <functional>
 #include <iostream>

@@ -1,6 +1,6 @@
 // examples/connection-pool-concurrency.cpp
 // Demonstrates ConnectionPool concurrent access and thread safety.
-// Compile: g++ -std=c++20 -pthread -O2 -o connection-pool-concurrency connection-pool-concurrency.cpp
+// Compile with: g++ -std=c++20 -pthread -O2 -o connection-pool-concurrency connection-pool-concurrency.cpp
 
 #include "../cpp-mastery-roadmap/06-stage6/connection-pool/include/connection_pool.hpp"
 

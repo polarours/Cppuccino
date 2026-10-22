@@ -1,7 +1,7 @@
 // examples/chrono-calendar.cpp
 // Demonstrates the C++20 chrono calendar: year/month/day arithmetic,
 // weekday queries, and date differences (no third-party date library).
-// Compile: g++ -std=c++20 -Wall -Wextra -o chrono-calendar chrono-calendar.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o chrono-calendar chrono-calendar.cpp
 
 #include <chrono>
 #include <iostream>

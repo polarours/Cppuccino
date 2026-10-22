@@ -1,3 +1,7 @@
+// examples/std-chrono-format.cpp
+// Demonstrates formatting std::chrono durations and time points with std::format.
+// Compile with: g++ -std=c++20 -o std_chrono_format std-chrono-format.cpp
+
 #include <iostream>
 #include <chrono>
 #include <format>

@@ -1,3 +1,7 @@
+// examples/fold-expressions.cpp
+// Demonstrates C++17 fold expressions for summing, multiplying and concatenating.
+// Compile with: g++ -std=c++17 -o fold_expressions fold-expressions.cpp
+
 #include <iostream>
 #include <string>
 

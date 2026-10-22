@@ -1,6 +1,6 @@
 // examples/repository-pattern-demo.cpp
 // Demonstrates Repository Pattern with User entity and in-memory repository.
-// Compile: g++ -std=c++20 -o repository-pattern-demo repository-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o repository-pattern-demo repository-pattern-demo.cpp
 
 #include <functional>
 #include <iostream>

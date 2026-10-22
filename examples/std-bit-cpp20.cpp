@@ -1,3 +1,7 @@
+// examples/std-bit-cpp20.cpp
+// Demonstrates the C++20 <bit> library: popcount, bit_width and bit utilities.
+// Compile with: g++ -std=c++20 -o std_bit_cpp20 std-bit-cpp20.cpp
+
 #include <iostream>
 #include <string>
 #include <bitset>

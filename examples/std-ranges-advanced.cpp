@@ -1,3 +1,7 @@
+// examples/std-ranges-advanced.cpp
+// Demonstrates advanced std::ranges: views, adaptors and algorithms.
+// Compile with: g++ -std=c++20 -o std_ranges_advanced std-ranges-advanced.cpp
+
 #include <vector>
 #include <string>
 #include <iostream>

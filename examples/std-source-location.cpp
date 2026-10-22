@@ -1,3 +1,7 @@
+// examples/std-source-location.cpp
+// Demonstrates std::source_location for compile-time source information.
+// Compile with: g++ -std=c++20 -o std_source_location std-source-location.cpp
+
 #include <iostream>
 #include <string>
 #include <sstream>

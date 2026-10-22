@@ -1,3 +1,7 @@
+// examples/smart-pointer-shared.cpp
+// Demonstrates std::shared_ptr for shared ownership.
+// Compile with: g++ -std=c++17 -o smart_pointer_shared smart-pointer-shared.cpp
+
 #include <memory>
 #include <string>
 #include <iostream>

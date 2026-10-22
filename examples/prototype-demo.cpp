@@ -1,7 +1,7 @@
 // examples/prototype-demo.cpp
 // Demonstrates the Prototype Pattern: clone existing objects instead of
 // rebuilding them from scratch (document templates with attachments).
-// Compile: g++ -std=c++20 -Wall -Wextra -o prototype-demo prototype-demo.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o prototype-demo prototype-demo.cpp
 
 #include <iostream>
 #include <memory>

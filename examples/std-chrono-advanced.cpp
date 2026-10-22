@@ -1,3 +1,7 @@
+// examples/std-chrono-advanced.cpp
+// Demonstrates advanced std::chrono: durations, clocks and time points.
+// Compile with: g++ -std=c++17 -o std_chrono_advanced std-chrono-advanced.cpp
+
 #include <chrono>
 #include <iostream>
 #include <thread>

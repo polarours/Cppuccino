@@ -1,6 +1,6 @@
 // examples/cqrs-pattern-demo.cpp
 // Demonstrates CQRS Pattern: CommandBus/QueryBus separated, AccountService with in-memory store.
-// Compile: g++ -std=c++20 -o cqrs-pattern-demo cqrs-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o cqrs-pattern-demo cqrs-pattern-demo.cpp
 
 #include <functional>
 #include <iostream>

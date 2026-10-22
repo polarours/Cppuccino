@@ -1,6 +1,6 @@
 // examples/event-sourcing-demo.cpp
 // Demonstrates Event Sourcing: EventStore, Account aggregate, replay from events.
-// Compile: g++ -std=c++20 -o event-sourcing-demo event-sourcing-demo.cpp
+// Compile with: g++ -std=c++20 -o event-sourcing-demo event-sourcing-demo.cpp
 
 #include <functional>
 #include <iostream>

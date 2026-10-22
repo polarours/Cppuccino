@@ -1,5 +1,7 @@
-// C++20 协程完整示例
-// 展示协程的基本用法和特性
+// examples/cpp20-coroutines-complete.cpp
+// Demonstrates C++20 coroutines: generators and tasks.
+// Compile with: g++ -std=c++20 -o cpp20_coroutines_complete cpp20-coroutines-complete.cpp
+
 
 #include <iostream>
 #include <coroutine>

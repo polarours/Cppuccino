@@ -1,5 +1,7 @@
-// C++20 std::span 完整示例
-// 展示 span 的各种用法和性能优势
+// examples/std-span-complete.cpp
+// Demonstrates std::span: views over contiguous sequences.
+// Compile with: g++ -std=c++20 -o std_span_complete std-span-complete.cpp
+
 
 #include <iostream>
 #include <span>

@@ -67,6 +67,14 @@ Cppuccino/
 - Compilable standalone: `g++ -std=c++17 example.cpp -o example`
 - Educational with intentional UB examples marked
 - Filename: lowercase-kebab-case with `.cpp` extension
+- Every example starts with the header that says how to build it:
+  ```
+  // examples/example-name.cpp
+  // <one line on what it demonstrates>
+  // Compile with: g++ -std=c++20 -o example_name example-name.cpp
+  ```
+  The standard in that command is the one the file needs, and a reader
+  copies the command as it stands.
 
 ### Project Convention
 

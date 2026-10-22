@@ -1,7 +1,7 @@
 // examples/cpp23-small-features.cpp
 // Demonstrates smaller C++23 library features: std::string::contains,
 // std::to_underlying, std::byteswap, and std::expected value_or.
-// Compile: g++ -std=c++23 -Wall -Wextra -o cpp23-small-features cpp23-small-features.cpp
+// Compile with: g++ -std=c++23 -Wall -Wextra -o cpp23-small-features cpp23-small-features.cpp
 
 #include <bit>
 #include <expected>

@@ -1,7 +1,7 @@
 // examples/cpp23-ranges-views.cpp
 // Demonstrates C++23 additions to <ranges>: views::zip, views::enumerate,
 // ranges::to, and views::as_rvalue.
-// Compile: g++ -std=c++23 -Wall -Wextra -o cpp23-ranges-views cpp23-ranges-views.cpp
+// Compile with: g++ -std=c++23 -Wall -Wextra -o cpp23-ranges-views cpp23-ranges-views.cpp
 
 #include <iostream>
 #include <ranges>

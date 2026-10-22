@@ -1,3 +1,7 @@
+// examples/crtp-basics.cpp
+// Demonstrates the Curiously Recurring Template Pattern for static polymorphism.
+// Compile with: g++ -std=c++17 -o crtp_basics crtp-basics.cpp
+
 #include <iostream>
 #include <string>
 #include <type_traits>

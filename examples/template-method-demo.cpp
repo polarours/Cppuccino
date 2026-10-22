@@ -1,7 +1,7 @@
 // examples/template-method-demo.cpp
 // Demonstrates the Template Method Pattern: a base class defines the
 // algorithm skeleton, subclasses override individual steps.
-// Compile: g++ -std=c++20 -Wall -Wextra -o template-method-demo template-method-demo.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o template-method-demo template-method-demo.cpp
 
 #include <iostream>
 #include <memory>

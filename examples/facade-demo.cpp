@@ -1,7 +1,7 @@
 // examples/facade-demo.cpp
 // Demonstrates the Facade Pattern: a simplified interface over a set of
 // complex subsystems (home theater boot sequence).
-// Compile: g++ -std=c++20 -Wall -Wextra -o facade-demo facade-demo.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o facade-demo facade-demo.cpp
 
 #include <iostream>
 #include <string>

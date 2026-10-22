@@ -1,7 +1,7 @@
 // examples/delegation-demo.cpp
 // Demonstrates the Delegation Pattern: an object forwards part of its work
 // to a helper object instead of implementing everything itself.
-// Compile: g++ -std=c++20 -Wall -Wextra -o delegation-demo delegation-demo.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o delegation-demo delegation-demo.cpp
 
 #include <algorithm>
 #include <iostream>

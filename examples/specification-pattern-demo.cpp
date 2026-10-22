@@ -1,6 +1,6 @@
 // examples/specification-pattern-demo.cpp
 // Demonstrates Specification Pattern with and/or/not composition.
-// Compile: g++ -std=c++20 -o specification-pattern-demo specification-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o specification-pattern-demo specification-pattern-demo.cpp
 
 #include <functional>
 #include <iostream>

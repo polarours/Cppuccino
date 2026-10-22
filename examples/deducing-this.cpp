@@ -2,7 +2,7 @@
 // Demonstrates C++26 explicit object parameter ("deducing this"): one
 // member function definition that covers ref-qualified overloads and
 // CRTP-style fluent interfaces without duplication.
-// Compile: g++ -std=c++26 -Wall -Wextra -o deducing-this deducing-this.cpp
+// Compile with: g++ -std=c++26 -Wall -Wextra -o deducing-this deducing-this.cpp
 
 #include <iostream>
 #include <string>

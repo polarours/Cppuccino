@@ -1,6 +1,6 @@
 // examples/interpreter-pattern-demo.cpp
 // Demonstrates Interpreter Pattern: Expression tree with Number/Add/Multiply/Variable.
-// Compile: g++ -std=c++20 -o interpreter-pattern-demo interpreter-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o interpreter-pattern-demo interpreter-pattern-demo.cpp
 
 #include <functional>
 #include <iostream>

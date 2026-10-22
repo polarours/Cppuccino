@@ -1,3 +1,7 @@
+// examples/cpp20-concepts-complete.cpp
+// Demonstrates C++20 concepts, requires clauses and constrained templates.
+// Compile with: g++ -std=c++20 -o cpp20_concepts_complete cpp20-concepts-complete.cpp
+
 #include <iostream>
 #include <concepts>
 #include <string>

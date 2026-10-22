@@ -1,3 +1,7 @@
+// examples/std-latch-barrier.cpp
+// Demonstrates std::latch and std::barrier for coordinating threads.
+// Compile with: g++ -std=c++20 -o std_latch_barrier std-latch-barrier.cpp
+
 #include <latch>
 #include <barrier>
 #include <thread>

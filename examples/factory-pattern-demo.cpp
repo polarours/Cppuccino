@@ -1,6 +1,6 @@
 // examples/factory-pattern-demo.cpp
 // Demonstrates the Factory Method Pattern with auto-registration.
-// Compile: g++ -std=c++20 -o factory-pattern-demo factory-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o factory-pattern-demo factory-pattern-demo.cpp
 
 #include <functional>
 #include <iostream>

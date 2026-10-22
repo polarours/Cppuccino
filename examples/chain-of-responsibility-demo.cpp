@@ -1,6 +1,6 @@
 // examples/chain-of-responsibility-demo.cpp
 // Demonstrates Chain of Responsibility: Auth -> Logging -> Validation -> Processing.
-// Compile: g++ -std=c++20 -o chain-of-responsibility-demo chain-of-responsibility-demo.cpp
+// Compile with: g++ -std=c++20 -o chain-of-responsibility-demo chain-of-responsibility-demo.cpp
 
 #include <iostream>
 #include <memory>

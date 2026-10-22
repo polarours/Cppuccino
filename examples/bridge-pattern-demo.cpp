@@ -1,6 +1,6 @@
 // examples/bridge-pattern-demo.cpp
 // Demonstrates Bridge Pattern: Abstraction with Implementation hierarchy decoupled.
-// Compile: g++ -std=c++20 -o bridge-pattern-demo bridge-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o bridge-pattern-demo bridge-pattern-demo.cpp
 
 #include <functional>
 #include <iostream>

@@ -1,6 +1,6 @@
 // examples/mediator-pattern-demo.cpp
 // Demonstrates Mediator Pattern: ChatRoom mediates between Users.
-// Compile: g++ -std=c++20 -o mediator-pattern-demo mediator-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o mediator-pattern-demo mediator-pattern-demo.cpp
 
 #include <functional>
 #include <iostream>

@@ -1,6 +1,6 @@
 // examples/observer-pattern-demo.cpp
 // Demonstrates Subject-Observer with Logger and Counter observers.
-// Compile: g++ -std=c++20 -o observer-pattern-demo observer-pattern-demo.cpp -lpthread
+// Compile with: g++ -std=c++20 -o observer-pattern-demo observer-pattern-demo.cpp -lpthread
 
 #include <algorithm>
 #include <functional>

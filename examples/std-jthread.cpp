@@ -1,3 +1,7 @@
+// examples/std-jthread.cpp
+// Demonstrates std::jthread, with automatic joining and stop tokens.
+// Compile with: g++ -std=c++20 -o std_jthread std-jthread.cpp
+
 #include <thread>
 #include <iostream>
 #include <string>

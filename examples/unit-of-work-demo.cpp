@@ -1,7 +1,7 @@
 // examples/unit-of-work-demo.cpp
 // Demonstrates the Unit of Work Pattern: track all changes to a set of
 // objects and apply them as one atomic transaction.
-// Compile: g++ -std=c++20 -Wall -Wextra -o unit-of-work-demo unit-of-work-demo.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o unit-of-work-demo unit-of-work-demo.cpp
 
 #include <iostream>
 #include <map>

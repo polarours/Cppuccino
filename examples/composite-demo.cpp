@@ -1,7 +1,7 @@
 // examples/composite-demo.cpp
 // Demonstrates the Composite Pattern: treat individual objects and
 // compositions uniformly (a file system tree).
-// Compile: g++ -std=c++20 -Wall -Wextra -o composite-demo composite-demo.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o composite-demo composite-demo.cpp
 
 #include <iostream>
 #include <memory>

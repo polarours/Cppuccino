@@ -1,3 +1,7 @@
+// examples/std-chrono-literals.cpp
+// Demonstrates the C++20 chrono literals, such as 100ms and 2s.
+// Compile with: g++ -std=c++20 -o std_chrono_literals std-chrono-literals.cpp
+
 #include <iostream>
 #include <chrono>
 #include <format>

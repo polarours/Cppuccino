@@ -1,7 +1,7 @@
 // examples/builder-demo.cpp
 // Demonstrates the Builder Pattern: step-by-step construction of a complex
 // object, with a director for common configurations.
-// Compile: g++ -std=c++20 -Wall -Wextra -o builder-demo builder-demo.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o builder-demo builder-demo.cpp
 
 #include <iostream>
 #include <memory>

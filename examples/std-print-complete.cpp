@@ -1,5 +1,7 @@
-// C++23 std::print 完整示例
-// 展示 std::print 的各种用法和特性
+// examples/std-print-complete.cpp
+// Demonstrates the C++23 std::print and std::println output functions.
+// Compile with: g++ -std=c++23 -o std_print_complete std-print-complete.cpp
+
 
 #include <iostream>
 #include <print>

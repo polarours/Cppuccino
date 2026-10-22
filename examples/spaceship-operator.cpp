@@ -1,7 +1,7 @@
 // examples/spaceship-operator.cpp
 // Demonstrates C++20 three-way comparison (operator<=>): defaulted
 // lexicographic ordering, custom ordering, and rewritten comparison rules.
-// Compile: g++ -std=c++20 -Wall -Wextra -o spaceship-operator spaceship-operator.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o spaceship-operator spaceship-operator.cpp
 
 #include <algorithm>
 #include <compare>

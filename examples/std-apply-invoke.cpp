@@ -1,3 +1,7 @@
+// examples/std-apply-invoke.cpp
+// Demonstrates std::apply and std::invoke for calling generic callables.
+// Compile with: g++ -std=c++17 -o std_apply_invoke std-apply-invoke.cpp
+
 #include <tuple>
 #include <iostream>
 #include <string>

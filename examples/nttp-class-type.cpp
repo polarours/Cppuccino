@@ -1,7 +1,7 @@
 // examples/nttp-class-type.cpp
 // Demonstrates C++20 non-type template parameters of class type and
 // template<auto> - compile-time values as types in the template argument.
-// Compile: g++ -std=c++20 -Wall -Wextra -o nttp-class-type nttp-class-type.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o nttp-class-type nttp-class-type.cpp
 
 #include <array>
 #include <cstddef>

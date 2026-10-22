@@ -1,3 +1,7 @@
+// examples/std-variant-advanced.cpp
+// Demonstrates advanced std::variant use: visitation, get_if and monadic calls.
+// Compile with: g++ -std=c++17 -o std_variant_advanced std-variant-advanced.cpp
+
 #include <variant>
 #include <string>
 #include <vector>

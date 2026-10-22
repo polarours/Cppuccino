@@ -1,6 +1,6 @@
 // examples/strategy-pattern-demo.cpp
 // Demonstrates Strategy Pattern with BubbleSort, QuickSort, InsertionSort.
-// Compile: g++ -std=c++20 -o strategy-pattern-demo strategy-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o strategy-pattern-demo strategy-pattern-demo.cpp
 
 #include <algorithm>
 #include <functional>

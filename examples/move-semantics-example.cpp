@@ -1,3 +1,7 @@
+// examples/move-semantics-example.cpp
+// Demonstrates move semantics and how copying differs from moving.
+// Compile with: g++ -std=c++17 -o move_semantics_example move-semantics-example.cpp
+
 #include <iostream>
 #include <vector>
 #include <utility>

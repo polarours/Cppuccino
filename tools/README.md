@@ -16,7 +16,7 @@ tools/run_all_checks.sh --full   # and every project build and test
 | `check_docs.py` | A file in `docs/en/` with an English filename but a Chinese body; the English and Chinese halves of a document drifting apart |
 | `check_links.py` | A relative link or `#anchor` that no longer resolves |
 | `check_doc_examples.py` | A complete example inside a document that no longer compiles or runs |
-| `check_examples.py` | A standalone file in `examples/` that no longer compiles, or a header that no longer describes how to build it |
+| `check_examples.py` | A standalone file in `examples/` that no longer compiles, a header that no longer describes how to build it, or two examples writing to the same binary |
 | `check_stats.py` | A statistic in the READMEs that no longer matches the repository |
 | `check_project_readmes.py` | A project README that drifted from its twin, or that names a binary the project does not build |
 | `check_overview_parity.py` | The two roadmap indexes listing different stages or different projects |

@@ -1,7 +1,7 @@
 // examples/balking-demo.cpp
 // Demonstrates the Balking Pattern: an operation only proceeds when the
 // object is in the right state - otherwise it bails out immediately.
-// Compile: g++ -std=c++20 -Wall -Wextra -o balking-demo balking-demo.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o balking-demo balking-demo.cpp
 
 #include <atomic>
 #include <chrono>

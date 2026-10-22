@@ -1,7 +1,7 @@
 // examples/if-consteval.cpp
 // Demonstrates C++23 if consteval: branch on whether evaluation is happening
 // at compile time (replaces the std::is_constant_evaluated() idiom).
-// Compile: g++ -std=c++23 -Wall -Wextra -o if-consteval if-consteval.cpp
+// Compile with: g++ -std=c++23 -Wall -Wextra -o if-consteval if-consteval.cpp
 
 #include <array>
 #include <iostream>

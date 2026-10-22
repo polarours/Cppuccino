@@ -1,6 +1,6 @@
 // examples/mvc-pattern-demo.cpp
 // Demonstrates MVC Pattern with TodoModel / TodoView / TodoController.
-// Compile: g++ -std=c++20 -o mvc-pattern-demo mvc-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o mvc-pattern-demo mvc-pattern-demo.cpp
 
 #include <algorithm>
 #include <functional>

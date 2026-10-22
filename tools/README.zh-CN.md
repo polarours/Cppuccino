@@ -15,7 +15,7 @@ tools/run_all_checks.sh --full   # 外加全部项目的构建与测试
 | `check_docs.py` | `docs/en/` 里文件名是英文、正文却是中文的文件；中英两半互相漂移 |
 | `check_links.py` | 失效的相对链接或 `#锚点` |
 | `check_doc_examples.py` | 文档里已编不过或跑不通的完整示例 |
-| `check_examples.py` | `examples/` 下编不过的独立示例，或头注释已经描述不准构建方式的示例 |
+| `check_examples.py` | `examples/` 下编不过的独立示例，头注释已经描述不准构建方式的示例，或两个示例写同一个可执行文件 |
 | `check_stats.py` | README 里已经和仓库实际对不上的统计数字 |
 | `check_project_readmes.py` | 项目 README 与它的中英另一半脱节，或写了项目并不构建的可执行文件 |
 | `check_overview_parity.py` | 中英两份路线图索引列出的阶段或项目不一致 |

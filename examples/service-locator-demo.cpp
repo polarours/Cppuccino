@@ -1,7 +1,7 @@
 // examples/service-locator-demo.cpp
 // Demonstrates the Service Locator Pattern: a central registry that
 // supplies shared services to clients (without hard-wiring dependencies).
-// Compile: g++ -std=c++20 -Wall -Wextra -o service-locator-demo service-locator-demo.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o service-locator-demo service-locator-demo.cpp
 
 #include <functional>
 #include <iostream>

@@ -1,3 +1,7 @@
+// examples/std-optional-advanced.cpp
+// Demonstrates advanced std::optional use: chaining, value_or and monadic calls.
+// Compile with: g++ -std=c++17 -o std_optional_advanced std-optional-advanced.cpp
+
 #include <optional>
 #include <string>
 #include <iostream>

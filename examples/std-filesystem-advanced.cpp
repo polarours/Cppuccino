@@ -1,3 +1,7 @@
+// examples/std-filesystem-advanced.cpp
+// Demonstrates advanced std::filesystem: recursion, permissions and symlinks.
+// Compile with: g++ -std=c++17 -o std_filesystem_advanced std-filesystem-advanced.cpp
+
 #include <filesystem>
 #include <iostream>
 #include <string>

@@ -1,3 +1,7 @@
+// examples/std-print-cpp23.cpp
+// Demonstrates the C++23 std::print and std::println output functions.
+// Compile with: g++ -std=c++20 -o std_print_cpp23 std-print-cpp23.cpp
+
 #include <iostream>
 #include <vector>
 #include <algorithm>

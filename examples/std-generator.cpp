@@ -1,7 +1,7 @@
 // examples/std-generator.cpp
 // Demonstrates C++23 std::generator: a coroutine-based lazy sequence without
 // hand-writing promise_type (contrast with cpp20-coroutines-complete.cpp).
-// Compile: g++ -std=c++23 -Wall -Wextra -o std-generator std-generator.cpp
+// Compile with: g++ -std=c++23 -Wall -Wextra -o std-generator std-generator.cpp
 
 #include <generator>
 #include <iostream>

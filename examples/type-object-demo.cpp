@@ -1,7 +1,7 @@
 // examples/type-object-demo.cpp
 // Demonstrates the Type Object Pattern: represent "types" as data objects
 // instead of hard-coding a subclass per type (game entities).
-// Compile: g++ -std=c++20 -Wall -Wextra -o type-object-demo type-object-demo.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o type-object-demo type-object-demo.cpp
 
 #include <iostream>
 #include <memory>

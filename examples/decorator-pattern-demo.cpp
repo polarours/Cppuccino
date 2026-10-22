@@ -1,6 +1,6 @@
 // examples/decorator-pattern-demo.cpp
 // Demonstrates Decorator Pattern: FileDataSource with Encryption + Compression + Logging.
-// Compile: g++ -std=c++20 -o decorator-pattern-demo decorator-pattern-demo.cpp
+// Compile with: g++ -std=c++20 -o decorator-pattern-demo decorator-pattern-demo.cpp
 
 #include <iostream>
 #include <memory>

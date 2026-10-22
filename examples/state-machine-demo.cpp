@@ -1,6 +1,6 @@
 // examples/state-machine-demo.cpp
 // Demonstrates State Machine Pattern: Order lifecycle with explicit transitions.
-// Compile: g++ -std=c++20 -o state-machine-demo state-machine-demo.cpp
+// Compile with: g++ -std=c++20 -o state-machine-demo state-machine-demo.cpp
 
 #include <functional>
 #include <iostream>

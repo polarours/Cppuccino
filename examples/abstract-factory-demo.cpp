@@ -1,7 +1,7 @@
 // examples/abstract-factory-demo.cpp
 // Demonstrates the Abstract Factory Pattern: create families of related
 // objects without specifying concrete classes.
-// Compile: g++ -std=c++20 -Wall -Wextra -o abstract-factory-demo abstract-factory-demo.cpp
+// Compile with: g++ -std=c++20 -Wall -Wextra -o abstract-factory-demo abstract-factory-demo.cpp
 
 #include <iostream>
 #include <memory>

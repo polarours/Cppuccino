@@ -1,3 +1,7 @@
+// examples/std-format.cpp
+// Demonstrates std::format string formatting and format specifications.
+// Compile with: g++ -std=c++20 -o std_format std-format.cpp
+
 #include <iostream>
 #include <string>
 #include <format>
