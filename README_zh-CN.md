@@ -114,7 +114,7 @@ tools/run_all_checks.sh --full   # 外加全部项目构建
 
 ### 示例
 
-- [examples](examples)：
+- [examples](examples)，索引见 [examples/README.zh-CN.md](examples/README.zh-CN.md)：
   120 个可运行示例，涵盖：
   - 核心概念：所有权、move 语义、智能指针、RAII
   - 现代 C++：lambda、constexpr、结构化绑定、ranges

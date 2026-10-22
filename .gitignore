@@ -64,3 +64,5 @@ database.txt
 # Binaries produced by compiling examples/ in place
 examples/*
 !examples/*.cpp
+!examples/README.md
+!examples/README.zh-CN.md

@@ -189,6 +189,50 @@ def check_output_collisions(sources, problems):
             print(f"  COLLISION  {name} <- {', '.join(sorted(files))}")
 
 
+def check_index_translation(problems):
+    """The Chinese index must describe the examples in Chinese.
+
+    The example files keep their English headers, so the descriptions in the
+    Chinese index are the one place the topic of each example is written in
+    Chinese. They have to stay that way.
+    """
+    index = os.path.join(EXAMPLES, 'README.zh-CN.md')
+    if not os.path.isfile(index):
+        problems.append('the Chinese examples index is missing')
+        print('  NO INDEX  examples/README.zh-CN.md')
+        return
+    for number, line in enumerate(
+            open(index, encoding='utf-8').read().splitlines(), 1):
+        m = re.match(r'^- \[[^\]]+\]\(([^)]+)\) — (.*)$', line)
+        if not m:
+            continue
+        description = m.group(2)
+        if len(re.findall(r'[\u4e00-\u9fff]', description)) < 2:
+            problems.append(
+                f'the Chinese index does not describe {m.group(1)} in Chinese')
+            print(f"  NOT CHINESE  {m.group(1)}: {description[:60]}")
+
+
+def check_index_coverage(sources, problems):
+    """The index must list every example.
+
+    An example nobody can find is an example nobody reads.
+    """
+    index = os.path.join(EXAMPLES, 'README.md')
+    if not os.path.isfile(index):
+        problems.append('the examples index is missing')
+        print('  NO INDEX  examples/README.md')
+        return
+    listed = set(re.findall(r'^- \[([^\]]+\.cpp)\]',
+                             open(index, encoding='utf-8').read(), re.M))
+    for path in sources:
+        name = os.path.basename(path)
+        if name not in listed:
+            problems.append(f'the examples index does not list {name}')
+            print(f"  UNLISTED  {name}")
+    print(f"  {len(listed)} example(s) listed in the index")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--jobs', '-j', type=int, default=os.cpu_count() or 2)
@@ -209,6 +253,8 @@ def main():
     collisions = []
     check_output_collisions(sources, collisions)
     check_header_convention(sources, collisions)
+    check_index_coverage(sources, collisions)
+    check_index_translation(collisions)
 
     try:
         with ThreadPoolExecutor(max_workers=args.jobs) as pool:

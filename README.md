@@ -117,7 +117,7 @@ tools/run_all_checks.sh --full   # and every project build
 
 ### Examples
 
-- [examples](examples):
+- [examples](examples), indexed in [examples/README.md](examples/README.md):
   120 runnable code samples covering:
   - Core concepts: ownership, move semantics, smart pointers, RAII
   - Modern C++: lambda, constexpr, structured bindings, ranges

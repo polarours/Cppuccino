@@ -1,0 +1,170 @@
+# Examples
+
+Every example is a single self-contained file. Each one states in
+its own header what it demonstrates and how to build it.
+
+```bash
+cd examples
+g++ -std=c++20 -o demo demo-file.cpp && ./demo
+```
+
+## Core concepts
+
+- [abstract-factory-demo.cpp](abstract-factory-demo.cpp) — Demonstrates the Abstract Factory Pattern: create families of related objects without specifying concrete classes.
+  - part of [abstract-factory](../cpp-mastery-roadmap/15-stage15/abstract-factory/README.md)
+- [active-record-demo.cpp](active-record-demo.cpp) — Demonstrates the Active Record Pattern: each object knows how to persist itself (object + row + data access in one class).
+  - part of [active-record](../cpp-mastery-roadmap/30-stage30/active-record/README.md)
+- [adapter-pattern-demo.cpp](adapter-pattern-demo.cpp) — Demonstrates Adapter Pattern: VlcPlayer + Mp3Player adapted to MediaPlayer interface.
+  - part of [adapter-pattern](../cpp-mastery-roadmap/10-stage10/adapter-pattern/README.md)
+- [auto-decltype.cpp](auto-decltype.cpp) — Demonstrates auto, decltype, and decltype(auto) in C++.
+- [balking-demo.cpp](balking-demo.cpp) — Demonstrates the Balking Pattern: an operation only proceeds when the object is in the right state - otherwise it bails out immediately.
+  - part of [balking](../cpp-mastery-roadmap/31-stage31/balking/README.md)
+- [bridge-pattern-demo.cpp](bridge-pattern-demo.cpp) — Demonstrates Bridge Pattern: Abstraction with Implementation hierarchy decoupled.
+  - part of [bridge-pattern](../cpp-mastery-roadmap/27-stage27/bridge-pattern/README.md)
+- [builder-demo.cpp](builder-demo.cpp) — Demonstrates the Builder Pattern: step-by-step construction of a complex object, with a director for common configurations.
+- [chain-of-responsibility-demo.cpp](chain-of-responsibility-demo.cpp) — Demonstrates Chain of Responsibility: Auth -> Logging -> Validation -> Processing.
+  - part of [chain-of-responsibility](../cpp-mastery-roadmap/12-stage12/chain-of-responsibility/README.md)
+- [chrono-calendar.cpp](chrono-calendar.cpp) — Demonstrates the C++20 chrono calendar: year/month/day arithmetic, weekday queries, and date differences (no third-party date library).
+- [command-pattern-demo.cpp](command-pattern-demo.cpp) — Demonstrates Command Pattern with TextEditor, InsertCommand, CommandHistory (undo/redo).
+  - part of [command-pattern](../cpp-mastery-roadmap/09-stage9/command-pattern/README.md)
+- [composite-demo.cpp](composite-demo.cpp) — Demonstrates the Composite Pattern: treat individual objects and compositions uniformly (a file system tree).
+- [connection-pool-concurrency.cpp](connection-pool-concurrency.cpp) — Demonstrates ConnectionPool concurrent access and thread safety.
+  - part of [connection-pool](../cpp-mastery-roadmap/06-stage6/connection-pool/README.md)
+- [const-vs-non-const.cpp](const-vs-non-const.cpp) — Demonstrates the performance difference between const and non-const methods.
+- [constexpr.cpp](constexpr.cpp) — Demonstrates constexpr variables, functions, and if constexpr.
+- [copy-elision.cpp](copy-elision.cpp) — Demonstrates copy elision and prvalue materialization in C++.
+- [copy_on_write_example.cpp](copy_on_write_example.cpp) — Demonstrates Copy-on-Write (COW) pattern in C++.
+- [coroutine-basics.cpp](coroutine-basics.cpp) — Demonstrates C++20 coroutine fundamentals.
+- [cqrs-pattern-demo.cpp](cqrs-pattern-demo.cpp) — Demonstrates CQRS Pattern: CommandBus/QueryBus separated, AccountService with in-memory store.
+  - part of [cqrs-pattern](../cpp-mastery-roadmap/28-stage28/cqrs-pattern/README.md)
+- [crtp-basics.cpp](crtp-basics.cpp) — Demonstrates the Curiously Recurring Template Pattern for static polymorphism.
+- [decorator-pattern-demo.cpp](decorator-pattern-demo.cpp) — Demonstrates Decorator Pattern: FileDataSource with Encryption + Compression + Logging.
+  - part of [decorator-pattern](../cpp-mastery-roadmap/10-stage10/decorator-pattern/README.md)
+- [deducing-this.cpp](deducing-this.cpp) — Demonstrates C++26 explicit object parameter ("deducing this"): one member function definition that covers ref-qualified overloads and CRTP-style fluent interfaces without duplication.
+  - part of [deducing-this](../cpp-mastery-roadmap/40-stage40/deducing-this/README.md)
+- [delegation-demo.cpp](delegation-demo.cpp) — Demonstrates the Delegation Pattern: an object forwards part of its work to a helper object instead of implementing everything itself.
+  - part of [delegation](../cpp-mastery-roadmap/31-stage31/delegation/README.md)
+- [event-sourcing-demo.cpp](event-sourcing-demo.cpp) — Demonstrates Event Sourcing: EventStore, Account aggregate, replay from events.
+  - part of [event-sourcing](../cpp-mastery-roadmap/29-stage29/event-sourcing/README.md)
+- [facade-demo.cpp](facade-demo.cpp) — Demonstrates the Facade Pattern: a simplified interface over a set of complex subsystems (home theater boot sequence).
+- [factory-pattern-demo.cpp](factory-pattern-demo.cpp) — Demonstrates the Factory Method Pattern with auto-registration.
+  - part of [factory-pattern](../cpp-mastery-roadmap/10-stage10/factory-pattern/README.md)
+- [flyweight-pattern-demo.cpp](flyweight-pattern-demo.cpp) — Demonstrates Flyweight Pattern: Shared fonts in text editor.
+  - part of [flyweight-pattern](../cpp-mastery-roadmap/12-stage12/flyweight-pattern/README.md)
+- [fold-expressions.cpp](fold-expressions.cpp) — Demonstrates C++17 fold expressions for summing, multiplying and concatenating.
+- [forwarding-references.cpp](forwarding-references.cpp) — Demonstrates forwarding references and perfect forwarding in C++.
+- [if-consteval.cpp](if-consteval.cpp) — Demonstrates C++23 if consteval: branch on whether evaluation is happening at compile time (replaces the std::is_constant_evaluated() idiom).
+- [inplace-vector.cpp](inplace-vector.cpp) — Demonstrates std::inplace_vector (C++26): a vector with inline storage - no heap allocation, fixed capacity, same interface as std::vector.
+- [interpreter-pattern-demo.cpp](interpreter-pattern-demo.cpp) — Demonstrates Interpreter Pattern: Expression tree with Number/Add/Multiply/Variable.
+  - part of [interpreter-pattern](../cpp-mastery-roadmap/14-stage14/interpreter-pattern/README.md)
+- [lambda-expressions.cpp](lambda-expressions.cpp) — Demonstrates lambda expressions in C++11/14/17.
+- [lvalue-rvalue-references.cpp](lvalue-rvalue-references.cpp) — Demonstrates lvalue and rvalue references in C++.
+- [mediator-pattern-demo.cpp](mediator-pattern-demo.cpp) — Demonstrates Mediator Pattern: ChatRoom mediates between Users.
+  - part of [mediator-pattern](../cpp-mastery-roadmap/11-stage11/mediator-pattern/README.md)
+- [memento-pattern-demo.cpp](memento-pattern-demo.cpp) — Demonstrates Memento Pattern: Editor + History for undo/redo.
+  - part of [memento-pattern](../cpp-mastery-roadmap/13-stage13/memento-pattern/README.md)
+- [move-semantics-advanced.cpp](move-semantics-advanced.cpp) — Demonstrates advanced move semantics: NRVO, move vs copy, and common pitfalls.
+- [move-semantics-example.cpp](move-semantics-example.cpp) — Demonstrates move semantics and how copying differs from moving.
+- [mvc-pattern-demo.cpp](mvc-pattern-demo.cpp) — Demonstrates MVC Pattern with TodoModel / TodoView / TodoController.
+  - part of [mvc-pattern](../cpp-mastery-roadmap/28-stage28/mvc-pattern/README.md)
+- [noexcept-move.cpp](noexcept-move.cpp) — Demonstrates noexcept and move operations in C++.
+- [nttp-class-type.cpp](nttp-class-type.cpp) — Demonstrates C++20 non-type template parameters of class type and template<auto> - compile-time values as types in the template argument.
+- [observer-pattern-demo.cpp](observer-pattern-demo.cpp) — Demonstrates Subject-Observer with Logger and Counter observers.
+  - part of [observer-pattern](../cpp-mastery-roadmap/09-stage9/observer-pattern/README.md)
+- [ownership-and-lifetime.cpp](ownership-and-lifetime.cpp) — Demonstrates different ownership semantics in C++17 and their impact on object lifetime.
+- [perfect-forwarding.cpp](perfect-forwarding.cpp) — Demonstrates forwarding references and perfect forwarding.
+- [pimpl-idiom.cpp](pimpl-idiom.cpp) — Demonstrates PImpl (Pointer to Implementation) idiom for ABI stability.
+- [prototype-demo.cpp](prototype-demo.cpp) — Demonstrates the Prototype Pattern: clone existing objects instead of rebuilding them from scratch (document templates with attachments).
+- [proxy-demo.cpp](proxy-demo.cpp) — Demonstrates the Proxy Pattern: a surrogate controlling access to a real object (lazy loading + access logging).
+- [raii-and-exception-safety.cpp](raii-and-exception-safety.cpp) — Demonstrates RAII pattern and exception safety in C++.
+- [range-based-for.cpp](range-based-for.cpp) — Demonstrates range-based for loops with various containers.
+- [repository-pattern-demo.cpp](repository-pattern-demo.cpp) — Demonstrates Repository Pattern with User entity and in-memory repository.
+  - part of [repository-pattern](../cpp-mastery-roadmap/28-stage28/repository-pattern/README.md)
+- [rule-of-zero-three-five.cpp](rule-of-zero-three-five.cpp) — Demonstrates Rule of Zero, Three, and Five in C++.
+- [service-locator-demo.cpp](service-locator-demo.cpp) — Demonstrates the Service Locator Pattern: a central registry that supplies shared services to clients (without hard-wiring dependencies).
+  - part of [service-locator](../cpp-mastery-roadmap/30-stage30/service-locator/README.md)
+- [sfinae-type-traits.cpp](sfinae-type-traits.cpp) — Demonstrates SFINAE-based type traits and custom detection idioms.
+- [singleton-pattern-demo.cpp](singleton-pattern-demo.cpp) — Demonstrates Meyers' Singleton and thread-safe Logger/Config singletons.
+  - part of [singleton-pattern](../cpp-mastery-roadmap/13-stage13/singleton-pattern/README.md)
+- [smart-pointer-shared.cpp](smart-pointer-shared.cpp) — Demonstrates std::shared_ptr for shared ownership.
+- [smart-pointer-unique.cpp](smart-pointer-unique.cpp) — Demonstrates std::unique_ptr for exclusive ownership.
+- [smart-pointers-ownership.cpp](smart-pointers-ownership.cpp) — Demonstrates unique_ptr, shared_ptr, weak_ptr, and ownership patterns.
+- [spaceship-operator.cpp](spaceship-operator.cpp) — Demonstrates C++20 three-way comparison (operator<=>): defaulted lexicographic ordering, custom ordering, and rewritten comparison rules.
+- [specification-pattern-demo.cpp](specification-pattern-demo.cpp) — Demonstrates Specification Pattern with and/or/not composition.
+  - part of [specification-pattern](../cpp-mastery-roadmap/27-stage27/specification-pattern/README.md)
+- [state-machine-demo.cpp](state-machine-demo.cpp) — Demonstrates State Machine Pattern: Order lifecycle with explicit transitions.
+  - part of [state-machine](../cpp-mastery-roadmap/08-stage8/state-machine/README.md)
+- [strategy-pattern-demo.cpp](strategy-pattern-demo.cpp) — Demonstrates Strategy Pattern with BubbleSort, QuickSort, InsertionSort.
+  - part of [strategy-pattern](../cpp-mastery-roadmap/09-stage9/strategy-pattern/README.md)
+- [structured-bindings.cpp](structured-bindings.cpp) — Demonstrates structured bindings (C++17) with pairs, tuples, arrays, and structs.
+- [task-scheduler-error-handling.cpp](task-scheduler-error-handling.cpp) — Demonstrates TaskScheduler error handling: cancellation, exception safety, and graceful shutdown. Verifies behavior with asserts.
+  - part of [task-scheduler](../cpp-mastery-roadmap/05-stage5/task-scheduler/README.md)
+- [template-basics.cpp](template-basics.cpp) — Demonstrates function templates, class templates, and template specialization.
+- [template-instantiation.cpp](template-instantiation.cpp) — Demonstrates template instantiation and two-phase lookup in C++.
+- [template-method-demo.cpp](template-method-demo.cpp) — Demonstrates the Template Method Pattern: a base class defines the algorithm skeleton, subclasses override individual steps.
+  - part of [template-method](../cpp-mastery-roadmap/15-stage15/template-method/README.md)
+- [type-object-demo.cpp](type-object-demo.cpp) — Demonstrates the Type Object Pattern: represent "types" as data objects instead of hard-coding a subclass per type (game entities).
+  - part of [type-object](../cpp-mastery-roadmap/31-stage31/type-object/README.md)
+- [undefined-behavior.cpp](undefined-behavior.cpp) — Demonstrates common undefined behavior scenarios and how to avoid them.
+- [unit-of-work-demo.cpp](unit-of-work-demo.cpp) — Demonstrates the Unit of Work Pattern: track all changes to a set of objects and apply them as one atomic transaction.
+  - part of [unit-of-work](../cpp-mastery-roadmap/30-stage30/unit-of-work/README.md)
+- [value-categories.cpp](value-categories.cpp) — Demonstrates lvalue, rvalue, prvalue, xvalue, and glvalue.
+- [views-chunk-split.cpp](views-chunk-split.cpp) — Demonstrates C++23 views::chunk and views::split: batch and tokenize ranges lazily without manual index bookkeeping.
+- [virtual-dispatch-and-slicing.cpp](virtual-dispatch-and-slicing.cpp) — Demonstrates virtual dispatch, object slicing, and polymorphism.
+- [virtual-dispatch-example.cpp](virtual-dispatch-example.cpp) — Demonstrates virtual dispatch, polymorphism, and object model in C++.
+- [visitor-pattern-demo.cpp](visitor-pattern-demo.cpp) — Demonstrates Visitor Pattern: double dispatch for Shapes.
+  - part of [visitor-pattern](../cpp-mastery-roadmap/12-stage12/visitor-pattern/README.md)
+- [web-server-benchmark.cpp](web-server-benchmark.cpp) — Real HTTP benchmark for the web_server project.
+  - part of [web-server](../cpp-mastery-roadmap/04-stage4/web-server/README.md)
+
+## Modern C++ and the standard library
+
+- [cpp20-concepts-complete.cpp](cpp20-concepts-complete.cpp) — Demonstrates C++20 concepts, requires clauses and constrained templates.
+- [cpp20-concepts.cpp](cpp20-concepts.cpp) — Demonstrates C++20 concepts for template constraints.
+- [cpp20-consteval.cpp](cpp20-consteval.cpp) — Demonstrates C++20 consteval and constinit.
+- [cpp20-coroutines-complete.cpp](cpp20-coroutines-complete.cpp) — Demonstrates C++20 coroutines: generators and tasks.
+- [cpp20-coroutines.cpp](cpp20-coroutines.cpp) — Demonstrates C++20 coroutine basics.
+- [cpp20-format.cpp](cpp20-format.cpp) — Demonstrates C++20 std::format for string formatting.
+- [cpp20-ranges.cpp](cpp20-ranges.cpp) — Demonstrates C++20 ranges library.
+- [cpp20-span.cpp](cpp20-span.cpp) — Demonstrates C++20 std::span for non-owning views.
+- [cpp23-features-complete.cpp](cpp23-features-complete.cpp) — Demonstrates the C++23 features used across this repository.
+- [cpp23-ranges-views.cpp](cpp23-ranges-views.cpp) — Demonstrates C++23 additions to <ranges>: views::zip, views::enumerate, ranges::to, and views::as_rvalue.
+- [cpp23-small-features.cpp](cpp23-small-features.cpp) — Demonstrates smaller C++23 library features: std::string::contains, std::to_underlying, std::byteswap, and std::expected value_or.
+- [std-any.cpp](std-any.cpp) — Demonstrates std::any for type-erased containers.
+- [std-apply-invoke.cpp](std-apply-invoke.cpp) — Demonstrates std::apply and std::invoke for calling generic callables.
+- [std-bit-cpp20.cpp](std-bit-cpp20.cpp) — Demonstrates the C++20 <bit> library: popcount, bit_width and bit utilities.
+- [std-chrono-advanced.cpp](std-chrono-advanced.cpp) — Demonstrates advanced std::chrono: durations, clocks and time points.
+- [std-chrono-format.cpp](std-chrono-format.cpp) — Demonstrates formatting std::chrono durations and time points with std::format.
+- [std-chrono-literals.cpp](std-chrono-literals.cpp) — Demonstrates the C++20 chrono literals, such as 100ms and 2s.
+- [std-chrono.cpp](std-chrono.cpp) — Demonstrates C++17 chrono library for time manipulation.
+- [std-clamp.cpp](std-clamp.cpp) — Demonstrates std::clamp for restricting a value to a range.
+- [std-expected.cpp](std-expected.cpp) — Demonstrates std::expected for returning either a value or an error.
+- [std-filesystem-advanced.cpp](std-filesystem-advanced.cpp) — Demonstrates advanced std::filesystem: recursion, permissions and symlinks.
+- [std-filesystem-cpp20.cpp](std-filesystem-cpp20.cpp) — Demonstrates std::filesystem for paths, directories and iteration.
+- [std-filesystem.cpp](std-filesystem.cpp) — Demonstrates C++17 filesystem library.
+- [std-flat-map.cpp](std-flat-map.cpp) — Demonstrates the C++23 std::flat_map and std::flat_set.
+- [std-format.cpp](std-format.cpp) — Demonstrates std::format string formatting and format specifications.
+- [std-function.cpp](std-function.cpp) — Demonstrates std::function for function objects and callbacks.
+- [std-generator.cpp](std-generator.cpp) — Demonstrates C++23 std::generator: a coroutine-based lazy sequence without hand-writing promise_type (contrast with cpp20-coroutines-complete.cpp).
+- [std-jthread.cpp](std-jthread.cpp) — Demonstrates std::jthread, with automatic joining and stop tokens.
+- [std-latch-barrier.cpp](std-latch-barrier.cpp) — Demonstrates std::latch and std::barrier for coordinating threads.
+- [std-mdspan.cpp](std-mdspan.cpp) — Demonstrates the C++23 std::mdspan multidimensional view.
+- [std-optional-advanced.cpp](std-optional-advanced.cpp) — Demonstrates advanced std::optional use: chaining, value_or and monadic calls.
+- [std-optional.cpp](std-optional.cpp) — Demonstrates std::optional usage and patterns.
+- [std-print-complete.cpp](std-print-complete.cpp) — Demonstrates the C++23 std::print and std::println output functions.
+- [std-print-cpp23.cpp](std-print-cpp23.cpp) — Demonstrates the C++23 std::print and std::println output functions.
+- [std-random.cpp](std-random.cpp) — Demonstrates C++17 random number generation.
+- [std-ranges-advanced.cpp](std-ranges-advanced.cpp) — Demonstrates advanced std::ranges: views, adaptors and algorithms.
+- [std-source-location.cpp](std-source-location.cpp) — Demonstrates std::source_location for compile-time source information.
+- [std-span-complete.cpp](std-span-complete.cpp) — Demonstrates std::span: views over contiguous sequences.
+- [std-string-view-advanced.cpp](std-string-view-advanced.cpp) — Demonstrates advanced std::string_view: trimming, splitting and lifetime rules.
+- [std-string-view.cpp](std-string-view.cpp) — Demonstrates std::string_view for non-owning string references.
+- [std-tuple.cpp](std-tuple.cpp) — Demonstrates std::tuple for returning multiple values.
+- [std-variant-advanced.cpp](std-variant-advanced.cpp) — Demonstrates advanced std::variant use: visitation, get_if and monadic calls.
+- [std-variant.cpp](std-variant.cpp) — Demonstrates std::variant for type-safe unions.
+
+## Pitfalls
+
+- [pitfall-dangling-reference.cpp](pitfall-dangling-reference.cpp) — Demonstrates dangling reference pitfalls and their fixes.
+- [pitfall-iterator-invalidation.cpp](pitfall-iterator-invalidation.cpp) — Demonstrates iterator invalidation pitfalls and their fixes.
+- [pitfall-object-slicing.cpp](pitfall-object-slicing.cpp) — Demonstrates object slicing pitfalls and their fixes.
