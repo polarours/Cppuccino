@@ -66,6 +66,12 @@ For C++17 and later, `if constexpr` or concepts (`requires` / `std::enable_if` a
 - **Watch the immediate-context boundary.** If your "constraint" can be moved into `decltype(...)` in the return type or a default template argument, do so — that is what makes it soft instead of hard.
 - **Don't over-constrain.** Each `enable_if` narrows the overload set; two overloads with overlapping conditions become ambiguous, so keep conditions mutually exclusive.
 
+## Example
+
+A runnable version of this topic:
+
+- [sfinae-type-traits.cpp](../../examples/sfinae-type-traits.cpp)
+
 ## Summary
 
 SFINAE is a safety valve, not a debugging tool: it turns an invalid substitution into a quiet "this overload is not a candidate." The misuse that breaks it is checking the requirement in the function body, where failure is a hard error. Keep constraints in the signature (traits + `enable_if`, or `requires` in C++20) and SFINAE does its job; put them in the body and you get a cryptic compile failure instead.

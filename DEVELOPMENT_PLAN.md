@@ -595,5 +595,9 @@ tinyshell 的代码**。
 
 中英两半同时插入，因此标题骨架仍然一一对应。
 
-**结果**：可从文档点到的示例从 16 个增加到 65 个；其余 55 个（标准库与
+概念文章与陷阱文章一视同仁：陷阱文章的配对走 `tools/pitfall_pairs.tsv`
+显式映射，因此 `object-slicing`、`returning-reference-to-local-object`、
+`sfinae-misuse` 三篇也各加上了对应示例的入口。
+
+**结果**：可从文档点到的示例从 16 个增加到 68 个；其余 52 个（标准库与
 现代 C++ 的示例）在第十六阶段的 `examples/README.md` 索引里可以找到。

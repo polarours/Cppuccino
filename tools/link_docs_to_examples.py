@@ -43,6 +43,34 @@ def normalise(name):
                 .replace('demo-', ''))
 
 
+def load_pair_map(root):
+    """The pitfall articles' explicit English-to-Chinese mapping."""
+    path = os.path.join(root, 'tools', 'pitfall_pairs.tsv')
+    pairs = {}
+    if not os.path.isfile(path):
+        return pairs
+    for line in open(path, encoding='utf-8'):
+        line = line.strip()
+        if not line or line.startswith('#'):
+            continue
+        parts = line.split('\t') if '\t' in line else line.split()
+        if len(parts) == 2:
+            pairs[parts[0].strip()] = parts[1].strip()
+    return pairs
+
+
+def pair_pitfalls(root):
+    """The pitfall articles and their Chinese twins."""
+    pairs = load_pair_map(root)
+    out = {}
+    for en_name, zh_name in pairs.items():
+        en_path = os.path.join(root, 'pitfalls', 'en', en_name)
+        zh_path = os.path.join(root, 'pitfalls', '中文版', zh_name)
+        if os.path.isfile(en_path) and os.path.isfile(zh_path):
+            out[en_name] = zh_name
+    return out
+
+
 def pair_docs():
     """Match each English document with its Chinese twin.
 
@@ -145,10 +173,13 @@ def main():
     args = parser.parse_args()
 
     example_paths = {example_stem(p): p for p in glob.glob(os.path.join(EXAMPLES, '*.cpp'))}
+    # Concept articles, then pitfall articles. Both are handled the same way.
     pairs = pair_docs()
+    pitfall_pairs = pair_pitfalls(REPO)
     changed = 0
 
-    for en_name, zh_name in sorted(pairs.items()):
+    for en_name, zh_name in sorted(pairs.items()) + sorted(pitfall_pairs.items()):
+        is_pitfall = en_name in pitfall_pairs
         en_stem = en_name[:-3]
         demo = find_example(en_stem, example_paths)
         if not demo:
@@ -165,12 +196,14 @@ def main():
         zh_body = (f'这个主题的可运行版本：\n\n'
                    f'- [{demo}.cpp](../../examples/{demo}.cpp)')
 
-        if insert_section(os.path.join(DOCS_EN, en_name),
-                          '## Example', en_body, args.dry_run):
+        en_path = (os.path.join(REPO, 'pitfalls', 'en', en_name) if is_pitfall
+                   else os.path.join(DOCS_EN, en_name))
+        zh_path = (os.path.join(REPO, 'pitfalls', '中文版', zh_name) if is_pitfall
+                   else os.path.join(DOCS_ZH, zh_name))
+        if insert_section(en_path, '## Example', en_body, args.dry_run):
             changed += 1
             print(f'  {en_name}: added an Example section')
-        if insert_section(os.path.join(DOCS_ZH, zh_name),
-                          '## 示例', zh_body, args.dry_run):
+        if insert_section(zh_path, '## 示例', zh_body, args.dry_run):
             changed += 1
             print(f'  {zh_name}: added an Example section')
 

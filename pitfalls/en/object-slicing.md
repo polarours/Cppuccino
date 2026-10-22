@@ -329,6 +329,12 @@ If any answer is uncertain, slicing risk remains.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-object-slicing.cpp](../../examples/pitfall-object-slicing.cpp)
+
 ## 23. Conclusion
 
 Object slicing is a direct consequence of value semantics applied to inheritance hierarchies.

@@ -337,3 +337,9 @@ Prefer staged migration over big-bang rewrites.
 5. If borrowing is required, make owner and lifetime constraints explicit and verifiable.
 
 Correctness of lifetime contracts is not optional API polish; it is a foundational safety property.
+
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-dangling-reference.cpp](../../examples/pitfall-dangling-reference.cpp)
