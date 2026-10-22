@@ -383,6 +383,12 @@ Use this matrix as design gate at class introduction time.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [rule-of-zero-three-five.cpp](../../examples/rule-of-zero-three-five.cpp)
+
 ## 22. Conclusion
 
 Rule of Zero, Rule of Three, and Rule of Five describe one continuum:

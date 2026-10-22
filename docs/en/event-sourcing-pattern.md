@@ -161,6 +161,12 @@ public:
 2. Version your events (schema evolution needs a migration story)
 3. Project events into read-optimized models
 
+## Example
+
+A runnable version of this topic:
+
+- [event-sourcing-demo.cpp](../../examples/event-sourcing-demo.cpp)
+
 ## Summary
 
 By storing the full history of events, event sourcing provides a complete,

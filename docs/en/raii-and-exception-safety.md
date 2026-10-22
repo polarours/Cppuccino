@@ -433,6 +433,12 @@ If any item is unclear, redesign before optimization.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [raii-and-exception-safety.cpp](../../examples/raii-and-exception-safety.cpp)
+
 ## 25. Conclusion
 
 RAII transforms exception handling from ad-hoc cleanup logic into type-level correctness.

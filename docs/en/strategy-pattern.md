@@ -133,6 +133,12 @@ assert(sorter.getStrategyName() == "BubbleSort");
 3. **Strategy registry**: `std::function` also works for lightweight strategies
    (see the strategy-adapter project)
 
+## Example
+
+A runnable version of this topic:
+
+- [strategy-pattern-demo.cpp](../../examples/strategy-pattern-demo.cpp)
+
 ## Summary
 
 Strategy extracts the "behavior that varies" out of the Context so adding an

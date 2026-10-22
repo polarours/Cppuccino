@@ -495,6 +495,12 @@ public:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [composite-demo.cpp](../../examples/composite-demo.cpp)
+
 ## Summary
 
 The key points of the composite pattern:

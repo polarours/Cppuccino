@@ -384,6 +384,12 @@ If any item is unclear, hierarchy is not production-ready.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [virtual-dispatch-example.cpp](../../examples/virtual-dispatch-example.cpp)
+
 ## 24. Conclusion
 
 Virtual dispatch in C++ is safe and predictable when three axes are reasoned together:

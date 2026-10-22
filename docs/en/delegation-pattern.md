@@ -116,6 +116,12 @@ assert(ok.draw() == "[OK: ✓]");
 4. **Delegates must be independently constructible**: a delegate's constructor
    arguments must not depend on the host
 
+## Example
+
+A runnable version of this topic:
+
+- [delegation-demo.cpp](../../examples/delegation-demo.cpp)
+
 ## Summary
 
 Delegation replaces inheritance with composition and is a direct expression of

@@ -502,6 +502,12 @@ void operation() {
 }
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [memento-pattern-demo.cpp](../../examples/memento-pattern-demo.cpp)
+
 ## Summary
 
 The key points of the memento pattern:

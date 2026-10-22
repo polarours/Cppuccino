@@ -153,6 +153,12 @@ private:
 2. **使用依赖注入**：便于测试
 3. **分离关注点**：每个组件只做一件事
 
+## 示例
+
+这个主题的可运行版本：
+
+- [mvc-pattern-demo.cpp](../../examples/mvc-pattern-demo.cpp)
+
 ## 总结
 
 MVC 模式通过分离 Model、View、Controller，使代码结构清晰、易于维护。

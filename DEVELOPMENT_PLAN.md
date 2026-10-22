@@ -580,3 +580,20 @@ tinyshell 的代码**。
 `decorator-pattern-demo` → `10-stage10/decorator-pattern`）在索引里附带项目链接。
 
 **新增检查**：索引必须列出每一个示例，新增示例忘了更新索引会被报出来。
+
+## 第十七阶段：文档指向可运行示例（2026-10-22）
+
+**问题**：120 个示例里只有 16 个能从文档里点到。示例是仓库里"能跑"的那一半，
+但读者读�� `decorator-pattern.md` 时，看不到能跑的 `decorator-pattern-demo.cpp`。
+
+**处理**：给 **52 篇文档**（104 个中英文件）在收尾章节之前插入一个「Example /
+示例」小节，指向对应的可运行示例：
+
+- 36 篇模式文档，示例名与文档名同源（`decorator-pattern` → `decorator-pattern-demo`）
+- 16 篇概念文档，示例另取名字（`ownership-and-lifetime` → `smart-pointers-ownership`），
+  这部分用显式配对表列出，不靠名字猜
+
+中英两半同时插入，因此标题骨架仍然一一对应。
+
+**结果**：可从文档点到的示例从 16 个增加到 65 个；其余 55 个（标准库与
+现代 C++ 的示例）在第十六阶段的 `examples/README.md` 索引里可以找到。

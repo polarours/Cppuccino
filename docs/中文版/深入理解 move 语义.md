@@ -92,6 +92,12 @@ std::vector<int> movedVec = std::move(vec);
 ```
 > **提示**: 更详细的 `move` 过程和所有权的介绍，请参考后面的章节（待补充）。
 
+## 示例
+
+这个主题的可运行版本：
+
+- [move-semantics-example.cpp](../../examples/move-semantics-example.cpp)
+
 ## 总结
 
 我们来总结一下 `std::move` 的关键点：

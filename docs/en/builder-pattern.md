@@ -478,6 +478,12 @@ private:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [builder-demo.cpp](../../examples/builder-demo.cpp)
+
 ## Summary
 
 The key points of the builder pattern:

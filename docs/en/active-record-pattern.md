@@ -117,6 +117,12 @@ assert(found && found->name() == "Alice Smith");
    before the model becomes "fat"
 4. Under concurrency, watch out for concurrent access to the static registry
 
+## Example
+
+A runnable version of this topic:
+
+- [active-record-demo.cpp](../../examples/active-record-demo.cpp)
+
 ## Summary
 
 Active Record trades layers for the most direct persistence experience: very

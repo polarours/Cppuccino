@@ -490,6 +490,12 @@ private:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [chain-of-responsibility-demo.cpp](../../examples/chain-of-responsibility-demo.cpp)
+
 ## Summary
 
 The core points of the chain of responsibility pattern:

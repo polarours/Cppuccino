@@ -491,6 +491,12 @@ The true semantics of a "moved-from object" are:
 > The object still has complete identity and lifetime, but its resources are in a "valid but unspecified state."
 > For more about `std::move`, please refer to the [move-is-not-moving](understanding-the-semantics-of-std::move.md) section.
 
+## Example
+
+A runnable version of this topic:
+
+- [value-categories.cpp](../../examples/value-categories.cpp)
+
 ## 6. Conclusion
 
 In this chapter, we've systematically introduced C++ value categories, including lvalues, prvalues, and xvalues. We've also thoroughly explored their definitions, sources, properties, and behavior in reference binding. Understanding value categories is fundamental to mastering C++ references, move semantics, and resource management. This is why we'll frequently mention value categories in subsequent chapters.

@@ -545,6 +545,12 @@ void publish(const std::string& event) {
 }
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [mediator-pattern-demo.cpp](../../examples/mediator-pattern-demo.cpp)
+
 ## Summary
 
 The key points of the mediator pattern:

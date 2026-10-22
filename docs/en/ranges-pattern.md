@@ -123,6 +123,12 @@ public:
 5. **`std::ranges::sort` requires a random_access_range**: fine for normal
    containers, but not for `std::list`
 
+## Example
+
+A runnable version of this topic:
+
+- [std-ranges-advanced.cpp](../../examples/std-ranges-advanced.cpp)
+
 ## Summary
 
 Ranges is C++'s step from "imperative iteration" to "declarative pipelines".

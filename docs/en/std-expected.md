@@ -120,6 +120,12 @@ composes, compares, and already lives in the standard-library ecosystem:
 std::expected<int, std::error_code> readConfig(const std::string& key);
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [std-expected.cpp](../../examples/std-expected.cpp)
+
 ## Summary
 
 `std::expected` is C++'s step from "errors via exceptions or return-value

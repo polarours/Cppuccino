@@ -132,6 +132,12 @@ assert(hero.currentHp() == 470);
 4. **Serializable**: once type data moves from code into JSON/databases, the
    same code serves mods and level data alike
 
+## Example
+
+A runnable version of this topic:
+
+- [type-object-demo.cpp](../../examples/type-object-demo.cpp)
+
 ## Summary
 
 Type Object shifts the diversity of classes into the data layer — the standard

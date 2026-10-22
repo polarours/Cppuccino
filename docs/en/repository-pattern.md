@@ -161,6 +161,12 @@ private:
 2. Keep the repository interface focused on data-access operations
 3. Inject dependencies for testability
 
+## Example
+
+A runnable version of this topic:
+
+- [repository-pattern-demo.cpp](../../examples/repository-pattern-demo.cpp)
+
 ## Summary
 
 The repository pattern abstracts the data-access layer so business logic stays

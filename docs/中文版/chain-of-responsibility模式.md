@@ -486,6 +486,12 @@ private:
 };
 ```
 
+## 示例
+
+这个主题的可运行版本：
+
+- [chain-of-responsibility-demo.cpp](../../examples/chain-of-responsibility-demo.cpp)
+
 ## 总结
 
 责任链模式的核心要点：

@@ -496,6 +496,12 @@ private:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [bridge-pattern-demo.cpp](../../examples/bridge-pattern-demo.cpp)
+
 ## Summary
 
 The key points of the bridge pattern:

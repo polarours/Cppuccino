@@ -324,6 +324,12 @@ struct B {
 
 ---
 
+## 示例
+
+这个主题的可运行版本：
+
+- [noexcept-move.cpp](../../examples/noexcept-move.cpp)
+
 ## 22. 总结
 
 `noexcept` 是移动语义中的关键接口契约，直接影响泛型策略、容器行为和异常安全边界。

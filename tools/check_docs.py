@@ -340,6 +340,20 @@ def title(path):
     return m.group(1).strip() if m else ''
 
 
+def english_gloss(heading_list):
+    """The English name a title carries in parentheses, normalised.
+
+    A Chinese title such as "MVC 模式 (MVC Pattern)" yields "mvcpattern".
+    Titles without a parenthetical yield None.
+    """
+    if not heading_list:
+        return None
+    m = re.search(r'[（(]([A-Za-z][^）)]*)[）)]\s*$', heading_list[0][1])
+    if not m:
+        return None
+    return re.sub(r'[^a-z0-9]+', '', m.group(1).lower())
+
+
 def load_pair_map(root, relative_path):
     """Read an "english<TAB>chinese" mapping file.
 
@@ -453,11 +467,22 @@ def check_pairs(root, problems):
         if sig is not None:
             by_signature[sig].append(f)
 
-    # Fallback for documents that carry no code block at all (a glossary or a
-    # build-system note): their heading skeleton is the only signal left.
+    # Fallbacks for documents that carry no code block at all (a glossary or a
+    # build-system note): their structure is the only signal left. The keys are
+    # tried from the most specific to the least, and the first one that names
+    # exactly one Chinese file wins.
     by_headings = defaultdict(list)
+    by_count = defaultdict(list)
+    by_english_title = defaultdict(list)
     for f in zh_files:
         by_headings[tuple(level for level, _ in headings(f))].append(f)
+        by_count[len(headings(f))].append(f)
+        # Many Chinese titles carry the English name in parentheses, for
+        # example "MVC 模式 (MVC Pattern)". That is the most precise
+        # tiebreaker for a document that has no code block.
+        gloss = english_gloss(headings(f))
+        if gloss:
+            by_english_title[gloss].append(f)
 
     print('\n== pair check ==')
     paired = 0
@@ -466,10 +491,19 @@ def check_pairs(root, problems):
         sig = code_signature(f)
         cands = by_signature.get(sig, []) if sig is not None else []
         if len(cands) != 1:
-            key = tuple(level for level, _ in headings(f))
-            fallback = by_headings.get(key, [])
-            if len(fallback) == 1:
-                cands = fallback
+            en_h = headings(f)
+            # The English title as a whole matches the parenthetical English
+            # name that the Chinese title carries.
+            english = re.sub(r'[^a-z0-9]+', '', en_h[0][1].lower()) if en_h else None
+            for key in (english, tuple(level for level, _ in en_h), len(en_h)):
+                if key is None:
+                    continue
+                fallback = (by_english_title.get(key, []) if isinstance(key, str)
+                            else by_headings.get(key, []) if isinstance(key, tuple)
+                            else by_count.get(key, []))
+                if len(fallback) == 1:
+                    cands = fallback
+                    break
         if len(cands) != 1:
             unverifiable.append(os.path.relpath(f, root))
             continue

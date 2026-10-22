@@ -413,6 +413,12 @@ Migration is manageable when done incrementally with tests.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [pimpl-idiom.cpp](../../examples/pimpl-idiom.cpp)
+
 ## 24. Conclusion
 
 PImpl is a strategic engineering trade-off, not a default style rule.

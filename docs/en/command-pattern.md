@@ -571,6 +571,12 @@ private:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [command-pattern-demo.cpp](../../examples/command-pattern-demo.cpp)
+
 ## Summary
 
 The key points of the command pattern:

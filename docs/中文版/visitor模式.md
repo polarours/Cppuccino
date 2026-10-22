@@ -476,6 +476,12 @@ public:
 // 推荐：使用 IDE 自动生成或静态检查
 ```
 
+## 示例
+
+这个主题的可运行版本：
+
+- [visitor-pattern-demo.cpp](../../examples/visitor-pattern-demo.cpp)
+
 ## 总结
 
 访问者模式的核心要点：

@@ -388,6 +388,12 @@ void Widget::draw() const {
 
 ---
 
+## 示例
+
+这个主题的可运行版本：
+
+- [pimpl-idiom.cpp](../../examples/pimpl-idiom.cpp)
+
 ## 24. 总结
 
 PImpl 是工程层面的战略取舍，而非“默认最佳实践”。

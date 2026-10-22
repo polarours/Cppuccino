@@ -493,6 +493,12 @@ private:
 };
 ```
 
+## 示例
+
+这个主题的可运行版本：
+
+- [bridge-pattern-demo.cpp](../../examples/bridge-pattern-demo.cpp)
+
 ## 总结
 
 桥接模式的核心要点：

@@ -145,6 +145,12 @@ For the full runnable example, see the
 4. **Idempotency is a precondition for balking**: a balked method must not
    leave dirty state behind when called repeatedly
 
+## Example
+
+A runnable version of this topic:
+
+- [balking-demo.cpp](../../examples/balking-demo.cpp)
+
 ## Summary
 
 Balking replaces "block or throw" with "nothing happened" — a tidy tool for

@@ -477,6 +477,12 @@ public:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [prototype-demo.cpp](../../examples/prototype-demo.cpp)
+
 ## Summary
 
 The key points of the prototype pattern:

@@ -148,6 +148,12 @@ assert(p->price() == 59.99);
 4. **Keep product constructor signatures uniform**: all creators take the same
    signature, or callers cannot generalize
 
+## Example
+
+A runnable version of this topic:
+
+- [factory-pattern-demo.cpp](../../examples/factory-pattern-demo.cpp)
+
 ## Summary
 
 Factory Method moves "deciding the concrete class" from the caller into a

@@ -244,6 +244,12 @@ Result:
 
 > There are many more caveats. The takeaway is that forwarding references and perfect forwarding are powerful tools, but they must be used carefully.
 
+## Example
+
+A runnable version of this topic:
+
+- [perfect-forwarding.cpp](../../examples/perfect-forwarding.cpp)
+
 ## 5. Summary
 
 This chapter has systematically covered **forwarding references** and **perfect forwarding**, from language design and standard semantics to engineering practice.

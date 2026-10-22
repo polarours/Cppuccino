@@ -343,6 +343,12 @@ const auto& [ca, cb] = p; // 只读引用
 
 ---
 
+## 示例
+
+这个主题的可运行版本：
+
+- [auto-decltype.cpp](../../examples/auto-decltype.cpp)
+
 ## 12. 总结
 
 `auto`、`decltype`、`decltype(auto)` 不是互斥关系，而是三种不同语义承诺：

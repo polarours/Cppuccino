@@ -127,6 +127,12 @@ logger->log("hello");
 4. **Destruction order**: the locator holds `shared_ptr`s; services held by the
    locator must not hold the locator back, or you get a cycle
 
+## Example
+
+A runnable version of this topic:
+
+- [service-locator-demo.cpp](../../examples/service-locator-demo.cpp)
+
 ## Summary
 
 The service locator provides runtime lookup and is a natural home for plugin

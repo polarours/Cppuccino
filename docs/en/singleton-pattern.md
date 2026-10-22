@@ -126,6 +126,12 @@ For the full runnable example, see the
 - It is only ever passed around — put it in the constructor parameters instead
 - Tests need to replace it — prefer an interface + factory
 
+## Example
+
+A runnable version of this topic:
+
+- [singleton-pattern-demo.cpp](../../examples/singleton-pattern-demo.cpp)
+
 ## Summary
 
 The Meyers singleton is the cleanest and safest singleton in modern C++; but a

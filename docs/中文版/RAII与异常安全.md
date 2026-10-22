@@ -413,6 +413,12 @@ RAII 不能替代并发协议设计，
 
 ---
 
+## 示例
+
+这个主题的可运行版本：
+
+- [raii-and-exception-safety.cpp](../../examples/raii-and-exception-safety.cpp)
+
 ## 25. 总结
 
 RAII 把异常路径中的清理问题，从“分支补丁”升级为“类型契约”。

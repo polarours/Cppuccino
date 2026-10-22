@@ -495,6 +495,12 @@ private:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [proxy-demo.cpp](../../examples/proxy-demo.cpp)
+
 ## Summary
 
 The key points of the proxy pattern:

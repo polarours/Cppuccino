@@ -117,6 +117,12 @@ void printValue(const int& value) {
 
 In this example, `const int& value` clearly indicates that the `printValue` function will not modify the passed parameter, which helps the caller understand the function's behavior.
 
+## Example
+
+A runnable version of this topic:
+
+- [const-vs-non-const.cpp](../../examples/const-vs-non-const.cpp)
+
 ## Summary
 
 - `const` is not "object immutable", but an interface contract that promises not to modify the object's logical state.

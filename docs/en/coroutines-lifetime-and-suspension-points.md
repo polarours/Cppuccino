@@ -348,6 +348,12 @@ Portability requires separating core language semantics from runtime framework p
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [cpp20-coroutines.cpp](../../examples/cpp20-coroutines.cpp)
+
 ## 24. Conclusion
 
 Coroutines extend function lifetime across time, scheduler boundaries, and ownership domains.

@@ -521,6 +521,12 @@ private:
 };
 ```
 
+## 示例
+
+这个主题的可运行版本：
+
+- [specification-pattern-demo.cpp](../../examples/specification-pattern-demo.cpp)
+
 ## 总结
 
 规范模式的核心要点：

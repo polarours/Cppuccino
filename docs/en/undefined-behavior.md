@@ -197,6 +197,12 @@ ASan has been available since LLVM 3.1 and GCC 4.8 and is widely used for fuzz t
 
 > Regarding the concept of "defensive programming," my understanding is still partial. Therefore, the content I might write could be inaccurate. For now, I will skip this section and fill it in later once I have a deeper understanding.
 
+## Example
+
+A runnable version of this topic:
+
+- [undefined-behavior.cpp](../../examples/undefined-behavior.cpp)
+
 ## 4. Summary
 
 UB is an unavoidable trap in C++, but also a source of its power and flexibility. Understanding UB means understanding object lifetime, ownership, and how program assumptions drive code generation.

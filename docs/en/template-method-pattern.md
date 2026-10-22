@@ -470,6 +470,12 @@ public:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [template-method-demo.cpp](../../examples/template-method-demo.cpp)
+
 ## Summary
 
 The key points of the template method pattern:

@@ -113,6 +113,12 @@ public:
 4. **`take_while` / `drop_while` 比手动 break 更可读**
 5. **`std::ranges::sort` 需要 random-access_range**；普通容器可以，但 `std::list` 不行
 
+## 示例
+
+这个主题的可运行版本：
+
+- [std-ranges-advanced.cpp](../../examples/std-ranges-advanced.cpp)
+
 ## 总结
 
 Ranges 是 C++ 从"命令式遍历"走向"声明式流水线"的关键一步。配合概念系统，编译器能给出更有意义的错误信息。理解 view 的惰性语义和生命周期，是写出高效且安全的 range 代码的前提。

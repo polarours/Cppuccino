@@ -527,6 +527,12 @@ private:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [specification-pattern-demo.cpp](../../examples/specification-pattern-demo.cpp)
+
 ## Summary
 
 The key points of the specification pattern:

@@ -336,6 +336,12 @@ Use this checklist during review:
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [copy-elision.cpp](../../examples/copy-elision.cpp)
+
 ## 19. Conclusion
 
 In modern C++, copy elision and prvalue materialization are part of the language model, not merely compiler cleverness.

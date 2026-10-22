@@ -346,6 +346,12 @@ This difference can appear even when source code “looks similar.”
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [noexcept-move.cpp](../../examples/noexcept-move.cpp)
+
 ## 22. Conclusion
 
 `noexcept` on move operations is part of your type’s semantic ABI for generic code.

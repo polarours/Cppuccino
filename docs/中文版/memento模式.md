@@ -500,6 +500,12 @@ void operation() {
 }
 ```
 
+## 示例
+
+这个主题的可运行版本：
+
+- [memento-pattern-demo.cpp](../../examples/memento-pattern-demo.cpp)
+
 ## 总结
 
 备忘录模式的核心要点：

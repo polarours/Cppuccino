@@ -356,6 +356,12 @@ This tiny example explains a large class of real-world template bugs.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [template-instantiation.cpp](../../examples/template-instantiation.cpp)
+
 ## 22. Conclusion
 
 Two-phase lookup is not optional complexity.

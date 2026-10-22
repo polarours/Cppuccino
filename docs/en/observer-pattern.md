@@ -130,6 +130,12 @@ temperature.setValue(43);    // only display left
 - Cross-process, cross-language → a real message queue (ZeroMQ / Kafka)
 - One-to-one notification → function pointer / `std::function`
 
+## Example
+
+A runnable version of this topic:
+
+- [observer-pattern-demo.cpp](../../examples/observer-pattern-demo.cpp)
+
 ## Summary
 
 Observer is the smallest unit of event-driven architecture; a correct

@@ -485,6 +485,12 @@ private:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-iterator-invalidation.cpp](../../examples/pitfall-iterator-invalidation.cpp)
+
 ## Summary
 
 The key points of the iterator pattern:

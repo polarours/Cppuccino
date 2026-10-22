@@ -349,6 +349,12 @@ If any answer is uncertain, make type explicit and document intent.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [auto-decltype.cpp](../../examples/auto-decltype.cpp)
+
 ## 12. Conclusion
 
 `auto`, `decltype`, and `decltype(auto)` are not competing features.

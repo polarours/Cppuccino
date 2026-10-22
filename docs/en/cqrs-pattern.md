@@ -254,6 +254,12 @@ int main() {
    and read models are projections of events — projections can be dropped and
    rebuilt at any time
 
+## Example
+
+A runnable version of this topic:
+
+- [cqrs-pattern-demo.cpp](../../examples/cqrs-pattern-demo.cpp)
+
 ## Summary
 
 CQRS separates commands and queries onto different models and channels so the

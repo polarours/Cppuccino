@@ -482,6 +482,12 @@ private:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [decorator-pattern-demo.cpp](../../examples/decorator-pattern-demo.cpp)
+
 ## Summary
 
 The key points of the decorator pattern:

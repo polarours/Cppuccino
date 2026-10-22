@@ -482,6 +482,12 @@ public:
 // Recommended: let the IDE generate them, or use a static check
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [visitor-pattern-demo.cpp](../../examples/visitor-pattern-demo.cpp)
+
 ## Summary
 
 The key points of the visitor pattern:

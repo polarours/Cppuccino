@@ -148,6 +148,12 @@ For the full runnable example, see the
 3. One business transaction = one UnitOfWork instance, discarded after use
 4. Combine with an Identity Map to avoid loading the same row twice
 
+## Example
+
+A runnable version of this topic:
+
+- [unit-of-work-demo.cpp](../../examples/unit-of-work-demo.cpp)
+
 ## Summary
 
 By tracking changes centrally and deferring the write, Unit of Work turns

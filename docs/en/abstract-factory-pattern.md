@@ -485,6 +485,12 @@ private:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [abstract-factory-demo.cpp](../../examples/abstract-factory-demo.cpp)
+
 ## Summary
 
 The key points of the abstract factory pattern:

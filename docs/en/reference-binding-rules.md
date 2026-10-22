@@ -169,6 +169,12 @@ delete ptr;
 // ref dangles now!
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [std-string-view.cpp](../../examples/std-string-view.cpp)
+
 ## Summary
 
 - Lvalue reference (`T&`): binds lvalues — expresses "borrowing"

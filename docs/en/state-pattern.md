@@ -468,6 +468,12 @@ private:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [state-machine-demo.cpp](../../examples/state-machine-demo.cpp)
+
 ## Summary
 
 The key points of the state pattern:

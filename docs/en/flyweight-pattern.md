@@ -458,6 +458,12 @@ class FontCharacter : public Flyweight {
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [flyweight-pattern-demo.cpp](../../examples/flyweight-pattern-demo.cpp)
+
 ## Summary
 
 The key points of the flyweight pattern:

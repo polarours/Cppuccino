@@ -244,6 +244,12 @@ We can use:
 
 > For more specific code examples and usage methods, please refer to subsequent sections (to be added).
 
+## Example
+
+A runnable version of this topic:
+
+- [ownership-and-lifetime.cpp](../../examples/ownership-and-lifetime.cpp)
+
 ## 5. Summary
 
 - Lifetime describes the period during which an object exists validly from construction to destruction.

@@ -617,6 +617,12 @@ public:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [adapter-pattern-demo.cpp](../../examples/adapter-pattern-demo.cpp)
+
 ## Summary
 
 The core points of the adapter pattern:

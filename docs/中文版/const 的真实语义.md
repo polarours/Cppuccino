@@ -117,6 +117,12 @@ void printValue(const int& value) {
 
 在这个例子中，`const int& value` 明确表示 `printValue` 函数不会修改传入的参数，这有助于调用者理解函数的行为。
 
+## 示例
+
+这个主题的可运行版本：
+
+- [const-vs-non-const.cpp](../../examples/const-vs-non-const.cpp)
+
 ## 总结
 
 - `const` 并不是“对象不可变”，而是一种接口契约，承诺不会修改对象的逻辑状态。

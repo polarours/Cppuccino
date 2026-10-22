@@ -159,6 +159,12 @@ private:
 2. **Use dependency injection**: testing stays easy
 3. **Separate concerns**: each component does one thing
 
+## Example
+
+A runnable version of this topic:
+
+- [mvc-pattern-demo.cpp](../../examples/mvc-pattern-demo.cpp)
+
 ## Summary
 
 MVC keeps the code structure clear and maintainable by separating Model,

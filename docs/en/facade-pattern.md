@@ -473,6 +473,12 @@ private:
 };
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [facade-demo.cpp](../../examples/facade-demo.cpp)
+
 ## Summary
 
 The key points of the facade pattern:

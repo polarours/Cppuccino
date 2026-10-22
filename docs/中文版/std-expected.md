@@ -105,6 +105,12 @@ int main() {
 std::expected<int, std::error_code> readConfig(const std::string& key);
 ```
 
+## 示例
+
+这个主题的可运行版本：
+
+- [std-expected.cpp](../../examples/std-expected.cpp)
+
 ## 总结
 
 `std::expected` 是 C++ 从"错误靠异常或返回值约定"走向"类型系统强制错误处理"的关键一步。配合 monadic API 可以写出错误安全（error-safe）的链式调用，逻辑清晰且不会遗漏错误分支。
