@@ -11,6 +11,7 @@ the two indexes cannot fall apart again.
 Usage: python3 tools/check_overview_parity.py [repo_root]
 """
 import argparse
+import glob
 import os
 import re
 import sys
@@ -69,6 +70,25 @@ def main():
     print(f'  projects:   {len(en_links)} en, {len(zh_links)} zh')
 
     problems = []
+
+    # The index is the way into the repository: every article and every
+    # pitfall has to be reachable from it.
+    for kind, directory, pattern in (
+            ('article', 'docs', r'\.\./docs/(?:en|中文版)/([^)]+\.md)'),
+            ('pitfall', 'pitfalls', r'\.\./pitfalls/(?:en|中文版)/([^)]+\.md)')):
+        for name, text in (('en', en), ('zh', zh)):
+            linked = set(re.findall(pattern, text))
+            folder = '中文版' if name == 'zh' else 'en'
+            on_disk = {os.path.basename(f)
+                       for f in glob.glob(os.path.join(root, directory, folder,
+                                                       '*.md'))}
+            missing = sorted(on_disk - linked)
+            if missing:
+                problems.append(
+                    f'the {name} index does not link {len(missing)} {kind}(s)')
+                for m in missing[:5]:
+                    problems.append(f'    {m}')
+
     if en_h != zh_h:
         problems.append('the two indexes have different heading skeletons')
         for index in range(min(len(en_h), len(zh_h))):

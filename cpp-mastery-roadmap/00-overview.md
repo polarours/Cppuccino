@@ -93,12 +93,21 @@ Read:
 - [RAII and Exception Safety](../docs/en/raii-and-exception-safety.md)
 - [The True Semantics of `const`](../docs/en/the-true-semantics-of-const.md)
 - [Undefined Behavior](../docs/en/undefined-behavior.md)
+- [Rule of Zero, Rule of Three, and Rule of Five](../docs/en/rule-of-zero-three-five.md)
+- [Lvalue References](../docs/en/lvalue-references.md)
+- [Rvalue References](../docs/en/rvalue-references.md)
+- [Glossary](../docs/en/glossary.md)
 
 Pitfalls:
 
 - [Dangling Pointer](../pitfalls/en/dangling-pointer.md)
 - [Returning Reference to Local Object](../pitfalls/en/returning-reference-to-local-object.md)
 - [Throwing from Destructor](../pitfalls/en/throwing-from-destructor.md)
+- [Const Correctness Pitfalls](../pitfalls/en/const-correctness-pitfalls.md)
+- [Narrowing Conversions in Initialization](../pitfalls/en/narrowing-conversions.md)
+- [Signed Integer Overflow Assumptions](../pitfalls/en/signed-integer-overflow-assumptions.md)
+- [Implicit Conversions](../pitfalls/en/implicit-conversions.md)
+- [Double Free](../pitfalls/en/double-free.md)
 
 Examples:
 
@@ -132,12 +141,21 @@ Read:
 - [Understanding Forwarding References and Perfect Forwarding](../docs/en/understanding-forwarding-references-and-perfect-forwarding.md)
 - [Copy Elision and Prvalue Materialization](../docs/en/copy-elision-and-prvalue-materialization.md)
 - [Noexcept and Move Operations](../docs/en/noexcept-and-move-operations.md)
+- [Lvalue and Rvalue References: Binding Rules](../docs/en/reference-binding-rules.md)
+- [`auto`, `decltype`, and `decltype(auto)`](../docs/en/auto-decltype-and-decltype-auto.md)
+- [Template Instantiation and Two-Phase Lookup](../docs/en/template-instantiation-and-two-phase-lookup.md)
 
 Pitfalls:
 
 - [Moving from `const` Object](../pitfalls/en/moving-from-const-object.md)
 - [Object Slicing](../pitfalls/en/object-slicing.md)
 - [Implicit Conversions](../pitfalls/en/implicit-conversions.md)
+- [Use After Move](../pitfalls/en/use-after-move.md)
+- [Move Semantics Trap: Moving from a `const` Object](../pitfalls/en/const-object-move-trap.md)
+- [SFINAE Misuse](../pitfalls/en/sfinae-misuse.md)
+- [Fold Expression Errors](../pitfalls/en/fold-expression-errors.md)
+- [Template Argument Deduction Pitfalls](../pitfalls/en/template-deduction-pitfalls.md)
+- [Template Specialization Pitfalls](../pitfalls/en/template-specialization-pitfalls.md)
 
 Examples:
 
@@ -164,6 +182,13 @@ Read:
 - [Template Instantiation and Two-Phase Lookup](../docs/en/template-instantiation-and-two-phase-lookup.md)
 - [PImpl and ABI Stability](../docs/en/pimpl-and-abi-stability.md)
 - [Coroutines: Lifetime and Suspension Points](../docs/en/coroutines-lifetime-and-suspension-points.md)
+- [C++20 Concepts In-Depth (C++20 Concepts)](../docs/en/cpp20-concepts.md)
+- [Memory Pool & Allocators](../docs/en/memory-pool-and-allocators.md)
+- [SIMD and Performance Optimization](../docs/en/simd-and-performance-optimization.md)
+- [The Ranges Pattern In-Depth (Ranges Pattern)](../docs/en/ranges-pattern.md)
+- [Testing Patterns in C++](../docs/en/testing-patterns.md)
+- [std::expected — A Type-Safe Answer for Error Handling (C++23)](../docs/en/std-expected.md)
+- [CMake & Build Systems](../docs/en/cmake-and-build-systems.md)
 
 Pitfalls:
 
@@ -171,6 +196,21 @@ Pitfalls:
 - [The Myth of Thread Safety](../pitfalls/en/the-myth-of-thread-safety.md)
 - [Iterator Invalidation](../pitfalls/en/iterator-invalidation.md)
 - [Static Initialization Order Fiasco](../pitfalls/en/static-initialization-order-fiasco.md)
+- [Data Race](../pitfalls/en/data-race.md)
+- [Deadlock](../pitfalls/en/deadlock.md)
+- [Livelock](../pitfalls/en/livelock.md)
+- [Priority Inversion](../pitfalls/en/priority-inversion.md)
+- [Thread Leak](../pitfalls/en/thread-leak.md)
+- [Dangling Lambda Captures](../pitfalls/en/dangling-lambda-captures.md)
+- [Dangling `std::string_view`](../pitfalls/en/dangling-string-view.md)
+- [Object Lifetime and Destruction Order Pitfalls](../pitfalls/en/object-lifetime-and-destruction-order-pitfalls.md)
+- [Memory Order Pitfalls](../pitfalls/en/memory-order-pitfalls.md)
+- [Concurrency Pitfall: The Thread-Safety Composition Fallacy](../pitfalls/en/thread-safety-composition-fallacy.md)
+- [Memory Leaks](../pitfalls/en/memory-leak.md)
+- [Memory Fragmentation](../pitfalls/en/memory-fragmentation.md)
+- [Stack Overflow](../pitfalls/en/stack-overflow.md)
+- [Uninitialized Member Variables](../pitfalls/en/uninitialized-members.md)
+- [Macro Pitfalls](../pitfalls/en/macro-pitfalls.md)
 
 Practice:
 
@@ -229,6 +269,20 @@ Projects:
   reference binding rules, the basis for move semantics and forwarding
 - [binary-heap](02-intermediate/binary-heap/README.md):
   array-backed heap with comparator ordering and bottom-up heapify
+
+Read:
+
+- [Chat Server API](../docs/en/chat-server-api.md)
+- [Simple Database API](../docs/en/simple-db-api.md)
+- [Task Scheduler API](../docs/en/task-scheduler-api.md)
+- [Connection Pool API](../docs/en/connection-pool-api.md)
+
+Pitfalls:
+
+- [Deleting Through a Non-Virtual Base Pointer](../pitfalls/en/deleting-through-non-virtual-base.md)
+- [Iterator Invalidation](../pitfalls/en/iterator-invalidation.md)
+- [Iterator Invalidation Pitfalls](../pitfalls/en/iterator-invalidation-pitfalls.md)
+- [Object Slicing](../pitfalls/en/object-slicing.md)
 
 ### Stage 4 Projects (04-stage4)
 
@@ -309,6 +363,12 @@ The goal is to make those gaps visible and then close them deliberately.
   probabilistic membership with double hashing over packed bits
 
 
+Read:
+
+- [Command Pattern](../docs/en/command-pattern.md)
+- [Observer Pattern](../docs/en/observer-pattern.md)
+- [Strategy Pattern](../docs/en/strategy-pattern.md)
+
 ### Stage 8 Projects (08-stage8)
 
 - [object-pool](08-stage8/object-pool/README.md):
@@ -321,6 +381,12 @@ The goal is to make those gaps visible and then close them deliberately.
   token bucket, fixed window and sliding window algorithms
 
 
+Read:
+
+- [Command Pattern](../docs/en/command-pattern.md)
+- [Observer Pattern](../docs/en/observer-pattern.md)
+- [Strategy Pattern](../docs/en/strategy-pattern.md)
+
 ### Stage 9 Projects (09-stage9)
 
 - [command-pattern](09-stage9/command-pattern/README.md):
@@ -329,6 +395,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer pattern for event notification
 - [strategy-pattern](09-stage9/strategy-pattern/README.md):
   strategy pattern for algorithm selection
+
+Read:
+
+- [Adapter Pattern](../docs/en/adapter-pattern.md)
+- [Decorator Pattern](../docs/en/decorator-pattern.md)
+- [Factory Method Pattern](../docs/en/factory-method-pattern.md)
 
 ### Stage 10 Projects (10-stage10)
 
@@ -339,6 +411,12 @@ The goal is to make those gaps visible and then close them deliberately.
 - [adapter-pattern](10-stage10/adapter-pattern/README.md):
   adapter pattern for interface compatibility
 
+Read:
+
+- [Builder Pattern](../docs/en/builder-pattern.md)
+- [Mediator Pattern](../docs/en/mediator-pattern.md)
+- [Prototype Pattern](../docs/en/prototype-pattern.md)
+
 ### Stage 11 Projects (11-stage11)
 
 - [builder-pattern](11-stage11/builder-pattern/README.md):
@@ -347,6 +425,12 @@ The goal is to make those gaps visible and then close them deliberately.
   prototype pattern for object cloning
 - [mediator-pattern](11-stage11/mediator-pattern/README.md):
   mediator pattern for object communication
+
+Read:
+
+- [Chain of Responsibility Pattern](../docs/en/chain-of-responsibility-pattern.md)
+- [Flyweight Pattern](../docs/en/flyweight-pattern.md)
+- [Visitor Pattern](../docs/en/visitor-pattern.md)
 
 ### Stage 12 Projects (12-stage12)
 
@@ -357,6 +441,12 @@ The goal is to make those gaps visible and then close them deliberately.
 - [visitor-pattern](12-stage12/visitor-pattern/README.md):
   visitor pattern for operations on object structures
 
+Read:
+
+- [Memento Pattern](../docs/en/memento-pattern.md)
+- [Singleton Pattern](../docs/en/singleton-pattern.md)
+- [State Pattern](../docs/en/state-pattern.md)
+
 ### Stage 13 Projects (13-stage13)
 
 - [singleton-pattern](13-stage13/singleton-pattern/README.md):
@@ -365,6 +455,11 @@ The goal is to make those gaps visible and then close them deliberately.
   null object pattern for handling null cases
 - [memento-pattern](13-stage13/memento-pattern/README.md):
   memento pattern for state snapshots
+
+Read:
+
+- [Composite Pattern](../docs/en/composite-pattern.md)
+- [Proxy Pattern](../docs/en/proxy-pattern.md)
 
 ### Stage 14 Projects (14-stage14)
 
@@ -375,6 +470,12 @@ The goal is to make those gaps visible and then close them deliberately.
 - [proxy-pattern](14-stage14/proxy-pattern/README.md):
   proxy pattern for controlled access
 
+Read:
+
+- [Abstract Factory Pattern](../docs/en/abstract-factory-pattern.md)
+- [Iterator Pattern](../docs/en/iterator-pattern.md)
+- [Template Method Pattern](../docs/en/template-method-pattern.md)
+
 ### Stage 15 Projects (15-stage15)
 
 - [abstract-factory](15-stage15/abstract-factory/README.md):
@@ -383,6 +484,11 @@ The goal is to make those gaps visible and then close them deliberately.
   template method for algorithm skeleton
 - [iterator-pattern](15-stage15/iterator-pattern/README.md):
   iterator pattern for traversing collections
+
+Read:
+
+- [Iterator Pattern](../docs/en/iterator-pattern.md)
+- [Template Method Pattern](../docs/en/template-method-pattern.md)
 
 ### Stage 16 Projects (16-stage16)
 
@@ -393,6 +499,12 @@ The goal is to make those gaps visible and then close them deliberately.
 - [object-pool-advanced](16-stage16/object-pool-advanced/README.md):
   advanced object pool with validation
 
+Read:
+
+- [Command Pattern](../docs/en/command-pattern.md)
+- [Observer Pattern](../docs/en/observer-pattern.md)
+- [Strategy Pattern](../docs/en/strategy-pattern.md)
+
 ### Stage 17 Projects (17-stage17)
 
 - [command-batch](17-stage17/command-batch/README.md):
@@ -401,6 +513,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer event system for event-driven architecture
 - [strategy-cache](17-stage17/strategy-cache/README.md):
   strategy cache with LRU and TTL strategies
+
+Read:
+
+- [Command Pattern](../docs/en/command-pattern.md)
+- [Observer Pattern](../docs/en/observer-pattern.md)
+- [Strategy Pattern](../docs/en/strategy-pattern.md)
 
 ### Stage 18 Projects (18-stage18)
 
@@ -411,6 +529,12 @@ The goal is to make those gaps visible and then close them deliberately.
 - [strategy-selector](18-stage18/strategy-selector/README.md):
   dynamic strategy selection system
 
+Read:
+
+- [Command Pattern](../docs/en/command-pattern.md)
+- [Observer Pattern](../docs/en/observer-pattern.md)
+- [Strategy Pattern](../docs/en/strategy-pattern.md)
+
 ### Stage 19 Projects (19-stage19)
 
 - [command-history](19-stage19/command-history/README.md):
@@ -419,6 +543,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer pattern with event filtering
 - [strategy-evaluator](19-stage19/strategy-evaluator/README.md):
   strategy evaluation system for performance comparison
+
+Read:
+
+- [Command Pattern](../docs/en/command-pattern.md)
+- [Observer Pattern](../docs/en/observer-pattern.md)
+- [Strategy Pattern](../docs/en/strategy-pattern.md)
 
 ### Stage 20 Projects (20-stage20)
 
@@ -429,6 +559,12 @@ The goal is to make those gaps visible and then close them deliberately.
 - [strategy-adapter](20-stage20/strategy-adapter/README.md):
   strategy adapter for interface compatibility
 
+Read:
+
+- [Command Pattern](../docs/en/command-pattern.md)
+- [Observer Pattern](../docs/en/observer-pattern.md)
+- [Strategy Pattern](../docs/en/strategy-pattern.md)
+
 ### Stage 21 Projects (21-stage21)
 
 - [command-router](21-stage21/command-router/README.md):
@@ -437,6 +573,12 @@ The goal is to make those gaps visible and then close them deliberately.
   event bus for publish-subscribe communication
 - [strategy-factory](21-stage21/strategy-factory/README.md):
   factory for creating strategies dynamically
+
+Read:
+
+- [Command Pattern](../docs/en/command-pattern.md)
+- [Observer Pattern](../docs/en/observer-pattern.md)
+- [Strategy Pattern](../docs/en/strategy-pattern.md)
 
 ### Stage 22 Projects (22-stage22)
 
@@ -447,6 +589,12 @@ The goal is to make those gaps visible and then close them deliberately.
 - [strategy-chain](22-stage22/strategy-chain/README.md):
   chain for executing multiple strategies
 
+Read:
+
+- [Command Pattern](../docs/en/command-pattern.md)
+- [Observer Pattern](../docs/en/observer-pattern.md)
+- [Strategy Pattern](../docs/en/strategy-pattern.md)
+
 ### Stage 23 Projects (23-stage23)
 
 - [command-queue-v2](23-stage23/command-queue-v2/README.md):
@@ -455,6 +603,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer with buffered event dispatch
 - [strategy-decorator](23-stage23/strategy-decorator/README.md):
   decorator pattern for adding behavior to strategies
+
+Read:
+
+- [Command Pattern](../docs/en/command-pattern.md)
+- [Observer Pattern](../docs/en/observer-pattern.md)
+- [Strategy Pattern](../docs/en/strategy-pattern.md)
 
 ### Stage 24 Projects (24-stage24)
 
@@ -465,6 +619,12 @@ The goal is to make those gaps visible and then close them deliberately.
 - [strategy-pipeline](24-stage24/strategy-pipeline/README.md):
   data processing pipeline using strategy pattern
 
+Read:
+
+- [Command Pattern](../docs/en/command-pattern.md)
+- [Observer Pattern](../docs/en/observer-pattern.md)
+- [Strategy Pattern](../docs/en/strategy-pattern.md)
+
 ### Stage 25 Projects (25-stage25)
 
 - [command-memento](25-stage25/command-memento/README.md):
@@ -473,6 +633,12 @@ The goal is to make those gaps visible and then close them deliberately.
   observer with debounced event dispatch
 - [strategy-combinator](25-stage25/strategy-combinator/README.md):
   strategy combinator for combining predicates
+
+Read:
+
+- [Command Pattern](../docs/en/command-pattern.md)
+- [Observer Pattern](../docs/en/observer-pattern.md)
+- [Strategy Pattern](../docs/en/strategy-pattern.md)
 
 ### Stage 26 Projects (26-stage26)
 
@@ -483,6 +649,12 @@ The goal is to make those gaps visible and then close them deliberately.
 - [strategy-resolver](26-stage26/strategy-resolver/README.md):
   resolves strategies dynamically based on context
 
+Read:
+
+- [Bridge Pattern](../docs/en/bridge-pattern.md)
+- [Facade Pattern](../docs/en/facade-pattern.md)
+- [Specification Pattern](../docs/en/specification-pattern.md)
+
 ### Stage 27 Projects (27-stage27) — GoF 23 Complete
 
 - [bridge-pattern](27-stage27/bridge-pattern/README.md):
@@ -491,6 +663,12 @@ The goal is to make those gaps visible and then close them deliberately.
   simplified interface to complex subsystem
 - [specification-pattern](27-stage27/specification-pattern/README.md):
   composable business rules
+
+Read:
+
+- [CQRS Pattern](../docs/en/cqrs-pattern.md)
+- [MVC Pattern](../docs/en/mvc-pattern.md)
+- [Repository Pattern](../docs/en/repository-pattern.md)
 
 ### Stage 28 Projects (28-stage28) — Architecture Patterns
 
@@ -501,6 +679,10 @@ The goal is to make those gaps visible and then close them deliberately.
 - [cqrs-pattern](28-stage28/cqrs-pattern/README.md):
   Command Query Responsibility Segregation
 
+Read:
+
+- [Event Sourcing Pattern](../docs/en/event-sourcing-pattern.md)
+
 ### Stage 29 Projects (29-stage29) — Architecture Patterns
 
 - [event-sourcing](29-stage29/event-sourcing/README.md):
@@ -510,6 +692,12 @@ The goal is to make those gaps visible and then close them deliberately.
 - [middleware-pipeline](29-stage29/middleware-pipeline/README.md):
   chained request/response processing
 
+Read:
+
+- [Active Record Pattern](../docs/en/active-record-pattern.md)
+- [Service Locator Pattern](../docs/en/service-locator-pattern.md)
+- [Unit of Work Pattern](../docs/en/unit-of-work-pattern.md)
+
 ### Stage 30 Projects (30-stage30) — Architecture Patterns
 
 - [service-locator](30-stage30/service-locator/README.md):
@@ -518,6 +706,12 @@ The goal is to make those gaps visible and then close them deliberately.
   tracks changes and commits as a single transaction
 - [active-record](30-stage30/active-record/README.md):
   object-relational mapping with persistence logic
+
+Read:
+
+- [Balking Pattern](../docs/en/balking-pattern.md)
+- [Delegation Pattern](../docs/en/delegation-pattern.md)
+- [Type Object Pattern](../docs/en/type-object-pattern.md)
 
 ### Stage 31 Projects (31-stage31) — Architecture Patterns
 
@@ -572,6 +766,12 @@ The goal is to make those gaps visible and then close them deliberately.
 - [allocation-tracker](35-stage35/allocation-tracker/README.md):
   process-wide alloc counters and a counting STL allocator
 
+
+Read:
+
+- [C++20 Concepts In-Depth (C++20 Concepts)](../docs/en/cpp20-concepts.md)
+- [Coroutines: Lifetime and Suspension Points](../docs/en/coroutines-lifetime-and-suspension-points.md)
+- [The Ranges Pattern In-Depth (Ranges Pattern)](../docs/en/ranges-pattern.md)
 
 ### Stage 36 Projects (36-stage36) — Modern C++ Patterns
 

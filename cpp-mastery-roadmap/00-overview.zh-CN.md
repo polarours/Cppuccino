@@ -94,12 +94,21 @@ graph TD
 - [RAII与异常安全](../docs/中文版/RAII与异常安全.md)
 - [const 的真实语义](../docs/中文版/const 的真实语义.md)
 - [未定义行为](../docs/中文版/未定义行为.md)
+- [零法则、三法则与五法则](../docs/中文版/零三五法则.md)
+- [左值引用](../docs/中文版/左值引用.md)
+- [右值引用](../docs/中文版/右值引用.md)
+- [术语表](../docs/中文版/术语表.md)
 
 对应 pitfalls：
 
 - [悬垂指针](../pitfalls/中文版/悬垂指针.md)
 - [返回局部对象引用](../pitfalls/中文版/返回局部对象引用.md)
 - [析构函数抛出异常](../pitfalls/中文版/析构函数抛出异常.md)
+- [const 正确性陷阱](../pitfalls/中文版/const正确性陷阱.md)
+- [初始化中的窄化转换](../pitfalls/中文版/窄化转换.md)
+- [有符号整数溢出假设](../pitfalls/中文版/有符号整数溢出假设.md)
+- [隐式转换 (Implicit Conversions)](../pitfalls/中文版/隐式转换.md)
+- [双重释放](../pitfalls/中文版/双重释放.md)
 
 对应示例：
 
@@ -130,12 +139,21 @@ graph TD
 - [转发引用与完美转发](../docs/中文版/转发引用与完美转发.md)
 - [拷贝消除与prvalue实体化](../docs/中文版/拷贝消除与prvalue实体化.md)
 - [noexcept与移动操作](../docs/中文版/noexcept与移动操作.md)
+- [Lvalue 与 Rvalue 引用](../docs/中文版/左值引用与右值引用.md)
+- [`auto`、`decltype` 与 `decltype(auto)`](../docs/中文版/auto-decltype与decltype-auto.md)
+- [模板实例化与两阶段查找](../docs/中文版/模板实例化与两阶段查找.md)
 
 对应 pitfalls：
 
 - [对const对象使用move](../pitfalls/中文版/对const对象使用move.md)
 - [对象切片](../pitfalls/中文版/对象切片.md)
 - [隐式转换](../pitfalls/中文版/隐式转换.md)
+- [移动后使用](../pitfalls/中文版/移动后使用.md)
+- [移动语义陷阱：从 const 对象移动](../pitfalls/中文版/从const对象移动陷阱.md)
+- [SFINAE 误用](../pitfalls/中文版/SFINAE误用.md)
+- [折叠表达式错误](../pitfalls/中文版/折叠表达式错误.md)
+- [模板参数推导陷阱](../pitfalls/中文版/模板参数推导陷阱.md)
+- [模板特化陷阱](../pitfalls/中文版/模板特化陷阱.md)
 
 对应示例：
 
@@ -159,6 +177,14 @@ graph TD
 - [模板实例化与两阶段查找](../docs/中文版/模板实例化与两阶段查找.md)
 - [PImpl与ABI稳定性](../docs/中文版/PImpl与ABI稳定性.md)
 - [协程的生命周期与挂起点](../docs/中文版/协程的生命周期与挂起点.md)
+- [深入理解 C++ 对象模型](../docs/中文版/深入理解 C++ 对象模型.md)
+- [C++20 Concepts 深入理解 (C++20 Concepts)](../docs/中文版/C++20概念深入理解.md)
+- [内存池与分配器 (Memory Pool & Allocators)](../docs/中文版/内存池与分配器.md)
+- [SIMD 与性能优化 (SIMD Pattern)](../docs/中文版/SIMD与性能优化.md)
+- [Ranges 模式与深度理解 (Ranges Pattern)](../docs/中文版/Ranges模式.md)
+- [C++ 测试模式 (Testing Patterns in C++)](../docs/中文版/C++测试模式.md)
+- [std::expected — 错误处理的类型安全解 (C++23)](../docs/中文版/std-expected.md)
+- [CMake 与构建系统 (CMake & Build Systems)](../docs/中文版/CMake与构建系统.md)
 
 对应 pitfalls：
 
@@ -166,6 +192,21 @@ graph TD
 - [线程安全的迷思](../pitfalls/中文版/线程安全的迷思.md)
 - [迭代器失效](../pitfalls/中文版/迭代器失效.md)
 - [静态初始化顺序问题](../pitfalls/中文版/静态初始化顺序问题.md)
+- [数据竞态](../pitfalls/中文版/数据竞态.md)
+- [死锁](../pitfalls/中文版/死锁.md)
+- [活锁](../pitfalls/中文版/活锁.md)
+- [优先级反转](../pitfalls/中文版/优先级反转.md)
+- [线程泄漏](../pitfalls/中文版/线程泄漏.md)
+- [Lambda 捕获悬垂引用](../pitfalls/中文版/Lambda捕获悬垂引用.md)
+- [`std::string_view` 悬垂问题](../pitfalls/中文版/string-view-悬垂问题.md)
+- [对象生命周期与析构顺序陷阱](../pitfalls/中文版/对象生命周期与析构顺序陷阱.md)
+- [内存序陷阱](../pitfalls/中文版/内存序陷阱.md)
+- [并发陷阱：线程安全的神话](../pitfalls/中文版/线程安全迷思.md)
+- [内存泄漏](../pitfalls/中文版/内存泄漏.md)
+- [内存碎片](../pitfalls/中文版/内存碎片.md)
+- [栈溢出](../pitfalls/中文版/栈溢出.md)
+- [未初始化成员变量](../pitfalls/中文版/未初始化成员变量.md)
+- [宏陷阱](../pitfalls/中文版/宏陷阱.md)
 
 动手方向：
 
@@ -231,6 +272,20 @@ graph TD
 3. 列出它的所有权边界、生命周期假设和错误路径
 4. 补上一块缺失内容：
    测试、更完整的解析、RAII 封装、更清晰的接口、持久化规则，或与实现一致的文档
+
+建议阅读：
+
+- [Chat Server API 文档](../docs/中文版/Chat服务器API文档.md)
+- [Simple Database API 文档](../docs/中文版/simple-db-API文档.md)
+- [Task Scheduler API 文档](../docs/中文版/任务调度器API文档.md)
+- [连接池 API](../docs/中文版/连接池API文档.md)
+
+对应 pitfalls：
+
+- [通过非虚基类指针删除对象](../pitfalls/中文版/通过非虚基类指针删除对象.md)
+- [迭代器失效（Iterator Invalidation）](../pitfalls/中文版/迭代器失效.md)
+- [迭代器失效陷阱](../pitfalls/中文版/迭代器失效陷阱.md)
+- [对象切片（Object Slicing）](../pitfalls/中文版/对象切片.md)
 
 ### 第四阶段项目（04-stage4）
 
@@ -298,6 +353,12 @@ graph TD
 - [bloom-filter](07-stage7/bloom-filter/README.md)：
   在位图上用双哈希做概率性成员判断
 
+建议阅读：
+
+- [命令模式 (Command Pattern)](../docs/中文版/命令模式.md)
+- [观察者模式 (Observer Pattern)](../docs/中文版/观察者模式.md)
+- [策略模式 (Strategy Pattern)](../docs/中文版/策略模式.md)
+
 ### 第八阶段项目（08-stage8）
 
 - [object-pool](08-stage8/object-pool/README.md)：
@@ -309,6 +370,12 @@ graph TD
 - [rate-limiter](08-stage8/rate-limiter/README.md)：
   令牌桶、固定窗口与滑动窗口算法
 
+建议阅读：
+
+- [命令模式 (Command Pattern)](../docs/中文版/命令模式.md)
+- [观察者模式 (Observer Pattern)](../docs/中文版/观察者模式.md)
+- [策略模式 (Strategy Pattern)](../docs/中文版/策略模式.md)
+
 ### 第九阶段项目（09-stage9）
 
 - [command-pattern](09-stage9/command-pattern/README.md)：
@@ -317,6 +384,12 @@ graph TD
   用于事件通知的观察者模式
 - [strategy-pattern](09-stage9/strategy-pattern/README.md)：
   用于算法选择的策略模式
+
+建议阅读：
+
+- [适配器模式](../docs/中文版/适配器模式.md)
+- [装饰器模式 (Decorator Pattern)](../docs/中文版/装饰器模式.md)
+- [工厂方法模式 (Factory Method Pattern)](../docs/中文版/工厂方法模式.md)
 
 ### 第十阶段项目（10-stage10）
 
@@ -327,6 +400,12 @@ graph TD
 - [adapter-pattern](10-stage10/adapter-pattern/README.md)：
   用于接口兼容的适配器模式
 
+建议阅读：
+
+- [建造者模式 (Builder Pattern)](../docs/中文版/建造者模式.md)
+- [中介者模式 (Mediator Pattern)](../docs/中文版/中介者模式.md)
+- [原型模式 (Prototype Pattern)](../docs/中文版/原型模式.md)
+
 ### 第十一阶段项目（11-stage11）
 
 - [builder-pattern](11-stage11/builder-pattern/README.md)：
@@ -335,6 +414,12 @@ graph TD
   用于对象克隆的原型模式
 - [mediator-pattern](11-stage11/mediator-pattern/README.md)：
   用于对象间通信的中介者模式
+
+建议阅读：
+
+- [责任链模式](../docs/中文版/chain-of-responsibility模式.md)
+- [享元模式 (Flyweight Pattern)](../docs/中文版/享元模式.md)
+- [访问者模式 (Visitor Pattern)](../docs/中文版/visitor模式.md)
 
 ### 第十二阶段项目（12-stage12）
 
@@ -345,6 +430,12 @@ graph TD
 - [visitor-pattern](12-stage12/visitor-pattern/README.md)：
   用于对对象结构执行操作的访问者模式
 
+建议阅读：
+
+- [备忘录模式 (Memento Pattern)](../docs/中文版/memento模式.md)
+- [单例模式 (Singleton Pattern)](../docs/中文版/单例模式.md)
+- [状态模式 (State Pattern)](../docs/中文版/状态模式.md)
+
 ### 第十三阶段项目（13-stage13）
 
 - [singleton-pattern](13-stage13/singleton-pattern/README.md)：
@@ -353,6 +444,11 @@ graph TD
   处理空值场景的空对象模式
 - [memento-pattern](13-stage13/memento-pattern/README.md)：
   用于状态快照的备忘录模式
+
+建议阅读：
+
+- [组合模式 (Composite Pattern)](../docs/中文版/组合模式.md)
+- [代理模式 (Proxy Pattern)](../docs/中文版/代理模式.md)
 
 ### 第十四阶段项目（14-stage14）
 
@@ -363,6 +459,12 @@ graph TD
 - [proxy-pattern](14-stage14/proxy-pattern/README.md)：
   用于受控访问的代理模式
 
+建议阅读：
+
+- [抽象工厂模式 (Abstract Factory Pattern)](../docs/中文版/抽象工厂模式.md)
+- [迭代器模式 (Iterator Pattern)](../docs/中文版/迭代器模式.md)
+- [模板方法模式 (Template Method Pattern)](../docs/中文版/模板方法模式.md)
+
 ### 第十五阶段项目（15-stage15）
 
 - [abstract-factory](15-stage15/abstract-factory/README.md)：
@@ -371,6 +473,11 @@ graph TD
   用于固定算法骨架的模板方法
 - [iterator-pattern](15-stage15/iterator-pattern/README.md)：
   用于遍历集合的迭代器模式
+
+建议阅读：
+
+- [迭代器模式 (Iterator Pattern)](../docs/中文版/迭代器模式.md)
+- [模板方法模式 (Template Method Pattern)](../docs/中文版/模板方法模式.md)
 
 ### 第十六阶段项目（16-stage16）
 
@@ -381,6 +488,12 @@ graph TD
 - [object-pool-advanced](16-stage16/object-pool-advanced/README.md)：
   带校验机制的高级对象池
 
+建议阅读：
+
+- [命令模式 (Command Pattern)](../docs/中文版/命令模式.md)
+- [观察者模式 (Observer Pattern)](../docs/中文版/观察者模式.md)
+- [策略模式 (Strategy Pattern)](../docs/中文版/策略模式.md)
+
 ### 第十七阶段项目（17-stage17）
 
 - [command-batch](17-stage17/command-batch/README.md)：
@@ -389,6 +502,12 @@ graph TD
   面向事件驱动架构的观察者事件系统
 - [strategy-cache](17-stage17/strategy-cache/README.md)：
   以 LRU 与 TTL 为策略的策略缓存
+
+建议阅读：
+
+- [命令模式 (Command Pattern)](../docs/中文版/命令模式.md)
+- [观察者模式 (Observer Pattern)](../docs/中文版/观察者模式.md)
+- [策略模式 (Strategy Pattern)](../docs/中文版/策略模式.md)
 
 ### 第十八阶段项目（18-stage18）
 
@@ -399,6 +518,12 @@ graph TD
 - [strategy-selector](18-stage18/strategy-selector/README.md)：
   动态策略选择系统
 
+建议阅读：
+
+- [命令模式 (Command Pattern)](../docs/中文版/命令模式.md)
+- [观察者模式 (Observer Pattern)](../docs/中文版/观察者模式.md)
+- [策略模式 (Strategy Pattern)](../docs/中文版/策略模式.md)
+
 ### 第十九阶段项目（19-stage19）
 
 - [command-history](19-stage19/command-history/README.md)：
@@ -407,6 +532,12 @@ graph TD
   带事件过滤的观察者模式
 - [strategy-evaluator](19-stage19/strategy-evaluator/README.md)：
   用于性能对比的策略评估系统
+
+建议阅读：
+
+- [命令模式 (Command Pattern)](../docs/中文版/命令模式.md)
+- [观察者模式 (Observer Pattern)](../docs/中文版/观察者模式.md)
+- [策略模式 (Strategy Pattern)](../docs/中文版/策略模式.md)
 
 ### 第二十阶段项目（20-stage20）
 
@@ -417,6 +548,12 @@ graph TD
 - [strategy-adapter](20-stage20/strategy-adapter/README.md)：
   用于接口兼容的策略适配器
 
+建议阅读：
+
+- [命令模式 (Command Pattern)](../docs/中文版/命令模式.md)
+- [观察者模式 (Observer Pattern)](../docs/中文版/观察者模式.md)
+- [策略模式 (Strategy Pattern)](../docs/中文版/策略模式.md)
+
 ### 第二十一阶段项目（21-stage21）
 
 - [command-router](21-stage21/command-router/README.md)：
@@ -425,6 +562,12 @@ graph TD
   用于发布-订阅通信的事件总线
 - [strategy-factory](21-stage21/strategy-factory/README.md)：
   动态创建策略对象的工厂
+
+建议阅读：
+
+- [命令模式 (Command Pattern)](../docs/中文版/命令模式.md)
+- [观察者模式 (Observer Pattern)](../docs/中文版/观察者模式.md)
+- [策略模式 (Strategy Pattern)](../docs/中文版/策略模式.md)
 
 ### 第二十二阶段项目（22-stage22）
 
@@ -435,6 +578,12 @@ graph TD
 - [strategy-chain](22-stage22/strategy-chain/README.md)：
   用于依次执行多个策略的策略链
 
+建议阅读：
+
+- [命令模式 (Command Pattern)](../docs/中文版/命令模式.md)
+- [观察者模式 (Observer Pattern)](../docs/中文版/观察者模式.md)
+- [策略模式 (Strategy Pattern)](../docs/中文版/策略模式.md)
+
 ### 第二十三阶段项目（23-stage23）
 
 - [command-queue-v2](23-stage23/command-queue-v2/README.md)：
@@ -443,6 +592,12 @@ graph TD
   带缓冲事件分发的观察者
 - [strategy-decorator](23-stage23/strategy-decorator/README.md)：
   用装饰器为策略追加行为的装饰器模式
+
+建议阅读：
+
+- [命令模式 (Command Pattern)](../docs/中文版/命令模式.md)
+- [观察者模式 (Observer Pattern)](../docs/中文版/观察者模式.md)
+- [策略模式 (Strategy Pattern)](../docs/中文版/策略模式.md)
 
 ### 第二十四阶段项目（24-stage24）
 
@@ -453,6 +608,12 @@ graph TD
 - [strategy-pipeline](24-stage24/strategy-pipeline/README.md)：
   使用策略模式的数据处理流水线
 
+建议阅读：
+
+- [命令模式 (Command Pattern)](../docs/中文版/命令模式.md)
+- [观察者模式 (Observer Pattern)](../docs/中文版/观察者模式.md)
+- [策略模式 (Strategy Pattern)](../docs/中文版/策略模式.md)
+
 ### 第二十五阶段项目（25-stage25）
 
 - [command-memento](25-stage25/command-memento/README.md)：
@@ -461,6 +622,12 @@ graph TD
   带防抖事件分发的观察者
 - [strategy-combinator](25-stage25/strategy-combinator/README.md)：
   用于组合谓词的策略组合器
+
+建议阅读：
+
+- [命令模式 (Command Pattern)](../docs/中文版/命令模式.md)
+- [观察者模式 (Observer Pattern)](../docs/中文版/观察者模式.md)
+- [策略模式 (Strategy Pattern)](../docs/中文版/策略模式.md)
 
 ### 第二十六阶段项目（26-stage26）
 
@@ -471,6 +638,12 @@ graph TD
 - [strategy-resolver](26-stage26/strategy-resolver/README.md)：
   依据上下文动态解析策略
 
+建议阅读：
+
+- [桥接模式](../docs/中文版/bridge模式.md)
+- [外观模式 (Facade Pattern)](../docs/中文版/外观模式.md)
+- [规范模式 (Specification Pattern)](../docs/中文版/specification模式.md)
+
 ### 第二十七阶段项目（27-stage27）— GoF 23 全集完成
 
 - [bridge-pattern](27-stage27/bridge-pattern/README.md)：
@@ -479,6 +652,12 @@ graph TD
   为复杂子系统提供简化接口
 - [specification-pattern](27-stage27/specification-pattern/README.md)：
   可组合的业务规则
+
+建议阅读：
+
+- [CQRS 模式](../docs/中文版/CQRS模式.md)
+- [MVC 模式 (MVC Pattern)](../docs/中文版/MVC模式.md)
+- [仓储模式 (Repository Pattern)](../docs/中文版/仓储模式.md)
 
 ### 第二十八阶段项目（28-stage28）— 架构模式
 
@@ -489,6 +668,10 @@ graph TD
 - [cqrs-pattern](28-stage28/cqrs-pattern/README.md)：
   命令查询职责分离（Command Query Responsibility Segregation）
 
+建议阅读：
+
+- [事件溯源模式 (Event Sourcing Pattern)](../docs/中文版/事件溯源模式.md)
+
 ### 第二十九阶段项目（29-stage29）— 架构模式
 
 - [event-sourcing](29-stage29/event-sourcing/README.md)：
@@ -498,6 +681,12 @@ graph TD
 - [middleware-pipeline](29-stage29/middleware-pipeline/README.md)：
   链式的请求/响应处理
 
+建议阅读：
+
+- [活动记录模式 (Active Record Pattern)](../docs/中文版/活动记录模式.md)
+- [服务定位器模式 (Service Locator Pattern)](../docs/中文版/服务定位器模式.md)
+- [单元工作模式 (Unit of Work Pattern)](../docs/中文版/单元工作模式.md)
+
 ### 第三十阶段项目（30-stage30）— 架构模式
 
 - [service-locator](30-stage30/service-locator/README.md)：
@@ -506,6 +695,12 @@ graph TD
   跟踪变更，并以单个事务提交
 - [active-record](30-stage30/active-record/README.md)：
   带持久化逻辑的对象关系映射
+
+建议阅读：
+
+- [推辞模式 (Balking Pattern)](../docs/中文版/推辞模式.md)
+- [委托模式 (Delegation Pattern)](../docs/中文版/委托模式.md)
+- [类型对象模式 (Type Object Pattern)](../docs/中文版/类型对象模式.md)
 
 ### 第三十一阶段项目（31-stage31）— 架构模式
 
@@ -557,6 +752,12 @@ graph TD
   按大小分类的内存缓存
 - [allocation-tracker](35-stage35/allocation-tracker/README.md)：
   进程级分配计数器与带计数的 STL 分配器
+
+建议阅读：
+
+- [C++20 Concepts 深入理解 (C++20 Concepts)](../docs/中文版/C++20概念深入理解.md)
+- [协程的生命周期与挂起点](../docs/中文版/协程的生命周期与挂起点.md)
+- [Ranges 模式与深度理解 (Ranges Pattern)](../docs/中文版/Ranges模式.md)
 
 ### 第三十六阶段项目（36-stage36）— 现代 C++ 模式
 
