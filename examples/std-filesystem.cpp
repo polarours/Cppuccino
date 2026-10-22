@@ -80,11 +80,15 @@ void directoryIteration() {
 void recursiveIteration() {
     std::cout << "\n--- Recursive Directory Iteration ---\n";
 
-    fs::path dir = ".";
+    // A tree of its own, so the example runs wherever it is started from.
+    fs::path root = "demo_fs_tree";
+    fs::create_directories(root / "nested");
+    { std::ofstream f(root / "a.txt"); f << "a"; }
+    { std::ofstream f(root / "nested" / "b.txt"); f << "b"; }
 
-    std::cout << "Files in examples/:\n";
+    std::cout << "Files under " << root << ":\n";
     int count = 0;
-    for (const auto& entry : fs::recursive_directory_iterator(dir / "examples")) {
+    for (const auto& entry : fs::recursive_directory_iterator(root)) {
         if (fs::is_regular_file(entry)) {
             std::cout << "  " << entry.path().filename() << "\n";
             count++;
@@ -94,6 +98,7 @@ void recursiveIteration() {
             }
         }
     }
+    fs::remove_all(root);
 }
 
 // --- 6. Create and remove ---

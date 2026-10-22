@@ -233,9 +233,43 @@ def check_index_coverage(sources, problems):
     print(f"  {len(listed)} example(s) listed in the index")
 
 
+def run_example(path, standard, workdir):
+    """Compile and run an example, from a directory that is not the repo.
+
+    Running from elsewhere is the point: an example that assumes the current
+    directory is the repository root crashes for a reader who just followed
+    the command in its header.
+    """
+    name = os.path.basename(path)
+    binary = os.path.join(workdir, 'run_' + name[:-4])
+    cmd = [CXX, f'-std=c++{standard}', '-pthread', '-o', binary, path]
+    project = PROJECT_DEPENDENT.get(name)
+    if project:
+        directory, sources = project
+        cmd.insert(2, f'-I{os.path.join(REPO, directory)}/include')
+        for source in sources:
+            cmd.append(os.path.join(REPO, directory, source))
+    built = subprocess.run(cmd, capture_output=True, text=True,
+                           errors='replace')
+    if built.returncode != 0:
+        return 'compile', 'the example does not compile'
+    try:
+        result = subprocess.run([binary], cwd=workdir, capture_output=True,
+                                text=True, errors='replace', timeout=20)
+    except subprocess.TimeoutExpired:
+        return 'run', 'the example did not finish'
+    if result.returncode != 0:
+        detail = (result.stderr.strip().splitlines() or ['?'])[-1]
+        return 'run', f'the example exited with {result.returncode}: {detail[:70]}'
+    return 'ok', ''
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--jobs', '-j', type=int, default=os.cpu_count() or 2)
+    parser.add_argument('--run', action='store_true',
+                        help='also run every example and report the ones that '
+                             'do not finish cleanly')
     args = parser.parse_args()
 
     if shutil.which(CXX) is None:
@@ -270,6 +304,16 @@ def main():
             else:
                 print(f'  {name:<48} FAIL {detail}')
                 failures.append((name, detail))
+
+        if args.run:
+            print('\n== run check ==')
+            for path in sources:
+                standard = declared_standard(path) or '20'
+                status, detail = run_example(path, standard, workdir)
+                if status != 'ok':
+                    failures.append((os.path.basename(path), detail))
+                    print(f"  {os.path.basename(path):<44} "
+                          f"{status.upper()} {detail}")
     finally:
         shutil.rmtree(workdir, ignore_errors=True)
 

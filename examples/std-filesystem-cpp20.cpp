@@ -6,7 +6,6 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
-#include <format>
 
 // C++20 std::filesystem - cross-platform file operations
 // Demonstrates file system traversal and manipulation
@@ -107,14 +106,21 @@ int main() {
     std::cout << "   Temp directory: " << fs::temp_directory_path().string() << "\n";
 
     // Recursive directory iterator
+    // A tree of its own, so the example runs wherever it is started from.
+    fs::path root = "demo_fs_cpp20";
+    fs::create_directories(root / "nested");
+    { std::ofstream f(root / "first.cpp"); f << "int main() { return 0; }"; }
+    { std::ofstream f(root / "nested" / "second.cpp"); f << "int x = 0;"; }
+
     std::cout << "\n8. Recursive search (find .cpp files):\n";
     int count = 0;
-    for (const auto& entry : fs::recursive_directory_iterator(fs::current_path() / "examples")) {
+    for (const auto& entry : fs::recursive_directory_iterator(root)) {
         if (entry.path().extension() == ".cpp") {
             std::cout << "   " << entry.path().filename().string() << "\n";
             if (++count >= 5) break;  // Limit output
         }
     }
+    fs::remove_all(root);
 
     return 0;
 }

@@ -44,8 +44,8 @@ run "documentation: relative links" \
 run "documentation: examples compile and run" \
     python3 tools/check_doc_examples.py
 
-run "examples: compile" \
-    python3 tools/check_examples.py
+run "examples: compile and run" \
+    python3 tools/check_examples.py --run
 
 run "statistics: the READMEs agree with the repository" \
     python3 tools/check_stats.py
