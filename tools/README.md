@@ -62,6 +62,12 @@ sanitizers found a signed integer overflow in a loop that sums a million
 numbers into an `int`, and a chat room that owned its users while every
 user owned the chat room.
 
+The second checker also runs the pitfall articles, and two of them show a
+mistake the program does not survive: a dangling reference and an iterator
+that an insert has already invalidated. Those are listed in
+`tools/known_failures.tsv`, and a file that starts failing in a different
+way is still reported.
+
 The compiler's own warnings are checked as well:
 
 ```bash

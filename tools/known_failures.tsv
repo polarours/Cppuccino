@@ -1,0 +1,20 @@
+# The examples that are expected not to work.
+#
+# A pitfall article shows what a mistake looks like, and sometimes that
+# means the program crashes. Those files are listed here, and the checker
+# expects them to fail instead of reporting them.
+#
+# The column after the tab says what the failure is expected to look like,
+# so that a file that starts failing in a different way is still reported.
+
+# The example hands out a reference to a string that is already gone, and
+# then reads it. The program dies with a segmentation fault, which is the
+# point the article makes.
+pitfalls/en/dangling-pointer.md	segfault
+pitfalls/中文版/悬垂指针.md	segfault
+
+# The example reads an iterator that an insert has already invalidated.
+# It usually works, because the freed memory still holds the old value,
+# and the sanitizer finds the use after free that the article is about.
+pitfalls/en/iterator-invalidation-pitfalls.md	use after free
+pitfalls/中文版/迭代器失效陷阱.md	use after free

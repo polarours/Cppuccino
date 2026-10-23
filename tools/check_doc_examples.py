@@ -9,7 +9,15 @@ Two families of documents are handled:
 * Project API docs: the example needs the project's own headers and sources,
   so the project directory is supplied via the API_DOC_PROJECTS table below.
 
-Usage: python3 tools/check_doc_examples.py [doc.md ...]
+The pitfall articles (pitfalls/en/*.md, pitfalls/中文版/*.md) are part of it
+as well. A few of them show a mistake that the program does not survive, and
+those are listed in tools/known_failures.tsv.
+
+The program may also be run under the sanitizers, which answer a different
+question: an example that reads freed memory or does something the standard
+leaves undefined.
+
+Usage: python3 tools/check_doc_examples.py [--sanitize] [--tsan] [doc.md ...]
 """
 import os
 import re
@@ -26,6 +34,27 @@ CXX = os.environ.get('CXX', 'g++')
 # Per-process scratch directory: two checker runs must not clobber each
 # other's intermediate files.
 WORKDIR = tempfile.mkdtemp(prefix='doc-ex-check-')
+
+# The documents whose example is expected not to work.
+KNOWN_FAILURES = os.path.join(REPO, 'tools', 'known_failures.tsv')
+
+
+def load_known_failures():
+    """The documents whose example is expected to fail, and how."""
+    expected = {}
+    if not os.path.isfile(KNOWN_FAILURES):
+        return expected
+    with open(KNOWN_FAILURES, encoding='utf-8') as handle:
+        for line in handle:
+            line = line.split('#', 1)[0].strip()
+            if not line:
+                continue
+            parts = line.split('\t')
+            if len(parts) != 2:
+                print(f'  MALFORMED  {line}')
+                continue
+            expected[parts[0].strip()] = parts[1].strip()
+    return expected
 
 # API doc -> (project dir, extra source files relative to the project).
 # Keyed by the English slug; the Chinese twin is matched by the slug that
@@ -222,11 +251,15 @@ def main():
     paths = args
     if not paths:
         paths = []
-        for d in ('docs/en', 'docs/中文版'):
-            paths += sorted(os.path.join(REPO, d, f)
-                            for f in os.listdir(os.path.join(REPO, d))
+        for d in ('docs/en', 'docs/中文版', 'pitfalls/en', 'pitfalls/中文版'):
+            directory = os.path.join(REPO, d)
+            if not os.path.isdir(directory):
+                continue
+            paths += sorted(os.path.join(directory, f)
+                            for f in os.listdir(directory)
                             if f.endswith('.md'))
     failures = 0
+    expected_failures = load_known_failures()
     for p in paths:
         status, detail = check(p, sanitizer)
         rel = os.path.relpath(p, REPO)
@@ -234,6 +267,10 @@ def main():
             print(f"  {rel:<52} OK   {detail}")
         elif status == 'skip':
             print(f"  {rel:<52} SKIP {detail}")
+        elif rel in expected_failures:
+            # The article shows a mistake that the program does not
+            # survive, and that is the point of the article.
+            print(f"  {rel:<52} EXPECTED FAIL {detail}")
         else:
             failures += 1
             print(f"  {rel:<52} FAIL {detail}")
