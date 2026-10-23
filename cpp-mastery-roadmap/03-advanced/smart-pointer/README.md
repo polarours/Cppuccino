@@ -62,6 +62,25 @@ if (auto locked = wptr.lock()) {
 }
 ```
 
+## Control block
+
+The shared and the weak pointer share one control block, and the block
+holds two counts:
+
+- `strong_count` counts the `SharedPtr`s.
+- `weak_count` counts the `WeakPtr`s **plus one**. That extra reference is
+  held for as long as the strong count is non-zero.
+
+The block dies with its last weak reference, never with its last strong
+one. A `WeakPtr` has to stay able to ask whether the object is still
+alive, so the block may not disappear while a `WeakPtr` is around.
+
+The extra weak reference is what makes the other direction safe as well.
+When the last `SharedPtr` goes away the object is destroyed, and its
+destructor may release weak references of its own -- a node that points
+back at itself, for instance. The block has to outlive that destructor, so
+the extra weak reference is dropped only after it has run.
+
 ## Suggested Next Steps
 
 - Add custom deleter support

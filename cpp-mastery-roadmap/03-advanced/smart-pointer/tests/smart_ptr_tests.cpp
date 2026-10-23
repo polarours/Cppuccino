@@ -162,6 +162,34 @@ void test_weak_ptr_prevent_cycle() {
     expect(node2.use_count() == 2, "expected use_count 2");
 }
 
+// The destructor of the managed object runs while the owning SharedPtr is
+// still inside releaseStrong(). If that destructor drops the last weak
+// reference, the control block must survive it -- otherwise the owner
+// would write into a block that has already been deleted.
+void test_weak_ptr_outlives_object() {
+    struct Node {
+        smart_ptr::WeakPtr<Node> self;
+        int value;
+        explicit Node(int v) : value(v) {}
+    };
+
+    smart_ptr::WeakPtr<Node> observer;
+
+    {
+        smart_ptr::SharedPtr<Node> node(new Node(7));
+        smart_ptr::WeakPtr<Node> holder(node);
+        observer = holder;
+        node->self = holder;
+
+        expect(observer.use_count() == 1, "expected use_count 1");
+        expect(!observer.expired(), "expected not expired");
+    }
+
+    expect(observer.expired(), "expected expired once the owner died");
+    expect(observer.use_count() == 0, "expected use_count 0");
+    expect(observer.lock() == nullptr, "expected lock to fail");
+}
+
 } // namespace
 
 int main() {
@@ -215,6 +243,9 @@ int main() {
 
         test_weak_ptr_prevent_cycle();
         std::cout << "    test_weak_ptr_prevent_cycle: PASS\n";
+
+        test_weak_ptr_outlives_object();
+        std::cout << "    test_weak_ptr_outlives_object: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "smart_ptr_tests failed: " << exception.what() << std::endl;

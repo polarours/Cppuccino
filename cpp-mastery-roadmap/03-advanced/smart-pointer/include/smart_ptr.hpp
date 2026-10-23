@@ -74,6 +74,11 @@ private:
     struct ControlBlock {
         T* ptr;
         std::size_t strong_count;
+
+        // Counts the weak references plus one implicit reference that is
+        // held for as long as strong_count is non-zero. The implicit
+        // reference is what keeps the block alive while the object it
+        // manages is being destroyed.
         std::size_t weak_count;
 
         explicit ControlBlock(T* p);
@@ -100,6 +105,10 @@ public:
 
     WeakPtr(WeakPtr&& other) noexcept;
     WeakPtr& operator=(WeakPtr&& other) noexcept;
+
+    // Releases the weak reference. Without it the control block would never
+    // see its last weak reference go away and would outlive the object.
+    ~WeakPtr();
 
     bool expired() const noexcept;
     SharedPtr<T> lock() const noexcept;
@@ -199,7 +208,11 @@ bool UniquePtr<T>::operator!=(std::nullptr_t) const noexcept {
 
 template <typename T>
 SharedPtr<T>::ControlBlock::ControlBlock(T* p)
-    : ptr(p), strong_count(1), weak_count(0) {}
+    : ptr(p), strong_count(1), weak_count(1) {
+    // The block starts with one weak reference: the implicit one that the
+    // strong count holds. It is dropped by releaseStrong(), which keeps
+    // the block alive for as long as the managed object is alive.
+}
 
 template <typename T>
 void SharedPtr<T>::ControlBlock::addStrong() {
@@ -209,11 +222,14 @@ void SharedPtr<T>::ControlBlock::addStrong() {
 template <typename T>
 void SharedPtr<T>::ControlBlock::releaseStrong() {
     if (--strong_count == 0) {
+        // The destructor of the managed object may release weak references
+        // of its own -- a node that points back at itself, for instance.
+        // The block has to outlive that destructor, and the implicit weak
+        // reference is what guarantees it: it is only dropped once the
+        // managed object is gone.
         delete ptr;
         ptr = nullptr;
-        if (weak_count == 0) {
-            delete this;
-        }
+        releaseWeak();
     }
 }
 
@@ -224,7 +240,10 @@ void SharedPtr<T>::ControlBlock::addWeak() {
 
 template <typename T>
 void SharedPtr<T>::ControlBlock::releaseWeak() {
-    if (--weak_count == 0 && strong_count == 0) {
+    // The block dies with its last weak reference, never with its last
+    // strong one: a WeakPtr must stay able to ask whether the object is
+    // still alive.
+    if (--weak_count == 0) {
         delete this;
     }
 }
@@ -398,6 +417,13 @@ WeakPtr<T>& WeakPtr<T>::operator=(WeakPtr&& other) noexcept {
         other.block_ = nullptr;
     }
     return *this;
+}
+
+template <typename T>
+WeakPtr<T>::~WeakPtr() {
+    if (block_) {
+        block_->releaseWeak();
+    }
 }
 
 template <typename T>
