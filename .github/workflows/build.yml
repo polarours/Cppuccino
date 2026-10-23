@@ -93,6 +93,13 @@ jobs:
         # standard leaves undefined. The sanitizers turn those into failures.
         run: python3 tools/run_sanitizers.py --jobs 4
 
+      - name: Run the examples under the sanitizers
+        # The examples are teaching material, so a leak in one teaches a leak.
+        run: python3 tools/check_examples.py --sanitize --jobs 4
+
+      - name: Run the document examples under the sanitizers
+        run: python3 tools/check_doc_examples.py --sanitize
+
   races:
     name: data races
     runs-on: ubuntu-latest
