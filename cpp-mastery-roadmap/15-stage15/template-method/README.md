@@ -53,9 +53,9 @@ template_method::CSVDataMiner miner;
 miner.mine("data.csv");
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多矿工类型
-- 实现钩子方法组合
-- 添加矿工配置
-- 实现矿工流水线
+- Add more miner types
+- Implement hook method composition
+- Add miner configuration
+- Implement a miner pipeline

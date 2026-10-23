@@ -57,9 +57,9 @@ auto expr = std::make_shared<interpreter_pattern::AddExpression>(
 int result = expr->interpret();  // 7
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多操作符（除法、取模）
-- 实现语法解析器
-- 添加表达式简化
-- 实现表达式缓存
+- Add more operators (division, modulo)
+- Implement the grammar parser
+- Add expression simplification
+- Implement expression caching

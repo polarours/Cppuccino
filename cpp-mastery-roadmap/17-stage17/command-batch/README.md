@@ -58,9 +58,9 @@ batch->execute();  // counter = 2
 batch->undo();     // counter = 0
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多命令类型
-- 实现条件批处理
-- 添加批处理日志
-- 实现分布式批处理
+- Add more command types
+- Implement conditional batching
+- Add batch logging
+- Implement distributed batching

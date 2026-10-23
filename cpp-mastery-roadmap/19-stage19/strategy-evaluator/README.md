@@ -49,15 +49,18 @@ ctest --test-dir build --output-on-failure
 ```cpp
 #include "strategy_evaluator.hpp"
 
+#include <vector>
+
 strategy_evaluator::StrategyEvaluator evaluator;
+std::vector<int> data = {5, 3, 1, 4, 2};
 evaluator.evaluate(std::make_shared<strategy_evaluator::BubbleSort>(), data);
 evaluator.evaluate(std::make_shared<strategy_evaluator::QuickSort>(), data);
 evaluator.printResults();
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多策略类型
-- 实现统计分析
-- 添加可视化
-- 实现分布式评估
+- Add more strategy types
+- Implement statistical analysis
+- Add visualization
+- Implement distributed evaluation

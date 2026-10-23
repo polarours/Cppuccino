@@ -57,9 +57,9 @@ auto compressed = std::make_shared<decorator_pattern::CompressionDecorator>(encr
 std::string data = compressed->readData();
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多装饰器类型
-- 实现装饰器链的性能优化
-- 添加装饰器缓存
-- 实现装饰器序列化
+- Add more decorator types
+- Optimize the performance of decorator chains
+- Add decorator caching
+- Implement decorator serialization

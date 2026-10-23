@@ -53,9 +53,9 @@ auto animal = null_object_pattern::AnimalFactory::create("unknown");
 std::cout << animal->speak() << "\n";  // "(silence)"
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多 null 对象类型
-- 实现 null 对象日志
-- 添加 null 对象统计
-- 实现 null 对象序列化
+- Add more null object types
+- Implement null object logging
+- Add null object statistics
+- Implement null object serialization

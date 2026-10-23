@@ -60,9 +60,9 @@ chain_of_responsibility::Request req{"test", 1};
 auth->handle(req);
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多处理器类型
-- 实现处理器优先级
-- 添加处理器缓存
-- 实现分布式处理器
+- Add more handler types
+- Implement handler priorities
+- Add handler caching
+- Implement distributed handlers

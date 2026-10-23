@@ -53,9 +53,9 @@ auto book = factory_pattern::ProductFactory::create("book", "C++ Primer", 49.99)
 auto electronics = factory_pattern::ProductFactory::create("electronics", "Laptop", 999.99);
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多产品类型
-- 实现工厂方法模式
-- 添加产品原型模式
-- 实现抽象工厂
+- Add more product types
+- Implement the factory method pattern
+- Add the prototype pattern for products
+- Implement the abstract factory

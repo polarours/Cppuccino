@@ -54,9 +54,9 @@ auto circle = virtual_constructor::ShapeFactory::create(
 auto copy = circle->clone();
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多形状类型
-- 实现形状变换
-- 添加形状序列化
-- 实现形状组合
+- Add more shape types
+- Implement shape transformations
+- Add shape serialization
+- Implement shape composition

@@ -49,6 +49,16 @@ ctest --test-dir build --output-on-failure
 ```cpp
 #include "object_pool_advanced.hpp"
 
+#include <string>
+
+// The pool hands out objects of the type you give it.
+struct Connection {
+    bool valid = true;
+    std::string query(const std::string& sql) {
+        return "rows for " + sql;
+    }
+};
+
 object_pool_advanced::ObjectPool<Connection> pool(
     []() { return new Connection(); },
     [](Connection* p) { delete p; },
@@ -61,9 +71,9 @@ auto conn = pool.acquire();
 conn.reset();  // Returns to pool
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多验证规则
-- 实现连接健康检查
-- 添加池统计
-- 实现池监控
+- Add more validation rules
+- Implement connection health checks
+- Add pool statistics
+- Implement pool monitoring

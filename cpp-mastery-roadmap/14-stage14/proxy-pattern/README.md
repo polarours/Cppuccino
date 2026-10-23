@@ -54,9 +54,9 @@ proxy->display();  // Loads real image on first call
 proxy->display();  // Uses cached image
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多代理类型
-- 实现代理缓存
-- 添加代理访问控制
-- 实现分布式代理
+- Add more proxy types
+- Implement proxy caching
+- Add proxy access control
+- Implement distributed proxies

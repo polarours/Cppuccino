@@ -56,9 +56,9 @@ cache.put("key", 42);
 auto val = cache.get("key");
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多缓存策略
-- 实现策略组合
-- 添加缓存统计
-- 实现分布式缓存
+- Add more caching strategies
+- Implement strategy composition
+- Add cache statistics
+- Implement a distributed cache

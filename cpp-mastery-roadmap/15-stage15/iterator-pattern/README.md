@@ -60,9 +60,9 @@ while (iter->hasNext()) {
 }
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多聚合类型
-- 实现反向迭代器
-- 添加过滤迭代器
-- 实现流式迭代器
+- Add more aggregate types
+- Implement a reverse iterator
+- Add a filtering iterator
+- Implement a streaming iterator

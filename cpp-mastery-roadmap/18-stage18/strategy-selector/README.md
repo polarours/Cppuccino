@@ -57,9 +57,9 @@ std::vector<int> data = {5, 3, 1, 4, 2};
 strategy->sort(data);
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多策略类型
-- 实现策略评估
-- 添加策略推荐
-- 实现策略缓存
+- Add more strategy types
+- Implement strategy evaluation
+- Add strategy recommendation
+- Implement strategy caching

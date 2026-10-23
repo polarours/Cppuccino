@@ -57,9 +57,9 @@ registry.registerShape("circle", circle);
 auto fromRegistry = registry.create("circle");
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多原型类型
-- 实现原型缓存
-- 添加原型验证
-- 实现原型序列化
+- Add more prototype types
+- Implement prototype caching
+- Add prototype validation
+- Implement prototype serialization

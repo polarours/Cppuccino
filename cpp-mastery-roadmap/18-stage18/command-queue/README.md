@@ -54,9 +54,9 @@ queue.enqueue([]() { /* work */ });
 queue.waitForAll();
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加任务优先级
-- 实现任务取消
-- 添加任务超时
-- 实现分布式队列
+- Add task priorities
+- Implement task cancellation
+- Add task timeouts
+- Implement a distributed queue

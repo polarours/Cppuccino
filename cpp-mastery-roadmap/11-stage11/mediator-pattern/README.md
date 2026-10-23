@@ -59,9 +59,9 @@ chatRoom->addColleague(user2);
 user1->send("Hello!");  // Notifies all other colleagues
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多中介者类型
-- 实现消息过滤
-- 添加消息历史
-- 实现分布式中介者
+- Add more mediator types
+- Implement message filtering
+- Add message history
+- Implement a distributed mediator

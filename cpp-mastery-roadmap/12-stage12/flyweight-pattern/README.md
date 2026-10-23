@@ -56,9 +56,9 @@ flyweight_pattern::TextCharacter ch2('B', font);
 // ch1 and ch2 share the same font
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多 flyweight 类型
-- 实现 flyweight 池管理
-- 添加 flyweight 统计
-- 实现 flyweight 序列化
+- Add more flyweight types
+- Implement flyweight pool management
+- Add flyweight statistics
+- Implement flyweight serialization

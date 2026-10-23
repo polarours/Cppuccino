@@ -55,9 +55,9 @@ double_dispatch::Paper paper;
 std::string result = double_dispatch::playGame(rock, paper);
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多游戏元素
-- 实现得分系统
-- 添加游戏历史
-- 实现网络对战
+- Add more game elements
+- Implement the scoring system
+- Add game history
+- Implement networked play

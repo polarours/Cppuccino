@@ -54,9 +54,9 @@ history.add("ls -la", "file1.txt");
 history.undo();
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加命令搜索
-- 实现命令过滤
-- 添加命令分类
-- 实现分布式历史
+- Add command search
+- Implement command filtering
+- Add command classification
+- Implement distributed history

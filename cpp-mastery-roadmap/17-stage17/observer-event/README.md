@@ -57,9 +57,9 @@ dispatcher.on("click", [](const observer_event::Event& e) {
 dispatcher.emit({"click", "button", "clicked"});
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多事件类型
-- 实现事件过滤
-- 添加事件历史
-- 实现分布式事件
+- Add more event types
+- Implement event filtering
+- Add event history
+- Implement distributed events

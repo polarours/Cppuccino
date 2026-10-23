@@ -57,9 +57,9 @@ adapter->play("test.vlc");
 adapter->stop();
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多适配器类型
-- 实现双向适配器
-- 添加适配器缓存
-- 实现适配器链
+- Add more adapter types
+- Implement a two-way adapter
+- Add adapter caching
+- Implement adapter chaining

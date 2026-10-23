@@ -54,9 +54,9 @@ director.setBuilder(std::make_shared<builder_pattern::GamingComputerBuilder>());
 auto computer = director.construct();
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多构建步骤
-- 实现构建器验证
-- 添加构建器缓存
-- 实现构建器序列化
+- Add more build steps
+- Implement builder validation
+- Add builder caching
+- Implement builder serialization

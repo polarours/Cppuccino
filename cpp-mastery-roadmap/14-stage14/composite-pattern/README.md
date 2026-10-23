@@ -56,9 +56,9 @@ std::cout << "Size: " << root->getSize() << "\n";
 root->print();
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多组件类型
-- 实现树遍历算法
-- 添加树操作（搜索、过滤）
-- 实现树序列化
+- Add more component types
+- Implement tree traversal algorithms
+- Add tree operations (search, filter)
+- Implement tree serialization

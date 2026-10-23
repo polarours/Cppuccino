@@ -57,9 +57,9 @@ button->render();    // [Linux Button]
 checkbox->render();  // [Linux Checkbox]
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多产品类型
-- 实现工厂注册表
-- 添加工厂缓存
-- 实现工厂组合
+- Add more product types
+- Implement a factory registry
+- Add factory caching
+- Implement factory composition

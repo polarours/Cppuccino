@@ -57,9 +57,9 @@ std::string result = pipeline.process("  hello  ");
 // result == "HELLO"
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加并行处理阶段
-- 实现错误处理
-- 添加中间结果查看
-- 实现管道缓存
+- Add parallel processing stages
+- Implement error handling
+- Add a view of the intermediate results
+- Implement pipeline caching

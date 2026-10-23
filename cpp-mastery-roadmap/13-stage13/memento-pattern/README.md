@@ -60,9 +60,9 @@ auto memento = history.undo();
 editor.restore(memento);
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多备忘录类型
-- 实现备忘录压缩
-- 添加备忘录验证
-- 实现分布式备忘录
+- Add more memento types
+- Implement memento compression
+- Add memento validation
+- Implement distributed mementos

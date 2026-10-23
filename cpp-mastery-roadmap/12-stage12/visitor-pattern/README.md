@@ -56,9 +56,9 @@ circle.accept(calculator);
 double area = calculator.getResult();
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多访问者类型
-- 实现访问者缓存
-- 添加访问者验证
-- 实现分布式访问者
+- Add more visitor types
+- Implement visitor caching
+- Add visitor validation
+- Implement distributed visitors

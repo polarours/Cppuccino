@@ -56,9 +56,9 @@ auto& config = singleton_pattern::Config::getInstance();
 config.set("host", "localhost");
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加单例生命周期管理
-- 实现单例依赖注入
-- 添加单例测试支持
-- 实现单例序列化
+- Add singleton lifetime management
+- Implement dependency injection for singletons
+- Add test support for singletons
+- Implement singleton serialization

@@ -62,9 +62,9 @@ dispatcher.emit({"click", "low", 3});   // Filtered
 dispatcher.emit({"click", "high", 10}); // Passed
 ```
 
-## 建议的下一步
+## Suggested Next Steps
 
-- 添加更多过滤器类型
-- 实现过滤器链
-- 添加过滤器统计
-- 实现分布式过滤
+- Add more filter types
+- Implement filter chaining
+- Add filter statistics
+- Implement distributed filtering
