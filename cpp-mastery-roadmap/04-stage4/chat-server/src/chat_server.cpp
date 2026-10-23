@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cstring>
+#include <cerrno>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -20,13 +21,13 @@ ChatServer::~ChatServer() {
 }
 
 void ChatServer::start() {
-    server_fd_ = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd_ < 0) {
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
         throw std::runtime_error("Failed to create socket");
     }
 
     int reuse = 1;
-    setsockopt(server_fd_, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
 
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
@@ -34,28 +35,78 @@ void ChatServer::start() {
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(port_);
 
-    if (bind(server_fd_, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        close(server_fd_);
+    if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+        close(fd);
         throw std::runtime_error("Failed to bind");
     }
 
-    if (listen(server_fd_, 10) < 0) {
-        close(server_fd_);
+    if (listen(fd, 10) < 0) {
+        close(fd);
         throw std::runtime_error("Failed to listen");
     }
 
-    running_ = true;
-    std::cout << "Chat server started on port " << port_ << "\n";
+    try {
+        // The flag goes up before the socket is published. A stop() that
+        // runs in between then sees the flag down, and the accept loop
+        // below never starts -- the other order would let the flag go up
+        // again after the stop, and the loop would spin on a socket that
+        // nobody is going to wake.
+        running_ = true;
 
-    while (running_) {
-        int client_fd = accept(server_fd_, nullptr, nullptr);
-        if (client_fd < 0) {
-            if (!running_) break;
-            continue;
+        // The socket is published under the lock, so that stop() can shut it
+        // down. It stays owned by this function: this is the only place
+        // that closes it.
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            server_fd_ = fd;
         }
 
-        clientThreads_.emplace_back(&ChatServer::handleClient, this, client_fd);
+        std::cout << "Chat server started on port " << port_ << "\n";
+
+        while (running_) {
+            int client_fd = accept(fd, nullptr, nullptr);
+            if (client_fd < 0) {
+                if (!running_) break;
+                // The socket is gone. Retrying would spin on the error.
+                if (errno == EBADF || errno == EINVAL || errno == ENOTSOCK) break;
+                continue;
+            }
+
+            // The running flag and the thread list are read under the same
+            // lock. A client that is accepted at the very moment the server
+            // is stopped would otherwise end up in a list that nobody joins,
+            // and a thread that is still joinable when the list is destroyed
+            // ends the program.
+            bool spawned = false;
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                if (running_) {
+                    clientThreads_.emplace_back(&ChatServer::handleClient, this, client_fd);
+                    spawned = true;
+                }
+            }
+            if (!spawned) {
+                close(client_fd);
+                break;
+            }
+        }
+    } catch (...) {
+        // The socket is forgotten before it is closed, so that a stop() that
+        // runs at the same time cannot shut down a descriptor that the
+        // system has already handed out to somebody else.
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            if (server_fd_ == fd) server_fd_ = -1;
+        }
+        close(fd);
+        throw;
     }
+
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (server_fd_ == fd) server_fd_ = -1;
+    }
+    close(fd);
 }
 
 void ChatServer::stop() {
@@ -64,30 +115,39 @@ void ChatServer::stop() {
     // shutdown() before close(): on Linux, close() does not wake a thread
     // already blocked in accept(), so the accept loop would never observe
     // running_ == false and the join below would hang forever.
-    if (server_fd_ >= 0) {
-        shutdown(server_fd_, SHUT_RDWR);
-    }
-
+    //
     // Same reasoning for the client threads: a thread blocked in recv() on an
     // idle connection is not woken by running_ becoming false, so the socket
     // itself has to be shut down.
+    //
+    // The shutdown happens under the lock. A descriptor that is closed while
+    // another thread still holds its number may already belong to somebody
+    // else by then, and shutting that one down would be worse than useless.
     {
         std::lock_guard<std::mutex> lock(mutex_);
+        if (server_fd_ >= 0) {
+            shutdown(server_fd_, SHUT_RDWR);
+        }
         for (int fd : clientFds_) {
             shutdown(fd, SHUT_RDWR);
         }
     }
 
-    for (auto& thread : clientThreads_) {
-        if (thread.joinable()) {
-            thread.join();
+    // The client threads are taken out of the list under the lock and joined
+    // outside of it: a client thread needs the lock itself to broadcast its
+    // farewell message.
+    for (;;) {
+        std::vector<std::thread> threads;
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            if (clientThreads_.empty()) break;
+            threads.swap(clientThreads_);
         }
-    }
-    clientThreads_.clear();
-
-    if (server_fd_ >= 0) {
-        close(server_fd_);
-        server_fd_ = -1;
+        for (auto& thread : threads) {
+            if (thread.joinable()) {
+                thread.join();
+            }
+        }
     }
 }
 
@@ -96,9 +156,20 @@ void ChatServer::handleClient(int client_fd) {
     std::string username;
 
     // Register the socket so stop() can wake this thread if it is blocked.
+    // The check and the registration are one step, so that a connection
+    // that arrives while the server is being stopped is closed instead of
+    // being left to block in recv() forever.
+    bool registered = false;
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        clientFds_.insert(client_fd);
+        if (running_) {
+            clientFds_.insert(client_fd);
+            registered = true;
+        }
+    }
+    if (!registered) {
+        close(client_fd);
+        return;
     }
 
     // Expect first message to be username

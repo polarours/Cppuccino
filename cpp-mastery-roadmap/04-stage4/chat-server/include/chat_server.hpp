@@ -50,11 +50,18 @@ private:
     void processCommand(const std::string& user, const std::string& cmd);
 
     int port_;
+    // The listening socket. start() creates it and closes it again when the
+    // accept loop ends; stop() only shuts it down, so that a thread blocked
+    // in accept() wakes up. Every access is under mutex_.
     int server_fd_;
     std::atomic<bool> running_;
     std::map<std::string, int> users_;
     std::map<std::string, std::set<std::string>> rooms_;
     std::map<std::string, std::set<std::string>> userRooms_;
+    // The threads that serve the clients. The accept loop fills the list
+    // and stop() takes it over, both under mutex_. The threads themselves
+    // are joined outside of the lock, because a client thread needs the
+    // lock to broadcast its farewell message.
     std::vector<std::thread> clientThreads_;
     // Client sockets that are still being served. stop() shuts them down so
     // that threads blocked in recv() wake up instead of hanging the join.

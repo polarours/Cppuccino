@@ -23,6 +23,26 @@ A simple multi-user chat server with rooms and commands.
 - Commands: /join, /leave, /rooms, /users, /quit
 - Thread-safe operation
 
+## Shutting Down
+
+`stop()` has to reach a thread that is blocked in `accept()` or in
+`recv()`. On Linux neither of them wakes up when a flag is set, so the
+sockets themselves are shut down.
+
+The ownership is what keeps that safe:
+
+- `start()` creates the listening socket and closes it again when the
+  accept loop ends. `stop()` only shuts it down, and does so under the
+  lock. A descriptor that is closed while another thread still holds its
+  number may already belong to somebody else.
+- A client that is accepted at the very moment the server is stopped does
+  not get a thread. The running flag and the thread list are read under
+  the same lock, so such a connection is closed instead of ending up in a
+  list that nobody joins.
+- The client threads are taken out of the list under the lock and joined
+  outside of it, because a client thread needs the lock itself to
+  broadcast its farewell message.
+
 ## Build
 
 ```bash
