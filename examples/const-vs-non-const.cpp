@@ -8,16 +8,19 @@
 
 class Data {
 public:
-    int compute() const {
-        int sum = 0;
+    // The sum of a million numbers does not fit in an int: 0 + 1 + ... +
+    // 999999 is 499999500000, which overflows a 32 bit signed integer.
+    // An overflow there is undefined behaviour, not a wrap-around.
+    long long compute() const {
+        long long sum = 0;
         for (int i = 0; i < 1000000; ++i) {
             sum += i;
         }
         return sum;
     }
 
-    int computeNonConst() {
-        int sum = 0;
+    long long computeNonConst() {
+        long long sum = 0;
         for (int i = 0; i < 1000000; ++i) {
             sum += i;
         }

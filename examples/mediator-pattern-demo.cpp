@@ -20,13 +20,17 @@ public:
     void send(const std::string& message);  // forward-declared impl below
 
     void receive(const std::string& from, const std::string& message) {
-        std::cout << "  " << name_ << "收到来自" << from << ": " << message << "\n";
+        std::cout << "  " << name_ << " received from " << from << ": " << message << "\n";
     }
 
     const std::string& getName() const { return name_; }
 
 private:
-    std::shared_ptr<ChatRoom> room_;
+    // The chat room owns the users, so a user must not own the chat room:
+    // shared ownership on both sides is a cycle, and neither side would
+    // ever be released. The weak pointer keeps the link without taking
+    // part in the ownership.
+    std::weak_ptr<ChatRoom> room_;
     std::string name_;
 };
 
@@ -37,7 +41,7 @@ public:
     }
 
     void broadcast(const std::string& message, const std::string& senderName) {
-        std::cout << "[" << senderName << "广播] " << message << "\n";
+        std::cout << "[" << senderName << " broadcast] " << message << "\n";
         for (const auto& user : colleagues_) {
             if (user->getName() != senderName)
                 user->receive(senderName, message);
@@ -49,7 +53,10 @@ private:
 };
 
 void User::send(const std::string& message) {
-    room_->broadcast(message, name_);
+    // The room may already be gone; there is nobody to broadcast to then.
+    if (auto room = room_.lock()) {
+        room->broadcast(message, name_);
+    }
 }
 
 } // namespace mediator_pattern

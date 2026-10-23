@@ -26,10 +26,10 @@ class AuthHandler : public Handler {
 public:
     bool handle(Request& req) override {
         if (req.content.empty()) {
-            std::cout << "[Auth] 拒绝：空请求\n";
+            std::cout << "[Auth] rejected: empty request\n";
             return false;
         }
-        std::cout << "[Auth] 通过\n";
+        std::cout << "[Auth] passed\n";
         return next_ ? next_->handle(req) : true;
     }
 };
@@ -37,7 +37,7 @@ public:
 class LoggingHandler : public Handler {
 public:
     bool handle(Request& req) override {
-        std::cout << "[Log] 记录请求: " << req.content << " (优先级:" << req.priority << ")\n";
+        std::cout << "[Log] recording request: " << req.content << " (priority:" << req.priority << ")\n";
         return next_ ? next_->handle(req) : true;
     }
 };
@@ -46,10 +46,10 @@ class ValidationHandler : public Handler {
 public:
     bool handle(Request& req) override {
         if (req.content.size() > 100) {
-            std::cout << "[Validation] 拒绝：内容过长\n";
+            std::cout << "[Validation] rejected: content too long\n";
             return false;
         }
-        std::cout << "[Validation] 通过\n";
+        std::cout << "[Validation] passed\n";
         return next_ ? next_->handle(req) : true;
     }
 };
@@ -57,7 +57,7 @@ public:
 class ProcessingHandler : public Handler {
 public:
     bool handle(Request& req) override {
-        std::cout << "[Processing] 处理: " << req.content << "\n";
+        std::cout << "[Processing] handling: " << req.content << "\n";
         return true;
     }
 };

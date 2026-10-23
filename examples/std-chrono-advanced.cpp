@@ -33,7 +33,9 @@ int main() {
     // Timing measurement
     auto start = std::chrono::high_resolution_clock::now();
     // Do some work
-    volatile int sum = 0;
+    // The sum of a million numbers does not fit in an int, and an
+    // overflow there is undefined behaviour.
+    volatile long long sum = 0;
     for (int i = 0; i < 1000000; ++i) {
         sum += i;
     }
