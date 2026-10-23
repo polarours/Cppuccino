@@ -524,6 +524,28 @@ class GoodMediator {
 };
 ```
 
+The weak reference goes on the side that must not own. The mediator
+usually owns the colleagues -- it is the one that has to reach all of them
+-- so the colleague holds the mediator weakly:
+
+```cpp
+class User {
+public:
+    void send(const std::string& message) {
+        if (auto mediator = mediator_.lock()) {
+            mediator->notify(name_, message);
+        }
+    }
+
+private:
+    std::weak_ptr<Mediator> mediator_;
+    std::string name_;
+};
+```
+
+The `mediator-pattern` project in this repository makes exactly this
+choice.
+
 ### Trap 3: Performance
 
 ```cpp

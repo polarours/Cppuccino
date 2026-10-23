@@ -29,7 +29,11 @@ public:
     std::string getName() const { return name_; }
 
 protected:
-    std::shared_ptr<Mediator> mediator_;
+    // The mediator owns the colleagues, so a colleague must not own the
+    // mediator: shared ownership on both sides is a cycle, and neither
+    // side would ever be released. The weak pointer keeps the link
+    // without taking part in the ownership.
+    std::weak_ptr<Mediator> mediator_;
     std::string name_;
 };
 
@@ -62,7 +66,10 @@ public:
         : Colleague(mediator, name) {}
 
     void send(const std::string& message) {
-        mediator_->notify(name_, message);
+        // The mediator may already be gone; there is nobody to notify then.
+        if (auto mediator = mediator_.lock()) {
+            mediator->notify(name_, message);
+        }
     }
 
     void receive(const std::string& from, const std::string& message) {
