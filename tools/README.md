@@ -13,15 +13,42 @@ tools/run_all_checks.sh --full   # and every project build and test
 
 | Script | What it catches |
 |--------|-----------------|
-| `check_docs.py` | A file in `docs/en/` with an English filename but a Chinese body; the English and Chinese halves of a document drifting apart |
+| `check_docs.py` | A file in `docs/en/` with an English filename but a Chinese body; the English and Chinese halves of a document drifting apart; a code block that was cut short, so its braces do not balance |
 | `check_links.py` | A relative link or `#anchor` that no longer resolves |
 | `check_doc_examples.py` | A complete example inside a document that no longer compiles or runs |
 | `check_examples.py` | A standalone file in `examples/` that no longer compiles, a header that no longer describes how to build it, or two examples writing to the same binary |
 | `check_stats.py` | A statistic in the READMEs that no longer matches the repository |
-| `check_project_readmes.py` | A project README that drifted from its twin, or that names a binary the project does not build |
+| `check_project_readmes.py` | A project README that drifted from its twin, that names a binary the project does not build, or that is written in the wrong language |
+| `check_readme_examples.py` | A C++ example in a project README that no longer compiles |
 | `check_overview_parity.py` | The two roadmap indexes listing different stages or different projects |
-| `check_docs.py` | A code block that was cut short, so its braces do not balance |
 | `build_all_projects.py` | A project that fails to configure, build or pass its tests |
+| `run_sanitizers.py` | A test that reads freed memory, writes out of bounds, or leaks, and still passes |
+
+The last two run the projects, the rest read the repository:
+
+```bash
+python3 tools/build_all_projects.py --jobs 4
+python3 tools/run_sanitizers.py --jobs 4
+```
+
+`run_sanitizers.py` builds every project a second time with
+`-fsanitize=address,undefined` and reports a leak or a use-after-free that
+the ordinary build waves through. It found three real defects in this
+repository: a control block that was freed while it was still in use, a
+list that never released its nodes, and a pair of objects that owned each
+other.
+
+The same script answers a different question with `--tsan`:
+
+```bash
+python3 tools/run_sanitizers.py --tsan --jobs 4
+```
+
+ThreadSanitizer looks for two threads touching the same memory without a
+lock. It found a descriptor that was closed while another thread was still
+reading it, a value that was moved out of a node before the exchange that
+owned it, and a timer thread that outlived the object it belonged to.
+
 
 ## How the language check works
 

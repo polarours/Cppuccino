@@ -68,6 +68,51 @@ jobs:
         run: |
           echo "shard ${{ matrix.shard.id }} covered ${{ matrix.shard.stages }}"
 
+  sanitize:
+    name: sanitizers
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Fetch the tinyshell submodule
+        # The pinned submodule commit is not on the submodule's remote yet, so
+        # this must not fail the run. The scan skips tinyshell when it is not
+        # checked out.
+        continue-on-error: true
+        run: git submodule update --init --recursive
+
+      - name: Install the C++ toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-recommends g++ cmake
+
+      - name: Run every test under the sanitizers
+        # A test that passes can still read freed memory or do something the
+        # standard leaves undefined. The sanitizers turn those into failures.
+        run: python3 tools/run_sanitizers.py --jobs 4
+
+  races:
+    name: data races
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Install the C++ toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-recommends g++ cmake
+
+      - name: Run every test under the thread sanitizer
+        # The thread sanitizer looks for a different kind of mistake: two
+        # threads touching the same memory without a lock. It found a
+        # released descriptor that was still being read, and a value that
+        # was moved out of a node before the exchange that owned it.
+        run: python3 tools/run_sanitizers.py --tsan --jobs 4 --skip tinyshell
+
   tinyshell:
     name: tinyshell
     runs-on: ubuntu-latest

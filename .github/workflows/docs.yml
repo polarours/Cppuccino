@@ -74,5 +74,8 @@ jobs:
       - name: Project READMEs agree with their twin and their build
         run: python3 tools/check_project_readmes.py
 
+      - name: The project README examples compile
+        run: python3 tools/check_readme_examples.py
+
       - name: The two roadmap indexes agree
         run: python3 tools/check_overview_parity.py

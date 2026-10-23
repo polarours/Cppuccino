@@ -4,9 +4,11 @@
 # Usage:
 #   tools/run_all_checks.sh            # documentation checks only
 #   tools/run_all_checks.sh --full     # also build and test every project
+#   tools/run_all_checks.sh --sanitize # also run every test under the sanitizers
 #
 # The documentation checks are fast enough to run before every commit. The
-# full run builds and tests all projects, which takes a while.
+# full run builds and tests all projects, which takes a while. The sanitizer
+# run builds everything a second time, so it is opt-in.
 
 set -uo pipefail
 
@@ -14,9 +16,11 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 FULL=0
-if [ "${1:-}" = "--full" ]; then
-    FULL=1
-fi
+SANITIZE=0
+case "${1:-}" in
+    --full) FULL=1 ;;
+    --sanitize) SANITIZE=1 ;;
+esac
 
 FAILED=()
 
@@ -53,12 +57,20 @@ run "statistics: the READMEs agree with the repository" \
 run "projects: the READMEs agree with their twin and their build" \
     python3 tools/check_project_readmes.py
 
+run "projects: the README examples compile" \
+    python3 tools/check_readme_examples.py
+
 run "roadmap: the two indexes describe the same thing" \
     python3 tools/check_overview_parity.py
 
 if [ "$FULL" = "1" ]; then
     run "projects: configure, build and test" \
         python3 tools/build_all_projects.py
+fi
+
+if [ "$SANITIZE" = "1" ]; then
+    run "projects: the tests under the sanitizers" \
+        python3 tools/run_sanitizers.py
 fi
 
 echo ""

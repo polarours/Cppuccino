@@ -12,15 +12,39 @@ tools/run_all_checks.sh --full   # 外加全部项目的构建与测试
 
 | 脚本 | 能查出什么 |
 |------|------------|
-| `check_docs.py` | `docs/en/` 里文件名是英文、正文却是中文的文件；中英两半互相漂移 |
+| `check_docs.py` | `docs/en/` 里文件名是英文、正文却是中文的文件；中英两半互相漂移；代码块被截断，导致花括号不配平 |
 | `check_links.py` | 失效的相对链接或 `#锚点` |
 | `check_doc_examples.py` | 文档里已编不过或跑不通的完整示例 |
 | `check_examples.py` | `examples/` 下编不过的独立示例，头注释已经描述不准构建方式的示例，或两个示例写同一个可执行文件 |
 | `check_stats.py` | README 里已经和仓库实际对不上的统计数字 |
-| `check_project_readmes.py` | 项目 README 与它的中英另一半脱节，或写了项目并不构建的可执行文件 |
+| `check_project_readmes.py` | 项目 README 与它的中英另一半脱节，或写了项目并不构建的可执行文件，或语言用错了 |
+| `check_readme_examples.py` | 项目 README 里的 C++ 示例已经编不过 |
 | `check_overview_parity.py` | 中英两份路线图索引列出的阶段或项目不一致 |
-| `check_docs.py` | 代码块被截断，导致花括号不配平 |
 | `build_all_projects.py` | 配置、构建或测试失败的项目 |
+| `run_sanitizers.py` | 读了已释放内存、越界写入或泄漏，却仍然跑通的测试 |
+
+后两个脚本会真的跑项目，其余脚本只读仓库：
+
+```bash
+python3 tools/build_all_projects.py --jobs 4
+python3 tools/run_sanitizers.py --jobs 4
+```
+
+`run_sanitizers.py` 会用 `-fsanitize=address,undefined` 把每个项目再编一遍，
+普通构建放过去的泄漏和 use-after-free，在它这里会被报出来。它在本仓库里
+查出了三个真实缺陷：一个还在使用中就被释放的控制块、一份从不释放节点的
+链表，以及一对互相持有的对象。
+
+同一个脚本换个参数，问的是另一个问题：
+
+```bash
+python3 tools/run_sanitizers.py --tsan --jobs 4
+```
+
+ThreadSanitizer 找的是"两个线程没加锁就碰同一块内存"。它查出了三个真实
+缺陷：一个线程还在读、另一个线程已经关掉的描述符；在拥有它的交换发生
+之前就被移走的节点载荷；以及一个活得比它所属对象还久的定时线程。
+
 
 ## 语言判定是怎么做的
 
