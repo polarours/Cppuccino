@@ -10,7 +10,9 @@ wrong, and all three have happened in this repository:
   command fails
 - a README names a feature the project does not have
 
-The first two are checked here. The third needs a human.
+The first two are checked here. The third needs a human. The language of
+each half is checked as well: thirty English READMEs ended with a section
+that was still Chinese, which the structural comparison did not notice.
 
 Usage: python3 tools/check_project_readmes.py [repo_root]
 """
@@ -102,6 +104,14 @@ def main():
         if zh_lines < en_lines:
             problems.append(f'{rel}: the Chinese README reads as English '
                             f'({zh_lines} chinese lines vs {en_lines} english)')
+
+        # The English README has to be English. Thirty of them ended with a
+        # section that was still Chinese, and nothing noticed, because the
+        # two halves were compared by structure and not by language.
+        en_zh, en_en = chinese_lines(en)
+        if en_zh > en_en:
+            problems.append(f'{rel}: the English README reads as Chinese '
+                            f'({en_zh} chinese lines vs {en_en} english)')
 
         # The binary a README tells the reader to run must be one the
         # project actually builds.

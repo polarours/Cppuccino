@@ -385,9 +385,19 @@ def check_language(root, problems):
     zh_files = sorted(glob.glob(os.path.join(root, 'docs/中文版/*.md')))
     pit_en = sorted(glob.glob(os.path.join(root, 'pitfalls/en/*.md')))
     pit_zh = sorted(glob.glob(os.path.join(root, 'pitfalls/中文版/*.md')))
+    # The English surfaces that are not part of a bilingual pair. They have
+    # no Chinese twin to compare against, so the language check is the only
+    # thing that stands between them and a stray Chinese section.
+    loose_en = [p for p in (
+        'README.md',
+        'examples/README.md',
+        'tools/README.md',
+        'cpp-mastery-roadmap/00-overview.md',
+        'cpp-mastery-roadmap/00-learning-path.md',
+    ) if os.path.isfile(os.path.join(root, p))]
 
     print('== language check ==')
-    for f in en_files + pit_en:
+    for f in en_files + pit_en + loose_en:
         verdict, zh, en = classify(open(f, encoding='utf-8').read())
         if verdict == 'zh':
             problems.append(f'EN body is Chinese: {os.path.relpath(f, root)}')
@@ -401,7 +411,8 @@ def check_language(root, problems):
                   f"({en} english lines vs {zh} chinese lines)")
     print(f"  {len(en_files)} english docs, {len(zh_files)} chinese docs checked")
     print(f"  {len(pit_en)} english pitfalls, {len(pit_zh)} chinese pitfalls checked")
-    return len(en_files) + len(pit_en), len(zh_files) + len(pit_zh)
+    print(f"  {len(loose_en)} other english files checked")
+    return len(en_files) + len(pit_en) + len(loose_en), len(zh_files) + len(pit_zh)
 
 
 def compare_documents(en_path, zh_path, root, problems, label):
