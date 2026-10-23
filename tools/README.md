@@ -20,6 +20,7 @@ tools/run_all_checks.sh --full   # and every project build and test
 | `check_stats.py` | A statistic in the READMEs that no longer matches the repository |
 | `check_project_readmes.py` | A project README that drifted from its twin, that names a binary the project does not build, or that is written in the wrong language |
 | `check_readme_examples.py` | A C++ example in a project README that no longer compiles |
+| `check_warnings.py` | A warning the compiler found in a project or an example, other than the ones that are on purpose |
 | `check_overview_parity.py` | The two roadmap indexes listing different stages or different projects |
 | `build_all_projects.py` | A project that fails to configure, build or pass its tests |
 | `run_sanitizers.py` | A test that reads freed memory, writes out of bounds, or leaks, and still passes |
@@ -60,6 +61,17 @@ The examples are teaching material, so a leak in one teaches a leak. The
 sanitizers found a signed integer overflow in a loop that sums a million
 numbers into an `int`, and a chat room that owned its users while every
 user owned the chat room.
+
+The compiler's own warnings are checked as well:
+
+```bash
+python3 tools/check_warnings.py --jobs 4
+```
+
+A warning is a mistake the compiler has already found. Three of the
+examples break the rules on purpose -- they are the ones that show what a
+dangling reference or a slice looks like -- and they are listed in
+`tools/known_warnings.tsv`. Everything else is expected to be quiet.
 
 
 ## How the language check works

@@ -92,6 +92,8 @@ int main() {
     auto& arial12b = factory.getFont("Arial", 12, true);
 
     std::cout << "Unique fonts: " << factory.size() << "\n\n";
+    std::cout << "  arial14 is " << arial14.key().family
+              << " at size " << arial14.key().size << "\n";
 
     std::string text = "Hello";
     for (char ch : text) {

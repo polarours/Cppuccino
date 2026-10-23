@@ -62,7 +62,9 @@ void demonstrateReferenceBinding() {
     
     std::cout << "ref1: " << ref1 << '\n';
     std::cout << "ref3: " << ref3 << '\n';
+    std::cout << "ref4: " << ref4 << '\n';
     std::cout << "ref5: " << ref5 << '\n';
+    std::cout << "rref3: " << rref3 << '\n';
     std::cout << "rref1: " << rref1 << '\n';
 }
 

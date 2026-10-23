@@ -179,10 +179,10 @@ void practicalExample() {
 
     auto printValue = [](const Value& v) {
         std::visit(overloaded{
-            [](int v) { std::cout << "Integer: " << v; },
-            [](double v) { std::cout << "Double: " << v; },
-            [](const std::string& v) { std::cout << "String: \"" << v << "\""; },
-            [](bool v) { std::cout << "Bool: " << std::boolalpha << v; }
+            [](int i) { std::cout << "Integer: " << i; },
+            [](double d) { std::cout << "Double: " << d; },
+            [](const std::string& s) { std::cout << "String: \"" << s << "\""; },
+            [](bool b) { std::cout << "Bool: " << std::boolalpha << b; }
         }, v);
     };
 

@@ -62,10 +62,10 @@ int main() {
     std::cout << "\napply(greet, {Alice, 30}) = " << greeting << "\n";
 
     // Practical use: unpack tuple as function arguments
-    auto callWithLog = [](auto&& func, auto&&... args) {
-        std::cout << "Calling with " << sizeof...(args) << " args\n";
+    auto callWithLog = [](auto&& func, auto&&... callArgs) {
+        std::cout << "Calling with " << sizeof...(callArgs) << " args\n";
         return std::invoke(std::forward<decltype(func)>(func),
-                           std::forward<decltype(args)>(args)...);
+                           std::forward<decltype(callArgs)>(callArgs)...);
     };
 
     auto r = callWithLog(add, 100, 200);

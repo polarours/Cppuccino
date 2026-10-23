@@ -100,6 +100,7 @@ void demonstrateDecltypeAuto() {
     
     std::cout << "a: " << a << "\n";
     std::cout << "d1 (int): " << d1 << "\n";
+    std::cout << "d3 (const int&): " << d3 << "\n";
     std::cout << "d2 (int&): " << d2 << "\n";
     d2 = 100;  // Modifies a through reference
     std::cout << "After d2 = 100, a: " << a << "\n";

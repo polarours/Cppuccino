@@ -65,8 +65,8 @@ int main() {
     auto u = repo.findById(2);
     std::cout << "Find by ID=2: " << u->name() << " <" << u->email() << ">\n";
 
-    auto devs = repo.findByPredicate([](const User& u){
-        return u.email().find("example") != std::string::npos;
+    auto devs = repo.findByPredicate([](const User& user){
+        return user.email().find("example") != std::string::npos;
     });
     std::cout << "Total users: " << devs.size() << "\n";
 

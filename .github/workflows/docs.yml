@@ -77,5 +77,8 @@ jobs:
       - name: The project README examples compile
         run: python3 tools/check_readme_examples.py
 
+      - name: The code compiles without an unexpected warning
+        run: python3 tools/check_warnings.py
+
       - name: The two roadmap indexes agree
         run: python3 tools/check_overview_parity.py

@@ -97,7 +97,7 @@ void whenNotToMove() {
     // Don't move fundamental types (no benefit)
     int x = 42;
     int y = std::move(x);  // Same as copy
-    std::cout << "Moving int: same as copy\n";
+    std::cout << "Moving int: same as copy, y is " << y << "\n";
 
     // Don't move string literals
     std::string s2 = std::move("literal");  // Copies

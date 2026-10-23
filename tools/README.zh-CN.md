@@ -19,6 +19,7 @@ tools/run_all_checks.sh --full   # 外加全部项目的构建与测试
 | `check_stats.py` | README 里已经和仓库实际对不上的统计数字 |
 | `check_project_readmes.py` | 项目 README 与它的中英另一半脱节，或写了项目并不构建的可执行文件，或语言用错了 |
 | `check_readme_examples.py` | 项目 README 里的 C++ 示例已经编不过 |
+| `check_warnings.py` | 编译器在项目或示例里发现的警告（故意为之的那些除外） |
 | `check_overview_parity.py` | 中英两份路线图索引列出的阶段或项目不一致 |
 | `build_all_projects.py` | 配置、构建或测试失败的项目 |
 | `run_sanitizers.py` | 读了已释放内存、越界写入或泄漏，却仍然跑通的测试 |
@@ -55,6 +56,16 @@ python3 tools/check_doc_examples.py --sanitize
 示例是教材，示例里的泄漏就是在教泄漏。sanitizer 查出了两处：一处是把
 一百万个数累加进 `int` 的有符号溢出，一处是聊天室拥有用户、而每个用户
 又拥有聊天室的循环引用。
+
+编译器自己报出来的警告也会检查：
+
+```bash
+python3 tools/check_warnings.py --jobs 4
+```
+
+警告是编译器已经替你找到的错。有三个示例是故意犯错的 —— 正是它们用来
+展示悬垂引用和对象切片长什么样 —— 它们列在 `tools/known_warnings.tsv`
+里。其余的都应该是安静的。
 
 
 ## 语言判定是怎么做的

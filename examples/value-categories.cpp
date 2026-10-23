@@ -151,7 +151,7 @@ void expressionCategories() {
     int x = 42;
 
     // Lvalue expressions
-    std::cout << "x is lvalue\n";
+    std::cout << "x is lvalue, and x is " << x << "\n";
     std::cout << "*(&x) is lvalue\n";
 
     // Prvalue expressions

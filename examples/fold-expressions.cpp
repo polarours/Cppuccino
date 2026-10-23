@@ -30,7 +30,10 @@ auto multiplyAll(Args... args) {
 }
 
 // --- string concat ---
-std::string concat(const std::string& separator, const std::string& first) {
+std::string concat([[maybe_unused]] const std::string& separator,
+                  const std::string& first) {
+    // The separator only goes between two strings, and there is only one
+    // string left here.
     return first;
 }
 

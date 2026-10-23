@@ -147,7 +147,9 @@ void demonstrateMoveIfNoexcept() {
     auto&& tm1_moved = std::move_if_noexcept(tm1);
     
     std::cout << "nm1 after move_if_noexcept: " << nm1.name() << '\n';
+    std::cout << "nm1_moved is still " << nm1_moved.name() << '\n';
     std::cout << "tm1 after move_if_noexcept: " << tm1.name() << '\n';
+    std::cout << "tm1_moved is still " << tm1_moved.name() << '\n';
     
     // Type trait check
     std::cout << "\nNoexceptMove is_nothrow_move_constructible: " 

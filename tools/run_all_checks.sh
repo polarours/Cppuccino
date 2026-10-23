@@ -60,6 +60,9 @@ run "projects: the READMEs agree with their twin and their build" \
 run "projects: the README examples compile" \
     python3 tools/check_readme_examples.py
 
+run "the code: no warning the compiler did not expect" \
+    python3 tools/check_warnings.py
+
 run "roadmap: the two indexes describe the same thing" \
     python3 tools/check_overview_parity.py
 

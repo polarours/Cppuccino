@@ -53,7 +53,7 @@ int main() {
 
     // Exception on wrong type
     try {
-        auto val = std::get<int>(v2);  // v2 is double, not int
+        [[maybe_unused]] auto val = std::get<int>(v2);  // v2 is double, not int
     } catch (const std::bad_variant_access& e) {
         std::cout << "\nBad access: " << e.what() << "\n";
     }
