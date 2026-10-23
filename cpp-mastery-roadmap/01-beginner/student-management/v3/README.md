@@ -9,13 +9,16 @@ An improved version of the student management system, demonstrating the **borrow
 v2 passed string parameters by value, then moved them into the object. v3 borrows the input with `std::string_view` and makes its own copy internally:
 
 ```cpp
-// v2: pass by value, then move
-Student(int id, std::string name, int age, std::string major,
-        double grade, std::string email, int phoneNumber);
+class Student {
+public:
+    // v2: pass by value, then move
+    Student(int id, std::string name, int age, std::string major,
+            double grade, std::string email, int phoneNumber);
 
-// v3: borrow at the boundary, own internally
-Student(int id, std::string_view name, int age, std::string_view major,
-        double grade, std::string_view email, int phoneNumber);
+    // v3: borrow at the boundary, own internally
+    Student(int id, std::string_view name, int age, std::string_view major,
+            double grade, std::string_view email, int phoneNumber);
+};
 ```
 
 Why this matters:
@@ -27,7 +30,13 @@ Why this matters:
 ### 2. Setters Borrow Too
 
 ```cpp
-void setName(std::string_view name) { name_ = name; }  // copy from view
+class Student {
+public:
+    void setName(std::string_view name) { name_ = name; }  // copy from view
+
+private:
+    std::string name_;
+};
 ```
 
 The member stays a `std::string` (owning); the setter avoids taking a by-value `std::string` just to move it.

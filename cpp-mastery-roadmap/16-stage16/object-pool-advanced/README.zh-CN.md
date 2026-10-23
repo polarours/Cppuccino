@@ -49,6 +49,16 @@ ctest --test-dir build --output-on-failure
 ```cpp
 #include "object_pool_advanced.hpp"
 
+#include <string>
+
+// 池发出去的是你给它的那个类型的对象。
+struct Connection {
+    bool valid = true;
+    std::string query(const std::string& sql) {
+        return "rows for " + sql;
+    }
+};
+
 object_pool_advanced::ObjectPool<Connection> pool(
     []() { return new Connection(); },
     [](Connection* p) { delete p; },

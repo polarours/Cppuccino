@@ -23,6 +23,10 @@ agree with each other, and that each half is written in the right language.
 ## API
 
 ```cpp
+#include <cstddef>
+#include <string>
+#include <vector>
+
 namespace bilingual_doc_checker {
 
 enum class Language { English, Chinese, Unknown };

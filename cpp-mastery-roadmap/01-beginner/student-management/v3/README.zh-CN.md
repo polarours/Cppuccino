@@ -9,13 +9,16 @@
 v2 按值传递字符串参数，再 move 进对象。v3 用 `std::string_view` 借用输入，内部自己做拷贝：
 
 ```cpp
-// v2: 按值传递，再 move
-Student(int id, std::string name, int age, std::string major,
-        double grade, std::string email, int phoneNumber);
+class Student {
+public:
+    // v2: 按值传递，再 move
+    Student(int id, std::string name, int age, std::string major,
+            double grade, std::string email, int phoneNumber);
 
-// v3: 边界处借用，内部持有
-Student(int id, std::string_view name, int age, std::string_view major,
-        double grade, std::string_view email, int phoneNumber);
+    // v3: 边界处借用，内部持有
+    Student(int id, std::string_view name, int age, std::string_view major,
+            double grade, std::string_view email, int phoneNumber);
+};
 ```
 
 为什么重要：
@@ -27,7 +30,13 @@ Student(int id, std::string_view name, int age, std::string_view major,
 ### 2. Setter 也借用
 
 ```cpp
-void setName(std::string_view name) { name_ = name; }  // 从 view 拷贝
+class Student {
+public:
+    void setName(std::string_view name) { name_ = name; }  // 从 view 拷贝
+
+private:
+    std::string name_;
+};
 ```
 
 成员仍是 `std::string`（持有）；setter 避免了仅为 move 而按值接收 `std::string`。

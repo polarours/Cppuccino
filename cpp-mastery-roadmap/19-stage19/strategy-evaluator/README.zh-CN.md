@@ -49,7 +49,10 @@ ctest --test-dir build --output-on-failure
 ```cpp
 #include "strategy_evaluator.hpp"
 
+#include <vector>
+
 strategy_evaluator::StrategyEvaluator evaluator;
+std::vector<int> data = {5, 3, 1, 4, 2};
 evaluator.evaluate(std::make_shared<strategy_evaluator::BubbleSort>(), data);
 evaluator.evaluate(std::make_shared<strategy_evaluator::QuickSort>(), data);
 evaluator.printResults();

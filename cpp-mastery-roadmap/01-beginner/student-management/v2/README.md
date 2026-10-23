@@ -13,6 +13,16 @@ v1 mixed `std::scanf` and `std::cin`, which is error-prone. v2 uses only C++ I/O
 v2 validates user input and handles invalid data gracefully:
 
 ```cpp
+#include <iostream>
+#include <limits>
+#include <string>
+
+// Throw away whatever is left in the input buffer.
+void clearInput() {
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
 int readInt(const std::string& prompt) {
     int value;
     while (true) {
@@ -40,8 +50,23 @@ v1 mixed UI code with business logic. v2 separates concerns:
 v1 had no error handling. v2 returns `bool` or `std::optional` to indicate success/failure:
 
 ```cpp
-bool addStudent(Student student);
-std::optional<Student> findStudent(int id) const;
+#include <optional>
+
+// The student the manager keeps.
+class Student {
+public:
+    Student(int id) : id_(id) {}
+    int id() const { return id_; }
+
+private:
+    int id_;
+};
+
+class StudentManager {
+public:
+    bool addStudent(Student student);
+    std::optional<Student> findStudent(int id) const;
+};
 ```
 
 ### 5. Modern C++ Idioms

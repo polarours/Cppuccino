@@ -19,6 +19,10 @@
 ## 接口
 
 ```cpp
+#include <cstddef>
+#include <string>
+#include <vector>
+
 namespace bilingual_doc_checker {
 
 enum class Language { English, Chinese, Unknown };

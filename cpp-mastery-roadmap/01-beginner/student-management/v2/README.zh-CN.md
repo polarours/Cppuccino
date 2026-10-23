@@ -13,6 +13,16 @@ v1 混用 `std::scanf` 和 `std::cin`，容易出错。v2 只使用 C++ I/O 流�
 v2 校验用户输入并妥善处理非法数据：
 
 ```cpp
+#include <iostream>
+#include <limits>
+#include <string>
+
+// 把输入缓冲区里剩下的东西丢掉。
+void clearInput() {
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
 int readInt(const std::string& prompt) {
     int value;
     while (true) {
@@ -40,8 +50,23 @@ v1 把 UI 代码和业务逻辑混在一起。v2 分离关注点：
 v1 没有错误处理。v2 用 `bool` 或 `std::optional` 表示成功/失败：
 
 ```cpp
-bool addStudent(Student student);
-std::optional<Student> findStudent(int id) const;
+#include <optional>
+
+// The student the manager keeps.
+class Student {
+public:
+    Student(int id) : id_(id) {}
+    int id() const { return id_; }
+
+private:
+    int id_;
+};
+
+class StudentManager {
+public:
+    bool addStudent(Student student);
+    std::optional<Student> findStudent(int id) const;
+};
 ```
 
 ### 5. 现代 C++ 惯用法

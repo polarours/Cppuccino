@@ -49,6 +49,15 @@ ctest --test-dir build --output-on-failure
 ```cpp
 #include "object_pool.hpp"
 
+#include <string>
+
+// The pool hands out objects of the type you give it.
+struct Connection {
+    std::string query(const std::string& sql) {
+        return "rows for " + sql;
+    }
+};
+
 object_pool::ObjectPool<Connection> pool(
     []() { return new Connection(); },
     [](Connection* p) { delete p; },

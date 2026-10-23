@@ -50,6 +50,15 @@ ctest --test-dir build --output-on-failure
 ```cpp
 #include "connection_pool.hpp"
 
+#include <string>
+
+// 池发出去的是你给它的那个类型的对象。
+struct Connection {
+    std::string query(const std::string& sql) {
+        return "rows for " + sql;
+    }
+};
+
 connection_pool::ConnectionPool<Connection> pool(
     []() { return Connection(); },  // 创建器
     5, 10  // 最小/最大大小
