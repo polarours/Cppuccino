@@ -52,6 +52,25 @@ FALLBACK_STANDARDS = ['20', '23', '26']
 # point at a newer toolchain without changing this script.
 CXX = os.environ.get('CXX', 'g++')
 
+# The flags for the sanitizer pass. An example that reads freed memory or
+# does something the standard leaves undefined still runs, and says so on
+# the error stream.
+SANITIZER_FLAGS = ['-fsanitize=address,undefined', '-fno-omit-frame-pointer',
+                   '-g']
+
+# What the sanitizer writes when it finds something.
+SANITIZER_MARKERS = ('AddressSanitizer:', 'LeakSanitizer:',
+                     'UndefinedBehaviorSanitizer:', 'runtime error:')
+
+
+def sanitizer_report(stderr):
+    """The first line the sanitizer wrote, or an empty string."""
+    for line in stderr.splitlines():
+        for marker in SANITIZER_MARKERS:
+            if marker in line:
+                return line.strip()[:120]
+    return ''
+
 
 def declared_standard(path):
     """The -std= flag the header declares, or None when it declares none."""
@@ -170,6 +189,24 @@ def check_header_convention(sources, problems):
             print(f"  HEADER     {name}: the header is not in English")
 
 
+def check_english_body(sources, problems):
+    """The body of an example has to be English, like its header.
+
+    The example files carry English names and the index that lists them has
+    an English half, so the code and the messages it prints are read by an
+    English reader. Seven of the files still had Chinese comments or
+    Chinese output, and the header check did not look that far.
+    """
+    for path in sources:
+        name = os.path.basename(path)
+        text = open(path, encoding='utf-8', errors='replace').read()
+        for number, line in enumerate(text.splitlines(), 1):
+            if not re.search(r'[\u4e00-\u9fff]', line):
+                continue
+            problems.append(f'{name}:{number}: the body is not in English')
+            print(f"  CHINESE   {name}:{number}: {line.strip()[:60]}")
+
+
 def check_output_collisions(sources, problems):
     """Two examples must not write to the same output name.
 
@@ -233,7 +270,7 @@ def check_index_coverage(sources, problems):
     print(f"  {len(listed)} example(s) listed in the index")
 
 
-def run_example(path, standard, workdir):
+def run_example(path, standard, workdir, sanitize=False):
     """Compile and run an example, from a directory that is not the repo.
 
     Running from elsewhere is the point: an example that assumes the current
@@ -243,6 +280,8 @@ def run_example(path, standard, workdir):
     name = os.path.basename(path)
     binary = os.path.join(workdir, 'run_' + name[:-4])
     cmd = [CXX, f'-std=c++{standard}', '-pthread', '-o', binary, path]
+    if sanitize:
+        cmd += SANITIZER_FLAGS
     project = PROJECT_DEPENDENT.get(name)
     if project:
         directory, sources = project
@@ -258,6 +297,10 @@ def run_example(path, standard, workdir):
                                 text=True, errors='replace', timeout=20)
     except subprocess.TimeoutExpired:
         return 'run', 'the example did not finish'
+    if sanitize:
+        report = sanitizer_report(result.stderr or '')
+        if report:
+            return 'sanitize', report
     if result.returncode != 0:
         detail = (result.stderr.strip().splitlines() or ['?'])[-1]
         return 'run', f'the example exited with {result.returncode}: {detail[:70]}'
@@ -270,6 +313,10 @@ def main():
     parser.add_argument('--run', action='store_true',
                         help='also run every example and report the ones that '
                              'do not finish cleanly')
+    parser.add_argument('--sanitize', action='store_true',
+                        help='run every example under the sanitizers and '
+                             'report the ones that read freed memory or do '
+                             'something the standard leaves undefined')
     args = parser.parse_args()
 
     if shutil.which(CXX) is None:
@@ -287,6 +334,7 @@ def main():
     collisions = []
     check_output_collisions(sources, collisions)
     check_header_convention(sources, collisions)
+    check_english_body(sources, collisions)
     check_index_coverage(sources, collisions)
     check_index_translation(collisions)
 
@@ -305,11 +353,19 @@ def main():
                 print(f'  {name:<48} FAIL {detail}')
                 failures.append((name, detail))
 
-        if args.run:
-            print('\n== run check ==')
-            for path in sources:
-                standard = declared_standard(path) or '20'
-                status, detail = run_example(path, standard, workdir)
+        for sanitize in (False, True):
+            if sanitize and not args.sanitize:
+                continue
+            if not sanitize and not args.run:
+                continue
+            print('\n== sanitizer check ==' if sanitize else '\n== run check ==')
+            with ThreadPoolExecutor(max_workers=args.jobs) as pool:
+                runs = list(pool.map(
+                    lambda p: (p, run_example(
+                        p, declared_standard(p) or '20', workdir,
+                        sanitize=sanitize)),
+                    sources))
+            for path, (status, detail) in runs:
                 if status != 'ok':
                     failures.append((os.path.basename(path), detail))
                     print(f"  {os.path.basename(path):<44} "

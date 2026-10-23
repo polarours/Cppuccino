@@ -14,8 +14,8 @@ tools/run_all_checks.sh --full   # 外加全部项目的构建与测试
 |------|------------|
 | `check_docs.py` | `docs/en/` 里文件名是英文、正文却是中文的文件；中英两半互相漂移；代码块被截断，导致花括号不配平 |
 | `check_links.py` | 失效的相对链接或 `#锚点` |
-| `check_doc_examples.py` | 文档里已编不过或跑不通的完整示例 |
-| `check_examples.py` | `examples/` 下编不过的独立示例，头注释已经描述不准构建方式的示例，或两个示例写同一个可执行文件 |
+| `check_doc_examples.py` | 文档里已编不过、跑不通，或者读了已释放内存的完整示例 |
+| `check_examples.py` | `examples/` 下编不过的独立示例，头注释已经描述不准构建方式的示例，两个示例写同一个可执行文件，正文还是中文的示例，或泄漏的示例 |
 | `check_stats.py` | README 里已经和仓库实际对不上的统计数字 |
 | `check_project_readmes.py` | 项目 README 与它的中英另一半脱节，或写了项目并不构建的可执行文件，或语言用错了 |
 | `check_readme_examples.py` | 项目 README 里的 C++ 示例已经编不过 |
@@ -44,6 +44,17 @@ python3 tools/run_sanitizers.py --tsan --jobs 4
 ThreadSanitizer 找的是"两个线程没加锁就碰同一块内存"。它查出了三个真实
 缺陷：一个线程还在读、另一个线程已经关掉的描述符；在拥有它的交换发生
 之前就被移走的节点载荷；以及一个活得比它所属对象还久的定时线程。
+
+两个示例检查器回答的是示例身上的同一个问题：
+
+```bash
+python3 tools/check_examples.py --sanitize --jobs 4
+python3 tools/check_doc_examples.py --sanitize
+```
+
+示例是教材，示例里的泄漏就是在教泄漏。sanitizer 查出了两处：一处是把
+一百万个数累加进 `int` 的有符号溢出，一处是聊天室拥有用户、而每个用户
+又拥有聊天室的循环引用。
 
 
 ## 语言判定是怎么做的

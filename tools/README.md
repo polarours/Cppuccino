@@ -15,8 +15,8 @@ tools/run_all_checks.sh --full   # and every project build and test
 |--------|-----------------|
 | `check_docs.py` | A file in `docs/en/` with an English filename but a Chinese body; the English and Chinese halves of a document drifting apart; a code block that was cut short, so its braces do not balance |
 | `check_links.py` | A relative link or `#anchor` that no longer resolves |
-| `check_doc_examples.py` | A complete example inside a document that no longer compiles or runs |
-| `check_examples.py` | A standalone file in `examples/` that no longer compiles, a header that no longer describes how to build it, or two examples writing to the same binary |
+| `check_doc_examples.py` | A complete example inside a document that no longer compiles or runs, or that reads freed memory |
+| `check_examples.py` | A standalone file in `examples/` that no longer compiles, a header that no longer describes how to build it, two examples writing to the same binary, a body that is still in Chinese, or an example that leaks |
 | `check_stats.py` | A statistic in the READMEs that no longer matches the repository |
 | `check_project_readmes.py` | A project README that drifted from its twin, that names a binary the project does not build, or that is written in the wrong language |
 | `check_readme_examples.py` | A C++ example in a project README that no longer compiles |
@@ -48,6 +48,18 @@ ThreadSanitizer looks for two threads touching the same memory without a
 lock. It found a descriptor that was closed while another thread was still
 reading it, a value that was moved out of a node before the exchange that
 owned it, and a timer thread that outlived the object it belonged to.
+
+The two example checkers answer the same question about the examples:
+
+```bash
+python3 tools/check_examples.py --sanitize --jobs 4
+python3 tools/check_doc_examples.py --sanitize
+```
+
+The examples are teaching material, so a leak in one teaches a leak. The
+sanitizers found a signed integer overflow in a loop that sums a million
+numbers into an `int`, and a chat room that owned its users while every
+user owned the chat room.
 
 
 ## How the language check works

@@ -58,6 +58,25 @@ PORT_ARG_DOCS = {
 # The C++ standards the checker tries, newest first for the fallback.
 STANDARDS = ['-std=c++20', '-std=c++23', '-std=c++26']
 
+# The flags for the sanitizer pass. An example that reads freed memory or
+# does something the standard leaves undefined still runs, and says so on
+# the error stream.
+SANITIZER_FLAGS = ['-fsanitize=address,undefined', '-fno-omit-frame-pointer',
+                   '-g']
+
+# What the sanitizer writes when it finds something.
+SANITIZER_MARKERS = ('AddressSanitizer:', 'LeakSanitizer:',
+                     'UndefinedBehaviorSanitizer:', 'runtime error:')
+
+
+def sanitizer_report(stderr):
+    """The first line the sanitizer wrote, or an empty string."""
+    for line in stderr.splitlines():
+        for marker in SANITIZER_MARKERS:
+            if marker in line:
+                return line.strip()[:120]
+    return ''
+
 
 def free_port():
     """Ask the OS for a port that is currently unused."""
@@ -130,7 +149,7 @@ def api_project_for(path):
     return API_DOC_PROJECTS[slug]
 
 
-def check(path):
+def check(path, sanitize=False):
     """Return (status, detail). status is 'ok', 'skip' or 'fail'.
 
     The program is assembled by trying each plausible starting block, from
@@ -148,6 +167,8 @@ def check(path):
 
     api = api_project_for(path)
     base_cmd = [CXX, '-pthread', '-o', exe]
+    if sanitize:
+        base_cmd += SANITIZER_FLAGS
     if api:
         proj, sources = api
         base_cmd.append(f'-I{os.path.join(REPO, proj)}/include')
@@ -173,6 +194,10 @@ def check(path):
                                        text=True, timeout=30)
                 except subprocess.TimeoutExpired:
                     return 'fail', 'run: timed out'
+                if sanitize:
+                    report = sanitizer_report(r.stderr or '')
+                    if report:
+                        return 'fail', f'sanitizer: {report}'
                 if r.returncode != 0:
                     return 'fail', f'run: exit {r.returncode}'
                 return 'ok', f'{len(r.stdout.strip().splitlines())} output lines'
@@ -183,7 +208,12 @@ def check(path):
 
 
 def main():
-    paths = sys.argv[1:]
+    args = sys.argv[1:]
+    sanitize = False
+    if '--sanitize' in args:
+        sanitize = True
+        args.remove('--sanitize')
+    paths = args
     if not paths:
         paths = []
         for d in ('docs/en', 'docs/中文版'):
@@ -192,7 +222,7 @@ def main():
                             if f.endswith('.md'))
     failures = 0
     for p in paths:
-        status, detail = check(p)
+        status, detail = check(p, sanitize)
         rel = os.path.relpath(p, REPO)
         if status == 'ok':
             print(f"  {rel:<52} OK   {detail}")
