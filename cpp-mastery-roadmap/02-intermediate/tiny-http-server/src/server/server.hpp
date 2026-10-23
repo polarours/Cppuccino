@@ -5,6 +5,9 @@
 
 #include <cstddef>
 #include <string>
+#include <atomic>
+#include <mutex>
+#include <set>
 
 namespace tiny_http_server {
 
@@ -26,15 +29,22 @@ public:
 private:
     int port_;
     std::string addr_;
+    // The listening socket. start() creates it and closes it again when the
+    // accept loop ends; stop() only shuts it down, so that a thread blocked
+    // in accept() wakes up. Every access is under mutex_.
     int server_fd_;
     Router router_;
     ThreadPool thread_pool_;
-    bool running_;
+    std::atomic<bool> running_;
+    // The client sockets that are still being served. stop() shuts them down
+    // so that a worker blocked in read() wakes up instead of hanging the
+    // join of the pool.
+    std::set<int> clientFds_;
+    std::mutex mutex_;
 
     void handle_client(int client_fd);
     void send_response(int client_fd, const HttpResponse& response);
-    void setup_socket();
-    void cleanup();
+    int setup_socket();
 };
 
 } // namespace tiny_http_server

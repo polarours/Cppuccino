@@ -3,12 +3,45 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <thread>
+#include <chrono>
+#include <atomic>
 
 namespace {
 
 void expect(bool condition, const std::string& message) {
     if (!condition) {
         throw std::runtime_error(message);
+    }
+}
+
+// Regression: stop() must terminate even though the accept loop is blocked
+// in accept(). close() alone does not wake a blocked accept() on Linux, so
+// stop() has to shut the socket down explicitly. Without this, stop() hangs
+// and never returns.
+void test_stop_terminates_with_blocked_accept() {
+    web_framework::App app;
+
+    std::thread serverThread([&app]() {
+        app.listen(18013);
+    });
+
+    // Give the accept loop time to block.
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    std::atomic<bool> stopped{false};
+    std::thread stopper([&app, &stopped]() {
+        app.stop();
+        stopped = true;
+    });
+
+    // If stop() hangs, the join below never returns and the test times out
+    // instead of failing cleanly.
+    stopper.join();
+    expect(stopped.load(), "expected stop() to complete");
+
+    if (serverThread.joinable()) {
+        serverThread.join();
     }
 }
 
@@ -123,6 +156,7 @@ void test_app_routing() {
 int main() {
     try {
         std::cout << "Web Framework Tests:\n";
+        test_stop_terminates_with_blocked_accept();
         test_response_ok();
         std::cout << "  test_response_ok: PASS\n";
 

@@ -3,6 +3,14 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <thread>
+#include <chrono>
+#include <atomic>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
 namespace {
 
@@ -135,6 +143,68 @@ void test_request_invalid() {
     expect(!req.parse(""), "expected empty request to fail");
 }
 
+// Regression: stop() must terminate even though the accept loop is blocked
+// in accept(). close() alone does not wake a blocked accept() on Linux, so
+// stop() has to shut the socket down explicitly. Without this, stop() hangs
+// and never returns.
+void test_stop_terminates_with_blocked_accept() {
+    web_server::WebServer server(18003);
+
+    std::thread serverThread([&server]() {
+        server.start();
+    });
+
+    // Give the accept loop time to block.
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    std::atomic<bool> stopped{false};
+    std::thread stopper([&server, &stopped]() {
+        server.stop();
+        stopped = true;
+    });
+
+    // If stop() hangs, the join below never returns and the test times out
+    // instead of failing cleanly.
+    stopper.join();
+    expect(stopped.load(), "expected stop() to complete");
+
+    if (serverThread.joinable()) {
+        serverThread.join();
+    }
+}
+
+// Regression: a client that stays connected without sending anything leaves
+// its handler blocked in recv(). stop() must still return.
+void test_stop_terminates_with_idle_client() {
+    web_server::WebServer server(18004);
+
+    std::thread serverThread([&server]() {
+        server.start();
+    });
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    // Connect a client and leave it idle.
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    expect(fd >= 0, "expected socket creation to succeed");
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(18004);
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+
+    bool connected = connect(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == 0;
+    expect(connected, "expected client connect to succeed");
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    server.stop();
+    expect(!server.isRunning(), "expected server not running after stop");
+
+    if (serverThread.joinable()) {
+        serverThread.join();
+    }
+    close(fd);
+}
+
 } // namespace
 
 int main() {
@@ -178,6 +248,12 @@ int main() {
 
         test_route_registration();
         std::cout << "  test_route_registration: PASS\n";
+
+        test_stop_terminates_with_blocked_accept();
+        std::cout << "  test_stop_terminates_with_blocked_accept: PASS\n";
+
+        test_stop_terminates_with_idle_client();
+        std::cout << "  test_stop_terminates_with_idle_client: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "web_server_tests failed: " << exception.what() << std::endl;

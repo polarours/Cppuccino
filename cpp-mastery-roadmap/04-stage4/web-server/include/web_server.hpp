@@ -3,10 +3,12 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include <functional>
 #include <memory>
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 namespace web_server {
 
@@ -61,8 +63,11 @@ private:
     Response routeRequest(const Request& request);
 
     int port_;
+    // The listening socket. start() creates it and closes it again when the
+    // accept loop ends; stop() only shuts it down, so that a thread blocked
+    // in accept() wakes up. Every access is under mutex_.
     int server_fd_;
-    bool running_;
+    std::atomic<bool> running_;
 
     struct Route {
         std::string method;
@@ -73,7 +78,14 @@ private:
     std::vector<Route> routes_;
     std::vector<Middleware> middleware_;
     std::map<std::string, std::string> staticFiles_;
+    // The threads that serve the clients. The accept loop fills the list
+    // and stop() takes it over, both under mutex_. The threads themselves
+    // are joined outside of the lock.
     std::vector<std::thread> clientThreads_;
+    // The client sockets that are still being served. stop() shuts them down
+    // so that a thread blocked in recv() wakes up instead of hanging the
+    // join.
+    std::set<int> clientFds_;
     std::mutex mutex_;
 };
 

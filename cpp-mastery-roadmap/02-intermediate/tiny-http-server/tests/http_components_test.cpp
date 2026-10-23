@@ -2,6 +2,7 @@
 #include "http/response.hpp"
 #include "router/router.hpp"
 #include "thread-pool/thread_pool.hpp"
+#include "server/server.hpp"
 
 #include <chrono>
 #include <condition_variable>
@@ -9,12 +10,44 @@
 #include <mutex>
 #include <stdexcept>
 #include <string>
+#include <thread>
+#include <atomic>
 
 namespace {
 
 void expect(bool condition, const std::string& message) {
     if (!condition) {
         throw std::runtime_error(message);
+    }
+}
+
+// Regression: stop() must terminate even though the accept loop is blocked
+// in accept(). close() alone does not wake a blocked accept() on Linux, so
+// stop() has to shut the socket down explicitly. Without this, stop() hangs
+// and never returns.
+void test_stop_terminates_with_blocked_accept() {
+    tiny_http_server::Server server("127.0.0.1", 18012, 2);
+
+    std::thread serverThread([&server]() {
+        server.start();
+    });
+
+    // Give the accept loop time to block.
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    std::atomic<bool> stopped{false};
+    std::thread stopper([&server, &stopped]() {
+        server.stop();
+        stopped = true;
+    });
+
+    // If stop() hangs, the join below never returns and the test times out
+    // instead of failing cleanly.
+    stopper.join();
+    expect(stopped.load(), "expected stop() to complete");
+
+    if (serverThread.joinable()) {
+        serverThread.join();
     }
 }
 
@@ -358,6 +391,7 @@ void test_router_handler_with_request_data() {
 
 int main() {
     try {
+        test_stop_terminates_with_blocked_accept();
         test_request_parsing_success();
         test_request_parsing_failure();
         test_request_no_headers();

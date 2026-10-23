@@ -4,6 +4,8 @@
 #include <sstream>
 #include <fstream>
 #include <cstring>
+#include <cerrno>
+#include <stdexcept>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -121,13 +123,13 @@ void WebServer::serveStatic(const std::string& path, const std::string& dir) {
 }
 
 void WebServer::start() {
-    server_fd_ = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd_ < 0) {
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
         throw std::runtime_error("Failed to create socket");
     }
 
     int reuse = 1;
-    setsockopt(server_fd_, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
 
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
@@ -135,49 +137,139 @@ void WebServer::start() {
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(port_);
 
-    if (bind(server_fd_, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        close(server_fd_);
+    if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+        close(fd);
         throw std::runtime_error("Failed to bind");
     }
 
-    if (listen(server_fd_, 10) < 0) {
-        close(server_fd_);
+    if (listen(fd, 10) < 0) {
+        close(fd);
         throw std::runtime_error("Failed to listen");
     }
 
-    running_ = true;
-    std::cout << "Web server started on port " << port_ << "\n";
+    try {
+        // The flag goes up before the socket is published, so that a stop()
+        // that runs in between sees the flag down and the accept loop below
+        // never starts.
+        running_ = true;
 
-    while (running_) {
-        int client_fd = accept(server_fd_, nullptr, nullptr);
-        if (client_fd < 0) {
-            if (!running_) break;
-            continue;
+        // The socket is published under the lock, so that stop() can shut it
+        // down. It stays owned by this function: this is the only place
+        // that closes it.
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            server_fd_ = fd;
         }
 
-        clientThreads_.emplace_back(&WebServer::handleClient, this, client_fd);
+        std::cout << "Web server started on port " << port_ << "\n";
+
+        while (running_) {
+            int client_fd = accept(fd, nullptr, nullptr);
+            if (client_fd < 0) {
+                if (!running_) break;
+                // The socket is gone. Retrying would spin on the error.
+                if (errno == EBADF || errno == EINVAL || errno == ENOTSOCK) break;
+                continue;
+            }
+
+            // The running flag and the thread list are read under the same
+            // lock. A client that is accepted at the very moment the server
+            // is stopped would otherwise end up in a list that nobody joins.
+            bool spawned = false;
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                if (running_) {
+                    clientThreads_.emplace_back(&WebServer::handleClient, this, client_fd);
+                    spawned = true;
+                }
+            }
+            if (!spawned) {
+                close(client_fd);
+                break;
+            }
+        }
+    } catch (...) {
+        // The socket is forgotten before it is closed, so that a stop() that
+        // runs at the same time cannot shut down a descriptor that the
+        // system has already handed out to somebody else.
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            if (server_fd_ == fd) server_fd_ = -1;
+        }
+        close(fd);
+        throw;
     }
+
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (server_fd_ == fd) server_fd_ = -1;
+    }
+    close(fd);
 }
 
 void WebServer::stop() {
     running_ = false;
-    if (server_fd_ >= 0) {
-        close(server_fd_);
-        server_fd_ = -1;
-    }
 
-    for (auto& thread : clientThreads_) {
-        if (thread.joinable()) {
-            thread.join();
+    // shutdown() before close(): on Linux, close() does not wake a thread
+    // that is already blocked in accept() or in recv(), so the accept loop
+    // would never observe running_ == false and the join below would hang
+    // forever. The socket itself has to be shut down.
+    //
+    // The shutdown happens under the lock. A descriptor that is closed while
+    // another thread still holds its number may already belong to somebody
+    // else by then.
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (server_fd_ >= 0) {
+            shutdown(server_fd_, SHUT_RDWR);
+        }
+        for (int fd : clientFds_) {
+            shutdown(fd, SHUT_RDWR);
         }
     }
-    clientThreads_.clear();
+
+    // The client threads are taken out of the list under the lock and joined
+    // outside of it.
+    for (;;) {
+        std::vector<std::thread> threads;
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            if (clientThreads_.empty()) break;
+            threads.swap(clientThreads_);
+        }
+        for (auto& thread : threads) {
+            if (thread.joinable()) {
+                thread.join();
+            }
+        }
+    }
 }
 
 void WebServer::handleClient(int client_fd) {
+    // Register the socket so stop() can wake this thread if it is blocked.
+    // The check and the registration are one step, so that a connection
+    // that arrives while the server is being stopped is closed instead of
+    // being left to block in recv() forever.
+    bool registered = false;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (running_) {
+            clientFds_.insert(client_fd);
+            registered = true;
+        }
+    }
+    if (!registered) {
+        close(client_fd);
+        return;
+    }
+
     char buffer[4096];
     ssize_t bytes = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
     if (bytes <= 0) {
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            clientFds_.erase(client_fd);
+        }
         close(client_fd);
         return;
     }
@@ -188,6 +280,10 @@ void WebServer::handleClient(int client_fd) {
         auto response = Response::badRequest();
         std::string serialized = response.serialize();
         send(client_fd, serialized.c_str(), serialized.size(), 0);
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            clientFds_.erase(client_fd);
+        }
         close(client_fd);
         return;
     }
@@ -195,6 +291,10 @@ void WebServer::handleClient(int client_fd) {
     Response response = handleRequest(request);
     std::string serialized = response.serialize();
     send(client_fd, serialized.c_str(), serialized.size(), 0);
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        clientFds_.erase(client_fd);
+    }
     close(client_fd);
 }
 

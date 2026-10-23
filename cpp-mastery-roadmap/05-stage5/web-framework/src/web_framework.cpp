@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sstream>
 #include <cstring>
+#include <cerrno>
+#include <stdexcept>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -130,7 +132,7 @@ Response Router::route(const Request& request) {
 
 // --- App ---
 
-App::App() : port_(8080), server_fd_(-1), running_(false) {}
+App::App() : port_(8080), server_fd_(-1), client_fd_(-1), running_(false) {}
 App::~App() { stop(); }
 
 App& App::get(const std::string& path, Handler handler) {
@@ -170,13 +172,13 @@ Response App::handleRequest(const Request& request) {
 
 void App::listen(int port) {
     port_ = port;
-    server_fd_ = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd_ < 0) {
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
         throw std::runtime_error("Failed to create socket");
     }
 
     int reuse = 1;
-    setsockopt(server_fd_, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
 
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
@@ -184,47 +186,109 @@ void App::listen(int port) {
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(port_);
 
-    if (bind(server_fd_, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        close(server_fd_);
+    if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+        close(fd);
         throw std::runtime_error("Failed to bind");
     }
 
-    if (::listen(server_fd_, 10) < 0) {
-        close(server_fd_);
+    if (::listen(fd, 10) < 0) {
+        close(fd);
         throw std::runtime_error("Failed to listen");
     }
 
-    running_ = true;
-    std::cout << "Server listening on port " << port << "\n";
+    try {
+        // The flag goes up before the socket is published, so that a stop()
+        // that runs in between sees the flag down and the accept loop below
+        // never starts.
+        running_ = true;
 
-    while (running_) {
-        int client_fd = accept(server_fd_, nullptr, nullptr);
-        if (client_fd < 0) continue;
-
-        char buffer[4096];
-        ssize_t bytes = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
-        if (bytes > 0) {
-            buffer[bytes] = '\0';
-            Request request;
-            std::istringstream stream(buffer);
-            std::string line;
-            std::getline(stream, line);
-            std::istringstream requestLine(line);
-            requestLine >> request.method >> request.path >> request.version;
-
-            Response response = handleRequest(request);
-            std::string serialized = response.serialize();
-            send(client_fd, serialized.c_str(), serialized.size(), 0);
+        // The socket is published under the lock, so that stop() can shut it
+        // down. It stays owned by this function: this is the only place
+        // that closes it.
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            server_fd_ = fd;
         }
-        close(client_fd);
+
+        std::cout << "Server listening on port " << port << "\n";
+
+        while (running_) {
+            int client = accept(fd, nullptr, nullptr);
+            if (client < 0) {
+                if (!running_) break;
+                // The socket is gone. Retrying would spin on the error.
+                if (errno == EBADF || errno == EINVAL || errno == ENOTSOCK) break;
+                continue;
+            }
+
+            // The client is published, so that stop() can shut it down. A
+            // client that connects and says nothing would otherwise hold the
+            // loop in recv() for ever.
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                client_fd_ = client;
+            }
+
+            char buffer[4096];
+            ssize_t bytes = recv(client, buffer, sizeof(buffer) - 1, 0);
+            if (bytes > 0) {
+                buffer[bytes] = '\0';
+                Request request;
+                std::istringstream stream(buffer);
+                std::string line;
+                std::getline(stream, line);
+                std::istringstream requestLine(line);
+                requestLine >> request.method >> request.path >> request.version;
+
+                Response response = handleRequest(request);
+                std::string serialized = response.serialize();
+                send(client, serialized.c_str(), serialized.size(), 0);
+            }
+
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                if (client_fd_ == client) client_fd_ = -1;
+            }
+            close(client);
+        }
+    } catch (...) {
+        // The socket is forgotten before it is closed, so that a stop() that
+        // runs at the same time cannot shut down a descriptor that the
+        // system has already handed out to somebody else.
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            if (server_fd_ == fd) server_fd_ = -1;
+        }
+        close(fd);
+        throw;
     }
+
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (server_fd_ == fd) server_fd_ = -1;
+    }
+    close(fd);
 }
 
 void App::stop() {
     running_ = false;
-    if (server_fd_ >= 0) {
-        close(server_fd_);
-        server_fd_ = -1;
+
+    // shutdown() before close(): on Linux, close() does not wake a thread
+    // that is already blocked in accept() or in recv(), so the accept loop
+    // would never observe running_ == false. The sockets themselves have to
+    // be shut down.
+    //
+    // The shutdown happens under the lock. A descriptor that is closed while
+    // another thread still holds its number may already belong to somebody
+    // else by then.
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (server_fd_ >= 0) {
+            shutdown(server_fd_, SHUT_RDWR);
+        }
+        if (client_fd_ >= 0) {
+            shutdown(client_fd_, SHUT_RDWR);
+        }
     }
 }
 

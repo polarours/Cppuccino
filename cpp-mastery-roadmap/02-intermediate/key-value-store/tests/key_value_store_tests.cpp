@@ -29,6 +29,37 @@ void expect(bool condition, const std::string& message) {
     }
 }
 
+// Regression: stop() must terminate even though the accept loop is blocked
+// in accept(). close() alone does not wake a blocked accept() on Linux, so
+// stop() has to shut the socket down explicitly. Without this, stop() hangs
+// and never returns.
+void test_stop_terminates_with_blocked_accept() {
+    key_value_store::Server server("127.0.0.1", 18011, "/tmp/cppuccino-kvs-test.txt");
+
+    std::thread serverThread([&server]() {
+        server.start();
+    });
+
+    // Give the accept loop time to block.
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    std::atomic<bool> stopped{false};
+    std::thread stopper([&server, &stopped]() {
+        server.stop();
+        stopped = true;
+    });
+
+    // If stop() hangs, the join below never returns and the test times out
+    // instead of failing cleanly.
+    stopper.join();
+    expect(stopped.load(), "expected stop() to complete");
+    expect(!server.isRunning(), "expected server not running after stop");
+
+    if (serverThread.joinable()) {
+        serverThread.join();
+    }
+}
+
 void test_basic_store_operations() {
     key_value_store::KeyValueStore store;
     
@@ -782,6 +813,7 @@ void test_concurrent_read_write() {
 
 int main() {
     try {
+        test_stop_terminates_with_blocked_accept();
         test_basic_store_operations();
         test_command_processor();
         test_persistence_round_trip();
