@@ -6,6 +6,7 @@
 #include <thread>
 #include <vector>
 #include <numeric>
+#include <atomic>
 
 namespace {
 
@@ -93,6 +94,35 @@ void test_multi_producer_consumer() {
     expect(consumed == 100, "expected 100 consumed");
 }
 
+// The payload of a queue is not always a number. A type with a destructor
+// makes the difference visible: taking the payload out of the node is a
+// write, so it must not happen while another thread is looking at the same
+// node.
+void test_concurrent_pop_with_owned_payload() {
+    lock_free_queue::LockFreeQueue<std::string> queue;
+
+    for (int i = 0; i < 200; ++i) {
+        queue.push(std::string("value") + std::to_string(i));
+    }
+
+    std::atomic<int> consumed{0};
+    std::vector<std::thread> consumers;
+    for (int i = 0; i < 4; ++i) {
+        consumers.emplace_back([&queue, &consumed]() {
+            for (int j = 0; j < 50; ++j) {
+                auto value = queue.pop();
+                if (value.has_value()) {
+                    expect(value->size() > 5, "expected the whole payload");
+                    consumed++;
+                }
+            }
+        });
+    }
+    for (auto& t : consumers) t.join();
+
+    expect(consumed == 200, "expected 200 consumed");
+}
+
 } // namespace
 
 int main() {
@@ -109,6 +139,9 @@ int main() {
 
         test_multi_producer_consumer();
         std::cout << "  test_multi_producer_consumer: PASS\n";
+
+        test_concurrent_pop_with_owned_payload();
+        std::cout << "  test_concurrent_pop_with_owned_payload: PASS\n";
 
     } catch (const std::string& exception) {
         std::cerr << "lock_free_queue_tests failed: " << exception << std::endl;
