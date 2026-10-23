@@ -18,7 +18,7 @@ int main() {
     std::print("Hello, C++23!\n");
     std::print("Number: {}\n", 42);
     
-    // 2. std::flat_map (有序哈希表)
+    // 2. std::flat_map (an ordered hash map)
     std::print("\n2. std::flat_map:\n");
     std::flat_map<std::string, int> scores = {
         {"Alice", 95}, {"Bob", 87}, {"Charlie", 92}
@@ -27,7 +27,7 @@ int main() {
         std::print("  {}: {}\n", name, score);
     }
     
-    // 3. std::mdspan (多维数组视图)
+    // 3. std::mdspan (a view over a multidimensional array)
     std::print("\n3. std::mdspan:\n");
     std::vector<int> data = {1, 2, 3, 4, 5, 6};
     std::mdspan<int, std::extents<std::size_t, 2, 3>> matrix(data.data(), 2, 3);

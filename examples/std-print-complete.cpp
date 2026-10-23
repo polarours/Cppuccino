@@ -10,13 +10,13 @@
 #include <format>
 #include <numeric>
 
-// 自定义类型的格式化
+// Formatting a type of your own
 struct Point {
     int x;
     int y;
 };
 
-// C++23 自定义 formatter
+// A custom formatter in C++23
 template<>
 struct std::formatter<Point> : std::formatter<string> {
     auto format(const Point& p, format_context& ctx) const {
@@ -27,12 +27,12 @@ struct std::formatter<Point> : std::formatter<string> {
 int main() {
     std::print("=== C++23 std::print Demo ===\n\n");
     
-    // 1. 基本输出
+    // 1. Basic output
     std::print("1. Basic output:\n");
     std::print("Hello, World!\n");
     std::print("Number: {}, Float: {}, String: {}\n", 42, 3.14, "test");
     
-    // 2. 格式化说明
+    // 2. The format specification
     std::print("\n2. Formatting:\n");
     std::print("Integer: {:d}\n", 42);
     std::print("Float: {:.2f}\n", 3.14159);
@@ -43,16 +43,16 @@ int main() {
     std::print("Hex: {:x}\n", 255);
     std::print("Pad zero: {:05d}\n", 42);
     
-    // 3. 类型安全
+    // 3. Type safety
     std::print("\n3. Type safety:\n");
-    std::print("Type: {}\n", 42);  // 自动推导类型
+    std::print("Type: {}\n", 42);  // the type is worked out
     
-    // 4. 自定义对象
+    // 4. An object of your own type
     std::print("\n4. Custom object:\n");
     Point p{10, 20};
     std::print("Point: {}\n", p);
     
-    // 5. 容器输出
+    // 5. Printing a container
     std::print("\n5. Container output:\n");
     std::vector<int> vec = {1, 2, 3, 4, 5};
     std::print("Vector: [");
@@ -62,12 +62,12 @@ int main() {
     }
     std::print("]\n");
     
-    // 6. 与 std::format 配合
+    // 6. Together with std::format
     std::print("\n6. Combined with std::format:\n");
     std::string formatted = std::format("Formatted: {} + {} = {}", 10, 20, 30);
     std::print("{}", formatted);
     
-    // 7. 错误处理
+    // 7. Error handling
     std::print("\n7. Error handling:\n");
     try {
         std::print("Value: {}\n", 42);

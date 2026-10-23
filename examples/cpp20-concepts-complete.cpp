@@ -10,10 +10,10 @@
 #include <algorithm>
 #include <type_traits>
 
-// C++20 Concepts 完整示例
-// 展示 concepts 的多种用法和组合
+// A complete C++20 concepts example
+// Shows the different ways a concept is used and combined
 
-// 基础概念定义
+// The basic concept
 template<typename T>
 concept Printable = requires(T a) {
     { std::cout << a } -> std::convertible_to<std::ostream&>;
@@ -30,7 +30,7 @@ concept Sortable = requires(T a) {
     { a.end() } -> std::input_iterator;
 };
 
-// 概念组合
+// Combining concepts
 template<typename T>
 concept Number = std::integral<T> || std::floating_point<T>;
 
@@ -44,7 +44,7 @@ concept Container = requires(T a) {
 template<typename T>
 concept PrintableAndAddable = Printable<T> && Addable<T>;
 
-// 使用概念的函数
+// A function that uses a concept
 template<Printable T>
 void print(const T& value) {
     std::cout << "Value: " << value << "\n";
@@ -60,7 +60,7 @@ void sortContainer(T& container) {
     std::sort(container.begin(), container.end());
 }
 
-// 概念约束的成员函数
+// A member function constrained by a concept
 class Calculator {
 public:
     template<Number T>
@@ -75,7 +75,7 @@ public:
     }
 };
 
-// 概念用于模板特化
+// A concept used for a template specialisation
 template<Printable T>
 struct TypeTraits {
     static void describe() {
@@ -83,11 +83,11 @@ struct TypeTraits {
     }
 };
 
-// 约束模板别名
+// A constrained template alias
 template<Number T>
 using NumberRef = T&;
 
-// 概念用于类模板
+// A concept used for a class template
 template<Container C>
 class ContainerWrapper {
 public:
@@ -107,17 +107,17 @@ private:
 int main() {
     std::cout << "=== C++20 Concepts Demo ===\n\n";
     
-    // 1. 基础概念使用
+    // 1. Using the basic concept
     std::cout << "1. Basic concepts:\n";
     print(42);
     print(std::string("Hello"));
     
-    // 2. 数值概念
+    // 2. The numeric concept
     std::cout << "\n2. Number concept:\n";
     std::cout << "int add: " << add(10, 20) << "\n";
     std::cout << "double add: " << add(10.5, 20.3) << "\n";
     
-    // 3. 容器排序
+    // 3. Sorting a container
     std::cout << "\n3. Sortable container:\n";
     std::vector<int> vec = {5, 2, 8, 1, 9};
     sortContainer(vec);
@@ -125,7 +125,7 @@ int main() {
     for (auto v : vec) std::cout << v << " ";
     std::cout << "\n";
     
-    // 4. 组合概念
+    // 4. The combined concept
     std::cout << "\n4. Combined concepts:\n";
     if constexpr (Printable<int> && Addable<int>) {
         std::cout << "int is both Printable and Addable\n";
@@ -136,12 +136,12 @@ int main() {
     ContainerWrapper<std::vector<int>> wrapper({1, 2, 3, 4, 5});
     wrapper.print();
     
-    // 6. 类型特征
+    // 6. Type traits
     std::cout << "\n6. Type traits:\n";
     TypeTraits<int>::describe();
     TypeTraits<std::string>::describe();
     
-    // 7. 概念约束
+    // 7. Concept constraints
     std::cout << "\n7. Concept constraints:\n";
     Calculator calc;
     std::cout << "Calculate: " << calc.calculate(10, 20) << "\n";

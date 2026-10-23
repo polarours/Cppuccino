@@ -11,19 +11,19 @@
 #include <numeric>
 #include <algorithm>
 
-// 使用 span 替代原始指针
+// Using a span instead of a raw pointer
 void processSpan(std::span<const int> data) {
     std::cout << "Processing span of size: " << data.size() << "\n";
     std::cout << "First: " << data.front() << ", Last: " << data.back() << "\n";
     
-    // 遍历
+    // Walking over it
     for (int v : data) {
         std::cout << v << " ";
     }
     std::cout << "\n";
 }
 
-// 子 span 操作
+// Working with a sub span
 void processSubSpan(std::span<int> data, int start, int count) {
     auto sub = data.subspan(start, count);
     std::cout << "Sub-span: ";
@@ -33,7 +33,7 @@ void processSubSpan(std::span<int> data, int start, int count) {
     std::cout << "\n";
 }
 
-// 二维 span
+// A two dimensional span
 void process2DSpan(std::span<std::span<const int>> matrix) {
     std::cout << "2D matrix:\n";
     for (const auto& row : matrix) {
@@ -44,7 +44,7 @@ void process2DSpan(std::span<std::span<const int>> matrix) {
     }
 }
 
-// 字符串 span
+// A span over a string
 void processStringSpan(std::span<const char> str) {
     std::cout << "String span: ";
     for (size_t i = 0; i < str.size(); ++i) {
@@ -56,7 +56,7 @@ void processStringSpan(std::span<const char> str) {
 int main() {
     std::cout << "=== C++20 std::span Demo ===\n\n";
     
-    // 1. 基本用法
+    // 1. The basic use
     std::cout << "1. Basic span:\n";
     std::vector<int> vec = {1, 2, 3, 4, 5};
     std::span<int> span1(vec);
@@ -64,7 +64,7 @@ int main() {
     for (int v : span1) std::cout << v << " ";
     std::cout << "\n";
     
-    // 2. 数组
+    // 2. An array
     std::cout << "\n2. Array span:\n";
     std::array<int, 5> arr = {10, 20, 30, 40, 50};
     std::span<int, 5> span2(arr);
@@ -72,7 +72,7 @@ int main() {
     for (int v : span2) std::cout << v << " ";
     std::cout << "\n";
     
-    // 3. 原始数组
+    // 3. A raw array
     std::cout << "\n3. Raw array span:\n";
     int raw[] = {100, 200, 300};
     std::span<int> span3(raw);
@@ -80,15 +80,15 @@ int main() {
     for (int v : span3) std::cout << v << " ";
     std::cout << "\n";
     
-    // 4. 函数参数
+    // 4. A function parameter
     std::cout << "\n4. Function parameters:\n";
     processSpan(vec);
     
-    // 5. 子 span
+    // 5. A sub span
     std::cout << "\n5. Sub-span:\n";
     processSubSpan(vec, 1, 3);
     
-    // 6. 二维 span
+    // 6. A two dimensional span
     std::cout << "\n6. 2D span:\n";
     std::vector<std::vector<int>> matrix = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     std::vector<std::span<const int>> spans;
@@ -97,22 +97,22 @@ int main() {
     }
     process2DSpan(spans);
     
-    // 7. 字符串 span
+    // 7. A span over a string
     std::cout << "\n7. String span:\n";
     std::string str = "Hello, C++20!";
     std::span<const char> strSpan(str.data(), str.size());
     processStringSpan(strSpan);
     
-    // 8. 类型推导
+    // 8. Working out the type
     std::cout << "\n8. Type deduction:\n";
     auto span4 = std::span<const int>(vec);
     std::cout << "Deduced span size: " << span4.size() << "\n";
     
-    // 9. 只读 span
+    // 9. A read only span
     std::cout << "\n9. Read-only span:\n";
     const std::vector<int> cvec = {1, 2, 3};
     std::span<const int> cspan(cvec);
-    // cspan[0] = 10; // 错误：不能修改
+    // cspan[0] = 10; // error: it cannot be modified
     std::cout << "Read-only span: ";
     for (int v : cspan) std::cout << v << " ";
     std::cout << "\n";

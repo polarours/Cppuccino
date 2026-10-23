@@ -10,7 +10,7 @@
 #include <string>
 #include <utility>
 
-// 简单协程：生成器
+// A simple coroutine: a generator
 template<typename T>
 class Generator {
 public:
@@ -49,11 +49,11 @@ public:
         if (handle_) handle_.destroy();
     }
     
-    // 禁止拷贝
+    // Copying is not allowed
     Generator(const Generator&) = delete;
     Generator& operator=(const Generator&) = delete;
     
-    // 允许移动
+    // Moving is allowed
     Generator(Generator&& other) noexcept : handle_(std::exchange(other.handle_, nullptr)) {}
     Generator& operator=(Generator&& other) noexcept {
         if (this != &other) {
@@ -63,14 +63,14 @@ public:
         return *this;
     }
     
-    // 迭代器接口
+    // The iterator interface
     struct Iterator {
         handle_type handle;
 
         T& operator*() { return handle.promise().current_value; }
         T* operator->() { return &handle.promise().current_value; }
 
-        // 哨兵语义：end() 迭代器的 handle 为空。
+        // Sentinel semantics: the handle of the end() iterator is empty.
         bool operator==(const Iterator& other) const {
             if (!other.handle) return handle ? handle.done() : true;
             if (!handle) return other.handle.done();
@@ -79,7 +79,7 @@ public:
         bool operator!=(const Iterator& other) const { return !(*this == other); }
 
         Iterator& operator++() {
-            // 防止在 final suspend 之后 resume（那是 UB）
+            // Keeps it from being resumed after the final suspend (that would be UB)
             if (handle && !handle.done()) handle.resume();
             return *this;
         }
@@ -93,7 +93,7 @@ public:
     Iterator end() { return Iterator{nullptr}; }
 };
 
-// 使用示例：生成斐波那契数列
+// Using it: the Fibonacci sequence
 Generator<int> fibonacci(int n) {
     int a = 0, b = 1;
     for (int i = 0; i < n; ++i) {
@@ -103,7 +103,7 @@ Generator<int> fibonacci(int n) {
     }
 }
 
-// 简单协程：异步任务
+// A simple coroutine: an asynchronous task
 class Task {
 public:
     struct promise_type {
@@ -114,9 +114,10 @@ public:
             return Task{std::coroutine_handle<promise_type>::from_promise(*this)};
         }
 
-        // 两点都挂起（惰性 Task）：帧一直存活，析构时由 destroy() 统一释放。
-        // 若 final_suspend 用 suspend_never，帧会在 co_return 处被运行时自动
-        // 回收，再调 destroy() 就是 double-destroy → SIGSEGV。
+        // Both suspend (a lazy Task): the frame stays alive, and the destructor
+        // releases it with destroy(). If the final suspend used suspend_never, the
+        // frame would be reclaimed by the runtime at the co_return, and calling
+        // destroy() on it afterwards would be a double destroy -> SIGSEGV.
         std::suspend_always initial_suspend() { return {}; }
         std::suspend_always final_suspend() noexcept { return {}; }
 
@@ -150,13 +151,13 @@ private:
     handle_type handle_;
 };
 
-// 异步计算
+// An asynchronous computation
 Task async_compute() {
-    // 模拟异步操作
+    // Stands in for an asynchronous operation
     co_return 42;
 }
 
-// 协程使用示例
+// Using the coroutine
 void demonstrateGenerator() {
     std::cout << "=== Generator Demo ===\n";
     auto fib = fibonacci(10);
@@ -174,7 +175,7 @@ void demonstrateTask() {
     std::cout << "Result: " << task.get_result() << "\n\n";
 }
 
-// 带返回值的协程
+// A coroutine that returns a value
 template<typename T>
 class Promise {
 public:
@@ -194,7 +195,7 @@ private:
     T value_;
 };
 
-// 简单的协程链
+// A simple chain of coroutines
 class Chain {
 public:
     struct promise_type {
