@@ -56,6 +56,11 @@ public:
     std::size_t size() const { return size_; }
     bool empty() const { return size_ == 0; }
 
+    // The nodes of the list are owned by the list, so they have to be
+    // released by hand: the head node is owned by head_, the rest are
+    // reached through the level-0 chain.
+    ~SkipList();
+
     // Ascending traversal (for tests / debugging)
     std::vector<T> toVector() const {
         std::vector<T> out;
@@ -94,5 +99,15 @@ private:
     std::size_t size_ = 0;
     mutable std::mt19937 rng_;
 };
+
+template <typename T>
+SkipList<T>::~SkipList() {
+    Node* node = head_->forward[0];
+    while (node != nullptr) {
+        Node* next = node->forward[0];
+        delete node;
+        node = next;
+    }
+}
 
 }  // namespace skip_list
