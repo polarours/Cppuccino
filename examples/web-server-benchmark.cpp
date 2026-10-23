@@ -178,11 +178,14 @@ int main() {
         if (r.errors != 0) failed = 1;
     }
 
-    // stop() closes the listening socket, which on Linux does NOT wake a
-    // thread blocked in accept(); the server thread would hang its join
-    // forever. Detach it — the process exits immediately, which kills it.
+    // stop() shuts the listening socket down, which wakes the accept loop,
+    // so the server thread ends on its own and can be joined. Without that,
+    // the thread would still be blocked in accept() when the process exits,
+    // and the sanitizer would report the frame it was standing in.
     server.stop();
-    serverThread.detach();
+    if (serverThread.joinable()) {
+        serverThread.join();
+    }
 
     std::cout << "\n=== Benchmark Complete ===\n";
     return failed;
