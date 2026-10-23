@@ -7,6 +7,8 @@
 #include <string>
 #include <chrono>
 #include <atomic>
+#include <mutex>
+#include <vector>
 
 // std::jthread - cooperative cancellation thread
 // std::stop_token - stop request for cooperative cancellation
@@ -25,10 +27,18 @@ void longRunningTask(std::stop_token stopToken, int id) {
     std::cout << "  Task " << id << " stopped after " << iterations << " iterations\n";
 }
 
-void producer(std::stop_token stopToken, std::vector<int>& buffer) {
+// The buffer belongs to two threads: the producer fills it and the main
+// thread reads it while the producer is still running. A vector that is
+// written and read at the same time is not a vector any more, so the
+// buffer needs a lock of its own.
+void producer(std::stop_token stopToken, std::vector<int>& buffer,
+              std::mutex& mutex) {
     for (int i = 0; i < 100; ++i) {
         if (stopToken.stop_requested()) break;
-        buffer.push_back(i);
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            buffer.push_back(i);
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 }
@@ -51,10 +61,14 @@ int main() {
     std::cout << "Cooperative cancellation:\n";
     {
         std::vector<int> buffer;
-        std::jthread producerThread(producer, std::ref(buffer));
+        std::mutex mutex;
+        std::jthread producerThread(producer, std::ref(buffer), std::ref(mutex));
 
         std::this_thread::sleep_for(std::chrono::milliseconds(30));
-        std::cout << "  Collected " << buffer.size() << " items before stop\n";
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            std::cout << "  Collected " << buffer.size() << " items before stop\n";
+        }
         // Thread auto-joins on scope exit
     }
 

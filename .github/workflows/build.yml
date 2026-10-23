@@ -100,6 +100,10 @@ jobs:
       - name: Run the document examples under the sanitizers
         run: python3 tools/check_doc_examples.py --sanitize
 
+      - name: Run the examples under the thread sanitizer
+        # Two threads touching the same memory without a lock.
+        run: python3 tools/check_examples.py --tsan --jobs 4
+
   races:
     name: data races
     runs-on: ubuntu-latest

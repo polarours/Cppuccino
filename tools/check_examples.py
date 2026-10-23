@@ -58,9 +58,14 @@ CXX = os.environ.get('CXX', 'g++')
 SANITIZER_FLAGS = ['-fsanitize=address,undefined', '-fno-omit-frame-pointer',
                    '-g']
 
+# The flags for the thread sanitizer pass. It looks for two threads
+# touching the same memory without a lock.
+TSAN_FLAGS = ['-fsanitize=thread', '-fno-omit-frame-pointer', '-g', '-O1']
+
 # What the sanitizer writes when it finds something.
 SANITIZER_MARKERS = ('AddressSanitizer:', 'LeakSanitizer:',
-                     'UndefinedBehaviorSanitizer:', 'runtime error:')
+                     'UndefinedBehaviorSanitizer:', 'runtime error:',
+                     'ThreadSanitizer:')
 
 
 def sanitizer_report(stderr):
@@ -270,7 +275,7 @@ def check_index_coverage(sources, problems):
     print(f"  {len(listed)} example(s) listed in the index")
 
 
-def run_example(path, standard, workdir, sanitize=False):
+def run_example(path, standard, workdir, sanitizer=None):
     """Compile and run an example, from a directory that is not the repo.
 
     Running from elsewhere is the point: an example that assumes the current
@@ -280,8 +285,8 @@ def run_example(path, standard, workdir, sanitize=False):
     name = os.path.basename(path)
     binary = os.path.join(workdir, 'run_' + name[:-4])
     cmd = [CXX, f'-std=c++{standard}', '-pthread', '-o', binary, path]
-    if sanitize:
-        cmd += SANITIZER_FLAGS
+    if sanitizer:
+        cmd += sanitizer
     project = PROJECT_DEPENDENT.get(name)
     if project:
         directory, sources = project
@@ -297,7 +302,7 @@ def run_example(path, standard, workdir, sanitize=False):
                                 text=True, errors='replace', timeout=20)
     except subprocess.TimeoutExpired:
         return 'run', 'the example did not finish'
-    if sanitize:
+    if sanitizer:
         report = sanitizer_report(result.stderr or '')
         if report:
             return 'sanitize', report
@@ -317,6 +322,9 @@ def main():
                         help='run every example under the sanitizers and '
                              'report the ones that read freed memory or do '
                              'something the standard leaves undefined')
+    parser.add_argument('--tsan', action='store_true',
+                        help='run every example under the thread sanitizer '
+                             'and report the ones with a data race')
     args = parser.parse_args()
 
     if shutil.which(CXX) is None:
@@ -353,17 +361,20 @@ def main():
                 print(f'  {name:<48} FAIL {detail}')
                 failures.append((name, detail))
 
-        for sanitize in (False, True):
-            if sanitize and not args.sanitize:
-                continue
-            if not sanitize and not args.run:
-                continue
-            print('\n== sanitizer check ==' if sanitize else '\n== run check ==')
+        passes = []
+        if args.run:
+            passes.append(('run check', None))
+        if args.sanitize:
+            passes.append(('sanitizer check', SANITIZER_FLAGS))
+        if args.tsan:
+            passes.append(('thread sanitizer check', TSAN_FLAGS))
+        for title, flags in passes:
+            print(f'\n== {title} ==')
             with ThreadPoolExecutor(max_workers=args.jobs) as pool:
                 runs = list(pool.map(
                     lambda p: (p, run_example(
                         p, declared_standard(p) or '20', workdir,
-                        sanitize=sanitize)),
+                        sanitizer=flags)),
                     sources))
             for path, (status, detail) in runs:
                 if status != 'ok':

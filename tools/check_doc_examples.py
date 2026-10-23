@@ -64,9 +64,14 @@ STANDARDS = ['-std=c++20', '-std=c++23', '-std=c++26']
 SANITIZER_FLAGS = ['-fsanitize=address,undefined', '-fno-omit-frame-pointer',
                    '-g']
 
+# The flags for the thread sanitizer pass. It looks for two threads
+# touching the same memory without a lock.
+TSAN_FLAGS = ['-fsanitize=thread', '-fno-omit-frame-pointer', '-g', '-O1']
+
 # What the sanitizer writes when it finds something.
 SANITIZER_MARKERS = ('AddressSanitizer:', 'LeakSanitizer:',
-                     'UndefinedBehaviorSanitizer:', 'runtime error:')
+                     'UndefinedBehaviorSanitizer:', 'runtime error:',
+                     'ThreadSanitizer:')
 
 
 def sanitizer_report(stderr):
@@ -149,7 +154,7 @@ def api_project_for(path):
     return API_DOC_PROJECTS[slug]
 
 
-def check(path, sanitize=False):
+def check(path, sanitizer=None):
     """Return (status, detail). status is 'ok', 'skip' or 'fail'.
 
     The program is assembled by trying each plausible starting block, from
@@ -167,8 +172,8 @@ def check(path, sanitize=False):
 
     api = api_project_for(path)
     base_cmd = [CXX, '-pthread', '-o', exe]
-    if sanitize:
-        base_cmd += SANITIZER_FLAGS
+    if sanitizer:
+        base_cmd += sanitizer
     if api:
         proj, sources = api
         base_cmd.append(f'-I{os.path.join(REPO, proj)}/include')
@@ -194,7 +199,7 @@ def check(path, sanitize=False):
                                        text=True, timeout=30)
                 except subprocess.TimeoutExpired:
                     return 'fail', 'run: timed out'
-                if sanitize:
+                if sanitizer:
                     report = sanitizer_report(r.stderr or '')
                     if report:
                         return 'fail', f'sanitizer: {report}'
@@ -209,10 +214,11 @@ def check(path, sanitize=False):
 
 def main():
     args = sys.argv[1:]
-    sanitize = False
-    if '--sanitize' in args:
-        sanitize = True
-        args.remove('--sanitize')
+    sanitizer = None
+    for flag, flags in (('--sanitize', SANITIZER_FLAGS), ('--tsan', TSAN_FLAGS)):
+        if flag in args:
+            sanitizer = flags
+            args.remove(flag)
     paths = args
     if not paths:
         paths = []
@@ -222,7 +228,7 @@ def main():
                             if f.endswith('.md'))
     failures = 0
     for p in paths:
-        status, detail = check(p, sanitize)
+        status, detail = check(p, sanitizer)
         rel = os.path.relpath(p, REPO)
         if status == 'ok':
             print(f"  {rel:<52} OK   {detail}")
