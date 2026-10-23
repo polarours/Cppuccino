@@ -39,6 +39,7 @@ void pass_by_value_demo() {
     
     auto func = [](DemoObject param) {
         // param is constructed via copy/move depending on argument
+        std::cout << "  inside the function: " << param.getId() << "\n";
     };
     
     DemoObject obj7("obj7");
@@ -54,6 +55,7 @@ void pass_by_reference_demo() {
     
     auto func = [](const DemoObject& ref) {
         // No construction - just references existing object
+        std::cout << "  inside the function: " << ref.getId() << "\n";
     };
     
     DemoObject obj8("obj8");

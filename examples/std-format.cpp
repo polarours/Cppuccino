@@ -36,8 +36,9 @@ int main() {
 
     // Positional arguments
     std::cout << "\n4. Positional arguments:\n";
-    std::cout << "  {1} {0}: {1} is at position 0, {0} at position 1\n",
-              "world", "hello";
+    std::cout << "  " << std::format("{1} {0}", "world", "hello") << "\n";
+    std::cout << "  The first argument is \"world\" and the second is \"hello\","
+                 " so {1} {0} prints them the other way round\n";
 
     // Container formatting
     std::cout << "\n5. Container formatting:\n";

@@ -13,11 +13,15 @@ void wrapper(T&& arg) {
     // arg is a forwarding reference - can bind to both lvalues and rvalues
     // Inside the function, arg is an lvalue (need std::move to forward)
     // another_function(std::forward<T>(arg));
+    std::cout << "  wrapper got " << arg << "\n";
 }
 
 // Define the helper functions
 void f1(int& ref) { ref = 10; }
-void f2(const int& ref) { /* read-only access */ }
+void f2(const int& ref) {
+    // read-only access
+    std::cout << "  f2 read " << ref << "\n";
+}
 void f3(int&& ref) { ref = 20; }
 
 void test_lvalue_ref_binding() {
@@ -27,11 +31,14 @@ void test_lvalue_ref_binding() {
 
     // lvalue reference to non-const can bind to lvalue
     int& r1 = x;
+    r1 = 10;  // an lvalue reference is another name for x
     std::cout << "int& r1 = x;  // OK: lvalue ref to non-const binds to lvalue\n";
+    std::cout << "  after r1 = 10, x is " << x << "\n";
 
     // const lvalue reference can bind to lvalue
     const int& r2 = x;
     std::cout << "const int& r2 = x;  // OK: const lvalue ref binds to lvalue\n";
+    std::cout << "  r2 reads x, which is now " << r2 << "\n";
 
     // lvalue reference to non-const cannot bind to rvalue (error, commented out)
     // int& r3 = 42;  // ERROR: cannot bind non-const lvalue ref to rvalue
@@ -50,10 +57,12 @@ void test_rvalue_ref_binding() {
     // rvalue reference binds to rvalue
     int&& r1 = 42;
     std::cout << "int&& r1 = 42;  // OK: rvalue ref binds to rvalue (temporary)\n";
+    std::cout << "  r1 reads " << r1 << "\n";
 
     // To bind rvalue ref to an lvalue, need std::move
     int&& r2 = std::move(x);
     std::cout << "int&& r2 = std::move(x);  // OK: explicitly cast lvalue to rvalue\n";
+    std::cout << "  r2 reads " << r2 << "\n";
 
     // After move, x is in valid but unspecified state
 

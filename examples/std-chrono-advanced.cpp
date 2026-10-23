@@ -19,6 +19,8 @@ int main() {
 
     std::cout << "System clock time: " << now.time_since_epoch().count() << "\n";
     std::cout << "Steady clock time: " << steady.time_since_epoch().count() << "\n";
+    std::cout << "High resolution clock time: "
+              << highRes.time_since_epoch().count() << "\n";
 
     // Duration
     auto ms = std::chrono::milliseconds(100);
@@ -43,6 +45,7 @@ int main() {
 
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
     std::cout << "\nLoop time: " << duration.count() << " microseconds\n";
+    std::cout << "Sum: " << sum << "\n";
 
     // Time point arithmetic
     auto later = now + std::chrono::hours(24);
