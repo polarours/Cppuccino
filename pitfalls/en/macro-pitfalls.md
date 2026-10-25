@@ -54,6 +54,12 @@ LOG("Hello " + name);      // ERROR: + doesn't work with "Hello "
 - Use `#undef` after use if macros are temporary
 - Prefer `constexpr` functions over function-like macros
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-macro-pitfalls.cpp](../../examples/pitfall-macro-pitfalls.cpp)
+
 ## See Also
 
 - [Implicit Conversions](implicit-conversions.md)

@@ -135,6 +135,12 @@ void demo() {
 - **AddressSanitizer**: `-fsanitize=address`
 - **Valgrind**: `valgrind --tool=memcheck ./program`
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-iterator-invalidation-pitfalls.cpp](../../examples/pitfall-iterator-invalidation-pitfalls.cpp)
+
 ## Summary
 
 > **Iterator invalidation is one of the sneakiest sources of bugs in C++.

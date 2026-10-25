@@ -350,6 +350,12 @@ This process removes a large class of nondeterministic production bugs.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-dangling-lambda-captures.cpp](../../examples/pitfall-dangling-lambda-captures.cpp)
+
 ## 24. Summary
 
 Dangling lambda captures are lifetime-contract failures.

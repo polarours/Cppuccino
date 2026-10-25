@@ -120,6 +120,12 @@ private:
 2. **从 const "移动"**：可拷贝类型会静默拷贝，只移动类型会编译失败
 3. **误以为 std::move 会移动**：它只是类型转换
 
+## 示例
+
+这个主题的可运行版本：
+
+- [pitfall-const-object-move-trap.cpp](../../examples/pitfall-const-object-move-trap.cpp)
+
 ## 总结
 
 - `std::move` 只是类型转换，不保证实际移动

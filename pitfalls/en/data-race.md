@@ -114,6 +114,12 @@ traces, which is far more reliable than trying to reproduce the bug by hand.
 4. **Test under ThreadSanitizer in CI** before declaring concurrency code safe.
 5. **Document ownership** — which thread owns which data, and what is shared.
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-data-race.cpp](../../examples/pitfall-data-race.cpp)
+
 ## 6. Summary
 
 - A data race = unsynchronized concurrent access with at least one writer.

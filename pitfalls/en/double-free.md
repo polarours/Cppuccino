@@ -66,6 +66,12 @@ If you cannot move to smart pointers yet, follow the strict discipline: **a raw 
 - **Use `= delete` on dangerous overloads.** If a class manages a resource, delete its copy operations or implement them properly; a silently-copied raw pointer is a double-free waiting to happen.
 - **Catch it with sanitizers.** AddressSanitizer (`-fsanitize=address`) detects double frees at runtime and points straight at both `delete` sites.
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-double-free.cpp](../../examples/pitfall-double-free.cpp)
+
 ## Summary
 
 A double free is what happens when two pieces of code each believe they own the same memory. Solve it by making ownership *unambiguous and unique*: one `std::unique_ptr` per resource, moved (not copied, not aliased) across boundaries. When ownership is encoded in the type system, freeing twice becomes impossible instead of merely "something to remember."

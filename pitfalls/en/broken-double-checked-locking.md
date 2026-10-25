@@ -314,6 +314,12 @@ This usually reduces both bug risk and code complexity.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-broken-double-checked-locking.cpp](../../examples/pitfall-broken-double-checked-locking.cpp)
+
 ## 21. Summary
 
 Classic double-checked locking is a concurrency pitfall because it appears correct while violating memory-model requirements.

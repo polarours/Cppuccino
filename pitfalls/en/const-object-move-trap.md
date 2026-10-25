@@ -129,6 +129,12 @@ private:
    fail to compile
 3. **Assuming `std::move` moves**: it is only a cast
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-const-object-move-trap.cpp](../../examples/pitfall-const-object-move-trap.cpp)
+
 ## Summary
 
 - `std::move` is only a cast; it guarantees no actual move

@@ -305,6 +305,12 @@ If any answer is unclear, class contract is incomplete.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-deleting-through-non-virtual-base.cpp](../../examples/pitfall-deleting-through-non-virtual-base.cpp)
+
 ## 22. Conclusion
 
 Deleting through a non-virtual base pointer is not a minor style defect.

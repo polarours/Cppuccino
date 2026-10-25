@@ -333,6 +333,12 @@ submit([weak] {
 
 ---
 
+## 示例
+
+这个主题的可运行版本：
+
+- [pitfall-dangling-lambda-captures.cpp](../../examples/pitfall-dangling-lambda-captures.cpp)
+
 ## 24. 总结
 
 Lambda 捕获悬垂引用本质上是“生命周期合同缺失”。
