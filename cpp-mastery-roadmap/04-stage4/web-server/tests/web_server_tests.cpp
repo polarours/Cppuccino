@@ -11,6 +11,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <cstring>
+#include <fstream>
 
 namespace {
 
@@ -205,6 +208,182 @@ void test_stop_terminates_with_idle_client() {
     close(fd);
 }
 
+// The tests above never went through the routing. These do, over a
+// socket, the way a reader uses the server.
+
+// Sends a request to the server and returns the whole answer.
+std::string ask(int port, const std::string& request) {
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+        throw std::runtime_error("could not open a socket");
+    }
+
+    struct sockaddr_in address;
+    memset(&address, 0, sizeof(address));
+    address.sin_family = AF_INET;
+    address.sin_port = htons(static_cast<uint16_t>(port));
+    address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+
+    if (connect(fd, reinterpret_cast<struct sockaddr*>(&address),
+                 sizeof(address)) < 0) {
+        close(fd);
+        throw std::runtime_error("could not connect to the server");
+    }
+
+    if (send(fd, request.data(), request.size(), 0) < 0) {
+        close(fd);
+        throw std::runtime_error("could not send the request");
+    }
+
+    std::string answer;
+    char buffer[1024];
+    ssize_t bytes = 0;
+    while ((bytes = recv(fd, buffer, sizeof(buffer) - 1, 0)) > 0) {
+        buffer[bytes] = '\0';
+        answer += buffer;
+        if (answer.find("\r\n\r\n") != std::string::npos &&
+            answer.size() > 40) {
+            break;
+        }
+    }
+    close(fd);
+    return answer;
+}
+
+// A route answers the method it was registered for.
+void test_the_route_answers_its_own_method() {
+    web_server::WebServer server(18021);
+
+    server.get("/thing", [](const web_server::Request&) {
+        return web_server::Response::ok("got");
+    });
+    server.post("/thing", [](const web_server::Request&) {
+        return web_server::Response::ok("posted");
+    });
+
+    std::thread serverThread([&server]() { server.start(); });
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    const std::string get = ask(18021, "GET /thing HTTP/1.1\r\nHost: x\r\n\r\n");
+    expect(get.find("200 OK") != std::string::npos, "expected 200 OK");
+    expect(get.find("got") != std::string::npos, "expected the get route");
+    expect(get.find("posted") == std::string::npos,
+           "expected the post route not to answer");
+
+    const std::string post = ask(18021, "POST /thing HTTP/1.1\r\nHost: x\r\n\r\n");
+    expect(post.find("posted") != std::string::npos, "expected the post route");
+    expect(post.find("got") == std::string::npos,
+           "expected the get route not to answer");
+
+    server.stop();
+    if (serverThread.joinable()) {
+        serverThread.join();
+    }
+}
+
+// A path nobody registered is a 404.
+void test_an_unknown_path_is_a_404() {
+    web_server::WebServer server(18022);
+
+    server.get("/known", [](const web_server::Request&) {
+        return web_server::Response::ok("ok");
+    });
+
+    std::thread serverThread([&server]() { server.start(); });
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    const std::string answer =
+        ask(18022, "GET /unknown HTTP/1.1\r\nHost: x\r\n\r\n");
+    expect(answer.find("404") != std::string::npos, "expected 404");
+
+    server.stop();
+    if (serverThread.joinable()) {
+        serverThread.join();
+    }
+}
+
+// A middleware sees the request before the route does, and it can stop it.
+void test_a_middleware_runs_first() {
+    web_server::WebServer server(18023);
+
+    int seen = 0;
+    server.use([&seen](web_server::Request& request, web_server::Response&) {
+        seen++;
+        return true;
+    });
+    server.get("/checked", [](const web_server::Request&) {
+        return web_server::Response::ok("ok");
+    });
+
+    std::thread serverThread([&server]() { server.start(); });
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    ask(18023, "GET /checked HTTP/1.1\r\nHost: x\r\n\r\n");
+    expect(seen == 1, "expected the middleware to have run");
+
+    server.stop();
+    if (serverThread.joinable()) {
+        serverThread.join();
+    }
+}
+
+// A middleware that says no keeps the request from reaching the route.
+void test_a_middleware_can_stop_a_request() {
+    web_server::WebServer server(18024);
+
+    server.use([](web_server::Request&, web_server::Response& response) {
+        response.statusCode = 403;
+        response.statusMessage = "Forbidden";
+        return false;
+    });
+    server.get("/blocked", [](const web_server::Request&) {
+        return web_server::Response::ok("should not be reached");
+    });
+
+    std::thread serverThread([&server]() { server.start(); });
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    const std::string answer =
+        ask(18024, "GET /blocked HTTP/1.1\r\nHost: x\r\n\r\n");
+    expect(answer.find("403") != std::string::npos, "expected 403");
+    expect(answer.find("should not be reached") == std::string::npos,
+           "expected the route not to run");
+
+    server.stop();
+    if (serverThread.joinable()) {
+        serverThread.join();
+    }
+}
+
+// A file under a static directory is served.
+void test_a_static_file_is_served() {
+    web_server::WebServer server(18025);
+
+    const std::string directory = "/tmp/cppuccino-web-server-static";
+    mkdir(directory.c_str(), 0755);
+    {
+        std::ofstream file(directory + "/hello.txt");
+        file << "from a file";
+    }
+
+    server.serveStatic("/files", directory);
+
+    std::thread serverThread([&server]() { server.start(); });
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    const std::string answer =
+        ask(18025, "GET /files/hello.txt HTTP/1.1\r\nHost: x\r\n\r\n");
+    expect(answer.find("200 OK") != std::string::npos, "expected 200 OK");
+    expect(answer.find("from a file") != std::string::npos, "expected the file");
+
+    server.stop();
+    if (serverThread.joinable()) {
+        serverThread.join();
+    }
+    remove((directory + "/hello.txt").c_str());
+    rmdir(directory.c_str());
+}
+
 } // namespace
 
 int main() {
@@ -254,6 +433,21 @@ int main() {
 
         test_stop_terminates_with_idle_client();
         std::cout << "  test_stop_terminates_with_idle_client: PASS\n";
+
+        test_the_route_answers_its_own_method();
+        std::cout << "  test_the_route_answers_its_own_method: PASS\n";
+
+        test_an_unknown_path_is_a_404();
+        std::cout << "  test_an_unknown_path_is_a_404: PASS\n";
+
+        test_a_middleware_runs_first();
+        std::cout << "  test_a_middleware_runs_first: PASS\n";
+
+        test_a_middleware_can_stop_a_request();
+        std::cout << "  test_a_middleware_can_stop_a_request: PASS\n";
+
+        test_a_static_file_is_served();
+        std::cout << "  test_a_static_file_is_served: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "web_server_tests failed: " << exception.what() << std::endl;
