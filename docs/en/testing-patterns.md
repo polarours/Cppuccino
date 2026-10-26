@@ -312,6 +312,12 @@ void demo() {
 5. **Test isolation is the iron rule**: state a test A mutated must not
    change test B's result
 
+## Example
+
+A runnable version of this topic:
+
+- [testing-patterns.cpp](../../examples/testing-patterns.cpp)
+
 ## Summary
 
 The three patterns divide the work: mocks verify interactions, fixtures

@@ -154,6 +154,12 @@ faster than `_mm256_loadu_ps`) and cache misses decrease.
 5. **Alignment before intrinsics**: try `alignas` + `-O3` first — the
    compiler vectorizes many simple loops on its own
 
+## Example
+
+A runnable version of this topic:
+
+- [simd-vectorization.cpp](../../examples/simd-vectorization.cpp)
+
 ## Summary
 
 The core pattern of hand-written SIMD is **"vectorized loop + scalar tail"**,

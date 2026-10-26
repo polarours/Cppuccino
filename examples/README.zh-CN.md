@@ -201,4 +201,6 @@ g++ -std=c++20 -o demo demo-file.cpp && ./demo
 - [pitfall-throwing-from-destructor.cpp](pitfall-throwing-from-destructor.cpp) — 演示析构函数为什么不能抛异常，以及如何安全地报告清理失败。
 - [pitfall-uninitialized-members.cpp](pitfall-uninitialized-members.cpp) — 演示未初始化的成员变量，以及能避免它的习惯。
 - [pitfall-use-after-move.cpp](pitfall-use-after-move.cpp) — 演示移动后使用的陷阱，以及安全的替代写法。
+- [simd-vectorization.cpp](simd-vectorization.cpp) — 演示手写的向量化循环，以及它后面那段标量尾巴。
+- [testing-patterns.cpp](testing-patterns.cpp) — 演示 mock 对象、测试夹具和参数化测试，配一个极小的测试框架。
 

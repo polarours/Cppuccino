@@ -84,6 +84,7 @@ g++ -std=c++20 -o demo demo-file.cpp && ./demo
 - [service-locator-demo.cpp](service-locator-demo.cpp) — Demonstrates the Service Locator Pattern: a central registry that supplies shared services to clients (without hard-wiring dependencies).
   - part of [service-locator](../cpp-mastery-roadmap/30-stage30/service-locator/README.md)
 - [sfinae-type-traits.cpp](sfinae-type-traits.cpp) — Demonstrates SFINAE-based type traits and custom detection idioms.
+- [simd-vectorization.cpp](simd-vectorization.cpp) — Demonstrates a hand written vectorized loop and the scalar tail beside it.
 - [singleton-pattern-demo.cpp](singleton-pattern-demo.cpp) — Demonstrates Meyers' Singleton and thread-safe Logger/Config singletons.
   - part of [singleton-pattern](../cpp-mastery-roadmap/13-stage13/singleton-pattern/README.md)
 - [smart-pointer-shared.cpp](smart-pointer-shared.cpp) — Demonstrates std::shared_ptr for shared ownership.
@@ -103,6 +104,7 @@ g++ -std=c++20 -o demo demo-file.cpp && ./demo
 - [template-instantiation.cpp](template-instantiation.cpp) — Demonstrates template instantiation and two-phase lookup in C++.
 - [template-method-demo.cpp](template-method-demo.cpp) — Demonstrates the Template Method Pattern: a base class defines the algorithm skeleton, subclasses override individual steps.
   - part of [template-method](../cpp-mastery-roadmap/15-stage15/template-method/README.md)
+- [testing-patterns.cpp](testing-patterns.cpp) — Demonstrates mock objects, test fixtures and parameterized tests with a small test harness.
 - [type-object-demo.cpp](type-object-demo.cpp) — Demonstrates the Type Object Pattern: represent "types" as data objects instead of hard-coding a subclass per type (game entities).
   - part of [type-object](../cpp-mastery-roadmap/31-stage31/type-object/README.md)
 - [undefined-behavior.cpp](undefined-behavior.cpp) — Demonstrates common undefined behavior scenarios and how to avoid them.

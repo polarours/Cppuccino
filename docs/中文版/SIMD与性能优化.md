@@ -136,6 +136,12 @@ alignas(32) float aligned_result[1024];
 4. **用 `-fopt-info-vec` 检查编译器是否 auto-vectorize**：`g++ -O3 -fopt-info-vec-optimized file.cpp` 输出 vectorization 报告
 5. **对齐比 intrinsics 优先**：先尝试 `alignas` + `-O3`，编译器会自动 vectorize 很多简单循环
 
+## 示例
+
+这个主题的可运行版本：
+
+- [simd-vectorization.cpp](../../examples/simd-vectorization.cpp)
+
 ## 总结
 
 手写 SIMD 的核心模式是 **"向量化循环 + 标量尾部"**，用 `i + 4 <= size` 保证向量化步长不超过边界。`alignas` 对齐内存是释放 performance 的第一步；intrinsics 是精细控制的手段，不是日常首选——大多数场景 `-O3` 就够用。

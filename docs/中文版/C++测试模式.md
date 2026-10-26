@@ -292,6 +292,12 @@ void demo() {
 4. **参数化测试要覆盖边界**：空字符串、极大数、负数、特殊字符——数据要有代表性
 5. **测试隔离是铁律**：测试 A 改了全局状态，不应影响测试 B 的结果
 
+## 示例
+
+这个主题的可运行版本：
+
+- [testing-patterns.cpp](../../examples/testing-patterns.cpp)
+
 ## 总结
 
 三种测试模式各司其职：Mock 验证交互，Fixture 保证隔离，Parameterized Tests 批量验证等价路径。配合 CMake + CTest 自动化构建，是 C++ 项目的测试基础设施标准配置。
