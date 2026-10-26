@@ -68,6 +68,12 @@ For a comma fold that evaluates each for side effects, wrap it: `((std::cout << 
 - **Prefer a comma fold for side effects.** `((action(ts)), ...)` evaluates `action` for every element in order; it is the idiomatic "for each" with folds.
 - **Watch associativity for non-associative operators.** Folds expand left-to-right for `(... op pack)`; if your operator is not associative (e.g. `-`), the result order matters — write it explicitly.
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-fold-expression-errors.cpp](../../examples/pitfall-fold-expression-errors.cpp)
+
 ## Summary
 
 Fold expressions are the cleanest way to reduce a parameter pack, but they demand respect for two rules: an empty pack is illegal for most operators (so supply an initializer), and the pack must sit correctly inside the fold's parentheses (unary vs binary shape). Get those right and folds replace pages of recursion with a single expressive line.

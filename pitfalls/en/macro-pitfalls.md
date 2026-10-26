@@ -1,5 +1,8 @@
 # Macro Pitfalls
 
+
+- [pitfall-macro-pitfalls.cpp](../../examples/pitfall-macro-pitfalls.cpp)
+
 ## The Problem
 
 C preprocessor macros are text substitution, not code. This leads to
@@ -53,12 +56,6 @@ LOG("Hello " + name);      // ERROR: + doesn't work with "Hello "
 - Prefix macros with project name to avoid collisions
 - Use `#undef` after use if macros are temporary
 - Prefer `constexpr` functions over function-like macros
-
-## Example
-
-A runnable version of this topic:
-
-- [pitfall-macro-pitfalls.cpp](../../examples/pitfall-macro-pitfalls.cpp)
 
 ## See Also
 

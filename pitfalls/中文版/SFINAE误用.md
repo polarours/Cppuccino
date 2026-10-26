@@ -71,6 +71,7 @@ int main() {
 这个主题的可运行版本：
 
 - [sfinae-type-traits.cpp](../../examples/sfinae-type-traits.cpp)
+- [pitfall-sfinae-misuse.cpp](../../examples/pitfall-sfinae-misuse.cpp)
 
 ## 总结
 

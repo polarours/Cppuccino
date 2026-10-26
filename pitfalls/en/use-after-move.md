@@ -1,5 +1,8 @@
 # Use After Move
 
+
+- [pitfall-use-after-move.cpp](../../examples/pitfall-use-after-move.cpp)
+
 ## The Problem
 
 Moving from an object leaves it in a valid but unspecified state.

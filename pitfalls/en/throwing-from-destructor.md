@@ -363,6 +363,12 @@ $$
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-throwing-from-destructor.cpp](../../examples/pitfall-throwing-from-destructor.cpp)
+
 ## 18. Key Takeaways
 
 1. Throwing from destructors is a severe exception-safety hazard.

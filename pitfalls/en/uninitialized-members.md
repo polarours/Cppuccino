@@ -1,5 +1,8 @@
 # Uninitialized Member Variables
 
+
+- [pitfall-uninitialized-members.cpp](../../examples/pitfall-uninitialized-members.cpp)
+
 ## The Problem
 
 In C++, member variables are only zero-initialized for certain types.

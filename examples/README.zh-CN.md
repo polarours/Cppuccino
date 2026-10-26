@@ -164,7 +164,41 @@ g++ -std=c++20 -o demo demo-file.cpp && ./demo
 - [std-variant.cpp](std-variant.cpp) — 演示用 std::variant 实现类型安全的联合体。
 
 ## 陷阱
-
 - [pitfall-dangling-reference.cpp](pitfall-dangling-reference.cpp) — 演示悬垂引用陷阱及其修复方法。
 - [pitfall-iterator-invalidation.cpp](pitfall-iterator-invalidation.cpp) — 演示迭代器失效陷阱及其修复方法。
 - [pitfall-object-slicing.cpp](pitfall-object-slicing.cpp) — 演示对象切片陷阱及其修复方法。
+- [pitfall-broken-double-checked-locking.cpp](pitfall-broken-double-checked-locking.cpp) — 演示失效的双重检查锁定，以及安全的替代写法。
+- [pitfall-const-correctness-pitfalls.cpp](pitfall-const-correctness-pitfalls.cpp) — 演示 const 正确性陷阱：临时对象的生命周期、可变状态，以及强转去掉 const。
+- [pitfall-const-object-move-trap.cpp](pitfall-const-object-move-trap.cpp) — 演示对 const 对象使用 std::move 时会悄悄退化成拷贝。
+- [pitfall-dangling-lambda-captures.cpp](pitfall-dangling-lambda-captures.cpp) — 演示 lambda 捕获悬垂引用，以及能避免它的所有权写法。
+- [pitfall-dangling-pointer.cpp](pitfall-dangling-pointer.cpp) — 演示悬垂指针（释放后使用）场景，以及能避免它的所有权写法。
+- [pitfall-dangling-string-view.cpp](pitfall-dangling-string-view.cpp) — 演示 std::string_view 悬垂陷阱，以及安全的自有替代方案。
+- [pitfall-data-race.cpp](pitfall-data-race.cpp) — 演示数据竞争，以及 std::atomic 与 std::mutex 两种修法。
+- [pitfall-deadlock.cpp](pitfall-deadlock.cpp) — 演示因加锁顺序不一致导致的死锁，以及无死锁的 std::scoped_lock 修法。
+- [pitfall-deleting-through-non-virtual-base.cpp](pitfall-deleting-through-non-virtual-base.cpp) — 演示为什么通过基类指针删除对象需要虚析构函数。
+- [pitfall-double-free.cpp](pitfall-double-free.cpp) — 演示重复释放的 bug，以及能避免它的所有权写法。
+- [pitfall-fold-expression-errors.cpp](pitfall-fold-expression-errors.cpp) — 演示折叠表达式的错误：空参数包、括号写错，以及它们的修法。
+- [pitfall-implicit-conversions.cpp](pitfall-implicit-conversions.cpp) — 演示 C++ 的隐式转换，以及它悄悄引发的 bug。
+- [pitfall-iterator-invalidation-pitfalls.cpp](pitfall-iterator-invalidation-pitfalls.cpp) — 演示迭代器失效陷阱，以及安全的写法。
+- [pitfall-livelock.cpp](pitfall-livelock.cpp) — 演示礼貌让出导致的活锁，以及修法：随机退避和单一持有者。
+- [pitfall-macro-pitfalls.cpp](pitfall-macro-pitfalls.cpp) — 演示宏的陷阱（优先级、重复求值、语句宏）及其修法。
+- [pitfall-memory-fragmentation.cpp](pitfall-memory-fragmentation.cpp) — 演示交错释放造成的堆内存碎片，以及竞技场/内存池的修法。
+- [pitfall-memory-leak.cpp](pitfall-memory-leak.cpp) — 演示手动所有权造成的内存泄漏，以及 RAII 的修法。
+- [pitfall-memory-order-pitfalls.cpp](pitfall-memory-order-pitfalls.cpp) — 演示 relaxed 原子操作为什么不构成同步点，以及 acquire/release 如何修好它。
+- [pitfall-moving-from-const-object.cpp](pitfall-moving-from-const-object.cpp) — 演示对 const 对象使用 std::move 只是拷贝，并给出真正会移动的接收端 API 写法。
+- [pitfall-narrowing-conversions.cpp](pitfall-narrowing-conversions.cpp) — 演示大括号、圆括号和拷贝初始化中的窄化转换。
+- [pitfall-object-lifetime-and-destruction-order-pitfalls.cpp](pitfall-object-lifetime-and-destruction-order-pitfalls.cpp) — 演示对象生命周期规则：析构顺序、析构后访问，以及 shared_ptr 循环引用。
+- [pitfall-priority-inversion.cpp](pitfall-priority-inversion.cpp) — 演示优先级反转及其修法：优先级继承、短临界区和无锁设计。
+- [pitfall-sfinae-misuse.cpp](pitfall-sfinae-misuse.cpp) — 演示写在函数体里的约束是硬错误，而写在签名里的同一个约束只是 SFINAE 软失败。
+- [pitfall-signed-integer-overflow-assumptions.cpp](pitfall-signed-integer-overflow-assumptions.cpp) — 演示有符号溢出是未定义行为，并给出带检查的算术写法。
+- [pitfall-stack-overflow.cpp](pitfall-stack-overflow.cpp) — 演示无界递归造成的栈溢出，以及改写成迭代的修法。
+- [pitfall-static-initialization-order-fiasco.cpp](pitfall-static-initialization-order-fiasco.cpp) — 演示静态初始化顺序问题，以及修法：Meyers 单例、constexpr 和 constinit。
+- [pitfall-template-deduction-pitfalls.cpp](pitfall-template-deduction-pitfalls.cpp) — 演示转发引用推导、引用折叠、不可推导上下文和 CTAD。
+- [pitfall-template-specialization-pitfalls.cpp](pitfall-template-specialization-pitfalls.cpp) — 演示模板特化的错误：函数的部分特化、标准库模板，以及悄悄失配。
+- [pitfall-the-myth-of-thread-safety.cpp](pitfall-the-myth-of-thread-safety.cpp) — 演示为什么 const、原子操作和逐对象加锁单靠自己是远远不够的。
+- [pitfall-thread-leak.cpp](pitfall-thread-leak.cpp) — 演示线程泄漏（joinable 线程被析构、detached 线程）以及 RAII 修法。
+- [pitfall-thread-safety-composition-fallacy.cpp](pitfall-thread-safety-composition-fallacy.cpp) — 演示线程安全的操作组合起来并不等于线程安全的整体。
+- [pitfall-throwing-from-destructor.cpp](pitfall-throwing-from-destructor.cpp) — 演示析构函数为什么不能抛异常，以及如何安全地报告清理失败。
+- [pitfall-uninitialized-members.cpp](pitfall-uninitialized-members.cpp) — 演示未初始化的成员变量，以及能避免它的习惯。
+- [pitfall-use-after-move.cpp](pitfall-use-after-move.cpp) — 演示移动后使用的陷阱，以及安全的替代写法。
+

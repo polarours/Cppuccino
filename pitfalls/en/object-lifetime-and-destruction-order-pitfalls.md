@@ -190,6 +190,12 @@ std::unique_ptr<FILE, decltype(deleter)> file(fopen("test.txt", "r"), deleter);
 6. **Thread safety** — Ensure objects outlive their threads
 7. **Static objects** — Minimize dependencies between translation units
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-object-lifetime-and-destruction-order-pitfalls.cpp](../../examples/pitfall-object-lifetime-and-destruction-order-pitfalls.cpp)
+
 ## 8. Summary
 
 - Objects are destroyed in reverse order of construction

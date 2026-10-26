@@ -348,6 +348,12 @@ In many real systems, correctness and observability dominate arithmetic micro-co
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-signed-integer-overflow-assumptions.cpp](../../examples/pitfall-signed-integer-overflow-assumptions.cpp)
+
 ## 17. Key Takeaways
 
 1. Signed overflow is UB in standard C++.

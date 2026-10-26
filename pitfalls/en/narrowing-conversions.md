@@ -1,5 +1,8 @@
 # Narrowing Conversions in Initialization
 
+
+- [pitfall-narrowing-conversions.cpp](../../examples/pitfall-narrowing-conversions.cpp)
+
 ## The Problem
 
 C++ brace initialization prevents narrowing conversions, but parenthesized

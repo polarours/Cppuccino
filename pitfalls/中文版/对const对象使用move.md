@@ -303,6 +303,12 @@ void sink(T&& x) {
 
 ---
 
+## 示例
+
+这个主题的可运行版本：
+
+- [pitfall-moving-from-const-object.cpp](../../examples/pitfall-moving-from-const-object.cpp)
+
 ## 23. 总结
 
 “对 const 使用 move”是 C++ 中非常典型的语义错觉。

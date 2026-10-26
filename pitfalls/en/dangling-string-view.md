@@ -346,6 +346,12 @@ If any item is uncertain, prefer ownership.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-dangling-string-view.cpp](../../examples/pitfall-dangling-string-view.cpp)
+
 ## 25. Conclusion
 
 `std::string_view` is a high-value performance and API ergonomics tool,

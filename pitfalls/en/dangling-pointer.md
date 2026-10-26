@@ -292,6 +292,12 @@ If you must use raw pointers, some simple rules dramatically improve safety:
 
 > Due to space limitations, we will not cover additional methods here. Interested readers are encouraged to consult relevant resources to learn more techniques for avoiding dangling pointers.
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-dangling-pointer.cpp](../../examples/pitfall-dangling-pointer.cpp)
+
 ## 6. Conclusion
 
 Dangling pointers are not “avoidable by language magic”, nor are they a flaw unique to C++. They are a byproduct of C++’s design trade-offs.

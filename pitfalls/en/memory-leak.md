@@ -81,6 +81,12 @@ When the resource is *not* memory (file handle, socket, lock), write a small RAI
 - **Catch leaks early with tooling.** Run debug builds under AddressSanitizer (`-fsanitize=address`) or Valgrind; both report exactly where the leaked block was allocated.
 - **Treat "trivial" early returns as leak hazards.** Any `return` / `break` / `continue` / exception past a `new` is a potential leak unless the object is RAII-owned.
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-memory-leak.cpp](../../examples/pitfall-memory-leak.cpp)
+
 ## Summary
 
 Memory leaks in C++ are rarely subtle logic errors — they are ownership errors. The fix is not "remember to call `delete` more carefully"; it is to stop managing memory by hand. Wrap every resource in an RAII type (`std::unique_ptr`, `std::shared_ptr`, a container, or a custom guard) so that leaving a scope — by any path, normal or exceptional — frees the resource automatically. Leaks then become a compile-time non-issue rather than a runtime hunt.

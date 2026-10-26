@@ -83,6 +83,12 @@ causes the inversion in the first place.
 3. **Isolate priority domains** so a medium thread cannot preempt a lock-holder.
 4. **Test with simulated load** to surface inversion-induced latency spikes.
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-priority-inversion.cpp](../../examples/pitfall-priority-inversion.cpp)
+
 ## 5. Summary
 
 - Priority inversion: High blocked by Medium because Low holds the lock.

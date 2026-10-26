@@ -200,6 +200,12 @@ For critical code, consider formal verification tools or proofs.
 5. **Test under load** — Thread bugs often appear only under heavy concurrency
 6. **Use tools** — ThreadSanitizer, helgrind, drd
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-the-myth-of-thread-safety.cpp](../../examples/pitfall-the-myth-of-thread-safety.cpp)
+
 ## 7. Summary
 
 - `const` doesn't guarantee thread safety

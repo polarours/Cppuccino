@@ -61,6 +61,12 @@ Also avoid giant by-value locals; use `std::vector<char>` (heap-backed) instead 
 - **Beware large stack allocations.** A multi-megabyte local array or `std::array` is a single-frame overflow waiting to happen; put big buffers on the heap.
 - **Let the compiler warn.** Build with `-Wstack-usage=<bytes>` to get a diagnostic whenever a function's stack use may exceed your budget.
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-stack-overflow.cpp](../../examples/pitfall-stack-overflow.cpp)
+
 ## Summary
 
 Stack overflow is the stack telling you it has run out of room for call frames. The fix is rarely "make the stack bigger"; it is to stop pushing unbounded frames: convert deep or open-ended recursion into iteration or an explicit heap-backed stack, and keep large objects off the stack. Design for the *largest* input, not just the one in your test suite.

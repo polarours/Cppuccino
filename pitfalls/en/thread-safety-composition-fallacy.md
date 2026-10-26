@@ -214,6 +214,12 @@ void dangerousCompound(bool condition) {
 - **AddressSanitizer (ASan)**: memory errors
 - **Helgrind**: Valgrind's thread error detector
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-thread-safety-composition-fallacy.cpp](../../examples/pitfall-thread-safety-composition-fallacy.cpp)
+
 ## Summary
 
 > **Composing individually thread-safe operations does not necessarily yield a

@@ -17,7 +17,7 @@ Cppuccino 是一个整理中的 C++ 双语学习仓库。
 |------|------|
 | 文档 | 134 篇（67 英文 + 67 中文） |
 | 陷阱 | 74 篇（37 英文 + 37 中文） |
-| 示例 | 120 个可运行示例 |
+| 示例 | 154 个可运行示例 |
 | 项目 | 151 个项目，横跨 43 个阶段 |
 | 测试 | 884（全部通过） |
 
@@ -115,12 +115,12 @@ tools/run_all_checks.sh --full   # 外加全部项目构建
 ### 示例
 
 - [examples](examples)，索引见 [examples/README.zh-CN.md](examples/README.zh-CN.md)：
-  120 个可运行示例，涵盖：
+  154 个可运行示例，涵盖：
   - 核心概念：所有权、move 语义、智能指针、RAII
   - 现代 C++：lambda、constexpr、结构化绑定、ranges
   - C++20：concepts、ranges、span、format、coroutines
   - C++23：fold expressions、CRTP、SFINAE、type traits
-  - 陷阱复现：悬垂引用、对象切片、迭代器失效
+  - 陷阱复现：每篇陷阱文章都有一个可运行示例
 
 ### 项目
 

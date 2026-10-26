@@ -92,6 +92,12 @@ yield-and-retry logic entirely.
 3. **Prefer mutex / condition_variable** over manual retry loops.
 4. **Watch CPU usage** — 100% busy but no output is a livelock smell.
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-livelock.cpp](../../examples/pitfall-livelock.cpp)
+
 ## 5. Summary
 
 - Livelock = threads run but make no progress (vs. deadlock = threads blocked).

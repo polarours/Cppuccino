@@ -1,233 +1,209 @@
 // examples/pitfall-iterator-invalidation.cpp
 // Demonstrates iterator invalidation pitfalls and their fixes.
-// Compile with: g++ -std=c++17 -o pitfall_iterator pitfall-iterator-invalidation.cpp
+// Compile with: g++ -std=c++17 -o pitfall_iterator_invalidation pitfall-iterator-invalidation.cpp
 
+#include <algorithm>
 #include <iostream>
-#include <vector>
 #include <list>
 #include <map>
-#include <set>
-#include <algorithm>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-// --- 1. Vector Iterator Invalidation ---
+// --- 1. Reallocation invalidates every iterator, reference and pointer ---
 
-void vectorIteratorInvalidation() {
-    std::cout << "--- Vector Iterator Invalidation ---\n";
+void reallocationInvalidatesHandles() {
+    std::cout << "--- Reallocation invalidates handles ---\n";
+
+    std::vector<int> vec = {1, 2, 3};
+    auto it = vec.begin();
+
+    // BAD: push_back may reallocate, which invalidates 'it', and reading through
+    // an invalidated iterator is undefined behaviour.
+    // vec.push_back(4);
+    // std::cout << *it << "\n";
+
+    // GOOD: reacquire the handle after the mutation.
+    vec.push_back(4);
+    it = vec.begin();
+    std::cout << "Good: after push_back the reacquired iterator points at " << *it << "\n";
+}
+
+// --- 2. A cached end iterator becomes stale in a mutating loop ---
+
+void cachedEndIterator() {
+    std::cout << "\n--- Cached end iterator ---\n";
+
+    std::vector<int> vec = {1, 2, 3};
+
+    // BAD: 'end' is captured before the loop body grows the vector, so the
+    // comparison against a stale end is undefined behaviour. The push_back
+    // invalidates 'it' as well.
+    // for (auto it = vec.begin(), e = vec.end(); it != e; ++it) {
+    //     vec.push_back(*it);
+    // }
+
+    // GOOD: separate the read phase from the write phase.
+    std::vector<int> doubled;
+    for (int n : vec) {
+        doubled.push_back(n * 2);
+    }
+    vec = doubled;
+
+    std::cout << "Good: after the two-phase update the vector holds ";
+    for (int n : vec) {
+        std::cout << n << " ";
+    }
+    std::cout << "\n";
+}
+
+// --- 3. Erasing inside a loop invalidates the iterator ---
+
+void eraseInsideLoop() {
+    std::cout << "\n--- Erasing inside a loop ---\n";
 
     std::vector<int> vec = {1, 2, 3, 4, 5};
 
-    // BAD: Erasing while iterating
+    // BAD: erase invalidates 'it', and the ++it afterwards is undefined
+    // behaviour.
     // for (auto it = vec.begin(); it != vec.end(); ++it) {
-    //     if (*it == 3) {
-    //         vec.erase(it);  // it is now invalid!
+    //     if (*it % 2 == 0) {
+    //         vec.erase(it);
     //     }
     // }
 
-    // GOOD: Use erase return value
+    // GOOD: use the iterator returned by erase.
     for (auto it = vec.begin(); it != vec.end(); ) {
-        if (*it == 3) {
-            it = vec.erase(it);  // erase returns next valid iterator
+        if (*it % 2 == 0) {
+            it = vec.erase(it);
         } else {
             ++it;
         }
     }
 
-    std::cout << "After erase: ";
-    for (int n : vec) std::cout << n << " ";
+    std::cout << "Good: only odd values remain: ";
+    for (int n : vec) {
+        std::cout << n << " ";
+    }
     std::cout << "\n";
 }
 
-// --- 2. Vector Insert Invalidation ---
+// --- 4. A pointer to an element does not survive growth ---
 
-void vectorInsertInvalidation() {
-    std::cout << "\n--- Vector Insert Invalidation ---\n";
+void pointerAcrossGrowth() {
+    std::cout << "\n--- Pointer across growth ---\n";
 
-    std::vector<int> vec = {1, 2, 3, 4, 5};
+    std::vector<int> vec = {10, 20, 30};
+    int* p = &vec[0];
 
-    // BAD: Insert may invalidate all iterators
-    // auto it = vec.begin() + 2;
-    // vec.push_back(6);  // it may be invalid now
-    // std::cout << *it << "\n";  // Undefined behavior
+    // BAD: the growth may reallocate, so 'p' dangles and *p is undefined
+    // behaviour.
+    // vec.push_back(40);
+    // std::cout << *p << "\n";
 
-    // GOOD: Revalidate iterator after modification
-    auto it = vec.begin() + 2;
-    vec.push_back(6);
-    it = vec.begin() + 2;  // Revalidate
-    std::cout << "After push_back: " << *it << "\n";
+    // GOOD: reacquire the pointer, or address the element by index.
+    vec.push_back(40);
+    p = &vec[0];
+    std::cout << "Good: reacquired pointer reads " << *p << ", element 3 is "
+              << vec[3] << "\n";
 }
 
-// --- 3. List Iterator Invalidation ---
+// --- 5. Node based containers keep their iterators stable ---
 
-void listIteratorInvalidation() {
-    std::cout << "\n--- List Iterator Invalidation ---\n";
+void stableIterators() {
+    std::cout << "\n--- Node based containers keep iterators stable ---\n";
 
     std::list<int> lst = {1, 2, 3, 4, 5};
+    std::map<int, std::string> mp = {{1, "one"}, {2, "two"}, {3, "three"}};
 
-    // List iterators are NOT invalidated by insert/erase at other positions
-    for (auto it = lst.begin(); it != lst.end(); ) {
-        if (*it == 3) {
-            it = lst.erase(it);  // Other iterators remain valid
-        } else {
-            ++it;
-        }
-    }
+    auto list_it = lst.begin();
+    auto map_it = mp.begin();
 
-    std::cout << "After erase: ";
-    for (int n : lst) std::cout << n << " ";
-    std::cout << "\n";
+    lst.insert(lst.begin(), 0);  // inserting does not invalidate the iterators
+    mp.emplace(4, "four");
+
+    // GOOD: the iterators still point at the same elements.
+    std::cout << "Good: list iterator still reads " << *list_it
+              << ", map iterator still reads " << map_it->first << "\n";
 }
 
-// --- 4. Map Iterator Invalidation ---
+// --- 6. Rehashing an unordered container invalidates its iterators ---
 
-void mapIteratorInvalidation() {
-    std::cout << "\n--- Map Iterator Invalidation ---\n";
+void rehashInvalidatesIterators() {
+    std::cout << "\n--- Rehashing invalidates iterators ---\n";
 
-    std::map<int, std::string> mp = {
-        {1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}
-    };
+    std::unordered_map<int, std::string> mp;
+    mp.emplace(1, "one");
 
-    // Map iterators are NOT invalidated by insert/erase at other positions
-    for (auto it = mp.begin(); it != mp.end(); ) {
-        if (it->first == 3) {
-            it = mp.erase(it);
-        } else {
-            ++it;
-        }
-    }
+    // BAD: inserting may rehash, which invalidates the iterator.
+    // auto it = mp.begin();
+    // mp.emplace(2, "two");
+    // std::cout << it->first << "\n";
 
-    std::cout << "After erase: ";
-    for (const auto& [k, v] : mp) {
-        std::cout << k << ":" << v << " ";
-    }
-    std::cout << "\n";
+    // GOOD: reserve the bucket count up front, and reacquire after insertion.
+    mp.reserve(16);
+    auto it = mp.begin();
+    mp.emplace(2, "two");
+    it = mp.find(1);
+    std::cout << "Good: after insertion the reacquired iterator reads " << it->first
+              << "\n";
 }
 
-// --- 5. Set Iterator Invalidation ---
-
-void setIteratorInvalidation() {
-    std::cout << "\n--- Set Iterator Invalidation ---\n";
-
-    std::set<int> s = {1, 2, 3, 4, 5};
-
-    for (auto it = s.begin(); it != s.end(); ) {
-        if (*it == 3) {
-            it = s.erase(it);
-        } else {
-            ++it;
-        }
-    }
-
-    std::cout << "After erase: ";
-    for (int n : s) std::cout << n << " ";
-    std::cout << "\n";
-}
-
-// --- 6. Fix: Erase-Remove Idiom ---
+// --- 7. Fix: the erase-remove idiom ---
 
 void eraseRemoveIdiom() {
-    std::cout << "\n--- Fix: Erase-Remove Idiom ---\n";
+    std::cout << "\n--- Fix: erase-remove idiom ---\n";
 
-    std::vector<int> vec = {1, 2, 3, 4, 5, 3, 6, 3};
+    std::vector<int> vec = {1, 2, 3, 2, 5, 2};
+    vec.erase(std::remove(vec.begin(), vec.end(), 2), vec.end());
 
-    // Remove all 3s
-    vec.erase(std::remove(vec.begin(), vec.end(), 3), vec.end());
-
-    std::cout << "After remove 3: ";
-    for (int n : vec) std::cout << n << " ";
-    std::cout << "\n";
-}
-
-// --- 7. Fix: Remove If ---
-
-void fixRemoveIf() {
-    std::cout << "\n--- Fix: Remove If ---\n";
-
-    std::vector<int> vec = {1, 2, 3, 4, 5, 6, 7, 8};
-
-    // Remove even numbers
-    vec.erase(
-        std::remove_if(vec.begin(), vec.end(), [](int n) { return n % 2 == 0; }),
-        vec.end()
-    );
-
-    std::cout << "After remove even: ";
-    for (int n : vec) std::cout << n << " ";
-    std::cout << "\n";
-}
-
-// --- 8. Fix: Collect First, Then Remove ---
-
-void fixCollectThenRemove() {
-    std::cout << "\n--- Fix: Collect First, Then Remove ---\n";
-
-    std::vector<int> vec = {1, 2, 3, 4, 5};
-    std::vector<int> toRemove;
-
-    // Collect items to remove
+    std::cout << "Good: after removing every 2: ";
     for (int n : vec) {
-        if (n % 2 == 0) {
-            toRemove.push_back(n);
-        }
+        std::cout << n << " ";
     }
-
-    // Remove collected items
-    for (int n : toRemove) {
-        vec.erase(std::remove(vec.begin(), vec.end(), n), vec.end());
-    }
-
-    std::cout << "After removing evens: ";
-    for (int n : vec) std::cout << n << " ";
     std::cout << "\n";
 }
 
-// --- 9. Fix: Use Index Instead of Iterator ---
+// --- 8. Mutating a container while a range-based for walks it ---
 
-void fixUseIndex() {
-    std::cout << "\n--- Fix: Use Index Instead of Iterator ---\n";
+void mutateDuringRangeFor() {
+    std::cout << "\n--- Mutating during a range-based for ---\n";
 
-    std::vector<int> vec = {1, 2, 3, 4, 5};
+    std::vector<int> vec = {1, 2, 3};
 
-    for (size_t i = 0; i < vec.size(); ) {
-        if (vec[i] == 3) {
-            vec.erase(vec.begin() + i);
-            // Don't increment i
-        } else {
-            ++i;
+    // BAD: growing the vector inside the loop invalidates the iterator that
+    // the range-based for is using.
+    // for (auto& x : vec) {
+    //     if (x == 2) {
+    //         vec.push_back(99);
+    //     }
+    // }
+
+    // GOOD: collect first, mutate afterwards.
+    std::vector<int> to_add;
+    for (int n : vec) {
+        if (n == 2) {
+            to_add.push_back(99);
         }
     }
+    vec.insert(vec.end(), to_add.begin(), to_add.end());
 
-    std::cout << "After erase by index: ";
-    for (int n : vec) std::cout << n << " ";
-    std::cout << "\n";
-}
-
-// --- 10. Fix: Copy and Modify ---
-
-void fixCopyAndModify() {
-    std::cout << "\n--- Fix: Copy and Modify ---\n";
-
-    std::vector<int> vec = {1, 2, 3, 4, 5};
-    std::vector<int> result;
-
-    std::copy_if(vec.begin(), vec.end(), std::back_inserter(result),
-        [](int n) { return n != 3; });
-
-    std::cout << "After copy_if: ";
-    for (int n : result) std::cout << n << " ";
+    std::cout << "Good: after the two-phase update the vector holds ";
+    for (int n : vec) {
+        std::cout << n << " ";
+    }
     std::cout << "\n";
 }
 
 int main() {
-    vectorIteratorInvalidation();
-    vectorInsertInvalidation();
-    listIteratorInvalidation();
-    mapIteratorInvalidation();
-    setIteratorInvalidation();
+    reallocationInvalidatesHandles();
+    cachedEndIterator();
+    eraseInsideLoop();
+    pointerAcrossGrowth();
+    stableIterators();
+    rehashInvalidatesIterators();
     eraseRemoveIdiom();
-    fixRemoveIf();
-    fixCollectThenRemove();
-    fixUseIndex();
-    fixCopyAndModify();
+    mutateDuringRangeFor();
 
     std::cout << "\n=== All iterator invalidation scenarios completed ===\n";
     return 0;

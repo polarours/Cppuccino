@@ -68,9 +68,10 @@ For C++17 and later, `if constexpr` or concepts (`requires` / `std::enable_if` a
 
 ## Example
 
-A runnable version of this topic:
+Runnable versions of this topic:
 
 - [sfinae-type-traits.cpp](../../examples/sfinae-type-traits.cpp)
+- [pitfall-sfinae-misuse.cpp](../../examples/pitfall-sfinae-misuse.cpp)
 
 ## Summary
 

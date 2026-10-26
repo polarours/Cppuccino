@@ -46,6 +46,12 @@ std::cout << data.load(std::memory_order_acquire);  // guaranteed 42
 - Use `std::atomic_thread_fence` for complex patterns
 - Run with ThreadSanitizer (`-fsanitize=thread`)
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-memory-order-pitfalls.cpp](../../examples/pitfall-memory-order-pitfalls.cpp)
+
 ## See Also
 
 - [Broken Double-Checked Locking](broken-double-checked-locking.md)

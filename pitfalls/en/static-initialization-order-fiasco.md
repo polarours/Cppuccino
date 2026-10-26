@@ -215,6 +215,12 @@ Because the approach is complex and easy to get wrong, modern C++ development us
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-static-initialization-order-fiasco.cpp](../../examples/pitfall-static-initialization-order-fiasco.cpp)
+
 ## 5. Summary
 
 The Static Initialization Order Fiasco (SIOF) is one of the most insidious traps in C++; at its core it is the **unspecified order of dynamic initialization across translation units**.

@@ -68,6 +68,12 @@ For object pools of a *fixed* type, a `std::vector<T>` (contiguous storage) or a
 - **Reuse objects.** A free-list or object pool recycles freed instances instead of returning them to the general heap — great for fixed-size structures.
 - **Measure, don't guess.** Track peak RSS and allocator stats under realistic load; fragmentation shows up only at scale, so test with production-sized churn.
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-memory-fragmentation.cpp](../../examples/pitfall-memory-fragmentation.cpp)
+
 ## Summary
 
 Fragmentation is the silent tax of mixing many differently sized, differently timed allocations on a general-purpose heap. You cannot "fix" the heap; you change *how you allocate*: give each phase of work its own arena and reclaim it in bulk, keep homogeneous data contiguous in `std::vector`, and reach for `std::pmr` pools on hot paths. Do that, and the "out of memory despite free RAM" crash disappears.

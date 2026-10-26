@@ -1,5 +1,8 @@
 # Const Correctness Pitfalls
 
+
+- [pitfall-const-correctness-pitfalls.cpp](../../examples/pitfall-const-correctness-pitfalls.cpp)
+
 ## The Problem
 
 Const correctness in C++ has subtle issues, especially with:

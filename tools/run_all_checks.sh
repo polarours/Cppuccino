@@ -63,6 +63,9 @@ run "projects: the README examples compile" \
 run "the code: no warning the compiler did not expect" \
     python3 tools/check_warnings.py
 
+run "pitfall articles: every one names an example" \
+    python3 tools/check_pitfall_examples.py
+
 run "roadmap: the two indexes describe the same thing" \
     python3 tools/check_overview_parity.py
 

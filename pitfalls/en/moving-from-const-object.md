@@ -329,6 +329,12 @@ If any answer is uncertain, redesign API contract first.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-moving-from-const-object.cpp](../../examples/pitfall-moving-from-const-object.cpp)
+
 ## 23. Conclusion
 
 “Move from const” is one of the most persistent C++ performance misconceptions.

@@ -80,5 +80,8 @@ jobs:
       - name: The code compiles without an unexpected warning
         run: python3 tools/check_warnings.py
 
+      - name: Every pitfall article names an example
+        run: python3 tools/check_pitfall_examples.py
+
       - name: The two roadmap indexes agree
         run: python3 tools/check_overview_parity.py

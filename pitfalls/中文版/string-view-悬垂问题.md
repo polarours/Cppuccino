@@ -333,6 +333,12 @@ void enqueue_view(std::string_view sv) {
 
 ---
 
+## 示例
+
+这个主题的可运行版本：
+
+- [pitfall-dangling-string-view.cpp](../../examples/pitfall-dangling-string-view.cpp)
+
 ## 25. 总结
 
 `std::string_view` 的价值在于零拷贝视图能力，

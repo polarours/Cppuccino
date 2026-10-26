@@ -50,6 +50,8 @@ auto toString(T value) -> decltype(std::to_string(value)) {
 // toString(ComplexNumber{})  // ERROR: no matching overload
 ```
 
+- [pitfall-template-deduction-pitfalls.cpp](../../examples/pitfall-template-deduction-pitfalls.cpp)
+
 ## Prevention
 
 - Understand reference collapsing rules (T& + & = T&, T& + && = T&)

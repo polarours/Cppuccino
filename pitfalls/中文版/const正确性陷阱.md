@@ -1,5 +1,8 @@
 # const 正确性陷阱
 
+
+- [pitfall-const-correctness-pitfalls.cpp](../../examples/pitfall-const-correctness-pitfalls.cpp)
+
 ## 问题
 
 C++ 中的 const 正确性有微妙的问题，特别是：

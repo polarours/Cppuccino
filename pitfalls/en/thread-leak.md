@@ -92,6 +92,12 @@ shutdown flag, and join them during teardown.
 4. **Track threads in a registry** so you can join them on shutdown.
 5. **Use a stop token / flag** for cooperative cancellation.
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-thread-leak.cpp](../../examples/pitfall-thread-leak.cpp)
+
 ## 5. Summary
 
 - A joinable `std::thread` destroyed = `std::terminate()` (crash).

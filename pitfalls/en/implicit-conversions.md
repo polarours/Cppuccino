@@ -356,6 +356,12 @@ operator int() const;
 
 then `Width` and `Height` lose their distinction, and the semantic boundary you created is silently erased.
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-implicit-conversions.cpp](../../examples/pitfall-implicit-conversions.cpp)
+
 ## 5. Summary
 
 Implicit conversions are among the most powerful—and dangerous—features in C++’s type system.

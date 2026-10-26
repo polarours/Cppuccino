@@ -78,6 +78,12 @@ If you need custom behavior for a user-defined type, define your own function/ty
 - **Declare specializations in the same namespace, after the primary template is visible.** A specialization the compiler hasn't seen yet is simply ignored — a silent, maddening bug.
 - **Keep class-template specializations minimal and intentional.** Prefer tag dispatch or `if constexpr` over a sprawl of specializations when the logic is closely related.
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-template-specialization-pitfalls.cpp](../../examples/pitfall-template-specialization-pitfalls.cpp)
+
 ## Summary
 
 Specialization is easy to reach for and easy to misuse. The two traps that bite most often are attempting partial specialization of a function template (use an overload) and trying to specialize a standard container (UB — use a trait or your own type). Get those right and specialization becomes a precise tool instead of a source of build breaks and silent mis-selection.

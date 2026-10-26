@@ -361,6 +361,12 @@ If any answer is uncertain, refactor for clearer safety.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-iterator-invalidation.cpp](../../examples/pitfall-iterator-invalidation.cpp)
+
 ## 25. Conclusion
 
 Iterator invalidation is not an edge case;

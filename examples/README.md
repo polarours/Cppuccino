@@ -165,6 +165,40 @@ g++ -std=c++20 -o demo demo-file.cpp && ./demo
 
 ## Pitfalls
 
+- [pitfall-broken-double-checked-locking.cpp](pitfall-broken-double-checked-locking.cpp) — Demonstrates broken double-checked locking and the safe replacements.
+- [pitfall-const-correctness-pitfalls.cpp](pitfall-const-correctness-pitfalls.cpp) — Demonstrates const correctness pitfalls: temporary lifetime, mutable state, and casting away const.
+- [pitfall-const-object-move-trap.cpp](pitfall-const-object-move-trap.cpp) — Demonstrates that std::move applied to a const object silently copies instead of moving.
+- [pitfall-dangling-lambda-captures.cpp](pitfall-dangling-lambda-captures.cpp) — Demonstrates dangling lambda captures and the ownership patterns that prevent them.
+- [pitfall-dangling-pointer.cpp](pitfall-dangling-pointer.cpp) — Demonstrates dangling-pointer scenarios (use-after-free) and the ownership patterns that prevent them.
 - [pitfall-dangling-reference.cpp](pitfall-dangling-reference.cpp) — Demonstrates dangling reference pitfalls and their fixes.
+- [pitfall-dangling-string-view.cpp](pitfall-dangling-string-view.cpp) — Demonstrates dangling std::string_view pitfalls and the safe owning alternatives.
+- [pitfall-data-race.cpp](pitfall-data-race.cpp) — Demonstrates data races and the std::atomic / std::mutex fixes.
+- [pitfall-deadlock.cpp](pitfall-deadlock.cpp) — Demonstrates a lock-ordering deadlock and the deadlock-free std::scoped_lock fix.
+- [pitfall-deleting-through-non-virtual-base.cpp](pitfall-deleting-through-non-virtual-base.cpp) — Demonstrates why deleting an object through a base pointer needs a virtual destructor.
+- [pitfall-double-free.cpp](pitfall-double-free.cpp) — Demonstrates double-free bugs and the ownership patterns that prevent them.
+- [pitfall-fold-expression-errors.cpp](pitfall-fold-expression-errors.cpp) — Demonstrates fold expression mistakes: empty packs, wrong parentheses, and the fixes.
+- [pitfall-implicit-conversions.cpp](pitfall-implicit-conversions.cpp) — Demonstrates implicit conversions in C++ and the bugs they silently cause.
+- [pitfall-iterator-invalidation-pitfalls.cpp](pitfall-iterator-invalidation-pitfalls.cpp) — Demonstrates iterator invalidation pitfalls and the safe patterns.
 - [pitfall-iterator-invalidation.cpp](pitfall-iterator-invalidation.cpp) — Demonstrates iterator invalidation pitfalls and their fixes.
+- [pitfall-livelock.cpp](pitfall-livelock.cpp) — Demonstrates a polite-yield livelock and the fixes: random backoff and a single owner.
+- [pitfall-macro-pitfalls.cpp](pitfall-macro-pitfalls.cpp) — Demonstrates macro pitfalls (precedence, double evaluation, statement macros) and their fixes.
+- [pitfall-memory-fragmentation.cpp](pitfall-memory-fragmentation.cpp) — Demonstrates heap fragmentation from interleaved frees and the arena/pool fix.
+- [pitfall-memory-leak.cpp](pitfall-memory-leak.cpp) — Demonstrates memory leaks caused by manual ownership and the RAII fix.
+- [pitfall-memory-order-pitfalls.cpp](pitfall-memory-order-pitfalls.cpp) — Demonstrates why a relaxed atomic handshake is not a synchronisation point and how acquire/release fixes it.
+- [pitfall-moving-from-const-object.cpp](pitfall-moving-from-const-object.cpp) — Demonstrates that std::move on a const object copies, and shows the sink-API patterns that really move.
+- [pitfall-narrowing-conversions.cpp](pitfall-narrowing-conversions.cpp) — Demonstrates narrowing conversions in brace, parenthesis and copy initialization.
+- [pitfall-object-lifetime-and-destruction-order-pitfalls.cpp](pitfall-object-lifetime-and-destruction-order-pitfalls.cpp) — Demonstrates object lifetime rules: destruction order, dangling access and shared_ptr cycles.
 - [pitfall-object-slicing.cpp](pitfall-object-slicing.cpp) — Demonstrates object slicing pitfalls and their fixes.
+- [pitfall-priority-inversion.cpp](pitfall-priority-inversion.cpp) — Demonstrates priority inversion and its fixes: priority inheritance, short critical sections and lock-free design.
+- [pitfall-sfinae-misuse.cpp](pitfall-sfinae-misuse.cpp) — Demonstrates that a constraint in the function body is a hard error, while the same constraint in the signature is a soft SFINAE failure.
+- [pitfall-signed-integer-overflow-assumptions.cpp](pitfall-signed-integer-overflow-assumptions.cpp) — Demonstrates that signed overflow is undefined behaviour and shows checked arithmetic patterns.
+- [pitfall-stack-overflow.cpp](pitfall-stack-overflow.cpp) — Demonstrates stack overflow from unbounded recursion and the iterative fix.
+- [pitfall-static-initialization-order-fiasco.cpp](pitfall-static-initialization-order-fiasco.cpp) — Demonstrates the static initialization order fiasco and the fixes: Meyers' singleton, constexpr and constinit.
+- [pitfall-template-deduction-pitfalls.cpp](pitfall-template-deduction-pitfalls.cpp) — Demonstrates forwarding-reference deduction, reference collapsing, non-deduced contexts and CTAD.
+- [pitfall-template-specialization-pitfalls.cpp](pitfall-template-specialization-pitfalls.cpp) — Demonstrates template specialization mistakes: partial specialization of functions, std templates, and silent misses.
+- [pitfall-the-myth-of-thread-safety.cpp](pitfall-the-myth-of-thread-safety.cpp) — Demonstrates why const, atomics and per-object locks are not enough on their own.
+- [pitfall-thread-leak.cpp](pitfall-thread-leak.cpp) — Demonstrates thread leaks (a joinable thread destroyed, a detached thread) and the RAII fixes.
+- [pitfall-thread-safety-composition-fallacy.cpp](pitfall-thread-safety-composition-fallacy.cpp) — Demonstrates why thread-safe operations do not compose into a thread-safe whole.
+- [pitfall-throwing-from-destructor.cpp](pitfall-throwing-from-destructor.cpp) — Demonstrates why destructors must be non-throwing and how to report cleanup failures safely.
+- [pitfall-uninitialized-members.cpp](pitfall-uninitialized-members.cpp) — Demonstrates uninitialized member variables and the habits that prevent them.
+- [pitfall-use-after-move.cpp](pitfall-use-after-move.cpp) — Demonstrates use-after-move pitfalls and the safe alternatives.

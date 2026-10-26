@@ -83,6 +83,12 @@ about ordering by hand.
 4. **Consider lock-free or single-owner designs** to eliminate the problem.
 5. **Detect with tools** — ThreadSanitizer can report potential deadlocks.
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-deadlock.cpp](../../examples/pitfall-deadlock.cpp)
+
 ## 5. Summary
 
 - A deadlock needs all four Coffman conditions; break any one to prevent it.
