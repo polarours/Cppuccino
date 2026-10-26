@@ -62,7 +62,7 @@ std::expected<double, ErrorCode> divide(double a, double b) {
 ```
 
 For the full runnable example, see
-[examples/std-expected.cpp](../../examples/std-expected.cpp).
+[std-expected.cpp](../../examples/std-expected.cpp).
 
 ## Monadic Operations (Chaining)
 

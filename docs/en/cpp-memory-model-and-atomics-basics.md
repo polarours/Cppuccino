@@ -386,6 +386,12 @@ Always state language mode in reproducible examples.
 
 ---
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-memory-order-pitfalls.cpp](../../examples/pitfall-memory-order-pitfalls.cpp)
+
 ## 22. Conclusion
 
 Correct concurrent C++ begins with language-level reasoning, not processor folklore.

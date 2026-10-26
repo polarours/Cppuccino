@@ -222,6 +222,12 @@ struct Triangle {};
 std::variant<Square, Rectangle, Triangle> shape;
 ```
 
+## 示例
+
+这个主题的可运行版本：
+
+- [virtual-dispatch-and-slicing.cpp](../../examples/virtual-dispatch-and-slicing.cpp)
+
 ## 总结
 
 - 虚函数通过 vtable 实现动态绑定

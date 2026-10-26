@@ -178,6 +178,12 @@ projects.
 | Fragmentation | yes | medium | none |
 | Scale | few / one-off | standard containers | huge numbers of same-shaped objects |
 
+## Example
+
+A runnable version of this topic:
+
+- [pitfall-memory-fragmentation.cpp](../../examples/pitfall-memory-fragmentation.cpp)
+
 ## Summary
 
 A pool turns allocation cost from "system call" into "pointer pop" through

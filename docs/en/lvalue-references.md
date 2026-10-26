@@ -128,6 +128,12 @@ void process(T&& arg) {
 | Syntax | Direct access | Dereference needed |
 | Safety | Safer | More flexible |
 
+## Example
+
+A runnable version of this topic:
+
+- [lvalue-rvalue-references.cpp](../../examples/lvalue-rvalue-references.cpp)
+
 ## Summary
 
 - Lvalue references bind to named objects

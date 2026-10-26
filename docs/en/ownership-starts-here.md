@@ -63,7 +63,7 @@ Understanding ownership requires understanding object lifetime. Lifetime include
 
 Ownership determines who is responsible for managing these lifetime stages. Incorrect ownership management often leads to dangling pointers, memory leaks, double-free problems, etc.
 
-More specific code can be found in [ownership_and_lifetime.cpp](../../examples/ownership-and-lifetime.cpp).
+More specific code can be found in [ownership-and-lifetime.cpp](../../examples/ownership-and-lifetime.cpp).
 
 > More in-depth content about lifetime will be discussed in detail in subsequent chapters, tentatively titled **Ownership & Lifetime**.
 

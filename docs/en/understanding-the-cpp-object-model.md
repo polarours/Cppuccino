@@ -225,6 +225,12 @@ struct Triangle {};
 std::variant<Square, Rectangle, Triangle> shape;
 ```
 
+## Example
+
+A runnable version of this topic:
+
+- [virtual-dispatch-and-slicing.cpp](../../examples/virtual-dispatch-and-slicing.cpp)
+
 ## Summary
 
 - Virtual functions implement dynamic binding through the vtable

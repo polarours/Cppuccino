@@ -177,6 +177,12 @@ int y = std::move(x);  // Same as copy
 | Primary use | Function parameters | Move semantics |
 | Syntax | `T& ref = obj;` | `T&& ref = temp;` |
 
+## Example
+
+A runnable version of this topic:
+
+- [lvalue-rvalue-references.cpp](../../examples/lvalue-rvalue-references.cpp)
+
 ## Summary
 
 - Rvalue references bind to temporary objects

@@ -55,7 +55,7 @@ std::expected<double, ErrorCode> divide(double a, double b) {
 }
 ```
 
-完整可运行示例见 [examples/std-expected.cpp](../../examples/std-expected.cpp)。
+完整可运行示例见 [std-expected.cpp](../../examples/std-expected.cpp)。
 
 ## Monadic 操作（链式调用）
 

@@ -372,6 +372,12 @@ Config* acquire_cfg() {
 
 ---
 
+## 示例
+
+这个主题的可运行版本：
+
+- [pitfall-memory-order-pitfalls.cpp](../../examples/pitfall-memory-order-pitfalls.cpp)
+
 ## 22. 总结
 
 正确的并发 C++ 必须从语言语义出发，而非 CPU 经验。

@@ -19,6 +19,9 @@ import sys
 from collections import defaultdict
 
 LINK_RE = re.compile(r'\[([^\]]*)\]\(([^)\s]+)\)')
+
+# A link whose text is the name of a file.
+FILE_NAME_RE = re.compile(r'^[A-Za-z0-9_.-]+\.(?:cpp|hpp|cc|h|md|txt)$')
 FENCE_RE = re.compile(r'^\s{0,3}(`{3,}|~{3,})')
 HEADING_RE = re.compile(r'^(#{1,6})\s+(.*)$')
 EXTERNAL = ('http://', 'https://', 'mailto:')
@@ -121,6 +124,7 @@ def main():
 
     anchor_cache = {}
     broken = []
+    misnamed = []
     unverified = []
     total = 0
 
@@ -167,8 +171,21 @@ def main():
                 if anchor.lower() not in anchor_cache[resolved]:
                     broken.append((os.path.relpath(path, root), target,
                                    'anchor not found'))
+            # A link whose text is a file name has to name the file it
+            # points at. The link works either way, but a reader who copies
+            # the text gets a name that does not exist.
+            label = m.group(1).strip()
+            if FILE_NAME_RE.match(label):
+                real = os.path.basename(resolved)
+                if label != real:
+                    misnamed.append((os.path.relpath(path, root), label, real))
 
     print(f'checked {total} relative link(s) in {len(md_files)} markdown file(s)')
+    if misnamed:
+        print(f'\n{len(misnamed)} link(s) whose text names a file that is not '
+              f'there:')
+        for source, label, real in misnamed:
+            print(f'  {source} -> {label}  (the file is {real})')
     if unverified:
         print(f'\n{len(unverified)} link(s) point into a submodule that was not '
               'checked out, so they could not be verified:')

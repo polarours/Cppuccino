@@ -179,7 +179,7 @@ void push_back(std::string&& value) {
 Therefore, the difference between "lvalues" and "rvalues" can also be explained from this perspective: it's fundamentally about **whether an object's lifetime and ownership can be transferred**.
 
 > It's important to emphasize: whether resources are actually transferred still completely depends on the type's move constructor/move assignment implementation, not the rvalue reference itself.
-> For a simple demonstration code, interested readers can refer to [move_semantics_example.cpp](../../examples/move-semantics-example.cpp).
+> For a simple demonstration code, interested readers can refer to [move-semantics-example.cpp](../../examples/move-semantics-example.cpp).
 
 ### 5.3 How Did C++ Handle This Problem Before Rvalue References?
 
