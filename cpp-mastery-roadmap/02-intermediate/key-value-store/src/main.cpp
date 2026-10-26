@@ -6,6 +6,8 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <future>
+#include <chrono>
 
 void printUsage(const char* prog) {
     std::cout << "Usage: " << prog << " [options]\n"
@@ -88,9 +90,31 @@ int main(int argc, char* argv[]) {
 
         std::cout << "Press Ctrl+C to stop\n\n";
 
-        std::thread serverThread([&server]() {
-            server.start();
+        // The server runs in its own thread, so an exception it throws --
+        // the port being taken, for instance -- does not reach the catch
+        // below. It is handed over instead.
+        std::promise<std::string> startup;
+        std::future<std::string> failure = startup.get_future();
+        std::thread serverThread([&server, &startup]() {
+            try {
+                server.start();
+                startup.set_value("");
+            } catch (const std::exception& error) {
+                startup.set_value(error.what());
+            }
         });
+
+        // If the server could not start, say so instead of pretending to
+        // run.
+        if (failure.wait_for(std::chrono::milliseconds(500)) ==
+            std::future_status::ready) {
+            const std::string message = failure.get();
+            if (!message.empty()) {
+                std::cerr << "Error: " << message << "\n";
+                serverThread.join();
+                return 1;
+            }
+        }
 
         serverThread.join();
     } catch (const std::exception& e) {
