@@ -102,6 +102,33 @@ void test_concurrent_access() {
     expect(completed == 10, "expected 10 completed operations");
 }
 
+// The pool knows how many objects are out and how many are in it, and
+// clear() throws the free ones away.
+void test_active_count_and_clear() {
+    int nextId = 0;
+    object_pool_advanced::ObjectPool<TestObject> pool(
+        [&nextId]() { return new TestObject(nextId++); },
+        [](TestObject* p) { delete p; },
+        [](const TestObject* p) { return true; },
+        2, 10
+    );
+
+    expect(pool.activeCount() == 0, "expected nothing active");
+
+    auto first = pool.acquire();
+    auto second = pool.acquire();
+    expect(pool.activeCount() == 2, "expected 2 active objects");
+    expect(pool.poolSize() == 0, "expected the pool to be empty");
+
+    first.reset();
+    second.reset();
+    expect(pool.activeCount() == 0, "expected nothing active again");
+    expect(pool.poolSize() == 2, "expected the objects back in the pool");
+
+    pool.clear();
+    expect(pool.poolSize() == 0, "expected the pool to be cleared");
+}
+
 } // namespace
 
 int main() {
@@ -118,6 +145,9 @@ int main() {
 
         test_concurrent_access();
         std::cout << "  test_concurrent_access: PASS\n";
+
+        test_active_count_and_clear();
+        std::cout << "  test_active_count_and_clear: PASS\n";
 
     } catch (const std::string& exception) {
         std::cerr << "object_pool_advanced_tests failed: " << exception << std::endl;

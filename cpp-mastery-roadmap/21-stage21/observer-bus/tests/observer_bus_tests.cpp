@@ -35,6 +35,22 @@ void test_multiple_subscribers() {
     expect(count == 2, "expected 2 subscribers");
 }
 
+// The bus knows how many handlers an event has.
+void test_handler_count() {
+    observer_bus::EventBus bus;
+
+    expect(bus.handlerCount("click") == 0, "expected no handlers");
+
+    bus.subscribe("click", [](const observer_bus::Event&) {});
+    expect(bus.handlerCount("click") == 1, "expected 1 handler");
+
+    bus.subscribe("click", [](const observer_bus::Event&) {});
+    expect(bus.handlerCount("click") == 2, "expected 2 handlers");
+
+    // The handlers of one event are not the handlers of another.
+    expect(bus.handlerCount("scroll") == 0, "expected no handlers for scroll");
+}
+
 } // namespace
 
 int main() {
@@ -45,6 +61,9 @@ int main() {
 
         test_multiple_subscribers();
         std::cout << "  test_multiple_subscribers: PASS\n";
+
+        test_handler_count();
+        std::cout << "  test_handler_count: PASS\n";
 
     } catch (const std::string& exception) {
         std::cerr << "observer_bus_tests failed: " << exception << std::endl;

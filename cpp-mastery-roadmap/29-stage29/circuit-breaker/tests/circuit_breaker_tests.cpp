@@ -67,6 +67,30 @@ void test_half_open_recovery() {
     expect(cb.state() == circuit_breaker::State::Closed, "expected Closed after recovery");
 }
 
+// A success is counted, and reset() puts the counters back to zero.
+void test_success_count_and_reset() {
+    circuit_breaker::CircuitBreaker breaker(2, std::chrono::milliseconds(100));
+
+    expect(breaker.successCount() == 0, "expected no successes yet");
+
+    breaker.execute([] { return 1; });
+    breaker.execute([] { return 2; });
+    expect(breaker.successCount() == 2, "expected 2 successes");
+    expect(breaker.failureCount() == 0, "expected no failures");
+
+    // A failure and then a reset.
+    try {
+        breaker.execute([]() -> int { throw std::runtime_error("boom"); });
+    } catch (const std::runtime_error&) {
+    }
+    expect(breaker.failureCount() == 1, "expected 1 failure");
+
+    breaker.reset();
+    expect(breaker.successCount() == 0, "expected the successes to be forgotten");
+    expect(breaker.failureCount() == 0, "expected the failures to be forgotten");
+    expect(breaker.state() == circuit_breaker::State::Closed, "expected closed");
+}
+
 } // namespace
 
 int main() {
@@ -83,6 +107,9 @@ int main() {
 
         test_half_open_recovery();
         std::cout << "  test_half_open_recovery: PASS\n";
+
+        test_success_count_and_reset();
+        std::cout << "  test_success_count_and_reset: PASS\n";
 
     } catch (const std::string& exception) {
         std::cerr << "circuit_breaker_tests failed: " << exception << std::endl;

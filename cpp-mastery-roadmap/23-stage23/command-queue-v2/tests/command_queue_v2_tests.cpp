@@ -6,6 +6,8 @@
 #include <atomic>
 #include <chrono>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 
 namespace {
 
@@ -52,6 +54,84 @@ void test_concurrent() {
     expect(counter == 20, "expected 20 tasks");
 }
 
+// The queue knows how many tasks are waiting and how many have run. A
+// worker that is busy leaves the rest of the tasks in the queue, so the
+// two counters tell them apart.
+void test_the_task_counters() {
+    command_queue_v2::CommandQueue queue(1);
+
+    std::mutex gateMutex;
+    std::condition_variable gate;
+    bool released = false;
+
+    // The first task occupies the only worker.
+    queue.enqueue([&] {
+        std::unique_lock<std::mutex> lock(gateMutex);
+        gate.wait(lock, [&] { return released; });
+    });
+    // The other two cannot start, so they wait in the queue.
+    queue.enqueue([] {});
+    queue.enqueue([] {});
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    expect(queue.pendingTasks() == 2, "expected 2 tasks waiting");
+    expect(queue.completedTasks() == 0, "expected nothing completed yet");
+
+    {
+        std::lock_guard<std::mutex> lock(gateMutex);
+        released = true;
+    }
+    gate.notify_all();
+
+    queue.waitForAll();
+    expect(queue.pendingTasks() == 0, "expected nothing waiting");
+    expect(queue.completedTasks() == 3, "expected 3 completed tasks");
+}
+
+// shutdown() stops the workers, and the queue says that it has.
+void test_shutdown() {
+    command_queue_v2::CommandQueue queue(2);
+    std::atomic<int> counter{0};
+
+    expect(!queue.isShutdown(), "expected the queue to be running");
+
+    queue.enqueue([&counter]() { counter++; });
+    queue.waitForAll();
+    expect(counter == 1, "expected 1 task");
+
+    queue.shutdown();
+    expect(queue.isShutdown(), "expected the queue to be shut down");
+    expect(queue.completedTasks() == 1, "expected 1 completed task");
+}
+
+// The tasks that are already in the queue when the queue is shut down are
+// still run: shutting down stops the workers, it does not throw the work
+// away.
+void test_shutdown_runs_the_tasks_that_are_waiting() {
+    command_queue_v2::CommandQueue queue(1);
+
+    std::mutex gateMutex;
+    std::condition_variable gate;
+    bool released = false;
+    std::atomic<int> counter{0};
+
+    queue.enqueue([&] {
+        std::unique_lock<std::mutex> lock(gateMutex);
+        gate.wait(lock, [&] { return released; });
+    });
+    queue.enqueue([&counter]() { counter++; });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    {
+        std::lock_guard<std::mutex> lock(gateMutex);
+        released = true;
+    }
+    gate.notify_all();
+
+    queue.shutdown();
+    expect(counter == 1, "expected the waiting task to have run");
+}
+
 } // namespace
 
 int main() {
@@ -65,6 +145,15 @@ int main() {
 
         test_concurrent();
         std::cout << "  test_concurrent: PASS\n";
+
+        test_the_task_counters();
+        std::cout << "  test_the_task_counters: PASS\n";
+
+        test_shutdown();
+        std::cout << "  test_shutdown: PASS\n";
+
+        test_shutdown_runs_the_tasks_that_are_waiting();
+        std::cout << "  test_shutdown_runs_the_tasks_that_are_waiting: PASS\n";
 
     } catch (const std::string& exception) {
         std::cerr << "command_queue_v2_tests failed: " << exception << std::endl;

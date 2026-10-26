@@ -58,8 +58,14 @@ public:
             raw = creator_();
         }
 
+        // The object is out of the pool now and in the hands of the caller.
+        ++activeCount_;
+
         return std::shared_ptr<T>(raw, [this](T* p) {
             std::lock_guard<std::mutex> lock(mutex_);
+            // The object goes back into the pool, so it is not active any
+            // more. Without this the counter would only ever grow.
+            --activeCount_;
             pool_.push(p);
         });
     }
