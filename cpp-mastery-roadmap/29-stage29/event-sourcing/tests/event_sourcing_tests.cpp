@@ -66,6 +66,48 @@ void test_version_tracking() {
     expect(store.version() == 2, "expected version 2");
 }
 
+// The stream can be asked for the events from a version on. The version
+// is included, so a caller that has applied version 3 asks for 4.
+void test_get_events_since() {
+    event_sourcing::EventStore store;
+
+    store.append({"Created", "100"});
+    store.append({"Deposited", "50"});
+    store.append({"Withdrawn", "20"});
+
+    expect(store.version() == 3, "expected version 3");
+
+    const auto all = store.getEvents();
+    expect(all.size() == 3, "expected 3 events");
+
+    const auto sinceTwo = store.getEventsSince(2);
+    expect(sinceTwo.size() == 2, "expected 2 events since version 2");
+    expect(sinceTwo[0].version == 2, "expected version 2 first");
+    expect(sinceTwo[1].version == 3, "expected version 3 second");
+
+    // A version that is past the end gives nothing back.
+    expect(store.getEventsSince(4).empty(), "expected no events");
+    expect(store.getEventsSince(0).size() == 3, "expected all 3 events");
+}
+
+// clear() empties the stream and starts the versions over.
+void test_clear() {
+    event_sourcing::EventStore store;
+
+    store.append({"Created", "100"});
+    store.append({"Deposited", "50"});
+    expect(store.size() == 2, "expected 2 events");
+
+    store.clear();
+    expect(store.size() == 0, "expected no events");
+    expect(store.version() == 0, "expected version 0");
+    expect(store.getEvents().empty(), "expected no events");
+
+    // The next event starts at version 1 again.
+    store.append({"Created", "200"});
+    expect(store.version() == 1, "expected version 1");
+}
+
 } // namespace
 
 int main() {
@@ -82,6 +124,12 @@ int main() {
 
         test_version_tracking();
         std::cout << "  test_version_tracking: PASS\n";
+
+        test_get_events_since();
+        std::cout << "  test_get_events_since: PASS\n";
+
+        test_clear();
+        std::cout << "  test_clear: PASS\n";
 
     } catch (const std::string& exception) {
         std::cerr << "event_sourcing_tests failed: " << exception << std::endl;

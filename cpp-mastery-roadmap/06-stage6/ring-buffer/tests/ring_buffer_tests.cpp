@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <chrono>
 #include <vector>
 #include <atomic>
 
@@ -140,6 +141,40 @@ void test_wrap_around() {
     expect(buffer.pop().value() == 5, "expected 5");
 }
 
+// full() says whether there is no room left, and the buffer says so
+// before it is full as well.
+void test_full() {
+    ring_buffer::RingBuffer<int> buffer(2);
+
+    expect(!buffer.full(), "expected an empty buffer not to be full");
+    expect(buffer.push(1), "expected the first push to fit");
+    expect(!buffer.full(), "expected room left");
+    expect(buffer.push(2), "expected the second push to fit");
+    expect(buffer.full(), "expected the buffer to be full");
+    expect(!buffer.push(3), "expected the third push not to fit");
+}
+
+// popWait() waits for something to arrive, and gives up when the time
+// is up.
+void test_pop_wait() {
+    ring_buffer::RingBuffer<int> buffer(4);
+
+    // Nothing to take yet: the wait ends with nothing.
+    const auto empty = buffer.popWait(std::chrono::milliseconds(50));
+    expect(!empty.has_value(), "expected nothing to pop");
+
+    // Something arrives while the wait is going on.
+    std::thread producer([&buffer]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        buffer.push(7);
+    });
+    const auto waited = buffer.popWait(std::chrono::milliseconds(1000));
+    producer.join();
+    expect(waited.has_value(), "expected a value to pop");
+    expect(waited.value() == 7, "expected 7");
+    expect(buffer.empty(), "expected the buffer to be empty");
+}
+
 } // namespace
 
 int main() {
@@ -174,6 +209,12 @@ int main() {
 
         test_wrap_around();
         std::cout << "  test_wrap_around: PASS\n";
+
+        test_full();
+        std::cout << "  test_full: PASS\n";
+
+        test_pop_wait();
+        std::cout << "  test_pop_wait: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "ring_buffer_tests failed: " << exception.what() << std::endl;

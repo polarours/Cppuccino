@@ -68,6 +68,25 @@ jobs:
         run: |
           echo "shard ${{ matrix.shard.id }} covered ${{ matrix.shard.stages }}"
 
+  demos:
+    name: demos
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Install the C++ toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-recommends g++ cmake
+
+      - name: Run every demo
+        # A demo that crashes on the way in is a demo nobody can use, and
+        # two of them did nothing at all: they printed that the server had
+        # started and never started it.
+        run: python3 tools/check_demos.py --jobs 4
+
   sanitize:
     name: sanitizers
     runs-on: ubuntu-latest

@@ -83,5 +83,8 @@ jobs:
       - name: Every pitfall article names an example
         run: python3 tools/check_pitfall_examples.py
 
+      - name: Every test function is called
+        run: python3 tools/check_test_coverage.py
+
       - name: The two roadmap indexes agree
         run: python3 tools/check_overview_parity.py

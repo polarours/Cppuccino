@@ -21,6 +21,8 @@ tools/run_all_checks.sh --full   # 外加全部项目的构建与测试
 | `check_readme_examples.py` | 项目 README 里的 C++ 示例已经编不过 |
 | `check_warnings.py` | 编译器在项目或示例里发现的警告（故意为之的那些除外） |
 | `check_pitfall_examples.py` | 没有指向示例的陷阱文章，或指向了不存在的示例的文章 |
+| `check_test_coverage.py` | 定义了却从来没被调用的测试函数 |
+| `check_demos.py` | 一启动就崩掉的 demo，或者什么都没做的 demo |
 | `check_overview_parity.py` | 中英两份路线图索引列出的阶段或项目不一致 |
 | `build_all_projects.py` | 配置、构建或测试失败的项目 |
 | `run_sanitizers.py` | 读了已释放内存、越界写入或泄漏，却仍然跑通的测试 |

@@ -66,6 +66,12 @@ run "the code: no warning the compiler did not expect" \
 run "pitfall articles: every one names an example" \
     python3 tools/check_pitfall_examples.py
 
+run "projects: every test function is called" \
+    python3 tools/check_test_coverage.py
+
+run "projects: every demo runs" \
+    python3 tools/check_demos.py
+
 run "roadmap: the two indexes describe the same thing" \
     python3 tools/check_overview_parity.py
 
