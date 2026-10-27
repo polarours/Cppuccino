@@ -96,10 +96,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Fetch the tinyshell submodule
-        # The pinned submodule commit is not on the submodule's remote yet, so
-        # this must not fail the run. The scan skips tinyshell when it is not
-        # checked out.
-        continue-on-error: true
         run: git submodule update --init --recursive
 
       - name: Install the C++ toolchain
@@ -167,10 +163,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Fetch the tinyshell submodule
-        # The commit the parent repository pins is not on the submodule's
-        # remote yet, so the fetch is allowed to fail. The job then reports
-        # that tinyshell was not checked, rather than failing the run.
-        continue-on-error: true
         run: git submodule update --init --recursive
 
       - name: Install the C++ toolchain
@@ -181,10 +173,6 @@ jobs:
       - name: Configure, build and test
         run: |
           set -euo pipefail
-          if [ ! -f tinyshell/CMakeLists.txt ]; then
-            echo "::notice::the tinyshell submodule is not available, skipping"
-            exit 0
-          fi
           build=$(mktemp -d)
           cmake -S tinyshell -B "$build" -DBUILD_TESTING=ON
           cmake --build "$build" -j 2
