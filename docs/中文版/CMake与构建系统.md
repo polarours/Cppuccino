@@ -120,6 +120,13 @@ target_link_libraries(kvs_tests PRIVATE kvs_core)
 add_test(NAME KVSTests COMMAND kvs_tests)
 ```
 
+## 示例
+
+本仓库里的一个项目，用到了三大核心命令、一个库目标、一个可执行目标和测试
+集成：
+
+- [chat-server/CMakeLists.txt](../../cpp-mastery-roadmap/04-stage4/chat-server/CMakeLists.txt)
+
 ## 最佳实践
 
 1. **始终指定 `cmake_minimum_required(VERSION 3.16)` 以上**：3.16 是现代 CMake 的门槛

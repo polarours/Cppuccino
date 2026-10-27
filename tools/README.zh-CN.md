@@ -20,7 +20,7 @@ tools/run_all_checks.sh --full   # 外加全部项目的构建与测试
 | `check_project_readmes.py` | 项目 README 与它的中英另一半脱节，或写了项目并不构建的可执行文件，或语言用错了 |
 | `check_readme_examples.py` | 项目 README 里的 C++ 示例已经编不过 |
 | `check_warnings.py` | 编译器在项目或示例里发现的警告（故意为之的那些除外） |
-| `check_pitfall_examples.py` | 没有指向示例的陷阱文章，或指向了不存在的示例的文章 |
+| `check_article_examples.py` | 没有指向任何可运行内容的文章，或中英两半指向了不同东西的文章 |
 | `check_test_coverage.py` | 定义了却从来没被调用的测试函数 |
 | `check_demos.py` | 一启动就崩掉的 demo，或者什么都没做的 demo |
 | `check_overview_parity.py` | 中英两份路线图索引列出的阶段或项目不一致 |

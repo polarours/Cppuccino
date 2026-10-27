@@ -80,8 +80,8 @@ jobs:
       - name: The code compiles without an unexpected warning
         run: python3 tools/check_warnings.py
 
-      - name: Every pitfall article names an example
-        run: python3 tools/check_pitfall_examples.py
+      - name: Every article points at something runnable
+        run: python3 tools/check_article_examples.py
 
       - name: Every test function is called
         run: python3 tools/check_test_coverage.py

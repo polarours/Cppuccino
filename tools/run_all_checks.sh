@@ -63,8 +63,8 @@ run "projects: the README examples compile" \
 run "the code: no warning the compiler did not expect" \
     python3 tools/check_warnings.py
 
-run "pitfall articles: every one names an example" \
-    python3 tools/check_pitfall_examples.py
+run "articles: every one points at something runnable" \
+    python3 tools/check_article_examples.py
 
 run "projects: every test function is called" \
     python3 tools/check_test_coverage.py

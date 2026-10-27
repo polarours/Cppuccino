@@ -150,6 +150,13 @@ target_link_libraries(kvs_tests PRIVATE kvs_core)
 add_test(NAME KVSTests COMMAND kvs_tests)
 ```
 
+## Example
+
+A project in this repository that uses the three core commands, a library
+target, an executable and the test integration:
+
+- [chat-server/CMakeLists.txt](../../cpp-mastery-roadmap/04-stage4/chat-server/CMakeLists.txt)
+
 ## Best Practices
 
 1. **Always require `cmake_minimum_required(VERSION 3.16)` or newer**: 3.16 is

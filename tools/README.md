@@ -21,7 +21,7 @@ tools/run_all_checks.sh --full   # and every project build and test
 | `check_project_readmes.py` | A project README that drifted from its twin, that names a binary the project does not build, or that is written in the wrong language |
 | `check_readme_examples.py` | A C++ example in a project README that no longer compiles |
 | `check_warnings.py` | A warning the compiler found in a project or an example, other than the ones that are on purpose |
-| `check_pitfall_examples.py` | A pitfall article that does not name an example, or one that names an example that is not there |
+| `check_article_examples.py` | An article that points at nothing the reader can run, or whose two halves point at different things |
 | `check_test_coverage.py` | A test function that is defined but never called |
 | `check_demos.py` | A demo that crashes when it is started, or that does nothing at all |
 | `check_overview_parity.py` | The two roadmap indexes listing different stages or different projects |
