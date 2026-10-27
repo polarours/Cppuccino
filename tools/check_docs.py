@@ -380,6 +380,26 @@ def load_pair_map(root, relative_path):
 # checks
 # --------------------------------------------------------------------------
 
+def chinese_in_code(path):
+    """The lines of Chinese inside the code blocks of a document.
+
+    A snippet carries its comments with it, so the comments of an English
+    document have to be in English.
+    """
+    text = open(path, encoding='utf-8', errors='replace').read()
+    out = []
+    for match in re.finditer(r'```(\w*)\n(.*?)```', text, re.S):
+        if match.group(1) not in ('cpp', 'c++', 'cmake', 'bash', 'sh', 'text', ''):
+            continue
+        offset = match.start(2)
+        for line in match.group(2).splitlines():
+            if count_cjk(line):
+                number = text[:offset].count('\n') + 1
+                out.append((number, line))
+                offset += len(line) + 1
+    return out
+
+
 def check_language(root, problems):
     en_files = sorted(glob.glob(os.path.join(root, 'docs/en/*.md')))
     zh_files = sorted(glob.glob(os.path.join(root, 'docs/中文版/*.md')))
@@ -403,6 +423,13 @@ def check_language(root, problems):
             problems.append(f'EN body is Chinese: {os.path.relpath(f, root)}')
             print(f"  EN->ZH  {os.path.relpath(f, root)} "
                   f"({zh} chinese lines vs {en} english lines)")
+        # The prose of an English document is English. So is the code in it:
+        # a reader who copies a snippet gets the comment with it.
+        for number, line in chinese_in_code(f):
+            problems.append(f'EN code is Chinese: {os.path.relpath(f, root)}'
+                            f':{number}')
+            print(f"  EN->ZH  {os.path.relpath(f, root)}:{number}: "
+                  f"{line.strip()[:60]}")
     for f in zh_files + pit_zh:
         verdict, zh, en = classify(open(f, encoding='utf-8').read())
         if verdict == 'en':
