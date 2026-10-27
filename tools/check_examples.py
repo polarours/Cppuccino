@@ -274,6 +274,23 @@ def check_index_coverage(sources, problems):
             print(f"  UNLISTED  {name}")
     print(f"  {len(listed)} example(s) listed in the index")
 
+    # The Chinese index is translated by hand, so it can fall behind the
+    # English one. Both have to list the same examples.
+    zh_index = os.path.join(EXAMPLES, 'README.zh-CN.md')
+    if not os.path.isfile(zh_index):
+        problems.append('the Chinese examples index is missing')
+        print('  NO INDEX  examples/README.zh-CN.md')
+        return
+    zh_listed = set(re.findall(r'^- \[([^\]]+\.cpp)\]',
+                               open(zh_index, encoding='utf-8').read(), re.M))
+    for name in sorted(listed - zh_listed):
+        problems.append(f'the Chinese index does not list {name}')
+        print(f'  UNLISTED (zh)  {name}')
+    for name in sorted(zh_listed - listed):
+        problems.append(f'the Chinese index lists {name}, which is not there')
+        print(f'  EXTRA (zh)  {name}')
+    print(f"  {len(zh_listed)} example(s) listed in the Chinese index")
+
 
 def run_example(path, standard, workdir, sanitizer=None):
     """Compile and run an example, from a directory that is not the repo.
