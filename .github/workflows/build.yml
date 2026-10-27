@@ -106,6 +106,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-recommends g++ cmake
+          # Two examples need a C++26 library header (<inplace_vector>), which
+          # the runner's default compiler does not ship. Use a newer one when
+          # it is available; the checker skips what the toolchain cannot build.
+          if apt-cache show g++-14 >/dev/null 2>&1; then
+            sudo apt-get install -y --no-recommends g++-14
+            echo "CXX=g++-14" >> "$GITHUB_ENV"
+            echo "CC=gcc-14" >> "$GITHUB_ENV"
+          fi
 
       - name: Run every test under the sanitizers
         # A test that passes can still read freed memory or do something the
@@ -135,6 +143,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-recommends g++ cmake
+          # The same newer compiler the sanitizer job uses, so that the
+          # examples are checked here the way they are checked there.
+          if apt-cache show g++-14 >/dev/null 2>&1; then
+            sudo apt-get install -y --no-recommends g++-14
+            echo "CXX=g++-14" >> "$GITHUB_ENV"
+            echo "CC=gcc-14" >> "$GITHUB_ENV"
+          fi
 
       - name: Run every test under the thread sanitizer
         # The thread sanitizer looks for a different kind of mistake: two
