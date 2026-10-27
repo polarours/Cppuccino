@@ -98,7 +98,14 @@ void test_repeating() {
         counter++;
     }, std::chrono::milliseconds(10));
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // Wait for the task to have run, instead of sleeping and hoping. A
+    // machine that is busy gives the worker less time, and a fixed sleep
+    // would turn that into a failure.
+    const auto deadline = std::chrono::steady_clock::now() +
+                           std::chrono::seconds(10);
+    while (counter < 5 && std::chrono::steady_clock::now() < deadline) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
     scheduler.stop();
 
     expect(counter >= 5, "expected at least 5 executions");
@@ -113,7 +120,13 @@ void test_completed_count() {
         scheduler.schedule([]() {});
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // The same here: wait for the five tasks to be done.
+    const auto deadline = std::chrono::steady_clock::now() +
+                           std::chrono::seconds(10);
+    while (scheduler.completedTasks() < 5 &&
+           std::chrono::steady_clock::now() < deadline) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
     scheduler.stop();
 
     expect(scheduler.completedTasks() == 5, "expected 5 completed tasks");
