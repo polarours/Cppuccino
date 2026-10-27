@@ -152,7 +152,7 @@ jobs:
         # threads touching the same memory without a lock. It found a
         # released descriptor that was still being read, and a value that
         # was moved out of a node before the exchange that owned it.
-        run: python3 tools/run_sanitizers.py --tsan --jobs 2 --skip tinyshell
+        run: python3 tools/run_sanitizers.py --tsan --jobs 2
 
   tinyshell:
     name: tinyshell

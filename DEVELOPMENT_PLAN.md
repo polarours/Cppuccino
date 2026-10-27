@@ -491,6 +491,10 @@ tinyshell 的代码**。
 **这需要仓库作者自己决定**：把 `v1` 推上去（`git push origin v1`），或者把父
 仓库的指针改到远端已有的 commit。
 
+> **2026-10-28 已解决**：`v1` 分支已推到 `polarours/tinyshell`，全新
+> `git clone --recursive` 现在能拉到子模块，workflow 里的
+> `continue-on-error` 绕也一并去掉了。
+
 ## 第十三阶段：项目 README 一致性与代码块完整性（2026-10-22）
 
 **背景**：前几阶段覆盖了 `docs/`、`pitfalls/` 和仓库根目录，但 151 个**项目**
@@ -693,6 +697,8 @@ TSan 下各跑一遍；新增 `tools/check_warnings.py`，用 `-Wall -Wextra
 无警告、且正文为英文；152 个项目在两种 sanitizer 下干净；143 个 demo 运行
 无异常；104 对文章（中英各 67 + 37）都指向可运行的东西。
 
-**留下的坑**：`tinyshell` 子模块的信号处理程序会污染 `errno`（TSan 报
-`signal handler spoils errno`）。它在子模块里，而父仓库钉住的 commit
-`687250f` 远端没有，所以只能报告、不能代改。
+**一并解决的遗留坑**：`tinyshell` 子模块的信号处理程序会污染 `errno`
+（TSan 报 `signal handler spoils errno`）。父仓库钉住的 commit `687250f`
+远端没有，只能报告、不能代改；把 `v1` 推上去之后，就可以在子模块里修：
+handler 入口保存 `errno`、出口放回。子模块现在也在 TSan 的覆盖之下，
+152 个项目全部干净。
