@@ -85,12 +85,12 @@ jobs:
         # A demo that crashes on the way in is a demo nobody can use, and
         # two of them did nothing at all: they printed that the server had
         # started and never started it.
-        run: python3 tools/check_demos.py --jobs 4
+        run: python3 tools/check_demos.py --jobs 2
 
   sanitize:
     name: sanitizers
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -118,23 +118,23 @@ jobs:
       - name: Run every test under the sanitizers
         # A test that passes can still read freed memory or do something the
         # standard leaves undefined. The sanitizers turn those into failures.
-        run: python3 tools/run_sanitizers.py --jobs 4
+        run: python3 tools/run_sanitizers.py --jobs 2
 
       - name: Run the examples under the sanitizers
         # The examples are teaching material, so a leak in one teaches a leak.
-        run: python3 tools/check_examples.py --sanitize --jobs 4
+        run: python3 tools/check_examples.py --sanitize --jobs 2
 
       - name: Run the document examples under the sanitizers
         run: python3 tools/check_doc_examples.py --sanitize
 
       - name: Run the examples under the thread sanitizer
         # Two threads touching the same memory without a lock.
-        run: python3 tools/check_examples.py --tsan --jobs 4
+        run: python3 tools/check_examples.py --tsan --jobs 2
 
   races:
     name: data races
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -156,7 +156,7 @@ jobs:
         # threads touching the same memory without a lock. It found a
         # released descriptor that was still being read, and a value that
         # was moved out of a node before the exchange that owned it.
-        run: python3 tools/run_sanitizers.py --tsan --jobs 4 --skip tinyshell
+        run: python3 tools/run_sanitizers.py --tsan --jobs 2 --skip tinyshell
 
   tinyshell:
     name: tinyshell
