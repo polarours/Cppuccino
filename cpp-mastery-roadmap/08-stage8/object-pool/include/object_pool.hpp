@@ -39,7 +39,7 @@ public:
         }
 
         return std::shared_ptr<T>(raw, [this](T* p) {
-            std::lock_guard<std::mutex> lock(mutex_);
+            std::lock_guard<std::mutex> pushLock(mutex_);
             pool_.push(p);
         });
     }

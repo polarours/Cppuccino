@@ -12,6 +12,15 @@ void expect(bool condition, const std::string& message) {
     }
 }
 
+// A minimal observer that keeps the value it received, so a test can check
+// what the subject handed over.
+class ValueRecorder : public observer_pattern::Observer<int> {
+public:
+    void update(const int& value) override { lastValue = value; }
+
+    int lastValue = 0;
+};
+
 void test_basic_observe() {
     observer_pattern::Subject<int> subject;
 
@@ -76,12 +85,13 @@ void test_multiple_value_changes() {
 void test_observer_receives_correct_value() {
     observer_pattern::Subject<int> subject;
 
-    int lastValue = 0;
-    auto observer = std::make_shared<observer_pattern::Logger<int>>();
-    subject.attach(observer);
+    auto logger = std::make_shared<observer_pattern::Logger<int>>();
+    auto recorder = std::make_shared<ValueRecorder>();
+    subject.attach(logger);
+    subject.attach(recorder);
 
     subject.setValue(100);
-    // Logger outputs to cout
+    expect(recorder->lastValue == 100, "expected 100");
 }
 
 } // namespace

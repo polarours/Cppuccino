@@ -35,7 +35,7 @@ bool Database::insert(const std::string& table, const Row& row) {
 }
 
 Rows Database::select(const std::string& table,
-                      const std::string& where,
+                      [[maybe_unused]] const std::string& where,
                       const std::function<bool(const Row&)>& predicate) {
     Rows result;
     auto it = tables_.find(table);

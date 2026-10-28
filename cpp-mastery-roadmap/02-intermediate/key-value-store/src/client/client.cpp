@@ -44,7 +44,7 @@ bool Client::connect() {
         return false;
     }
 
-    if (::connect(sock_, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+    if (::connect(sock_, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) < 0) {
         std::cerr << "Failed to connect to " << host_ << ":" << port_ << "\n";
         close(sock_);
         sock_ = -1;

@@ -76,7 +76,7 @@ public:
 template <typename T>
 class Counter : public Observer<T> {
 public:
-    void update(const T& value) override {
+    void update([[maybe_unused]] const T& value) override {
         count_++;
         std::cout << "[Counter] Update #" << count_ << "\n";
     }

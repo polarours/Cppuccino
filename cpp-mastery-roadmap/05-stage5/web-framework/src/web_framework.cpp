@@ -18,7 +18,7 @@ std::string Request::getHeader(const std::string& name) const {
     return (it != headers.end()) ? it->second : "";
 }
 
-std::string Request::getParam(const std::string& name) const {
+std::string Request::getParam([[maybe_unused]] const std::string& name) const {
     // Simple implementation - could be extended
     return "";
 }
@@ -186,7 +186,7 @@ void App::listen(int port) {
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(port_);
 
-    if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+    if (bind(fd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) < 0) {
         close(fd);
         throw std::runtime_error("Failed to bind");
     }

@@ -55,15 +55,15 @@ public:
 
 class GameVisitor : public Visitor {
 public:
-    void visit(Rock& rock) override {
+    void visit([[maybe_unused]] Rock& rock) override {
         result_ = "Rock crushes Scissors";
     }
 
-    void visit(Paper& paper) override {
+    void visit([[maybe_unused]] Paper& paper) override {
         result_ = "Paper covers Rock";
     }
 
-    void visit(Scissors& scissors) override {
+    void visit([[maybe_unused]] Scissors& scissors) override {
         result_ = "Scissors cuts Paper";
     }
 

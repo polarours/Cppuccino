@@ -7,12 +7,12 @@ int main() {
 
     middleware_pipeline::Pipeline pipeline;
 
-    pipeline.use([](middleware_pipeline::Request& req, middleware_pipeline::Response& res, std::function<void()> next) {
+    pipeline.use([](middleware_pipeline::Request& req, [[maybe_unused]] middleware_pipeline::Response& res, std::function<void()> next) {
         std::cout << "  Logger: " << req.method << " " << req.path << "\n";
         next();
     });
 
-    pipeline.use([](middleware_pipeline::Request& req, middleware_pipeline::Response& res, std::function<void()> next) {
+    pipeline.use([]([[maybe_unused]] middleware_pipeline::Request& req, middleware_pipeline::Response& res, std::function<void()> next) {
         res.headers["X-Powered-By"] = "Cppuccino";
         next();
     });

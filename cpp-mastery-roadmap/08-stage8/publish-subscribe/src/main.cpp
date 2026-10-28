@@ -29,9 +29,12 @@ int main() {
     std::cout << "Sports subscribers: " << pub.subscriberCount("sports") << "\n";
 
     // Unsubscribe
+    pub.unsubscribe(id1);
+    pub.unsubscribe(id2);
     pub.unsubscribe(id3);
     std::cout << "\nAfter unsubscribe:\n";
     std::cout << "News subscribers: " << pub.subscriberCount("news") << "\n";
+    std::cout << "Sports subscribers: " << pub.subscriberCount("sports") << "\n";
 
     std::cout << "\n=== Demo Complete ===\n";
     return 0;

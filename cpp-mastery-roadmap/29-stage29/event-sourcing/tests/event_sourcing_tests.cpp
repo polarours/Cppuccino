@@ -71,9 +71,9 @@ void test_version_tracking() {
 void test_get_events_since() {
     event_sourcing::EventStore store;
 
-    store.append({"Created", "100"});
-    store.append({"Deposited", "50"});
-    store.append({"Withdrawn", "20"});
+    store.append({"Created", "100", 0});
+    store.append({"Deposited", "50", 0});
+    store.append({"Withdrawn", "20", 0});
 
     expect(store.version() == 3, "expected version 3");
 
@@ -94,8 +94,8 @@ void test_get_events_since() {
 void test_clear() {
     event_sourcing::EventStore store;
 
-    store.append({"Created", "100"});
-    store.append({"Deposited", "50"});
+    store.append({"Created", "100", 0});
+    store.append({"Deposited", "50", 0});
     expect(store.size() == 2, "expected 2 events");
 
     store.clear();
@@ -104,7 +104,7 @@ void test_clear() {
     expect(store.getEvents().empty(), "expected no events");
 
     // The next event starts at version 1 again.
-    store.append({"Created", "200"});
+    store.append({"Created", "200", 0});
     expect(store.version() == 1, "expected version 1");
 }
 

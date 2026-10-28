@@ -315,7 +315,7 @@ void test_a_middleware_runs_first() {
     web_server::WebServer server(18023);
 
     int seen = 0;
-    server.use([&seen](web_server::Request& request, web_server::Response&) {
+    server.use([&seen](web_server::Request&, web_server::Response&) {
         seen++;
         return true;
     });

@@ -609,7 +609,7 @@ std::string sendCommand(const std::string& host, int port, const std::string& co
     addr.sin_port = htons(port);
     inet_pton(AF_INET, host.c_str(), &addr.sin_addr);
 
-    if (connect(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+    if (connect(sock, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) < 0) {
         close(sock);
         return "CONNECT_ERROR";
     }

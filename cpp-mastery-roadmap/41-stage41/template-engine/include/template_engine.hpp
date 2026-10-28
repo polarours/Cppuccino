@@ -8,14 +8,14 @@ namespace template_engine {
 
 struct Value;
 using Context = std::map<std::string, Value>;
-using List = std::vector<Context>;
+using ValueList = std::vector<Context>;
 
 struct Value {
     enum class Kind { String, Bool, List };
     Kind kind = Kind::String;
     std::string str;
     bool flag = false;
-    List list;
+    ValueList list;
 
     static Value string(std::string s) {
         Value v; v.kind = Kind::String; v.str = std::move(s); return v;
@@ -23,7 +23,7 @@ struct Value {
     static Value boolean(bool b) {
         Value v; v.kind = Kind::Bool; v.flag = b; return v;
     }
-    static Value fromList(List l) {
+    static Value fromList(ValueList l) {
         Value v; v.kind = Kind::List; v.list = std::move(l); return v;
     }
 

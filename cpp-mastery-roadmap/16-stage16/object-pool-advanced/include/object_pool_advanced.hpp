@@ -62,7 +62,7 @@ public:
         ++activeCount_;
 
         return std::shared_ptr<T>(raw, [this](T* p) {
-            std::lock_guard<std::mutex> lock(mutex_);
+            std::lock_guard<std::mutex> pushLock(mutex_);
             // The object goes back into the pool, so it is not active any
             // more. Without this the counter would only ever grow.
             --activeCount_;

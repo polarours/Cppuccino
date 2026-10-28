@@ -109,7 +109,7 @@ void test_middleware_pipeline() {
     mini_http::MiddlewarePipeline pipeline;
     std::string order;
 
-    pipeline.use([&order](const mini_http::Request&, mini_http::Response& res, std::function<void()> next) {
+    pipeline.use([&order](const mini_http::Request&, [[maybe_unused]] mini_http::Response& res, std::function<void()> next) {
         order += "A";
         next();
         order += "A'";

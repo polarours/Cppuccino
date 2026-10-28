@@ -34,12 +34,12 @@ bool Request::parse(const std::string& raw) {
     line = trim(line);
 
     std::istringstream requestLine(line);
-    std::string methodStr, path, version;
-    if (!(requestLine >> methodStr >> path >> version)) return false;
+    std::string methodStr, pathStr, versionStr;
+    if (!(requestLine >> methodStr >> pathStr >> versionStr)) return false;
 
     method = parseMethod(methodStr);
-    this->path = path;
-    this->version = version;
+    this->path = pathStr;
+    this->version = versionStr;
 
     // Parse headers
     while (std::getline(stream, line)) {

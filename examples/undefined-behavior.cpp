@@ -186,7 +186,7 @@ void shiftByNegative() {
     // int result2 = x << 32;
 
     // Safe alternative: check shift amount
-    if (shift >= 0 && shift < sizeof(int) * 8) {
+    if (shift >= 0 && shift < static_cast<int>(sizeof(int) * 8)) {
         int result = x << shift;
         std::cout << "1 << " << shift << " = " << result << "\n";
     }

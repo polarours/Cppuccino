@@ -54,7 +54,7 @@ std::vector<Block> parseBlocks(const std::string& source) {
         if (!line.empty() && line[0] == '#') {
             flushPara();
             int level = 0;
-            while (level < (int)line.size() && line[level] == '#') ++level;
+            while (level < static_cast<int>(line.size()) && line[level] == '#') ++level;
             blocks.push_back({BlockType::Heading, level, trim(line.substr(level)), ""});
         } else if (startsWith(trim(line), "- ") || startsWith(trim(line), "* ")) {
             flushPara();

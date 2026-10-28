@@ -21,7 +21,7 @@ void test_calls_heterogeneous_lambdas() {
 }
 
 void test_copy_semantics() {
-    int a = 0, b = 0;
+    int a = 0;
     type_erasure::AnyAction original([&] { a += 1; });
     type_erasure::AnyAction copy = original;  // deep clone of holder
     copy();

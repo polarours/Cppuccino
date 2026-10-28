@@ -51,7 +51,7 @@ void Server::start() {
             struct sockaddr_in clientAddr;
             socklen_t clientLen = sizeof(clientAddr);
 
-            int client_fd = accept(fd, (struct sockaddr*)&clientAddr, &clientLen);
+            int client_fd = accept(fd, reinterpret_cast<struct sockaddr*>(&clientAddr), &clientLen);
             if (client_fd < 0) {
                 if (!running_) break;
                 // The socket is gone. Retrying would spin on the error.
@@ -235,7 +235,7 @@ int Server::setupSocket() {
         }
     }
 
-    if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+    if (bind(fd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) < 0) {
         close(fd);
         throw std::runtime_error("Failed to bind to " + host_ + ":" + std::to_string(port_));
     }

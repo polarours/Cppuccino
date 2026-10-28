@@ -19,7 +19,7 @@ int main() {
         return web_framework::Response::json(R"({"users": ["Alice", "Bob"]})");
     });
 
-    app.post("/api/users", [](const web_framework::Request& req) {
+    app.post("/api/users", []([[maybe_unused]] const web_framework::Request& req) {
         return web_framework::Response::json(R"({"status": "created"})").setStatus(201, "Created");
     });
 

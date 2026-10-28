@@ -85,7 +85,7 @@ void test_mpmc_no_loss_no_dup() {
 
     long n = kProducers * kPer;
     long expected = n * (n - 1) / 2;  // 0..n-1 sum
-    expect(mb.handled() == n, "exactly n handled (no loss/dup)");
+    expect(mb.handled() == static_cast<std::size_t>(n), "exactly n handled (no loss/dup)");
     expect(sum.load() == expected, "sum intact");
 }
 

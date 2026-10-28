@@ -27,7 +27,7 @@ public:
         handlers_[eventType].push_back(std::move(handler));
     }
 
-    void notify(const std::string& sender, const Event& event) {
+    void notify([[maybe_unused]] const std::string& sender, const Event& event) {
         auto it = handlers_.find(event.type);
         if (it != handlers_.end()) {
             for (auto& handler : it->second) {

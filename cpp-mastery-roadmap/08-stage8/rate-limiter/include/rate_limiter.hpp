@@ -16,8 +16,8 @@ using Clock = std::chrono::steady_clock;
 class TokenBucket {
 public:
     TokenBucket(std::size_t capacity, double refillPerSecond)
-        : capacity_(capacity), tokens_(static_cast<double>(capacity)),
-          refillPerSec_(refillPerSecond) {}
+        : capacity_(capacity), refillPerSec_(refillPerSecond),
+          tokens_(static_cast<double>(capacity)) {}
 
     // Try to consume one token; false when rate-limited.
     bool tryAcquire(std::size_t n = 1, Clock::time_point now = Clock::now());

@@ -8,7 +8,7 @@ int main() {
     auto& app = mini_http::App::instance();
 
     // Middleware: logging
-    app.use([](const mini_http::Request& req, mini_http::Response& res, std::function<void()> next) {
+    app.use([](const mini_http::Request& req, mini_http::Response&, std::function<void()> next) {
         std::cout << "[LOG] " << req.method() << " " << req.path() << "\n";
         next();
     });

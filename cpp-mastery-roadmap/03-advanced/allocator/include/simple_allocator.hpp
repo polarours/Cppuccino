@@ -48,7 +48,7 @@ public:
     StlAllocator(const StlAllocator<U>& other) noexcept;
 
     T* allocate(std::size_t n);
-    void deallocate(T* p, std::size_t n);
+    void deallocate(T* p, [[maybe_unused]] std::size_t n);
 
     bool operator==(const StlAllocator& other) const noexcept;
     bool operator!=(const StlAllocator& other) const noexcept;
@@ -77,7 +77,7 @@ T* StlAllocator<T>::allocate(std::size_t n) {
 }
 
 template <typename T>
-void StlAllocator<T>::deallocate(T* p, std::size_t n) {
+void StlAllocator<T>::deallocate(T* p, [[maybe_unused]] std::size_t n) {
     allocator_->deallocate(p);
 }
 

@@ -87,7 +87,7 @@ void renderRange(const std::vector<Segment>& segs, std::size_t& i,
                          segs[i].key == key) --depth;
                 if (depth > 0) ++i;
             }
-            std::size_t bodyEnd = i;  // points at matching close
+            [[maybe_unused]] std::size_t bodyEnd = i;  // points at matching close
             if (i < segs.size()) ++i;  // skip the close tag
 
             auto it = ctx.find(key);

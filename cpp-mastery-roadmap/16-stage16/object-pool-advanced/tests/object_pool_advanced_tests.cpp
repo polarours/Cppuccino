@@ -61,7 +61,7 @@ void test_pool_size() {
     object_pool_advanced::ObjectPool<TestObject> pool(
         [&nextId]() { return new TestObject(nextId++); },
         [](TestObject* p) { delete p; },
-        [](const TestObject* p) { return true; },
+        [](const TestObject*) { return true; },
         3, 10
     );
 
@@ -109,7 +109,7 @@ void test_active_count_and_clear() {
     object_pool_advanced::ObjectPool<TestObject> pool(
         [&nextId]() { return new TestObject(nextId++); },
         [](TestObject* p) { delete p; },
-        [](const TestObject* p) { return true; },
+        [](const TestObject*) { return true; },
         2, 10
     );
 

@@ -97,6 +97,7 @@ void test_pool_reuse() {
     auto conn2 = pool.acquire();
     // Pool should reuse connections
     expect(pool.size() < 2, "expected pool size to decrease after acquire");
+    pool.release(conn2);
 }
 
 void test_pool_size() {
@@ -127,6 +128,8 @@ void test_pool_max_size() {
 
     // Pool should have created connections up to max size
     expect(pool.size() == 0, "expected pool size 0 when all connections acquired");
+    pool.release(conn1);
+    pool.release(conn2);
 }
 
 void test_concurrent_access() {

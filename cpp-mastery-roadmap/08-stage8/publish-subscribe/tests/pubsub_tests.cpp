@@ -80,6 +80,11 @@ void test_subscriber_count() {
 
     pub.unsubscribe(id1);
     expect(pub.subscriberCount("topic1") == 1, "expected 1 subscriber");
+    expect(pub.totalSubscribers() == 1, "expected 1 total subscriber");
+
+    pub.unsubscribe(id2);
+    expect(pub.subscriberCount("topic1") == 0, "expected 0 subscribers");
+    expect(pub.totalSubscribers() == 0, "expected 0 total subscribers");
 }
 
 void test_no_subscribers() {

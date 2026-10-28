@@ -14,8 +14,8 @@
 namespace tiny_http_server {
 
 Server::Server(const std::string& addr, int port, std::size_t thread_count)
-    : addr_(addr)
-    , port_(port)
+    : port_(port)
+    , addr_(addr)
     , server_fd_(-1)
     , thread_pool_(thread_count)
     , running_(false) {}
@@ -146,7 +146,7 @@ int Server::setup_socket() {
         throw std::runtime_error("Invalid IPv4 address: " + addr_);
     }
 
-    if (bind(fd, (sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+    if (bind(fd, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) < 0) {
         std::string message = "Failed to bind socket";
         close(fd);
         throw std::runtime_error(message);

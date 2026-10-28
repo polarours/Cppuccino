@@ -20,12 +20,14 @@ public:
 // Bad: Cannot forward both lvalues and rvalues
 void badWrapper(const Widget& w) {
     std::cout << "Bad wrapper (const lvalue ref): ";
-    Widget local = w;  // Always copies!
+    // The copy is the point: the constructor above says so.
+    [[maybe_unused]] Widget local = w;  // Always copies!
 }
 
 void badWrapper(Widget&& w) {
     std::cout << "Bad wrapper (rvalue ref): ";
-    Widget local = std::move(w);  // Always moves!
+    // The move is the point: the constructor above says so.
+    [[maybe_unused]] Widget local = std::move(w);  // Always moves!
 }
 
 // Problem: We need overloads for every combination
