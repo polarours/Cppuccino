@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/time.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <cstring>
@@ -217,6 +218,13 @@ std::string ask(int port, const std::string& request) {
     if (fd < 0) {
         throw std::runtime_error("could not open a socket");
     }
+
+    // A server that does not answer has to fail the test rather than hang
+    // it, so the socket gives up after a second.
+    struct timeval timeout;
+    timeout.tv_sec = 2;
+    timeout.tv_usec = 0;
+    setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
     struct sockaddr_in address;
     memset(&address, 0, sizeof(address));

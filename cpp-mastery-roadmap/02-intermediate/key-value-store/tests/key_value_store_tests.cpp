@@ -17,6 +17,7 @@
 #include <atomic>
 #include <vector>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -595,6 +596,13 @@ std::string sendCommand(const std::string& host, int port, const std::string& co
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) return "SOCKET_ERROR";
 
+    // A server that does not answer has to fail the test rather than hang
+    // it, so the socket gives up after a second.
+    struct timeval timeout;
+    timeout.tv_sec = 2;
+    timeout.tv_usec = 0;
+    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
@@ -616,6 +624,70 @@ std::string sendCommand(const std::string& host, int port, const std::string& co
     if (bytesRead <= 0) return "RECV_ERROR";
     buffer[bytesRead] = '\0';
     return std::string(buffer);
+}
+
+// The answer of the server, without the line ending.
+std::string answer(const std::string& raw) {
+    std::string trimmed = raw;
+    while (!trimmed.empty() &&
+           (trimmed.back() == '\n' || trimmed.back() == '\r')) {
+        trimmed.pop_back();
+    }
+    return trimmed;
+}
+
+// A server on a thread, with the thread joined even when the test fails.
+// A std::thread that is still joinable when the exception leaves the
+// function ends the program without a message.
+class RunningServer {
+public:
+    explicit RunningServer(const std::string& persistencePath)
+        : server_("127.0.0.1", 18012, persistencePath) {
+        thread_ = std::thread([this]() { server_.start(); });
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+
+    ~RunningServer() {
+        server_.stop();
+        if (thread_.joinable()) {
+            thread_.join();
+        }
+    }
+
+    RunningServer(const RunningServer&) = delete;
+    RunningServer& operator=(const RunningServer&) = delete;
+
+private:
+    key_value_store::Server server_;
+    std::thread thread_;
+};
+
+// The server is talked to over a socket here, rather than through the
+// protocol class. That is the way a client reaches it, and it is the path
+// the other tests never take: the accept loop, the reading of a line and
+// the writing of an answer.
+void test_the_server_answers_over_a_socket() {
+    const std::string persistencePath = "/tmp/cppuccino-kvs-socket-test.txt";
+    std::remove(persistencePath.c_str());
+
+    RunningServer running(persistencePath);
+
+    const std::string set = answer(sendCommand("127.0.0.1", 18012,
+                                               "SET language C++"));
+    expect(set == "+OK", "expected +OK, got " + set);
+
+    const std::string get = answer(sendCommand("127.0.0.1", 18012,
+                                               "GET language"));
+    expect(get == "$C++", "expected $C++, got " + get);
+
+    const std::string count = answer(sendCommand("127.0.0.1", 18012, "COUNT"));
+    expect(count == ":1", "expected :1, got " + count);
+
+    const std::string missing = answer(sendCommand("127.0.0.1", 18012,
+                                                    "GET nothing"));
+    expect(missing == "-NOT_FOUND", "expected -NOT_FOUND, got " + missing);
+
+    std::remove(persistencePath.c_str());
 }
 
 void test_server_protocol_integration() {
@@ -853,6 +925,9 @@ int main() {
         test_protocol_error_handling();
         test_protocol_response_serialize();
         test_protocol_response_parse();
+        test_the_server_answers_over_a_socket();
+        std::cout << "  test_the_server_answers_over_a_socket: PASS\n";
+
         test_server_protocol_integration();
         test_store_manager_with_protocol();
         test_client_direct_connection();
