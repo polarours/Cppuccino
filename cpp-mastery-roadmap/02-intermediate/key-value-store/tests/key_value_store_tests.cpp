@@ -642,7 +642,7 @@ std::string answer(const std::string& raw) {
 class RunningServer {
 public:
     explicit RunningServer(const std::string& persistencePath)
-        : server_("127.0.0.1", 18012, persistencePath) {
+        : server_("127.0.0.1", 18041, persistencePath) {
         thread_ = std::thread([this]() { server_.start(); });
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
@@ -672,18 +672,18 @@ void test_the_server_answers_over_a_socket() {
 
     RunningServer running(persistencePath);
 
-    const std::string set = answer(sendCommand("127.0.0.1", 18012,
+    const std::string set = answer(sendCommand("127.0.0.1", 18041,
                                                "SET language C++"));
     expect(set == "+OK", "expected +OK, got " + set);
 
-    const std::string get = answer(sendCommand("127.0.0.1", 18012,
+    const std::string get = answer(sendCommand("127.0.0.1", 18041,
                                                "GET language"));
     expect(get == "$C++", "expected $C++, got " + get);
 
-    const std::string count = answer(sendCommand("127.0.0.1", 18012, "COUNT"));
+    const std::string count = answer(sendCommand("127.0.0.1", 18041, "COUNT"));
     expect(count == ":1", "expected :1, got " + count);
 
-    const std::string missing = answer(sendCommand("127.0.0.1", 18012,
+    const std::string missing = answer(sendCommand("127.0.0.1", 18041,
                                                     "GET nothing"));
     expect(missing == "-NOT_FOUND", "expected -NOT_FOUND, got " + missing);
 
