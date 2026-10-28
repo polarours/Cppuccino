@@ -182,7 +182,7 @@ projects.
 
 A runnable version of this topic:
 
-- [pitfall-memory-fragmentation.cpp](../../examples/pitfall-memory-fragmentation.cpp)
+- [memory-pool-demo.cpp](../../examples/memory-pool-demo.cpp)
 
 ## Summary
 

@@ -489,7 +489,7 @@ private:
 
 A runnable version of this topic:
 
-- [pitfall-iterator-invalidation.cpp](../../examples/pitfall-iterator-invalidation.cpp)
+- [iterator-pattern-demo.cpp](../../examples/iterator-pattern-demo.cpp)
 
 ## Summary
 

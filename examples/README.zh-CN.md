@@ -203,4 +203,6 @@ g++ -std=c++20 -o demo demo-file.cpp && ./demo
 - [pitfall-use-after-move.cpp](pitfall-use-after-move.cpp) — 演示移动后使用的陷阱，以及安全的替代写法。
 - [simd-vectorization.cpp](simd-vectorization.cpp) — 演示手写的向量化循环，以及它后面那段标量尾巴。
 - [testing-patterns.cpp](testing-patterns.cpp) — 演示 mock 对象、测试夹具和参数化测试，配一个极小的测试框架。
+- [iterator-pattern-demo.cpp](iterator-pattern-demo.cpp) — 演示迭代器设计模式：迭代器接口、创建迭代器的聚合，以及从不知道底层是什么的客户端代码。
+- [memory-pool-demo.cpp](memory-pool-demo.cpp) — 演示三种分配内存的方式：空闲链表内存池、只进不出的竞技场，以及按大小分类的沙盘分配器。
 

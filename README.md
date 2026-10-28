@@ -18,7 +18,7 @@ public learning resource.
 |----------|-------|
 | Documentation | 134 articles (67 en + 67 zh) |
 | Pitfalls | 74 articles (37 en + 37 zh) |
-| Examples | 156 runnable examples |
+| Examples | 158 runnable examples |
 | Projects | 151 projects across 43 stages |
 | Tests | 903 (all passing) |
 
@@ -118,7 +118,7 @@ tools/run_all_checks.sh --full   # and every project build
 ### Examples
 
 - [examples](examples), indexed in [examples/README.md](examples/README.md):
-  156 runnable code samples covering:
+  158 runnable code samples covering:
   - Core concepts: ownership, move semantics, smart pointers, RAII
   - Modern C++: lambda, constexpr, structured bindings, ranges
   - C++20: concepts, ranges, span, format, coroutines

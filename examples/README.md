@@ -57,12 +57,16 @@ g++ -std=c++20 -o demo demo-file.cpp && ./demo
 - [inplace-vector.cpp](inplace-vector.cpp) — Demonstrates std::inplace_vector (C++26): a vector with inline storage - no heap allocation, fixed capacity, same interface as std::vector.
 - [interpreter-pattern-demo.cpp](interpreter-pattern-demo.cpp) — Demonstrates Interpreter Pattern: Expression tree with Number/Add/Multiply/Variable.
   - part of [interpreter-pattern](../cpp-mastery-roadmap/14-stage14/interpreter-pattern/README.md)
+- [iterator-pattern-demo.cpp](iterator-pattern-demo.cpp) — Demonstrates the iterator design pattern: an iterator interface, aggregates that create one, and the client code that never knows the difference.
+  - part of [iterator-pattern](../cpp-mastery-roadmap/15-stage15/iterator-pattern/README.md)
 - [lambda-expressions.cpp](lambda-expressions.cpp) — Demonstrates lambda expressions in C++11/14/17.
 - [lvalue-rvalue-references.cpp](lvalue-rvalue-references.cpp) — Demonstrates lvalue and rvalue references in C++.
 - [mediator-pattern-demo.cpp](mediator-pattern-demo.cpp) — Demonstrates Mediator Pattern: ChatRoom mediates between Users.
   - part of [mediator-pattern](../cpp-mastery-roadmap/11-stage11/mediator-pattern/README.md)
 - [memento-pattern-demo.cpp](memento-pattern-demo.cpp) — Demonstrates Memento Pattern: Editor + History for undo/redo.
   - part of [memento-pattern](../cpp-mastery-roadmap/13-stage13/memento-pattern/README.md)
+- [memory-pool-demo.cpp](memory-pool-demo.cpp) — Demonstrates three ways of handing out memory: a free list pool, an arena that never gives anything back, and a slab allocator with one free list per size.
+  - part of [memory-pool](../cpp-mastery-roadmap/35-stage35/memory-pool/README.md)
 - [move-semantics-advanced.cpp](move-semantics-advanced.cpp) — Demonstrates advanced move semantics: NRVO, move vs copy, and common pitfalls.
 - [move-semantics-example.cpp](move-semantics-example.cpp) — Demonstrates move semantics and how copying differs from moving.
 - [mvc-pattern-demo.cpp](mvc-pattern-demo.cpp) — Demonstrates MVC Pattern with TodoModel / TodoView / TodoController.
