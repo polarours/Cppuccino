@@ -173,7 +173,7 @@ delete ptr;
 
 A runnable version of this topic:
 
-- [std-string-view.cpp](../../examples/std-string-view.cpp)
+- [reference-binding-rules-demo.cpp](../../examples/reference-binding-rules-demo.cpp)
 
 ## Summary
 

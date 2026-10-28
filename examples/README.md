@@ -82,6 +82,7 @@ g++ -std=c++20 -o demo demo-file.cpp && ./demo
 - [proxy-demo.cpp](proxy-demo.cpp) — Demonstrates the Proxy Pattern: a surrogate controlling access to a real object (lazy loading + access logging).
 - [raii-and-exception-safety.cpp](raii-and-exception-safety.cpp) — Demonstrates RAII pattern and exception safety in C++.
 - [range-based-for.cpp](range-based-for.cpp) — Demonstrates range-based for loops with various containers.
+- [reference-binding-rules-demo.cpp](reference-binding-rules-demo.cpp) — Demonstrates the rules that decide which reference binds to which expression: the binding matrix, reference collapsing, and the lifetime of a temporary.
 - [repository-pattern-demo.cpp](repository-pattern-demo.cpp) — Demonstrates Repository Pattern with User entity and in-memory repository.
   - part of [repository-pattern](../cpp-mastery-roadmap/28-stage28/repository-pattern/README.md)
 - [rule-of-zero-three-five.cpp](rule-of-zero-three-five.cpp) — Demonstrates Rule of Zero, Three, and Five in C++.

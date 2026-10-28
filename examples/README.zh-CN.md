@@ -205,4 +205,5 @@ g++ -std=c++20 -o demo demo-file.cpp && ./demo
 - [testing-patterns.cpp](testing-patterns.cpp) — 演示 mock 对象、测试夹具和参数化测试，配一个极小的测试框架。
 - [iterator-pattern-demo.cpp](iterator-pattern-demo.cpp) — 演示迭代器设计模式：迭代器接口、创建迭代器的聚合，以及从不知道底层是什么的客户端代码。
 - [memory-pool-demo.cpp](memory-pool-demo.cpp) — 演示三种分配内存的方式：空闲链表内存池、只进不出的竞技场，以及按大小分类的沙盘分配器。
+- [reference-binding-rules-demo.cpp](reference-binding-rules-demo.cpp) — 演示决定哪种引用绑定到哪种表达式的规则：绑定矩阵、引用折叠，以及临时量的生命周期。
 
