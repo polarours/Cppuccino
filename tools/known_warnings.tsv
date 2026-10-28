@@ -7,25 +7,14 @@
 # The three files below are the ones that show what a mistake looks like.
 # They are teaching material, and a version of them that does not warn
 # would not show the mistake.
-
 # A lambda that captures a local by reference and outlives it.
 examples/pitfall-dangling-reference.cpp	-Wreturn-local-addr
-examples/pitfall-dangling-reference.cpp	-Wunused-variable
 examples/pitfall-dangling-reference.cpp	-Wunused-but-set-variable
-
 # A function that returns a reference to a local, and the objects that
 # slicing cuts in half.
 examples/pitfall-object-slicing.cpp	-Wreturn-local-addr
 examples/pitfall-object-slicing.cpp	-Wunused-variable
-examples/pitfall-object-slicing.cpp	-Wunused-but-set-variable
-
 # The mistakes the standard leaves undefined: the overflow, the null
 # pointer, the array that is one element too short.
 examples/undefined-behavior.cpp	-Wreturn-local-addr
 examples/undefined-behavior.cpp	-Wunused-variable
-examples/undefined-behavior.cpp	-Wunused-but-set-variable
-examples/undefined-behavior.cpp	-Wsign-compare
-
-# A copy that is made to show the copy, and then thrown away.
-examples/perfect-forwarding.cpp	-Wunused-but-set-variable
-examples/perfect-forwarding.cpp	-Wunused-variable

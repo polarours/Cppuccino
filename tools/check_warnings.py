@@ -51,6 +51,16 @@ def load_allowlist():
     return allowed
 
 
+# The examples that build on a project need its headers and its sources,
+# so they cannot be checked on their own. The example checker compiles them
+# with the project, and this one leaves them alone.
+PROJECT_EXAMPLES = {
+    'task-scheduler-error-handling.cpp',
+    'web-server-benchmark.cpp',
+    'connection-pool-concurrency.cpp',
+}
+
+
 def sources():
     """Every .cpp file that belongs to a project, and every example."""
     found = []
@@ -60,30 +70,88 @@ def sources():
             if name.endswith('.cpp'):
                 found.append(os.path.join(dirpath, name))
     for name in sorted(os.listdir(EXAMPLES)):
-        if name.endswith('.cpp'):
+        if name.endswith('.cpp') and name not in PROJECT_EXAMPLES:
             found.append(os.path.join(EXAMPLES, name))
     return found
 
 
+def project_root(path):
+    """The directory of the project a file belongs to."""
+    current = os.path.dirname(os.path.abspath(path))
+    while current != os.path.dirname(current):
+        if os.path.isfile(os.path.join(current, 'CMakeLists.txt')):
+            return current
+        current = os.path.dirname(current)
+    return os.path.dirname(os.path.abspath(path))
+
+
 def include_dirs(path):
-    """The headers a file may include, taken from the project it is in."""
+    """The headers a file may include.
+
+    The project root is the directory that carries the CMakeLists.txt, and
+    every directory below it that holds a header is on the include path.
+    The headers of a project usually live in include/, which is a sibling
+    of src/ and not a child of it, so looking only below the directory of
+    the file misses them.
+    """
+    # The examples of the repository itself stand alone: they have no
+    # project of their own. The examples subdirectory of a project is
+    # another matter -- that one belongs to its project.
+    if os.path.dirname(os.path.abspath(path)) == os.path.abspath(EXAMPLES):
+        return []
+    root = project_root(path)
     dirs = []
-    project = os.path.dirname(path)
-    if os.path.basename(os.path.dirname(path)) == 'examples':
-        return dirs
-    for sub in ('include', 'src', 'tests'):
-        base = os.path.join(project, sub)
-        if not os.path.isdir(base):
-            continue
-        for root, _, files in os.walk(base):
-            for name in files:
-                if name.endswith(('.hpp', '.h')):
-                    dirs.append(root)
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d != 'build']
+        for name in filenames:
+            if name.endswith(('.hpp', '.h')):
+                dirs.append(dirpath)
+                # The parent as well: a header in include/mini_http/ is
+                # included as "mini_http/app.hpp" from the include path
+                # include/, not from include/mini_http/.
+                dirs.append(os.path.dirname(dirpath))
+                break
+    dirs += extra_include_dirs(root)
     return sorted(set(dirs))
 
 
+def extra_include_dirs(root):
+    """The include paths the CMakeLists.txt names.
+
+    A project may borrow the headers of another one, as the producer and
+    consumer demo does with the ring buffer. Those paths are written as
+    ${CMAKE_CURRENT_SOURCE_DIR}/../something/include, and they are not
+    below the project.
+    """
+    cmake = os.path.join(root, 'CMakeLists.txt')
+    if not os.path.isfile(cmake):
+        return []
+    with open(cmake, encoding='utf-8', errors='replace') as handle:
+        text = handle.read()
+    out = []
+    for match in re.finditer(r'\$\{CMAKE_CURRENT_SOURCE_DIR\}(/[^\s"\')]+)*', text):
+        relative = match.group(0).replace('${CMAKE_CURRENT_SOURCE_DIR}', root)
+        resolved = os.path.normpath(relative)
+        if os.path.isdir(resolved):
+            out.append(resolved)
+            out.append(os.path.dirname(resolved))
+    return out
+
+
 def standard(path):
-    """The standard the file's own header asks for."""
+    """The standard the project asks for.
+
+    The CMakeLists.txt knows it; the header of the file usually does not
+    mention it at all, and guessing C++17 for a file that needs C++20 says
+    nothing about the file.
+    """
+    root = project_root(path)
+    cmake = os.path.join(root, 'CMakeLists.txt')
+    if os.path.isfile(cmake):
+        with open(cmake, encoding='utf-8', errors='replace') as handle:
+            match = re.search(r'set\s*\(\s*CMAKE_CXX_STANDARD\s+(\d+)', handle.read())
+        if match:
+            return match.group(1)
     try:
         with open(path, encoding='utf-8', errors='replace') as handle:
             head = handle.read(4000)
@@ -114,6 +182,12 @@ def check(path):
         else:
             name = text.split(' [-W', 1)[0][:40] if ' [-W' in text else text[:40]
         found.append((name, line.strip()[:150]))
+    if result.returncode != 0 and not found:
+        # A file that does not compile is a problem of its own. Reporting
+        # only the warnings would let it pass as a quiet one.
+        first = next((l for l in result.stderr.splitlines() if ' error:' in l),
+                     result.stderr.splitlines()[0] if result.stderr else '?')
+        found.append(('does not compile', first.strip()[:150]))
     return found
 
 
@@ -125,6 +199,7 @@ def main():
     allowed = load_allowlist()
     paths = sources()
     problems = []
+    used = set()
 
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
         results = list(pool.map(check, paths))
@@ -133,16 +208,27 @@ def main():
         rel = os.path.relpath(path, REPO)
         for kind, line in warnings:
             if kind in allowed.get(rel, ()):
+                used.add((rel, kind))
                 continue
             problems.append((rel, line))
+
+    # An entry that no longer matches anything is a leftover: the warning it
+    # allowed has been fixed, and the entry would hide it coming back.
+    stale = [(rel, kind) for rel, kinds in allowed.items() for kind in kinds
+             if (rel, kind) not in used]
 
     print('== warnings ==')
     print(f'  {len(paths)} file(s) compiled with the warnings on')
     print(f'  {len(allowed)} file(s) with an expected warning')
+    if stale:
+        print(f'\n{len(stale)} expected warning(s) that are not there any more:')
+        for rel, kind in sorted(stale):
+            print(f'  {rel}  {kind}')
     if problems:
         print(f'\n{len(problems)} unexpected warning(s):')
         for rel, line in problems:
             print(f'  {rel}\n    {line}')
+    if problems or stale:
         return 1
     print('\nevery project source and every example is quiet')
     return 0
