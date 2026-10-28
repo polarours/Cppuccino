@@ -249,6 +249,8 @@ We can use:
 A runnable version of this topic:
 
 - [ownership-and-lifetime.cpp](../../examples/ownership-and-lifetime.cpp)
+- [smart-pointers-ownership.cpp](../../examples/smart-pointers-ownership.cpp)
+
 
 ## 5. Summary
 

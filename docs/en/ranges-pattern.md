@@ -128,6 +128,11 @@ public:
 A runnable version of this topic:
 
 - [std-ranges-advanced.cpp](../../examples/std-ranges-advanced.cpp)
+- [range-based-for.cpp](../../examples/range-based-for.cpp)
+- [views-chunk-split.cpp](../../examples/views-chunk-split.cpp)
+- [cpp20-ranges.cpp](../../examples/cpp20-ranges.cpp)
+- [cpp23-ranges-views.cpp](../../examples/cpp23-ranges-views.cpp)
+
 
 ## Summary
 

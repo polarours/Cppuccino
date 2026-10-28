@@ -118,6 +118,11 @@ public:
 这个主题的可运行版本：
 
 - [std-ranges-advanced.cpp](../../examples/std-ranges-advanced.cpp)
+- [range-based-for.cpp](../../examples/range-based-for.cpp)
+- [views-chunk-split.cpp](../../examples/views-chunk-split.cpp)
+- [cpp20-ranges.cpp](../../examples/cpp20-ranges.cpp)
+- [cpp23-ranges-views.cpp](../../examples/cpp23-ranges-views.cpp)
+
 
 ## 总结
 

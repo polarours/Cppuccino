@@ -97,6 +97,8 @@ std::vector<int> movedVec = std::move(vec);
 这个主题的可运行版本：
 
 - [move-semantics-example.cpp](../../examples/move-semantics-example.cpp)
+- [move-semantics-advanced.cpp](../../examples/move-semantics-advanced.cpp)
+
 
 ## 总结
 

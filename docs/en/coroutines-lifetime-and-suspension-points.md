@@ -353,6 +353,10 @@ Portability requires separating core language semantics from runtime framework p
 A runnable version of this topic:
 
 - [cpp20-coroutines.cpp](../../examples/cpp20-coroutines.cpp)
+- [coroutine-basics.cpp](../../examples/coroutine-basics.cpp)
+- [cpp20-coroutines-complete.cpp](../../examples/cpp20-coroutines-complete.cpp)
+- [std-generator.cpp](../../examples/std-generator.cpp)
+
 
 ## 24. Conclusion
 

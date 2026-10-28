@@ -101,6 +101,8 @@ std::vector<int> movedVec = std::move(vec);
 A runnable version of this topic:
 
 - [move-semantics-example.cpp](../../examples/move-semantics-example.cpp)
+- [move-semantics-advanced.cpp](../../examples/move-semantics-advanced.cpp)
+
 
 ## Summary
 
