@@ -44,9 +44,15 @@ def find_projects(stage=None):
     return sorted(projects)
 
 
-def run(cmd, log_path):
+def run(cmd, log_path, timeout=None):
     with open(log_path, 'w') as log:
-        return subprocess.run(cmd, stdout=log, stderr=subprocess.STDOUT).returncode
+        try:
+            return subprocess.run(cmd, stdout=log, stderr=subprocess.STDOUT,
+                                  timeout=timeout).returncode
+        except subprocess.TimeoutExpired:
+            log.write(f'\n*** {cmd[0]} did not finish in {timeout} seconds\n')
+            log.flush()
+            return 124
 
 
 def main():
@@ -82,8 +88,10 @@ def main():
             failures.append((name, 'build', log_path))
             print('    build FAILED')
             continue
+        # A test that hangs has to fail the run rather than fill the job's
+        # whole timeout.
         if run(['ctest', '--test-dir', build_dir, '--output-on-failure'],
-               log_path) != 0:
+               log_path, timeout=300) != 0:
             failures.append((name, 'test', log_path))
             print('    test FAILED')
             continue

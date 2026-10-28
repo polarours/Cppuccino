@@ -42,6 +42,10 @@ def include_dirs(project):
             for name in files:
                 if name.endswith(('.hpp', '.h')):
                     dirs.append(root)
+                    # The parent as well: a header in include/mini_http/ is
+                    # included as "mini_http/app.hpp" from the include path
+                    # include/, not from include/mini_http/.
+                    dirs.append(os.path.dirname(root))
     return sorted(set(dirs))
 
 
@@ -59,7 +63,11 @@ def compiles(source, project, std, workdir):
     command = ['g++', f'-std=c++{std}', '-fsyntax-only']
     command += [f'-I{path}' for path in include_dirs(project)]
     command.append(path)
-    result = subprocess.run(command, capture_output=True, text=True)
+    try:
+        result = subprocess.run(command, capture_output=True, text=True,
+                                timeout=60)
+    except subprocess.TimeoutExpired:
+        return False, 'the compiler did not finish'
     return result.returncode == 0, result.stderr
 
 
