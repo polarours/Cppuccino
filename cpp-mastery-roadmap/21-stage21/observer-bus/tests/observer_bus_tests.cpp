@@ -65,8 +65,8 @@ int main() {
         test_handler_count();
         std::cout << "  test_handler_count: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "observer_bus_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "observer_bus_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

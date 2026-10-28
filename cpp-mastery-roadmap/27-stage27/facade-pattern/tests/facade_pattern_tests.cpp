@@ -53,8 +53,8 @@ int main() {
         test_facade_simplifies();
         std::cout << "  test_facade_simplifies: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "facade_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "facade_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

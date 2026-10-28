@@ -88,8 +88,8 @@ int main() {
         test_clear();
         std::cout << "  test_clear: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "command_history_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "command_history_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

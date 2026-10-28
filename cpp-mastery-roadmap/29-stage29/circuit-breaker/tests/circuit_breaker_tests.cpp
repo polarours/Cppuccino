@@ -111,8 +111,8 @@ int main() {
         test_success_count_and_reset();
         std::cout << "  test_success_count_and_reset: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "circuit_breaker_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "circuit_breaker_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

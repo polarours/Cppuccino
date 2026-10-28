@@ -82,8 +82,8 @@ int main() {
         test_short_circuit();
         std::cout << "  test_short_circuit: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "middleware_pipeline_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "middleware_pipeline_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

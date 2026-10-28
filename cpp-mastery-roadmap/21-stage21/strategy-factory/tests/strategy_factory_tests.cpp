@@ -50,8 +50,8 @@ int main() {
         test_create_strategy();
         std::cout << "  test_create_strategy: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "strategy_factory_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "strategy_factory_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

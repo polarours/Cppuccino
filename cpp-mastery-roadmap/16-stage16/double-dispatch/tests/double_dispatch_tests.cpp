@@ -62,8 +62,8 @@ int main() {
         test_play_game();
         std::cout << "  test_play_game: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "double_dispatch_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "double_dispatch_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

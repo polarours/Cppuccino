@@ -84,8 +84,8 @@ int main() {
         test_mock_disconnect();
         std::cout << "  test_mock_disconnect: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "mock_objects_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "mock_objects_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

@@ -59,8 +59,8 @@ int main() {
         test_format_empty();
         std::cout << "  test_format_empty: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "varargs_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "varargs_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

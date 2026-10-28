@@ -155,8 +155,8 @@ int main() {
         test_shutdown_runs_the_tasks_that_are_waiting();
         std::cout << "  test_shutdown_runs_the_tasks_that_are_waiting: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "command_queue_v2_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "command_queue_v2_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

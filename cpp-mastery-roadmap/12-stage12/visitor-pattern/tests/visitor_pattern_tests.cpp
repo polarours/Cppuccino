@@ -64,8 +64,8 @@ int main() {
         test_multiple_shapes();
         std::cout << "  test_multiple_shapes: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "visitor_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "visitor_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

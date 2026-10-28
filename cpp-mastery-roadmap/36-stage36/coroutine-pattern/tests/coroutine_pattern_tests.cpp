@@ -84,8 +84,8 @@ int main() {
         test_string_generator();
         std::cout << "  test_string_generator: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "coroutine_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "coroutine_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

@@ -103,8 +103,8 @@ int main() {
         test_unaligned_sizes();
         std::cout << "  test_unaligned_sizes: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "simd_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "simd_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

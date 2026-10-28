@@ -52,8 +52,8 @@ int main() {
         test_auto_flush();
         std::cout << "  test_auto_flush: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "observer_buffer_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "observer_buffer_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

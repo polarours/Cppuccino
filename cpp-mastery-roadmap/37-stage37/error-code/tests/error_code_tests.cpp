@@ -67,8 +67,8 @@ int main() {
         test_service_not_found();
         std::cout << "  test_service_not_found: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "error_code_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "error_code_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

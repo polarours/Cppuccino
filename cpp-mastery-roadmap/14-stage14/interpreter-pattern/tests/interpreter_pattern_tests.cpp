@@ -96,8 +96,8 @@ int main() {
         test_variable_expression();
         std::cout << "  test_variable_expression: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "interpreter_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "interpreter_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

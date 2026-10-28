@@ -70,8 +70,8 @@ int main() {
         test_dirty_tracking();
         std::cout << "  test_dirty_tracking: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "active_record_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "active_record_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

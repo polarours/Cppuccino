@@ -55,8 +55,8 @@ int main() {
         test_multiple_chains();
         std::cout << "  test_multiple_chains: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "strategy_chain_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "strategy_chain_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

@@ -143,8 +143,8 @@ int main() {
         test_concurrent_pop_with_owned_payload();
         std::cout << "  test_concurrent_pop_with_owned_payload: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "lock_free_queue_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "lock_free_queue_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

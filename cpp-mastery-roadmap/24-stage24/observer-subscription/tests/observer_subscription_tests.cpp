@@ -76,8 +76,8 @@ int main() {
         test_move_subscription();
         std::cout << "  test_move_subscription: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "observer_subscription_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "observer_subscription_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

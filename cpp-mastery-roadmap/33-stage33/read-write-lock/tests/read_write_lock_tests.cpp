@@ -73,8 +73,8 @@ int main() {
         test_keys();
         std::cout << "  test_keys: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "read_write_lock_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "read_write_lock_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

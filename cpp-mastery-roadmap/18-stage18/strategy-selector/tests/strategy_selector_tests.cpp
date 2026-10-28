@@ -66,8 +66,8 @@ int main() {
         test_use_strategy();
         std::cout << "  test_use_strategy: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "strategy_selector_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "strategy_selector_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

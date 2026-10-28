@@ -74,8 +74,8 @@ int main() {
         test_type_registry();
         std::cout << "  test_type_registry: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "type_object_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "type_object_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

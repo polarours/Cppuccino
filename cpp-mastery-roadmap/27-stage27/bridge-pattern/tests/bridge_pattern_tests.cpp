@@ -55,8 +55,8 @@ int main() {
         test_bridge_separation();
         std::cout << "  test_bridge_separation: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "bridge_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "bridge_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

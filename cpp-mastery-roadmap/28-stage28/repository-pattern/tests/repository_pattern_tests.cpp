@@ -79,8 +79,8 @@ int main() {
         test_exists();
         std::cout << "  test_exists: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "repository_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "repository_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

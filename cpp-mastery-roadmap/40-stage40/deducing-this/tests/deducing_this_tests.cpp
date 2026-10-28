@@ -59,8 +59,8 @@ int main() {
         test_counter_chaining();
         std::cout << "  test_counter_chaining: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "deducing_this_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "deducing_this_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

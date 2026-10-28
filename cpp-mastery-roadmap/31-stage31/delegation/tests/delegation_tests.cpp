@@ -44,8 +44,8 @@ int main() {
         test_change_renderer();
         std::cout << "  test_change_renderer: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "delegation_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "delegation_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

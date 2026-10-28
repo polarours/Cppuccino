@@ -102,8 +102,8 @@ int main() {
         test_the_event_reaches_the_handler_unchanged();
         std::cout << "  test_the_event_reaches_the_handler_unchanged: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "observer_mediator_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "observer_mediator_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

@@ -69,8 +69,8 @@ int main() {
         test_fixture_reusable();
         std::cout << "  test_fixture_reusable: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "test_fixture_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "test_fixture_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

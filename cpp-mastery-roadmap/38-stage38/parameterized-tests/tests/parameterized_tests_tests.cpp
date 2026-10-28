@@ -90,8 +90,8 @@ int main() {
         test_parameterized_fibonacci();
         std::cout << "  test_parameterized_fibonacci: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "parameterized_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "parameterized_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

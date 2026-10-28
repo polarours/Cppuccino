@@ -71,8 +71,8 @@ int main() {
         test_zip_size();
         std::cout << "  test_zip_size: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "zip_range_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "zip_range_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

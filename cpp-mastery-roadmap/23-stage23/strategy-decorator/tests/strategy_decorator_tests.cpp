@@ -50,8 +50,8 @@ int main() {
         test_timing_decorator();
         std::cout << "  test_timing_decorator: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "strategy_decorator_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "strategy_decorator_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

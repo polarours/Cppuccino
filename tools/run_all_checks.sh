@@ -66,8 +66,8 @@ run "the code: no warning the compiler did not expect" \
 run "articles: every one points at something runnable" \
     python3 tools/check_article_examples.py
 
-run "projects: every test function is called" \
-    python3 tools/check_test_coverage.py
+run "projects: the tests call what they define and can report a failure" \
+    python3 tools/check_tests.py
 
 run "projects: every demo runs" \
     python3 tools/check_demos.py

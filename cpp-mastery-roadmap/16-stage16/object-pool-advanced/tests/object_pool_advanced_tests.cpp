@@ -149,8 +149,8 @@ int main() {
         test_active_count_and_clear();
         std::cout << "  test_active_count_and_clear: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "object_pool_advanced_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "object_pool_advanced_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

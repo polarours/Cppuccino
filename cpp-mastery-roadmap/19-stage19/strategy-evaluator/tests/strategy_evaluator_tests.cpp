@@ -62,8 +62,8 @@ int main() {
         test_compare_strategies();
         std::cout << "  test_compare_strategies: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "strategy_evaluator_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "strategy_evaluator_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

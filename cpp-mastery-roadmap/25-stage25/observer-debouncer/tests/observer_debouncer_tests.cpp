@@ -103,8 +103,8 @@ int main() {
         test_destroy_while_a_dispatch_is_on_its_way();
         std::cout << "  test_destroy_while_a_dispatch_is_on_its_way: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "observer_debouncer_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "observer_debouncer_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

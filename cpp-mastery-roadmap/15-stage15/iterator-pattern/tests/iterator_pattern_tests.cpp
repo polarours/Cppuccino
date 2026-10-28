@@ -60,8 +60,8 @@ int main() {
         test_aggregate_size();
         std::cout << "  test_aggregate_size: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "iterator_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "iterator_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

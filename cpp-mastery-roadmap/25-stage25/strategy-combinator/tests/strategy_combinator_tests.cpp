@@ -69,8 +69,8 @@ int main() {
         test_greater_than();
         std::cout << "  test_greater_than: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "strategy_combinator_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "strategy_combinator_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

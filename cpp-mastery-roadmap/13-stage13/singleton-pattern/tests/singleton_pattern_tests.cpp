@@ -79,8 +79,8 @@ int main() {
         test_singleton_thread_safety();
         std::cout << "  test_singleton_thread_safety: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "singleton_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "singleton_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

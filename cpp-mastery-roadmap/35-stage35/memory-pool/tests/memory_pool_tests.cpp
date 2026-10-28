@@ -69,8 +69,8 @@ int main() {
         test_block_size();
         std::cout << "  test_block_size: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "memory_pool_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "memory_pool_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

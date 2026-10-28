@@ -72,8 +72,8 @@ int main() {
         test_read_file();
         std::cout << "  test_read_file: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "expected_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "expected_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

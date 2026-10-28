@@ -64,8 +64,8 @@ int main() {
         test_parse_int_failure();
         std::cout << "  test_parse_int_failure: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "result_type_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "result_type_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

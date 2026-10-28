@@ -54,8 +54,8 @@ int main() {
         test_factory();
         std::cout << "  test_factory: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "virtual_constructor_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "virtual_constructor_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

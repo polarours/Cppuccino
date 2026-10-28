@@ -76,8 +76,8 @@ int main() {
         test_list_packages();
         std::cout << "  test_list_packages: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "package_manager_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "package_manager_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

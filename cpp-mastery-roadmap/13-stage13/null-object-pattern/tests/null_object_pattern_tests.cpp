@@ -63,8 +63,8 @@ int main() {
         test_multiple_animals();
         std::cout << "  test_multiple_animals: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "null_object_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "null_object_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

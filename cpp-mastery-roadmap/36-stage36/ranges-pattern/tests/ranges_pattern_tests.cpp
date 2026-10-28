@@ -66,8 +66,8 @@ int main() {
         test_any_all();
         std::cout << "  test_any_all: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "ranges_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "ranges_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

@@ -71,8 +71,8 @@ int main() {
         test_summary();
         std::cout << "  test_summary: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "mvc_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "mvc_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

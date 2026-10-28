@@ -99,8 +99,8 @@ int main() {
         test_filter();
         std::cout << "  test_filter: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "specification_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "specification_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

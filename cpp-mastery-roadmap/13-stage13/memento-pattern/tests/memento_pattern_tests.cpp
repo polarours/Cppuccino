@@ -88,8 +88,8 @@ int main() {
         test_undo_empty_history();
         std::cout << "  test_undo_empty_history: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "memento_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "memento_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

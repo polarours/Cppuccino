@@ -74,8 +74,8 @@ int main() {
         test_shared_state();
         std::cout << "  test_shared_state: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "flyweight_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "flyweight_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

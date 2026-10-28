@@ -85,8 +85,8 @@ int main() {
         test_concurrent();
         std::cout << "  test_concurrent: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "producer_consumer_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "producer_consumer_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

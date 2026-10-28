@@ -79,8 +79,8 @@ int main() {
         test_stack_sizes();
         std::cout << "  test_stack_sizes: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "command_snapshot_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "command_snapshot_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

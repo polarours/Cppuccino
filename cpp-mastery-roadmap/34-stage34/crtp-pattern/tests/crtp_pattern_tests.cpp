@@ -63,8 +63,8 @@ int main() {
         test_counter_destructor();
         std::cout << "  test_counter_destructor: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "crtp_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "crtp_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

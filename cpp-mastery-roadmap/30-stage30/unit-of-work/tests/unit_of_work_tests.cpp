@@ -78,8 +78,8 @@ int main() {
         test_rollback();
         std::cout << "  test_rollback: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "unit_of_work_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "unit_of_work_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

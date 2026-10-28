@@ -66,8 +66,8 @@ int main() {
         test_factory_consistency();
         std::cout << "  test_factory_consistency: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "abstract_factory_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "abstract_factory_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

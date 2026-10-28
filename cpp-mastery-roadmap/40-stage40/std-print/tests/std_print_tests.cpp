@@ -86,8 +86,8 @@ int main() {
         test_level_names();
         std::cout << "  test_level_names: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "std_print_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "std_print_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

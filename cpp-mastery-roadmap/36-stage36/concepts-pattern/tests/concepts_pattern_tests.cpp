@@ -66,8 +66,8 @@ int main() {
         test_concepts_compile();
         std::cout << "  test_concepts_compile: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "concepts_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "concepts_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

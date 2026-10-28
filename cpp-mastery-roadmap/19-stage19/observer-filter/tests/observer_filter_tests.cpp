@@ -82,8 +82,8 @@ int main() {
         test_multiple_filters();
         std::cout << "  test_multiple_filters: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "observer_filter_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "observer_filter_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

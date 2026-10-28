@@ -77,8 +77,8 @@ int main() {
         test_soa_resize();
         std::cout << "  test_soa_resize: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "cache_friendly_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "cache_friendly_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

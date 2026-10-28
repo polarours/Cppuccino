@@ -57,8 +57,8 @@ int main() {
         test_direct_access();
         std::cout << "  test_direct_access: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "proxy_pattern_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "proxy_pattern_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

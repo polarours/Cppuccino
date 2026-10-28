@@ -79,8 +79,8 @@ jobs:
       - name: Every article points at something runnable
         run: python3 tools/check_article_examples.py
 
-      - name: Every test function is called
-        run: python3 tools/check_test_coverage.py
+      - name: The tests call what they define and can report a failure
+        run: python3 tools/check_tests.py
 
       - name: The two roadmap indexes agree
         run: python3 tools/check_overview_parity.py

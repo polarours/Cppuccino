@@ -78,8 +78,8 @@ int main() {
         test_strategy_switch();
         std::cout << "  test_strategy_switch: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "strategy_cache_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "strategy_cache_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

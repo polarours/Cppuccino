@@ -271,8 +271,8 @@ int main() {
         test_app_serve();
         std::cout << "  test_app_serve: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "\nTests FAILED: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "\nTests FAILED: " << exception.what() << std::endl;
         return 1;
     }
 

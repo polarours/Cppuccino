@@ -51,8 +51,8 @@ int main() {
         test_prefix_transform();
         std::cout << "  test_prefix_transform: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "strategy_pipeline_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "strategy_pipeline_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

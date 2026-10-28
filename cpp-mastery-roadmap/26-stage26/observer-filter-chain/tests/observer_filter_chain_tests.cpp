@@ -76,8 +76,8 @@ int main() {
         test_chained_filters();
         std::cout << "  test_chained_filters: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "observer_filter_chain_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "observer_filter_chain_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

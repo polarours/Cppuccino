@@ -71,8 +71,8 @@ int main() {
         test_get_errors();
         std::cout << "  test_get_errors: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "command_validator_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "command_validator_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

@@ -66,8 +66,8 @@ int main() {
         test_batch_undo();
         std::cout << "  test_batch_undo: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "command_batch_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "command_batch_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

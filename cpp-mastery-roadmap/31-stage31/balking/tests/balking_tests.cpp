@@ -69,8 +69,8 @@ int main() {
         test_sensor_threshold();
         std::cout << "  test_sensor_threshold: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "balking_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "balking_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

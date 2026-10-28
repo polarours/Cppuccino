@@ -77,8 +77,8 @@ int main() {
         test_set_back();
         std::cout << "  test_set_back: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "double_buffer_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "double_buffer_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

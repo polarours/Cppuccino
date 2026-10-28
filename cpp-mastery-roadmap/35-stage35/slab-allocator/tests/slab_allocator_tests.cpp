@@ -68,8 +68,8 @@ int main() {
         test_reset();
         std::cout << "  test_reset: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "slab_allocator_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "slab_allocator_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

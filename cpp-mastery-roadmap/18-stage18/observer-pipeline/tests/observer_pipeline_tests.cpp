@@ -68,8 +68,8 @@ int main() {
         test_stage_count();
         std::cout << "  test_stage_count: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "observer_pipeline_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "observer_pipeline_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 

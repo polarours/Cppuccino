@@ -69,8 +69,8 @@ int main() {
         test_aligned_allocator();
         std::cout << "  test_aligned_allocator: PASS\n";
 
-    } catch (const std::string& exception) {
-        std::cerr << "memory_alignment_tests failed: " << exception << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "memory_alignment_tests failed: " << exception.what() << std::endl;
         return 1;
     }
 
