@@ -65,7 +65,7 @@ int main() {
 In this example, the `getCount` method is declared as `const`, meaning it does not modify the logical state of the `Counter` object (i.e., `count_`). However, it does modify the member variables `cache_valid_` and `cached_value_`, which are part of the physical state.
 
 > Note: The division between logical and physical state is not language-enforced, but rather a design concept. In actual projects, reasonable division helps performance optimization and interface design.
-> The examples above demonstrate positive use cases for mutable. Of course, mutable can also be misused, leading to code that is difficult to understand and maintain. Subsequent chapters (to be added) will discuss negative examples of mutable and explain why it is necessary to use it.
+> The examples above demonstrate positive use cases for mutable. Of course, mutable can also be misused: it is an escape hatch, not a habit. If a member can be `const`, it should be, and a `mutable` member is worth a comment saying why it has to be one.
 
 ### The True Meaning of const
 

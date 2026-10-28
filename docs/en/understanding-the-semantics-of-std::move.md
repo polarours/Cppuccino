@@ -94,7 +94,7 @@ std::vector<int> vec = {1, 2, 3, 4, 5};
 std::vector<int> movedVec = std::move(vec);
 // vec is still valid, but content may have been moved (typically becomes empty).
 ```
-> **Note**: For more detailed introduction of the `move` process and ownership, please refer to upcoming sections (to be added).
+> **Note**: For the whole `move` process and the rules of ownership, see [ownership-and-lifetime.md](ownership-and-lifetime.md).
 
 ## Example
 

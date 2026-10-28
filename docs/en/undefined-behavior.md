@@ -73,7 +73,7 @@ That yields:
 - Lower branch-prediction pressure
 - Better overall performance
 
-This is a tiny example; compilers exploit UB for far more aggressive optimizations. UB is the cost of peak performance and abstraction; understanding it is key to why C++ is both powerful and risky.
+This is a tiny example; compilers exploit UB for far more aggressive optimizations. The [undefined-behavior.cpp](../../examples/undefined-behavior.cpp) example shows a few of them. UB is the cost of peak performance and abstraction; understanding it is key to why C++ is both powerful and risky.
 
 ## 2. Common Examples of UB
 
@@ -159,7 +159,7 @@ How do we live with UB in real C++ projects?
 - Prefer standard containers to avoid out-of-bounds indexing.
 - Use range-for and standard algorithms to reduce manual indexing and iterator mistakes.
 
-> More on modern C++ features and their relationship to UB to be added.
+> The features above are the modern answer to UB: they make the invalid state impossible to write, instead of leaving it to the programmer to avoid. The [ownership-and-lifetime.md](ownership-and-lifetime.md) article goes through the ownership rules in full.
 
 ### 3.2 Using Static and Dynamic Analysis Tools
 
@@ -183,7 +183,7 @@ It operates on Clang’s AST (Abstract Syntax Tree) and semantic analysis result
 
 Clang-Tidy is not merely an extension of compiler warnings; it is a semantic analysis tool independent of the compilation process, with analysis precision significantly higher than traditional compiler diagnostics.
 
-> A dedicated chapter will cover the principles and usage of Clang-Tidy (to be added).
+> Clang-Tidy is not a tool to install and forget. The repository compiles every file with the warnings on, one file at a time, and reports what it finds: that is what `tools/check_warnings.py` does.
 
 #### 3.2.2 Dynamic Analysis Tools (AddressSanitizer as an Example)
 
@@ -191,11 +191,43 @@ AddressSanitizer (ASan) is a fast memory error detection tool for C/C++ programs
 
 ASan has been available since LLVM 3.1 and GCC 4.8 and is widely used for fuzz testing, debugging, and memory safety checks in production environments. Since Visual Studio 2019 version 16.9, Microsoft’s implementation of AddressSanitizer can integrate with the Visual Studio IDE. If an error is detected at runtime, it can optionally generate a crash dump file.
 
-> A dedicated chapter will cover the principles and usage of AddressSanitizer (to be added).
+> AddressSanitizer is used here the way it is meant to be: every project's tests are built a second time with it, and a leak or a read of freed memory fails the run. That is `tools/run_sanitizers.py`.
 
 ### 3.3 Defensive Programming in Practice
 
-> Regarding the concept of "defensive programming," my understanding is still partial. Therefore, the content I might write could be inaccurate. For now, I will skip this section and fill it in later once I have a deeper understanding.
+Defensive programming is the habit of checking the things that can be checked, at the boundary where the data enters, and of making the program say clearly what went wrong.
+
+- Check the preconditions of a function where the function is called, not deep inside it. A function that takes a pointer and a length has to be told whether the length makes sense.
+- Use `assert` for the things the programmer guarantees. The check is there in a debug build and gone in a release build, so it costs nothing when the program runs fast.
+- Validate what comes from outside: what a user typed, what a file holds, what the network sent.
+- Fail fast. A clear message at the point of the failure is worth more than a strange value three layers down.
+
+```cpp
+#include <cassert>
+#include <stdexcept>
+
+class Buffer {
+public:
+    Buffer(std::size_t size) : size_(size) {
+        // The programmer guarantees the size: an assertion says so.
+        assert(size > 0);
+    }
+
+    void write(std::size_t at, int value) {
+        if (at >= size_) {
+            // What comes from outside is checked, and the failure says why.
+            throw std::out_of_range("the write is past the end of the buffer");
+        }
+        data_[at] = value;
+    }
+
+private:
+    std::size_t size_;
+    int data_[64] = {};
+};
+```
+
+`assert` says "this has to be true", and it checks it while you are still working on the code. An exception says "this must not happen, and if it does, this is what to tell the person who hit it". The first is for the programmer, the second is for the user.
 
 ## Example
 

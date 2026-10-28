@@ -242,7 +242,7 @@ We can use:
 - `std::weak_ptr`: Implements non-owning observation, preventing dangling pointers
 - `RAII` design pattern: Ensures resources are properly managed during object lifetime
 
-> For more specific code examples and usage methods, please refer to subsequent sections (to be added).
+> For more specific code and the rules in full, see [ownership-starts-here.md](ownership-starts-here.md) and the [ownership-and-lifetime.cpp](../../examples/ownership-and-lifetime.cpp) example.
 
 ## Example
 
