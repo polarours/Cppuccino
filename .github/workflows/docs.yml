@@ -82,5 +82,8 @@ jobs:
       - name: The tests call what they define and can report a failure
         run: python3 tools/check_tests.py
 
+      - name: No two projects use the same port
+        run: python3 tools/check_test_ports.py
+
       - name: The two roadmap indexes agree
         run: python3 tools/check_overview_parity.py
