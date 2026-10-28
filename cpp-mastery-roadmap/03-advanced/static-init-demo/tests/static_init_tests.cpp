@@ -18,14 +18,22 @@ void test_counter_creation() {
 
 void test_increment() {
     Counter c("Test");
+    expect(c.getValue() == 0, "expected initial value 0");
+
     c.increment();
-    // increment doesn't return anything, just check it compiles
-    expect(true, "increment should compile");
+    expect(c.getValue() == 1, "expected value 1 after one increment");
+
+    c.increment();
+    c.increment();
+    expect(c.getValue() == 3, "expected value 3 after three increments");
 }
 
 void test_check_with_other() {
     Counter a("A");
     Counter b("B");
+    a.increment();
+    b.increment();
+    b.increment();
     a.checkWithOther(b);  // Should compile and work
     expect(true, "checkWithOther should work");
 }

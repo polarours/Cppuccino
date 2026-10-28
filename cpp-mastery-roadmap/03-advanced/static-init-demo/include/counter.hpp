@@ -6,7 +6,7 @@ class Counter {
 public:
     Counter(const std::string& name) : name_(name) {
         int currentIdx = index_;
-        index_;
+        index_++;
         std::cout << "[CONSTRUCT] " << name_ << " (index=" << currentIdx << ")\n";
     }
 
@@ -15,7 +15,7 @@ public:
     }
 
     int getValue() const { return value_; }
-    void increment() { value_; }
+    void increment() { value_++; }
 
     void checkWithOther(const Counter& other) const {
         std::cout << name_ << " compares with " << other.name_
