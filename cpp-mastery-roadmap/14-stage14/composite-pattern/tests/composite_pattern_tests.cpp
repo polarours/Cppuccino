@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <sstream>
 #include <string>
 #include <memory>
 
@@ -12,6 +13,23 @@ void expect(bool condition, const std::string& message) {
         throw std::runtime_error(message);
     }
 }
+
+// The classes under test report what they do by printing, so the output
+// is what the test looks at.
+class CapturedOutput {
+public:
+    CapturedOutput() : previous_(std::cout.rdbuf(buffer_.rdbuf())) {}
+    ~CapturedOutput() { std::cout.rdbuf(previous_); }
+
+    CapturedOutput(const CapturedOutput&) = delete;
+    CapturedOutput& operator=(const CapturedOutput&) = delete;
+
+    std::string text() const { return buffer_.str(); }
+
+private:
+    std::ostringstream buffer_;
+    std::streambuf* previous_;
+};
 
 void test_file() {
     auto file = std::make_shared<composite_pattern::File>("test.txt", 100);
@@ -51,8 +69,19 @@ void test_print_structure() {
     root->add(subDir);
     root->add(std::make_shared<composite_pattern::File>("root.txt", 50));
 
-    // Should not throw
+    CapturedOutput output;
     root->print();
+
+    const std::string text = output.text();
+    expect(text.find("Directory: root") != std::string::npos,
+           "expected the root directory to be printed, got: " + text);
+    // The children are indented by two spaces per level.
+    expect(text.find("  Directory: sub") != std::string::npos,
+           "expected the sub directory to be printed, got: " + text);
+    expect(text.find("    File: file.txt (100 bytes)") != std::string::npos,
+           "expected the nested file to be printed, got: " + text);
+    expect(text.find("  File: root.txt (50 bytes)") != std::string::npos,
+           "expected the root file to be printed, got: " + text);
 }
 
 } // namespace

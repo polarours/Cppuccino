@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <sstream>
 #include <string>
 
 namespace {
@@ -11,6 +12,23 @@ void expect(bool condition, const std::string& message) {
         throw std::runtime_error(message);
     }
 }
+
+// The classes under test report what they do by printing, so the output
+// is what the test looks at.
+class CapturedOutput {
+public:
+    CapturedOutput() : previous_(std::cout.rdbuf(buffer_.rdbuf())) {}
+    ~CapturedOutput() { std::cout.rdbuf(previous_); }
+
+    CapturedOutput(const CapturedOutput&) = delete;
+    CapturedOutput& operator=(const CapturedOutput&) = delete;
+
+    std::string text() const { return buffer_.str(); }
+
+private:
+    std::ostringstream buffer_;
+    std::streambuf* previous_;
+};
 
 void test_sum() {
     std::vector<int> ints = {1, 2, 3, 4, 5};
@@ -37,13 +55,29 @@ void test_describe() {
 
 void test_print_container() {
     std::vector<int> v = {10, 20, 30};
+
+    CapturedOutput output;
     concepts_pattern::printContainer(v);
+
+    const std::string text = output.text();
+    expect(text.find("10, 20, 30") != std::string::npos,
+           "expected the values to be printed, got: " + text);
 }
 
 void test_concepts_compile() {
     static_assert(concepts_pattern::Numeric<int>, "int is Numeric");
     static_assert(concepts_pattern::Numeric<double>, "double is Numeric");
     static_assert(!concepts_pattern::Numeric<std::string>, "string is not Numeric");
+
+    // A concept that accepts everything accepts nothing.
+    expect(concepts_pattern::HasToString<concepts_pattern::Point>,
+           "expected Point to have a toString");
+    expect(!concepts_pattern::HasToString<concepts_pattern::NoToString>,
+           "expected NoToString not to have a toString");
+    expect(concepts_pattern::Container<std::vector<int>>,
+           "expected a vector to be a container");
+    expect(!concepts_pattern::Container<int>,
+           "expected int not to be a container");
 }
 
 } // namespace

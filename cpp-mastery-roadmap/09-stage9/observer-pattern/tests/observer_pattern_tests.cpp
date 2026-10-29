@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <sstream>
 #include <string>
 
 namespace {
@@ -11,6 +12,23 @@ void expect(bool condition, const std::string& message) {
         throw std::runtime_error(message);
     }
 }
+
+// The classes under test report what they do by printing, so the output
+// is what the test looks at.
+class CapturedOutput {
+public:
+    CapturedOutput() : previous_(std::cout.rdbuf(buffer_.rdbuf())) {}
+    ~CapturedOutput() { std::cout.rdbuf(previous_); }
+
+    CapturedOutput(const CapturedOutput&) = delete;
+    CapturedOutput& operator=(const CapturedOutput&) = delete;
+
+    std::string text() const { return buffer_.str(); }
+
+private:
+    std::ostringstream buffer_;
+    std::streambuf* previous_;
+};
 
 // A minimal observer that keeps the value it received, so a test can check
 // what the subject handed over.
@@ -24,12 +42,15 @@ public:
 void test_basic_observe() {
     observer_pattern::Subject<int> subject;
 
-    std::string received;
     auto observer = std::make_shared<observer_pattern::Logger<int>>();
     subject.attach(observer);
 
+    CapturedOutput output;
     subject.setValue(42);
-    // Logger outputs to cout
+
+    const std::string text = output.text();
+    expect(text.find("[Logger] Value changed to: 42") != std::string::npos,
+           "expected the logger to report the new value, got: " + text);
 }
 
 void test_multiple_observers() {

@@ -61,18 +61,34 @@ void test_multiple_users() {
     chatRoom->addColleague(user2);
     chatRoom->addColleague(user3);
 
-    // Should not throw
+    CapturedOutput output;
     user2->send("Hello everyone!");
+
+    const std::string text = output.text();
+    expect(text.find("[Bob -> Alice] Hello everyone!") != std::string::npos,
+           "expected alice to be told about the message, got: " + text);
+    expect(text.find("[Bob -> Charlie] Hello everyone!") != std::string::npos,
+           "expected charlie to be told about the message, got: " + text);
+    expect(text.find("[Bob -> Bob]") == std::string::npos,
+           "expected bob not to be told about his own message, got: " + text);
 }
 
 void test_mediator_notification() {
     auto chatRoom = std::make_shared<mediator_pattern::ChatRoom>();
 
     auto user1 = std::make_shared<mediator_pattern::User>(chatRoom, "Alice");
+    auto user2 = std::make_shared<mediator_pattern::User>(chatRoom, "Bob");
     chatRoom->addColleague(user1);
+    chatRoom->addColleague(user2);
 
-    // Notify with event
+    CapturedOutput output;
     chatRoom->notify("Alice", "Test event");
+
+    const std::string text = output.text();
+    expect(text.find("[Alice -> Bob] Test event") != std::string::npos,
+           "expected bob to receive the event, got: " + text);
+    expect(text.find("[Alice -> Alice]") == std::string::npos,
+           "expected alice not to receive her own event, got: " + text);
 }
 
 } // namespace

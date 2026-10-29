@@ -88,7 +88,15 @@ void test_handler_chain() {
     auth->setNext(logging);
 
     chain_of_responsibility::Request req{"test", 1};
+
+    CapturedOutput output;
     auth->handle(req);
+
+    const std::string text = output.text();
+    expect(text.find("[Auth] Checking authentication for: test") != std::string::npos,
+           "expected the auth handler to run, got: " + text);
+    expect(text.find("[Log] Logging request: test") != std::string::npos,
+           "expected the request to reach the logging handler, got: " + text);
 }
 
 } // namespace

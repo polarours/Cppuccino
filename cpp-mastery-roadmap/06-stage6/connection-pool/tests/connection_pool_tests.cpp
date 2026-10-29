@@ -184,10 +184,18 @@ void test_pool_release_after_close() {
     );
 
     auto conn = pool.acquire();
+    expect(pool.activeConnections() == 1, "expected one borrowed connection");
+    expect(pool.size() == 1, "expected one idle connection left");
+
     pool.close();
 
-    // Should not throw
+    // The pool is closed, so the loan is dropped instead of going back
+    // into the queue. The borrowed counter is not a live-loan metric
+    // after close, and the idle queue is not touched.
     pool.release(conn);
+    expect(pool.activeConnections() == 1,
+           "expected the borrowed counter to stay at 1 after close");
+    expect(pool.size() == 1, "expected the idle queue to be untouched");
 }
 
 } // namespace

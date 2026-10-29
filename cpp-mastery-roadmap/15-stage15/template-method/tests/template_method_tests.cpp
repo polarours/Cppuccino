@@ -75,14 +75,34 @@ void test_json_miner() {
 
 void test_xml_miner() {
     template_method::XMLDataMiner miner;
-    // Should not throw
+    CapturedOutput output;
     miner.mine("data.xml");
+
+    const std::string text = output.text();
+    // The xml miner does not override the hook, so the base class runs.
+    expect(text.find("[DataMiner] Opening file: data.xml") != std::string::npos,
+           "expected the base hook to open the file: " + text);
+    expect(text.find("[XML] Extracting XML data") != std::string::npos,
+           "expected the data to be extracted: " + text);
+    expect(text.find("[XML] Parsing XML format") != std::string::npos,
+           "expected the data to be parsed: " + text);
+    expect(text.find("[XML] Analyzing XML data") != std::string::npos,
+           "expected the data to be analysed: " + text);
+    expect(text.find("[DataMiner] Closing file") != std::string::npos,
+           "expected the file to be closed: " + text);
 }
 
 void test_hook_override() {
     template_method::JSONDataMiner miner;
-    // JSON miner overrides openFile hook
+    CapturedOutput output;
     miner.mine("test.json");
+
+    const std::string text = output.text();
+    // The json miner overrides the hook, so the base class does not run.
+    expect(text.find("[JSON] Opening JSON file: test.json") != std::string::npos,
+           "expected the overridden hook to run: " + text);
+    expect(text.find("[DataMiner] Opening file") == std::string::npos,
+           "expected the base hook not to run: " + text);
 }
 
 } // namespace
