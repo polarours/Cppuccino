@@ -22,7 +22,7 @@ tools/run_all_checks.sh --full   # and every project build and test
 | `check_readme_examples.py` | A C++ example in a project README that no longer compiles |
 | `check_warnings.py` | A warning the compiler found in a project or an example, other than the ones that are on purpose |
 | `check_article_examples.py` | An article that points at nothing the reader can run, or whose two halves point at different things |
-| `check_tests.py` | A test function that is defined but never called, or a test that cannot report its own failure |
+| `check_tests.py` | A test function that is defined but never called, a test that checks nothing, or a test that cannot report its own failure |
 | `check_test_ports.py` | Two projects that bind the same port in their tests, and so fight over it when the CI runs them at the same time |
 | `check_demos.py` | A demo that crashes when it is started, or that does nothing at all |
 | `check_overview_parity.py` | The two roadmap indexes listing different stages or different projects |

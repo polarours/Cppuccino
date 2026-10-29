@@ -79,7 +79,7 @@ jobs:
       - name: Every article points at something runnable
         run: python3 tools/check_article_examples.py
 
-      - name: The tests call what they define and can report a failure
+      - name: The tests call what they define, check something, and can report a failure
         run: python3 tools/check_tests.py
 
       - name: No two projects use the same port
