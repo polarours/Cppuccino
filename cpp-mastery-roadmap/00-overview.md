@@ -459,6 +459,7 @@ Read:
 Read:
 
 - [Composite Pattern](../docs/en/composite-pattern.md)
+- [Null Object Pattern](../docs/en/null-object-pattern.md)
 - [Proxy Pattern](../docs/en/proxy-pattern.md)
 
 ### Stage 14 Projects (14-stage14)
@@ -473,6 +474,7 @@ Read:
 Read:
 
 - [Abstract Factory Pattern](../docs/en/abstract-factory-pattern.md)
+- [Interpreter Pattern](../docs/en/interpreter-pattern.md)
 - [Iterator Pattern](../docs/en/iterator-pattern.md)
 - [Template Method Pattern](../docs/en/template-method-pattern.md)
 
@@ -502,6 +504,7 @@ Read:
 Read:
 
 - [Command Pattern](../docs/en/command-pattern.md)
+- [Double Dispatch](../docs/en/double-dispatch.md)
 - [Observer Pattern](../docs/en/observer-pattern.md)
 - [Strategy Pattern](../docs/en/strategy-pattern.md)
 

@@ -182,9 +182,9 @@
 
 | 类型 | 英文 | 中文 | 总计 | 当前 |
 |------|------|------|------|------|
-| 学习文档 | 40 篇 | 40 篇 | 80 篇 | 134 篇 |
+| 学习文档 | 40 篇 | 40 篇 | 80 篇 | 140 篇 |
 | 陷阱文章 | 35 篇 | 35 篇 | 70 篇 | 74 篇 |
-| 示例代码 | - | - | 120 个 | 156 个 |
+| 示例代码 | - | - | 120 个 | 161 个 |
 | 项目练习 | - | - | 151 个 | 151 个 |
 
 ## 第六阶段：docs/en 英文正文欠账（2026-10-04 发现）
@@ -741,3 +741,61 @@ anything, just check it compiles"）。其余是 socket 代码里的 C 风格转
 
 **新加的检查**：`tools/check_tests.py`（测试函数定义了却没被调用；测试失败时
 报不出自己的失败）、`tools/check_warnings.py` 的豁免表过期检查。
+
+## 第九阶段：测试断言欠账与三篇新模式文章（2026-10-22）
+
+**问题一：12 个测试函数一条断言都没有。**
+
+上一阶段修掉了"定义了却从没被调用"的测试，却漏掉了更糟的一类：**定义了、
+也被调用了，但函数体里一句"检查"都没有**。典型写法是调用一下代码，注释写着
+"Should not throw"，然后什么都没做：
+
+```cpp
+void test_basic_observe() {
+    observer_pattern::Subject<int> subject;
+    auto observer = std::make_shared<observer_pattern::Logger<int>>();
+    subject.attach(observer);
+    subject.setValue(42);
+    // Logger outputs to cout
+}
+```
+
+这个测试永远不会失败：观察者是不是真的收到了值、值对不对，它都不知道。改代码
+的人看到"test_basic_observe: PASS"只会以为这条路被守住了。
+
+涉及 9 个项目 12 个函数：`connection-pool`（close 之后 release 不减计数器）、
+`observer-pattern`（挂了 logger 却不看它说了什么）、`decorator-pattern`、
+`mediator-pattern`（两个）、`chain-of-responsibility`、`visitor-pattern`、
+`composite-pattern`、`template-method`（两个）、`concepts-pattern`（两个）。
+
+**处理**：全部改成断言**行为**。这些类靠 `std::cout` 报告自己做了什么，所以
+测试用 `CapturedOutput` 接管 `std::cout` 的 rdbuf，再对输出下断言。顺带把
+`connection-pool` 那个测试改成钉住文章里已经写明的限制——`release()` 在
+`close()` 之后丢弃参数、不更新借出计数——让这条限制从"文档里的一句话"变成
+"测试守着的行为"。
+
+**问题二：检查器只查"调用"，不查"检查"。**
+
+`tools/check_tests.py` 之前只查两件事：测试函数被定义了却没被调用；测试失败
+时报不出自己的失败。现在多查第三件：函数体里既没有 `expect` / `assert` 一类
+调用，也没有 `throw`，就是**什么都不检查**。它会跳过字符串和注释里的花括号，
+所以 `std::cout << "}"` 不会把解析带偏。
+
+**问题三：三个模式还没有文章。**
+
+`interpreter-pattern`（stage 14）、`null-object-pattern`（stage 13）、
+`double-dispatch`（stage 16）三个项目一直只有代码没有文章。这一轮补齐了三篇
+中英双语的完整文章，并给后两个配了可运行示例
+（`examples/null-object-pattern-demo.cpp`、`examples/double-dispatch-demo.cpp`）。
+两半标题骨架一一对应、代码块逐字节相同，文章末尾的 `## Example` 段指向各自
+的示例。
+
+**当前真实口径**（按文件数统计）：
+
+| 类型 | 英文 | 中文 | 总计 | 备注 |
+|------|------|------|------|------|
+| 学习文档 | 70 | 70 | 140 | 英文正文 70 篇全部就绪 |
+| 陷阱文章 | 37 | 37 | 74 | 正文均为英文/中文 |
+| 示例代码 | - | - | 161 | 全部可编译、可运行、sanitizer 干净 |
+| 项目练习 | - | - | 151 | 全部构建通过、ctest 全绿 |
+| 测试函数 | - | - | 903 | 全部通过，且每一条都真的检查了东西 |

@@ -44,6 +44,8 @@ g++ -std=c++20 -o demo demo-file.cpp && ./demo
   - part of [deducing-this](../cpp-mastery-roadmap/40-stage40/deducing-this/README.md)
 - [delegation-demo.cpp](delegation-demo.cpp) — Demonstrates the Delegation Pattern: an object forwards part of its work to a helper object instead of implementing everything itself.
   - part of [delegation](../cpp-mastery-roadmap/31-stage31/delegation/README.md)
+- [double-dispatch-demo.cpp](double-dispatch-demo.cpp) — Demonstrates Double Dispatch: one operation that depends on the runtime types of two operands.
+  - part of [double-dispatch](../cpp-mastery-roadmap/16-stage16/double-dispatch/README.md)
 - [event-sourcing-demo.cpp](event-sourcing-demo.cpp) — Demonstrates Event Sourcing: EventStore, Account aggregate, replay from events.
   - part of [event-sourcing](../cpp-mastery-roadmap/29-stage29/event-sourcing/README.md)
 - [facade-demo.cpp](facade-demo.cpp) — Demonstrates the Facade Pattern: a simplified interface over a set of complex subsystems (home theater boot sequence).
@@ -73,6 +75,8 @@ g++ -std=c++20 -o demo demo-file.cpp && ./demo
   - part of [mvc-pattern](../cpp-mastery-roadmap/28-stage28/mvc-pattern/README.md)
 - [noexcept-move.cpp](noexcept-move.cpp) — Demonstrates noexcept and move operations in C++.
 - [nttp-class-type.cpp](nttp-class-type.cpp) — Demonstrates C++20 non-type template parameters of class type and template<auto> - compile-time values as types in the template argument.
+- [null-object-pattern-demo.cpp](null-object-pattern-demo.cpp) — Demonstrates the Null Object Pattern: a null object answers every call with a do-nothing default, so the client never checks for null.
+  - part of [null-object-pattern](../cpp-mastery-roadmap/13-stage13/null-object-pattern/README.md)
 - [observer-pattern-demo.cpp](observer-pattern-demo.cpp) — Demonstrates Subject-Observer with Logger and Counter observers.
   - part of [observer-pattern](../cpp-mastery-roadmap/09-stage9/observer-pattern/README.md)
 - [ownership-and-lifetime.cpp](ownership-and-lifetime.cpp) — Demonstrates different ownership semantics in C++17 and their impact on object lifetime.

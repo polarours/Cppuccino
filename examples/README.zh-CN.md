@@ -44,6 +44,8 @@ g++ -std=c++20 -o demo demo-file.cpp && ./demo
   - 属于 [deducing-this](../cpp-mastery-roadmap/40-stage40/deducing-this/README.md)
 - [delegation-demo.cpp](delegation-demo.cpp) — 演示委托模式：对象把部分工作转交给辅助对象，而不是自己实现全部逻辑。
   - 属于 [delegation](../cpp-mastery-roadmap/31-stage31/delegation/README.md)
+- [double-dispatch-demo.cpp](double-dispatch-demo.cpp) — 演示双重分派：一个运算同时依赖两个操作数的运行时类型。
+  - 属于 [double-dispatch](../cpp-mastery-roadmap/16-stage16/double-dispatch/README.md)
 - [event-sourcing-demo.cpp](event-sourcing-demo.cpp) — 演示 Event Sourcing：EventStore、Account 聚合与基于事件的回放。
   - 属于 [event-sourcing](../cpp-mastery-roadmap/29-stage29/event-sourcing/README.md)
 - [facade-demo.cpp](facade-demo.cpp) — 演示外观模式：为一系列复杂子系统提供简化接口（家庭影院开机流程）。
@@ -68,6 +70,8 @@ g++ -std=c++20 -o demo demo-file.cpp && ./demo
 - [mvc-pattern-demo.cpp](mvc-pattern-demo.cpp) — 演示 MVC 模式：TodoModel / TodoView / TodoController 之间的配合。
   - 属于 [mvc-pattern](../cpp-mastery-roadmap/28-stage28/mvc-pattern/README.md)
 - [noexcept-move.cpp](noexcept-move.cpp) — 演示 C++ 中的 noexcept 与移动操作。
+- [null-object-pattern-demo.cpp](null-object-pattern-demo.cpp) — 演示空对象模式：空对象用什么都不做的默认值回答每一次调用，于是客户端永远不必检查空指针。
+  - 属于 [null-object-pattern](../cpp-mastery-roadmap/13-stage13/null-object-pattern/README.md)
 - [nttp-class-type.cpp](nttp-class-type.cpp) — 演示 C++20 的类类型非类型模板参数与 `template<auto>`，把编译期值当作类型写进模板实参。
 - [observer-pattern-demo.cpp](observer-pattern-demo.cpp) — 演示 Subject-Observer：Logger 与 Counter 充当观察者。
   - 属于 [observer-pattern](../cpp-mastery-roadmap/09-stage9/observer-pattern/README.md)

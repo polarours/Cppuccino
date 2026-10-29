@@ -99,13 +99,16 @@
 12-stage12	doc	flyweight-pattern
 12-stage12	doc	visitor-pattern
 13-stage13	doc	memento-pattern
+13-stage13	doc	null-object-pattern
 13-stage13	doc	singleton-pattern
 13-stage13	doc	state-pattern
 14-stage14	doc	composite-pattern
+14-stage14	doc	interpreter-pattern
 14-stage14	doc	proxy-pattern
 15-stage15	doc	abstract-factory-pattern
 15-stage15	doc	iterator-pattern
 15-stage15	doc	template-method-pattern
+16-stage16	doc	double-dispatch
 16-stage16	doc	iterator-pattern
 16-stage16	doc	template-method-pattern
 17-stage17	doc	command-pattern
