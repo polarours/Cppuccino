@@ -5,6 +5,7 @@
 #include <string>
 #include <atomic>
 #include <chrono>
+#include <thread>
 #include <vector>
 #include <numeric>
 
@@ -87,6 +88,30 @@ void test_wait_for_all() {
 void test_thread_count() {
     thread_pool::ThreadPool pool(4);
     expect(pool.threadCount() == 4, "expected 4 threads");
+}
+
+// Regression: shutdown() took the worker list apart while threadCount()
+// was reading it, so both sides touched the same vector at the same
+// time. The thread sanitizer finds the race; what this test asks for is
+// that the pool stays readable while it is being shut down.
+void test_thread_count_during_shutdown() {
+    thread_pool::ThreadPool pool(4);
+
+    std::atomic<bool> stop{false};
+    std::atomic<std::size_t> seen{0};
+
+    std::thread reader([&]() {
+        while (!stop.load()) {
+            seen = pool.threadCount();
+        }
+    });
+
+    pool.shutdown();
+    stop = true;
+    reader.join();
+
+    expect(pool.threadCount() == 0, "expected no workers after the shutdown");
+    expect(seen.load() <= 4, "the pool never had more than four workers");
 }
 
 void test_shutdown() {
@@ -183,6 +208,9 @@ int main() {
 
         test_thread_count();
         std::cout << "  test_thread_count: PASS\n";
+
+        test_thread_count_during_shutdown();
+        std::cout << "  test_thread_count_during_shutdown: PASS\n";
 
         test_shutdown();
         std::cout << "  test_shutdown: PASS\n";

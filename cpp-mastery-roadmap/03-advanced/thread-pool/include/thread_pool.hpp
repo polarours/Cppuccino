@@ -38,7 +38,10 @@ private:
     std::vector<std::thread> workers_;
     std::queue<std::function<void()>> tasks_;
 
-    std::mutex mutex_;
+    // Mutable so that the queries can take the lock without casting it
+    // away. Everything the lock guards -- the queue, the active count,
+    // the shutdown flag and the worker list -- is read under it.
+    mutable std::mutex mutex_;
     std::condition_variable condition_;
     std::condition_variable finished_;
     bool shutdown_;

@@ -56,12 +56,22 @@ void ThreadPool::shutdown() {
     }
     condition_.notify_all();
 
-    for (auto& worker : workers_) {
+    // The worker list is taken under the lock, because threadCount()
+    // reads it and the two must not touch the same vector at the same
+    // time. The join happens with the list in a local variable and
+    // without the lock held: a worker that is still running needs the
+    // lock to finish.
+    std::vector<std::thread> workers;
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        workers.swap(workers_);
+    }
+
+    for (auto& worker : workers) {
         if (worker.joinable()) {
             worker.join();
         }
     }
-    workers_.clear();
 }
 
 void ThreadPool::waitForAll() {
@@ -72,16 +82,17 @@ void ThreadPool::waitForAll() {
 }
 
 std::size_t ThreadPool::threadCount() const {
+    std::unique_lock<std::mutex> lock(mutex_);
     return workers_.size();
 }
 
 std::size_t ThreadPool::pendingTasks() const {
-    std::unique_lock<std::mutex> lock(const_cast<std::mutex&>(mutex_));
+    std::unique_lock<std::mutex> lock(mutex_);
     return tasks_.size();
 }
 
 bool ThreadPool::isShutdown() const {
-    std::unique_lock<std::mutex> lock(const_cast<std::mutex&>(mutex_));
+    std::unique_lock<std::mutex> lock(mutex_);
     return shutdown_;
 }
 
