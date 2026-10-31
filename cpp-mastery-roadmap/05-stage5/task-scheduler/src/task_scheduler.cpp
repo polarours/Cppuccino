@@ -104,27 +104,36 @@ void TaskScheduler::workerLoop() {
                     hasTask = true;
                 }
             }
+
+            // The cancellation flag lives in the same map that cancel()
+            // writes to, so it has to be read under the same lock. Looking
+            // it up after the lock was released let cancel() change the
+            // map while it was being searched, which is a data race and
+            // can break the tree inside it.
+            if (hasTask) {
+                auto it = activeTasks_.find(task.id);
+                if (it == activeTasks_.end() || !it->second) {
+                    hasTask = false;
+                }
+            }
         }
 
         if (hasTask) {
-            auto it = activeTasks_.find(task.id);
-            if (it != activeTasks_.end() && it->second) {
-                try {
-                    task.func();
-                } catch (const std::exception& e) {
-                    std::cerr << "task " << task.id << " threw: "
-                              << e.what() << std::endl;
-                } catch (...) {
-                    std::cerr << "task " << task.id << " threw unknown exception"
-                              << std::endl;
-                }
-                completedCount_++;
+            try {
+                task.func();
+            } catch (const std::exception& e) {
+                std::cerr << "task " << task.id << " threw: "
+                          << e.what() << std::endl;
+            } catch (...) {
+                std::cerr << "task " << task.id << " threw unknown exception"
+                          << std::endl;
+            }
+            completedCount_++;
 
-                if (task.recurring) {
-                    std::lock_guard<std::mutex> lock(mutex_);
-                    task.executeAt = std::chrono::steady_clock::now() + task.interval;
-                    taskQueue_.push(task);
-                }
+            if (task.recurring) {
+                std::lock_guard<std::mutex> lock(mutex_);
+                task.executeAt = std::chrono::steady_clock::now() + task.interval;
+                taskQueue_.push(task);
             }
         }
     }

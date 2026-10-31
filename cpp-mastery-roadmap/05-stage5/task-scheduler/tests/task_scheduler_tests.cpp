@@ -8,6 +8,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <thread>
+#include <vector>
 
 namespace {
 
@@ -207,6 +208,36 @@ void test_cancel_repeating_task() {
     expect(ticks < 20, "cancelled repeating task must stop ticking");
 }
 
+// Regression: cancel() writes the cancellation flag while the workers are
+// taking tasks off the queue. The worker used to read that flag after it
+// had let go of the lock, so the two sides touched the same map at the
+// same time -- a data race that can break the tree inside the map. The
+// thread sanitizer finds the race; what this test asks for is that the
+// scheduler stays consistent while both sides are busy.
+void test_cancel_while_the_workers_are_busy() {
+    task_scheduler::TaskScheduler scheduler(4);
+
+    std::vector<task_scheduler::TaskId> ids;
+    for (int i = 0; i < 200; ++i) {
+        ids.push_back(scheduler.schedule([]() {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }));
+    }
+
+    scheduler.start();
+
+    for (task_scheduler::TaskId id : ids) {
+        scheduler.cancel(id);
+    }
+
+    scheduler.stop();
+
+    expect(scheduler.completedTasks() <= ids.size(),
+           "the completed count cannot be larger than the number of tasks");
+    expect(scheduler.pendingTasks() <= ids.size(),
+           "the queue cannot hold more tasks than were scheduled");
+}
+
 } // namespace
 
 int main() {
@@ -241,6 +272,9 @@ int main() {
 
         test_cancel_repeating_task();
         std::cout << "  test_cancel_repeating_task: PASS\n";
+
+        test_cancel_while_the_workers_are_busy();
+        std::cout << "  test_cancel_while_the_workers_are_busy: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "task_scheduler_tests failed: " << exception.what() << std::endl;
