@@ -798,4 +798,52 @@ void test_basic_observe() {
 | 陷阱文章 | 37 | 37 | 74 | 正文均为英文/中文 |
 | 示例代码 | - | - | 161 | 全部可编译、可运行、sanitizer 干净 |
 | 项目练习 | - | - | 151 | 全部构建通过、ctest 全绿 |
-| 测试函数 | - | - | 903 | 全部通过，且每一条都真的检查了东西 |
+| 测试函数 | - | - | 905 | 全部通过，且每一条都真的检查了东西 |
+
+## 第十阶段：两处真实数据竞争（2026-10-31）
+
+**怎么发现的**：跑示例的 sanitizer 回归时，TSan 报了一次
+`task-scheduler-error-handling.cpp` 的 data race。竞争窗口很窄，本地单跑
+15 次都不复现，只有在 6 个示例并行、机器被压满的时候才撞上。这种问题正是
+"跑一次是绿的"最容易放过的那一类。
+
+**第一处：`task-scheduler` 的 worker 在锁外读取消标记。**
+
+```cpp
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    // ... 把任务从队列里取出来
+}                                  // 锁在这里就放了
+
+if (hasTask) {
+    auto it = activeTasks_.find(task.id);   // 锁外读这张 map
+```
+
+`activeTasks_` 是一张 `std::map`，`cancel()` 持锁写它，worker 却不持锁读它。
+两个线程同时动同一棵红黑树，不是"读到旧值"那么简单，是能把树踩坏。主线程
+调一次 `cancel()`，worker 正好在这中间出队，就撞上了。
+
+**处理**：取消标记的查找挪回锁内，和 `cancel()` 用同一把锁。
+
+**第二处：`thread-pool` 的 `shutdown()` 和 `threadCount()` 抢同一个 vector。**
+
+`shutdown()` 在锁外 `workers_.clear()`，而 `threadCount()` 不加锁直接读
+`workers_.size()`。clear 会销毁 vector 里的 `std::thread` 对象，另一个线程
+同时在读同一个 vector 的内存。
+
+**处理**：`workers_` 的所有访问都放到锁下——`shutdown()` 在锁内把 vector 换
+到局部变量，**join 仍然在锁外**（正在跑的任务需要这把锁才能收尾，锁内 join
+会死锁）；`threadCount()` 读的时候加锁。顺带把 `mutex_` 改成 `mutable`，
+去掉两处 `const_cast<std::mutex&>`。
+
+**两个回归测试**：一个在 worker 忙着取任务时并发 `cancel()`，一个在关池的
+同时问线程数。普通编译下它们只会通过，**只有 TSan 才能看见竞争**，而 CI 里
+本来就有 TSan 这一关。两处修复都验证过"回退即复现"。
+
+**顺带确认不是问题的**：
+
+- `simple-db` 和 `mini-redis` 的存储类**根本没有锁**，但它们的 README 明确
+  把 TCP 服务端列为 Non-Goal，单线程使用，没有承诺也没有违背。
+- `bloom-filter` 同样没有锁，也没承诺线程安全。
+- `command-queue-v2` 和 `thread-pool` 的 worker 列表访问都在锁内。
+
