@@ -1,5 +1,6 @@
 #include "observer_debouncer.hpp"
 
+#include <atomic>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -89,6 +90,39 @@ void test_destroy_while_a_dispatch_is_on_its_way() {
     expect(count == 0, "expected the cancelled dispatch not to run");
 }
 
+// Regression: the handler was called while the dispatcher still held its
+// own mutex. A handler that asks for one more dispatch -- the natural
+// thing for a debouncer to do -- deadlocked on a mutex the thread
+// already had, and the dispatcher could not even be destroyed afterwards.
+void test_handler_may_ask_for_one_more_dispatch() {
+    // The dispatcher is on the heap and is not deleted on purpose. If the
+    // handler deadlocks, the destructor would wait for the very mutex the
+    // stuck thread is holding, and the test would hang instead of failing
+    // with a message.
+    auto* dispatcher = new observer_debouncer::DebouncedDispatcher(
+        std::chrono::milliseconds(20));
+
+    std::atomic<int> seen{0};
+    dispatcher->setHandler([&](const observer_debouncer::Event& event) {
+        seen++;
+        if (event.type == "first") {
+            dispatcher->emit({"second", "again"});
+        }
+    });
+
+    dispatcher->emit({"first", "once"});
+
+    // If the handler deadlocks, the second event never arrives.
+    for (int i = 0; i < 500 && seen.load() < 2; ++i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    expect(seen.load() == 2,
+           "expected both events to be delivered, got " +
+               std::to_string(seen.load()));
+
+    delete dispatcher;
+}
+
 } // namespace
 
 int main() {
@@ -102,6 +136,9 @@ int main() {
 
         test_destroy_while_a_dispatch_is_on_its_way();
         std::cout << "  test_destroy_while_a_dispatch_is_on_its_way: PASS\n";
+
+        test_handler_may_ask_for_one_more_dispatch();
+        std::cout << "  test_handler_may_ask_for_one_more_dispatch: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "observer_debouncer_tests failed: " << exception.what() << std::endl;

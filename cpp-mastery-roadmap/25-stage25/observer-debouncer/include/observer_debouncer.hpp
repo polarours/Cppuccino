@@ -64,15 +64,30 @@ public:
 
         timer->thread = std::thread([this, event, timer]() {
             std::this_thread::sleep_for(delay_);
-            std::lock_guard<std::mutex> lock(mutex_);
-            // A dispatch that was cancelled does not reach the handler.
-            if (!cancelled_) {
-                if (handler_) {
-                    handler_(event);
+            Handler handler;
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                // A dispatch that was cancelled does not reach the handler.
+                if (cancelled_) {
+                    timer->finished = true;
+                    return;
                 }
-                emitCount_++;
+                handler = handler_;
             }
-            timer->finished = true;
+
+            // The handler runs with the mutex released. A handler that
+            // emits another event -- the natural thing for a debouncer to
+            // do -- has to be able to take the lock again, and the mutex
+            // is not recursive.
+            if (handler) {
+                handler(event);
+            }
+
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                emitCount_++;
+                timer->finished = true;
+            }
         });
 
         std::lock_guard<std::mutex> lock(mutex_);
