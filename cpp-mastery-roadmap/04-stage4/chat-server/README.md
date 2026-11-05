@@ -71,7 +71,7 @@ ctest --test-dir build --output-on-failure
 ./build/chat_server_example
 
 # Terminal 2
-telnet localhost 8080
+telnet localhost 18081
 > Alice
 > Hello everyone!
 > /join general

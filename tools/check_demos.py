@@ -15,6 +15,7 @@ import argparse
 import json
 import os
 import resource
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -79,13 +80,30 @@ def one(project):
             # The output goes to a file, not into memory: a demo that prints
             # without end would fill the machine before the timeout fires.
             out_path = os.path.join(workdir, 'out.txt')
+            # The stdout is unbuffered, so that the output of a demo that
+            # is killed is on disk. std::cout writes into the C buffer, and
+            # a buffer that is killed is a buffer that is lost.
+            command = [demo]
+            if shutil.which('stdbuf'):
+                command = ['stdbuf', '-o0', demo]
             with open(out_path, 'wb') as out:
                 try:
-                    run = subprocess.run([demo], cwd=workdir, stdout=out,
+                    run = subprocess.run(command, cwd=workdir, stdout=out,
                                          stderr=subprocess.STDOUT,
                                          timeout=TIMEOUT, preexec_fn=limits)
                 except subprocess.TimeoutExpired:
-                    return name, 'skip', f'{os.path.basename(demo)} does not finish'
+                    # A demo that does not finish is a server, or a program
+                    # that waits for input. Either is fine, as long as it
+                    # said something first: a demo that hangs before it
+                    # printed anything never got off the ground.
+                    with open(out_path, encoding='utf-8',
+                              errors='replace') as handle:
+                        said = handle.read().strip()
+                    if said:
+                        return name, 'skip', (f'{os.path.basename(demo)}: it '
+                                              f'waits for input')
+                    return name, 'fail', (f'{os.path.basename(demo)} hung '
+                                          f'before it printed anything')
                 except MemoryError:
                     return name, 'fail', (f'{os.path.basename(demo)} ran out of '
                                           'memory')

@@ -1,13 +1,19 @@
 #include "web_framework.hpp"
 
 #include <chrono>
+#include <cstdlib>
 #include <future>
 #include <iostream>
 #include <string>
 #include <thread>
 
-int main() {
+int main(int argc, char** argv) {
     std::cout << "=== Web Framework Demo ===\n\n";
+
+    // The port can be given on the command line. 8080 is the port
+    // that everything on a machine wants, and three demos of this
+    // repository used to fight over it.
+    const int port = argc > 1 ? std::atoi(argv[1]) : 18083;
 
     web_framework::App app;
 
@@ -28,9 +34,9 @@ int main() {
     // It is handed over instead.
     std::promise<std::string> startup;
     std::future<std::string> failure = startup.get_future();
-    std::thread serverThread([&app, &startup]() {
+    std::thread serverThread([&app, &startup, port]() {
         try {
-            app.listen(8080);
+            app.listen(port);
             startup.set_value("");
         } catch (const std::exception& error) {
             startup.set_value(error.what());
@@ -49,9 +55,9 @@ int main() {
         }
     }
 
-    std::cout << "Starting server on port 8080...\n";
-    std::cout << "Try: curl http://localhost:8080/\n";
-    std::cout << "Try: curl http://localhost:8080/api/users\n\n";
+    std::cout << "Starting server on port " << port << "...\n";
+    std::cout << "Try: curl http://localhost:" << port << "/\n";
+    std::cout << "Try: curl http://localhost:" << port << "/api/users\n\n";
 
     std::cout << "Press Enter to stop server...\n";
     std::cin.get();
