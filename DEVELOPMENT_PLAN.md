@@ -798,7 +798,7 @@ void test_basic_observe() {
 | 陷阱文章 | 37 | 37 | 74 | 正文均为英文/中文 |
 | 示例代码 | - | - | 161 | 全部可编译、可运行、sanitizer 干净 |
 | 项目练习 | - | - | 151 | 全部构建通过、ctest 全绿 |
-| 测试函数 | - | - | 905 | 全部通过，且每一条都真的检查了东西 |
+| 测试函数 | - | - | 909 | 全部通过，且每一条都真的检查了东西 |
 
 ## 第十阶段：两处真实数据竞争（2026-10-31）
 
@@ -846,4 +846,109 @@ if (hasTask) {
   把 TCP 服务端列为 Non-Goal，单线程使用，没有承诺也没有违背。
 - `bloom-filter` 同样没有锁，也没承诺线程安全。
 - `command-queue-v2` 和 `thread-pool` 的 worker 列表访问都在锁内。
+
+## 第十一阶段：并发路径上的三处真缺陷（2026-11-02）
+
+**怎么找的**：不写新的功能，而是给现有的并发项目写 TSan 压测 —— 用几个线程
+同时调用公开 API，看编译器能不能找出"两个线程碰了同一块内存"。上一轮的经验是
+这类问题只有 TSan 看得见，而项目自带的测试往往只跑单线程。
+
+### 一、`event-loop` 根本没有锁
+
+`running_` 和 `stopped_` 是 `std::atomic<bool>`，而 `post()` 和 `stop()` 存在的
+意义就是**从别的线程调用** —— 但保护任务队列、定时器堆和取消标记的地方**一把锁
+都没有**。这是一处内部矛盾：标志位准备好了跨线程 signalling，它守护的数据却
+没有保护。
+
+- `post()` 与 `run()` 在同一个 `std::queue` 的 deque 上竞争（TSan 实证）。
+- `schedule()` / `cancelTimer()` 与 `processTimers()` 在同一张 `std::map` 上竞争。
+- `nextTimerId_++` 本身也不是原子的。
+
+**处理**：加一把 mutex。**回调在释放锁之后执行** —— 回调里完全可以再 `post()`
+或 `cancelTimer()`，持锁调用就会自己死在自己手里。
+
+### 二、`chat-server` 在持锁状态下调用用户回调
+
+`broadcast()` 拿着 `mutex_` 调用 `onMessage_`。用户回调最自然的用法就是
+"收到消息后做点什么"，比如把发言的人拉进房间 —— 而 `joinRoom()` 也要拿
+`mutex_`。`std::mutex` 不可重入，于是**整个服务器永久挂死**（实证：回调跑到
+一半就再也不动了）。
+
+同一处还有第二个缺陷：设置回调的 `setOnMessage()` 等三个函数**不加锁**，而
+服务器读它们时加锁 —— 服务器运行中换回调就是在改一个正在被调用的
+`std::function`。
+
+**处理**：回调一律在锁外调用（先把回调复制出来），设置器也纳入锁。
+
+### 三、`chat-server` 的用户名带着换行符
+
+客户端发来的是一行 `"Alice\n"`，服务端 `username = buffer` 就把换行符一起
+当成了名字。于是真客户端收到的是：
+
+```
+[System] Alice
+ has joined the chat
+Welcome, Alice
+! Commands: /join <room>, ...
+```
+
+**处理**：裁掉行尾的 `\n` 和 `\r`。
+
+### 四、`http-router` 的路由表一边写一边读
+
+路由器被每个请求线程读，而 `add()` 可以同时往同一 vector 里塞路由。
+
+**处理**：加一把 mutex；**handler 在锁外调用**（handler 里若要再注册一条
+路由，锁内调用同样会死锁）。
+
+### 顺带修掉的一个假测试
+
+`chat-server` 的 `test_message_callbacks` 设好回调，紧接着用
+`setOnMessage(nullptr)` 把它扔掉，然后**自己手动给计数器加一**，最后断言
+计数器等于 1 —— 断言的其实是自己，服务器有没有调用回调完全没验证。那个 `msg`
+变量甚至根本没被用过。现在它真的去调 `broadcast()`，并断言回调被调用了一次。
+
+**同时补上的三个回归测试**：`event-loop` 的"从别的线程投递工作"、
+`chat-server` 的"回调可以回调回服务器"和"加入/离开回调真的会触发"、
+`http-router` 的"一边加路由一边匹配"。
+
+### 核实过、确认**不是**问题的
+
+- `timer-wheel` 的 README 明确把"线程安全"列为 Non-Goal（"生产环境请自己
+  加锁"），属于**已声明的限制**。
+- `mini-redis` / `simple-db` / `bloom-filter` 的存储类没有锁，但 mini-redis 的
+  README 明确把 TCP 服务端列为 Non-Goal、单线程使用，没违背任何承诺。
+- `rate-limiter` 的三个限流器、`actor-mailbox` 的邮箱、`ring-buffer`、
+  `blocking-queue` 的共享状态访问全在锁内，TSan 压测干净。
+
+### 五、三个 server demo 抢同一个端口
+
+`chat-server`、`web-server`、`web-framework` 三个 demo 都绑 **8080**。而
+`check_demos.py` 默认**两个并行**跑 demo —— 抢输的那个绑定失败，被报成
+"the port is taken" 然后**跳过**。也就是说这三个 demo 里总有一个根本没被测，
+而检查照样是绿的。
+
+8080 还是开发机上最常被占的端口（本机就有个服务占着它），读者照着 README 跑
+demo 也会撞上。
+
+**处理**：
+
+- 三个 demo 各用各的端口：`18081` / `18082` / `18083`；
+- 端口都可以在命令行上给（`./demo 19000`），跟 `chat-server-api` 文章里
+  "端口可配置，因为 8080 经常已被占用" 的写法一致；
+- `tools/check_test_ports.py` 现在**也扫 demo 的入口**（`src/main.cpp`）。
+  规则是：这一行要提到 port / server / listen / bind，且不能是打印语句 ——
+  `std-print` 那个 demo 打印 "Server started on port 8080"，但它根本没开
+  socket。为此还把 `8080` 从排除表里拿掉了。
+
+### 六、demo 检查器把"卡死"和"等待输入"混为一谈
+
+一个不结束的 demo 可能是服务器，也可能是等输入的程序，两种都合法。但原来的
+检查器一律报 skip，**什么都没验证**。现在：demo 被杀掉时若**一个字符都没
+打印**，那就是卡在启动之前，算失败。
+
+要做到这一点，输出必须已经在磁盘上 —— `std::cout` 写进的是 C 缓冲，被杀的
+进程会连缓冲区一起丢掉。所以 demo 是用 `stdbuf -o0` 跑的。
+
+**结果**：三个 server demo 从"被静默跳过"变成**真的跑起来并通过**。
 
