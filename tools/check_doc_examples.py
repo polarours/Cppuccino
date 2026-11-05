@@ -39,6 +39,17 @@ WORKDIR = tempfile.mkdtemp(prefix='doc-ex-check-')
 KNOWN_FAILURES = os.path.join(REPO, 'tools', 'known_failures.tsv')
 
 
+def applies(entry, sanitizer):
+    """Does an expected failure belong to this run?
+
+    A program that reads freed memory usually does not crash: it reads
+    what used to be there. Only the address sanitizer sees it, so the
+    entry says which run the failure belongs to.
+    """
+    _, where = entry
+    return where == 'any' or sanitizer is not None
+
+
 def load_known_failures():
     """The documents whose example is expected to fail, and how."""
     expected = {}
@@ -50,10 +61,15 @@ def load_known_failures():
             if not line:
                 continue
             parts = line.split('\t')
-            if len(parts) != 2:
+            if len(parts) < 2:
                 print(f'  MALFORMED  {line}')
                 continue
-            expected[parts[0].strip()] = parts[1].strip()
+            # The third column says in which run the failure is expected.
+            where = parts[0].strip()
+            if len(parts) > 2:
+                expected[where] = (parts[1].strip(), parts[2].strip())
+            else:
+                expected[where] = (parts[1].strip(), 'any')
     return expected
 
 # API doc -> (project dir, extra source files relative to the project).
@@ -260,20 +276,34 @@ def main():
                             if f.endswith('.md'))
     failures = 0
     expected_failures = load_known_failures()
+    stale = []
     for p in paths:
         status, detail = check(p, sanitizer)
         rel = os.path.relpath(p, REPO)
         if status == 'ok':
             print(f"  {rel:<52} OK   {detail}")
+            if rel in expected_failures and applies(expected_failures[rel],
+                                                      sanitizer):
+                # The article was supposed to show a mistake that the
+                # program does not survive, and now it survives. The
+                # entry is a leftover, and the article no longer shows
+                # what it claims to show.
+                stale.append(rel)
         elif status == 'skip':
             print(f"  {rel:<52} SKIP {detail}")
-        elif rel in expected_failures:
+        elif rel in expected_failures and applies(expected_failures[rel],
+                                                    sanitizer):
             # The article shows a mistake that the program does not
             # survive, and that is the point of the article.
             print(f"  {rel:<52} EXPECTED FAIL {detail}")
         else:
             failures += 1
             print(f"  {rel:<52} FAIL {detail}")
+    if stale:
+        failures += len(stale)
+        print(f'\n{len(stale)} expected failure(s) that do not fail any more:')
+        for rel in stale:
+            print(f'  {rel}')
     print(f"\n{failures} failure(s)")
     return 1 if failures else 0
 
