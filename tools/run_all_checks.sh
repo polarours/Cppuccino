@@ -69,6 +69,9 @@ run "articles: every one points at something runnable" \
 run "projects: the tests call what they define and can report a failure" \
     python3 tools/check_tests.py
 
+run "projects: no callback is called while a lock is held" \
+    python3 tools/check_callback_under_lock.py
+
 run "projects: no two of them use the same port" \
     python3 tools/check_test_ports.py
 

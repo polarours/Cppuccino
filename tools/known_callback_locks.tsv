@@ -1,0 +1,21 @@
+# The callbacks that are called while a lock is held, and why.
+#
+# A callback that is called under the class's own mutex deadlocks as soon
+# as it calls back into the class. Most of them are called with the lock
+# released now, and the check in tools/check_callback_under_lock.py keeps
+# them that way.
+#
+# The entries below are the ones that are called under the lock on
+# purpose. A pool hands out an object and takes one back, and it does
+# that while it holds its lock, so that two callers never get the same
+# object. The factory, the deleter and the validator therefore run under
+# the lock, and they must not call back into the pool.
+#
+# The path, the member, and why it is the way it is.
+
+cpp-mastery-roadmap/06-stage6/connection-pool/include/connection_pool.hpp	creator_	the pool counts the connection it is about to hand out while it still holds the lock, so the factory runs under it
+cpp-mastery-roadmap/08-stage8/object-pool/include/object_pool.hpp	creator_	the pool hands out an object while it holds the lock, so the factory runs under it
+cpp-mastery-roadmap/08-stage8/object-pool/include/object_pool.hpp	deleter_	the pool empties itself while it holds the lock, so the deleter runs under it
+cpp-mastery-roadmap/16-stage16/object-pool-advanced/include/object_pool_advanced.hpp	creator_	the pool hands out an object while it holds the lock, so the factory runs under it
+cpp-mastery-roadmap/16-stage16/object-pool-advanced/include/object_pool_advanced.hpp	deleter_	the pool empties itself while it holds the lock, so the deleter runs under it
+cpp-mastery-roadmap/16-stage16/object-pool-advanced/include/object_pool_advanced.hpp	validator_	an object that the validator rejects is deleted while the pool still holds the lock

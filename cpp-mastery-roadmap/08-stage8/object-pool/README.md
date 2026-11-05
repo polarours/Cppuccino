@@ -15,6 +15,15 @@ A generic object pool for reusing expensive objects.
 - Implementing connection-specific features
 - Supporting complex eviction policies
 
+## Thread Safety
+
+The pool hands an object out and takes one back while it holds its lock,
+so that two callers never get the same object. The factory, the deleter
+and the validator therefore run under that lock: they must not call back
+into the pool, because the mutex is not recursive and the call would
+wait for itself.
+
+
 ## Features
 
 - Generic template-based pool
