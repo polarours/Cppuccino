@@ -1,8 +1,10 @@
 #include "http_router.hpp"
 
+#include <atomic>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <thread>
 
 namespace {
 
@@ -63,6 +65,49 @@ void test_literal_beats_nothing() {
 
 }  // namespace
 
+// Regression: the route table was read while another thread was adding
+// a route to it, so the two changed the same vector at the same time.
+// The thread sanitizer finds that; under an ordinary build this test
+// only proves that the router survives the traffic.
+void test_add_while_matching() {
+    http_router::Router router;
+    std::atomic<int> matched{0};
+
+    std::thread adder([&router]() {
+        for (int i = 0; i < 500; ++i) {
+            router.add("GET", "/route" + std::to_string(i), ok200);
+        }
+    });
+
+    std::thread matcher([&router, &matched]() {
+        for (int i = 0; i < 500; ++i) {
+            http_router::Request req{"GET", "/route" + std::to_string(i)};
+            http_router::Handler handler;
+            std::map<std::string, std::string> params;
+            if (router.match(req, handler, params)) {
+                matched++;
+            }
+            (void)router.routeCount();
+        }
+    });
+
+    adder.join();
+    matcher.join();
+
+    // How many of the requests matched depends on the schedule: the
+    // matcher may finish before the adder has added anything. What has
+    // to hold is that every route that was added is there afterwards.
+    expect(router.routeCount() == 500, "expected 500 routes");
+    for (int i = 0; i < 500; ++i) {
+        http_router::Request req{"GET", "/route" + std::to_string(i)};
+        http_router::Handler handler;
+        std::map<std::string, std::string> params;
+        expect(router.match(req, handler, params),
+               "expected route" + std::to_string(i) + " to be there");
+    }
+    expect(matched.load() <= 500, "a request cannot match twice");
+}
+
 int main() {
     try {
         test_exact_match();
@@ -70,6 +115,10 @@ int main() {
         test_no_match_404();
         test_segment_count_must_match();
         test_literal_beats_nothing();
+
+        test_add_while_matching();
+        std::cout << "  test_add_while_matching: PASS\n";
+
         std::cout << "All http_router tests passed\n";
         return 0;
     } catch (const std::exception& e) {

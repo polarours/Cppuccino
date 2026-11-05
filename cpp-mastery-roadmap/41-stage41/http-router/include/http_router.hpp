@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -30,7 +31,7 @@ public:
                std::map<std::string, std::string>& params) const;
     // Convenience: dispatch, or a 404 response when nothing matches.
     Response dispatch(const Request& req) const;
-    std::size_t routeCount() const { return routes_.size(); }
+    std::size_t routeCount() const;
 
 private:
     struct Route {
@@ -38,6 +39,15 @@ private:
         std::vector<std::string> segments;  // pattern split by '/'
         Handler handler;
     };
+
+    // A router is shared by every request thread, and a route may be
+    // added while another thread is matching one. The table is therefore
+    // read and written under this mutex.
+    //
+    // The handler itself is called with the mutex released: a handler
+    // that wants to register another route would deadlock on a mutex it
+    // already holds.
+    mutable std::mutex mutex_;
     std::vector<Route> routes_;
 };
 
