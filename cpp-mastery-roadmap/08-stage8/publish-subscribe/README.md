@@ -21,6 +21,13 @@ A simple publish-subscribe messaging system.
 - Multiple subscribers per topic
 - Subscribe/unsubscribe operations
 - Thread-safe operations
+
+## Thread Safety
+
+The subscribers that are there when a message is published are the ones
+that receive it. They are called with the lock released, so a subscriber
+may unsubscribe itself, subscribe to another topic or publish again
+without waiting for itself.
 - Message ordering
 
 ## Build

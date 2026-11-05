@@ -34,13 +34,24 @@ public:
     }
 
     void publish(const std::string& topic, const Message& message) {
-        std::lock_guard<std::mutex> lock(mutex_);
-
-        auto it = subscribers_.find(topic);
-        if (it != subscribers_.end()) {
-            for (const auto& sub : it->second) {
-                sub.callback(message);
+        // The subscribers that are there now are the ones that get this
+        // message. They are taken out under the lock and called with it
+        // released, because a subscriber that unsubscribes itself, or
+        // publishes again, would deadlock on a mutex it already holds.
+        std::vector<Callback> callbacks;
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            auto it = subscribers_.find(topic);
+            if (it != subscribers_.end()) {
+                callbacks.reserve(it->second.size());
+                for (const auto& sub : it->second) {
+                    callbacks.push_back(sub.callback);
+                }
             }
+        }
+
+        for (const auto& callback : callbacks) {
+            callback(message);
         }
     }
 

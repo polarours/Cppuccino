@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 #include <atomic>
+#include <chrono>
+#include <thread>
 
 namespace {
 
@@ -113,6 +115,47 @@ void test_message_order() {
     expect(received[2] == 3, "expected 3");
 }
 
+// Regression: the subscribers were called while the publisher still held
+// its own mutex. A subscriber that unsubscribes itself -- or publishes
+// again -- deadlocked on a mutex the thread already had.
+void test_subscriber_may_unsubscribe_itself() {
+    // The publisher is on the heap and is not deleted on purpose. If the
+    // subscriber deadlocks, the destructor would wait for the very mutex
+    // the stuck thread is holding, and the test would hang instead of
+    // failing with a message.
+    auto* pub = new pubsub::Publisher<std::string>();
+
+    std::atomic<int> seen{0};
+    int id = pub->subscribe("news", [&](const std::string&) {
+        seen++;
+        pub->unsubscribe(id);
+    });
+
+    // The publish runs on its own thread: if the subscriber deadlocks, the
+    // thread that published is stuck with it, and the test has to be able
+    // to say so instead of hanging.
+    std::atomic<bool> done{false};
+    std::thread publisher([&]() {
+        pub->publish("news", "hello");
+        done = true;
+    });
+
+    for (int i = 0; i < 500 && !done.load(); ++i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    if (!done.load()) {
+        publisher.detach();
+        expect(false, "the publish deadlocked inside the subscriber");
+    }
+    publisher.join();
+
+    expect(seen.load() == 1, "expected the subscriber to run once");
+    expect(pub->subscriberCount("news") == 0,
+           "expected the subscriber to have left");
+
+    delete pub;
+}
+
 } // namespace
 
 int main() {
@@ -138,6 +181,9 @@ int main() {
 
         test_message_order();
         std::cout << "  test_message_order: PASS\n";
+
+        test_subscriber_may_unsubscribe_itself();
+        std::cout << "  test_subscriber_may_unsubscribe_itself: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "pubsub_tests failed: " << exception.what() << std::endl;
