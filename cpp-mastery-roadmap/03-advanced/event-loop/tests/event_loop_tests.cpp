@@ -133,6 +133,48 @@ void test_has_pending_tasks() {
     expect(loop.hasPendingTasks(), "expected pending tasks after post");
 }
 
+// Regression: post(), schedule() and cancelTimer() are meant to be
+// called from another thread while run() is going. The queue, the timers
+// and the cancellation flags were not protected at all, so the two
+// threads changed the same containers at the same time. The thread
+// sanitizer finds that; under an ordinary build this test only proves
+// that the loop survives the traffic and runs everything it was given.
+void test_work_from_another_thread() {
+    event_loop::EventLoop loop;
+    std::atomic<int> ran{0};
+
+    std::thread runner([&]() {
+        loop.run();
+    });
+
+    for (int i = 0; i < 100; ++i) {
+        loop.post([&ran]() { ran++; });
+    }
+    for (int i = 0; i < 100; ++i) {
+        auto id = loop.schedule([&ran]() { ran++; },
+                                std::chrono::milliseconds(1));
+        loop.cancelTimer(id);
+    }
+    for (int i = 0; i < 100; ++i) {
+        (void)loop.hasPendingTasks();
+    }
+
+    // The loop takes one task per turn and sleeps a millisecond between
+    // turns, so the hundred tasks need a moment. A fixed sleep would be
+    // a race on a machine that is busy, and stop() drops whatever is
+    // still queued.
+    for (int i = 0; i < 500 && ran.load() < 100; ++i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    loop.stop();
+    runner.join();
+
+    // The hundred posted tasks all have to run. The timers were either
+    // cancelled or fired, so they only add to the count.
+    expect(ran.load() >= 100,
+           "expected the posted tasks to run, got " + std::to_string(ran.load()));
+}
+
 } // namespace
 
 int main() {
@@ -161,6 +203,9 @@ int main() {
 
         test_has_pending_tasks();
         std::cout << "  test_has_pending_tasks: PASS\n";
+
+        test_work_from_another_thread();
+        std::cout << "  test_work_from_another_thread: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "event_loop_tests failed: " << exception.what() << std::endl;

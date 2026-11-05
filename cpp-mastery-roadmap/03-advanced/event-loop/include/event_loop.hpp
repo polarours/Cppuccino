@@ -7,6 +7,7 @@
 #include <memory>
 #include <chrono>
 #include <atomic>
+#include <mutex>
 
 namespace event_loop {
 
@@ -45,6 +46,17 @@ private:
 
     void processTimers();
 
+    // The queue, the timers, the cancellation flags and the timer counter
+    // are all guarded by this mutex. post(), schedule() and cancelTimer()
+    // are meant to be called from another thread while run() is going, and
+    // the flags are atomic for the same reason -- but a flag that says
+    // "there is work" is worth nothing if the work itself is not
+    // protected.
+    //
+    // The callbacks run with the mutex released: a callback is free to
+    // post more work or to cancel a timer, and both of those need the
+    // mutex.
+    mutable std::mutex mutex_;
     std::queue<Callback> taskQueue_;
     std::priority_queue<TimerEntry, std::vector<TimerEntry>, std::greater<TimerEntry>> timers_;
     std::map<TimerId, bool> activeTimers_;

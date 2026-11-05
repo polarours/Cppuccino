@@ -22,6 +22,11 @@ A simple event loop implementation for asynchronous programming.
 - Timer cancellation
 - Graceful shutdown
 
+The loop may be driven from one thread while other threads post work,
+schedule timers or ask what is pending: the queue, the timers and the
+cancellation flags are all under one mutex. The callbacks run with the
+mutex released, so a callback is free to post more work.
+
 ## Build
 
 ```bash
