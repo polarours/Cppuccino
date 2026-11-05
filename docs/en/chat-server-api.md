@@ -84,6 +84,17 @@ observable over TCP rather than through the public API.
   running client.
 - Broadcasting and room operations are atomic with respect to other callers
   because each of them holds the lock for the whole operation.
+- The three callbacks are called with the lock released, so a callback is free
+  to call back into the server -- putting the sender in a room, for instance.
+  Calling one while the server held the lock would deadlock, because the
+  mutex is not recursive.
+- A callback does not run on a thread of its own: the message callback runs on
+  whichever thread called `broadcast()`, and the join and leave callbacks run
+  on the client thread. A callback that shares state with the caller has to
+  protect it itself.
+- The username is the first line a client sends, without its line ending. A
+  name that keeps the newline would put a line break in the middle of the join
+  message and of the welcome message.
 
 ## Complete Example
 

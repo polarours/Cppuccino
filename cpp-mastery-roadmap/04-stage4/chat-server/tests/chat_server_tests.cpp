@@ -12,6 +12,7 @@
 #include <chrono>
 #include <atomic>
 #include <vector>
+#include <future>
 
 namespace {
 
@@ -47,29 +48,122 @@ void test_room_management() {
 void test_message_callbacks() {
     chat_server::ChatServer server(17003);
     std::atomic<int> messageCount{0};
-    std::atomic<int> joinCount{0};
-    std::atomic<int> leaveCount{0};
 
     server.setOnMessage([&](const chat_server::Message&) {
         messageCount++;
     });
-    server.setOnUserJoin([&](const std::string&) {
-        joinCount++;
-    });
-    server.setOnUserLeave([&](const std::string&) {
-        leaveCount++;
-    });
 
-    // Simulate callbacks
     chat_server::Message msg{"Alice", "Hello", "", ""};
-    server.setOnMessage(nullptr);
-    messageCount++;
-    joinCount++;
-    leaveCount++;
+    server.broadcast(msg);
 
-    expect(messageCount == 1, "expected 1 message");
-    expect(joinCount == 1, "expected 1 join");
-    expect(leaveCount == 1, "expected 1 leave");
+    expect(messageCount == 1,
+           "expected the message callback to fire once, got " +
+               std::to_string(messageCount.load()));
+}
+
+// The callback belongs to the user, and the natural thing to do in it is
+// to answer the message by doing something to the server. The server used
+// to call the callback while it was holding its own mutex, so a callback
+// that called joinRoom() deadlocked the whole server.
+void test_callback_may_call_back_into_the_server() {
+    // The server is on the heap and is not deleted on purpose. If the
+    // callback deadlocks, the destructor would wait for the very mutex
+    // that the stuck thread is holding, and the test would hang instead
+    // of failing with a message.
+    auto* server = new chat_server::ChatServer(17015);
+    std::atomic<int> joined{0};
+
+    server->setOnMessage([&](const chat_server::Message&) {
+        server->joinRoom("Alice", "general");
+        joined++;
+    });
+
+    chat_server::Message msg{"System", "hello", "", ""};
+
+    // The broadcast has to finish. If it deadlocks, the wait times out and
+    // the test fails with a message instead of hanging the whole run.
+    std::promise<void> done;
+    std::future<void> finished = done.get_future();
+    std::thread worker([&]() {
+        server->broadcast(msg);
+        done.set_value();
+    });
+
+    bool returned = finished.wait_for(std::chrono::seconds(5)) ==
+                    std::future_status::ready;
+    if (!returned) {
+        worker.detach();
+        expect(false, "the broadcast deadlocked inside the message callback");
+    }
+    worker.join();
+
+    expect(joined.load() == 1, "expected the callback to run once");
+    expect(server->getRoomUsers("general").size() == 1,
+           "expected the callback to have put alice in the room");
+    delete server;
+}
+
+// The join and leave callbacks fire when a client connects and goes away.
+// The old test set them and then incremented the counters by hand, so it
+// never showed that the server calls them at all.
+void test_join_and_leave_callbacks() {
+    chat_server::ChatServer server(17016);
+    std::atomic<int> joinCount{0};
+    std::atomic<int> leaveCount{0};
+
+    server.setOnUserJoin([&](const std::string& user) {
+        if (user == "Alice") joinCount++;
+    });
+    server.setOnUserLeave([&](const std::string& user) {
+        if (user == "Alice") leaveCount++;
+    });
+
+    std::thread serverThread([&server]() {
+        server.start();
+    });
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    expect(fd >= 0, "expected socket creation to succeed");
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(17016);
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+
+    bool connected = connect(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == 0;
+    expect(connected, "expected client connect to succeed");
+    send(fd, "Alice\n", 6, MSG_NOSIGNAL);
+
+    // The server reads the name and calls the callback on its own thread.
+    // A fixed sleep would be a race on a machine that is busy, so the
+    // count is waited for instead.
+    for (int i = 0; i < 500 && joinCount.load() == 0; ++i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    int joins = joinCount.load();
+
+    // Closing the socket has to make the server notice the client is gone.
+    close(fd);
+    for (int i = 0; i < 500 && leaveCount.load() == 0; ++i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    int leaves = leaveCount.load();
+
+    // The server is stopped before the checks: an expect that throws while
+    // a thread is still joinable ends the program with "terminate called"
+    // instead of a message that says what went wrong.
+    server.stop();
+    if (serverThread.joinable()) {
+        serverThread.join();
+    }
+
+    expect(joins == 1,
+           "expected the join callback to fire once, got " +
+               std::to_string(joins));
+    expect(leaves == 1,
+           "expected the leave callback to fire once, got " +
+               std::to_string(leaves));
 }
 
 void test_online_users() {
@@ -276,6 +370,12 @@ int main() {
 
         test_message_callbacks();
         std::cout << "  test_message_callbacks: PASS\n";
+
+        test_callback_may_call_back_into_the_server();
+        std::cout << "  test_callback_may_call_back_into_the_server: PASS\n";
+
+        test_join_and_leave_callbacks();
+        std::cout << "  test_join_and_leave_callbacks: PASS\n";
 
         test_online_users();
         std::cout << "  test_online_users: PASS\n";

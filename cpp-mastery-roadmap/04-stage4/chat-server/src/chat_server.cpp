@@ -184,14 +184,25 @@ void ChatServer::handleClient(int client_fd) {
     }
     buffer[bytes] = '\0';
     username = buffer;
+    // The client sends its name on a line, so the line ending belongs to
+    // the protocol and not to the name. Keeping it put a newline in the
+    // middle of the join message and broke the welcome message in two.
+    while (!username.empty() &&
+           (username.back() == '\n' || username.back() == '\r')) {
+        username.pop_back();
+    }
 
+    std::function<void(const std::string&)> onJoin;
     {
         std::lock_guard<std::mutex> lock(mutex_);
         users_[username] = client_fd;
+        onJoin = onUserJoin_;
     }
 
-    if (onUserJoin_) {
-        onUserJoin_(username);
+    // The callback runs with the lock released, so that it is free to
+    // call back into the server.
+    if (onJoin) {
+        onJoin(username);
     }
 
     Message joinMsg;
@@ -226,8 +237,16 @@ void ChatServer::handleClient(int client_fd) {
     leaveMsg.content = username + " has left the chat";
     broadcast(leaveMsg);
 
-    if (onUserLeave_) {
-        onUserLeave_(username);
+    std::function<void(const std::string&)> onLeave;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        onLeave = onUserLeave_;
+    }
+
+    // The callback runs with the lock released, so that it is free to
+    // call back into the server.
+    if (onLeave) {
+        onLeave(username);
     }
 
     {
@@ -291,15 +310,25 @@ void ChatServer::processCommand(const std::string& user, const std::string& cmd)
 }
 
 void ChatServer::broadcast(const Message& msg) {
-    std::lock_guard<std::mutex> lock(mutex_);
-    std::string formatted = "[" + msg.sender + "] " + msg.content + "\n";
+    std::string formatted;
+    std::function<void(const Message&)> onMessage;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        formatted = "[" + msg.sender + "] " + msg.content + "\n";
 
-    for (const auto& [user, fd] : users_) {
-        send(fd, formatted.c_str(), formatted.size(), MSG_NOSIGNAL);
+        for (const auto& [user, fd] : users_) {
+            send(fd, formatted.c_str(), formatted.size(), MSG_NOSIGNAL);
+        }
+
+        onMessage = onMessage_;
     }
 
-    if (onMessage_) {
-        onMessage_(msg);
+    // The callback runs with the lock released. A callback that wants to
+    // answer the message by doing something to the server -- putting the
+    // sender in a room, for instance -- would deadlock on a mutex that is
+    // already held by this thread.
+    if (onMessage) {
+        onMessage(msg);
     }
 }
 
@@ -371,15 +400,21 @@ std::vector<std::string> ChatServer::getRoomUsers(const std::string& room) const
     return users;
 }
 
+// The callbacks are set under the lock, because the server reads them
+// under it too. Setting one while the server is running used to change
+// the std::function while another thread was calling it.
 void ChatServer::setOnMessage(std::function<void(const Message&)> callback) {
+    std::lock_guard<std::mutex> lock(mutex_);
     onMessage_ = std::move(callback);
 }
 
 void ChatServer::setOnUserJoin(std::function<void(const std::string&)> callback) {
+    std::lock_guard<std::mutex> lock(mutex_);
     onUserJoin_ = std::move(callback);
 }
 
 void ChatServer::setOnUserLeave(std::function<void(const std::string&)> callback) {
+    std::lock_guard<std::mutex> lock(mutex_);
     onUserLeave_ = std::move(callback);
 }
 
