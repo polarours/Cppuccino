@@ -10,6 +10,7 @@ Usage:
     python3 tools/build_all_projects.py [--jobs N] [--stage NAME] [--keep]
 """
 import argparse
+import json
 import os
 import shutil
 import subprocess
@@ -42,6 +43,22 @@ def find_projects(stage=None):
         if os.path.isfile(os.path.join(shell, 'CMakeLists.txt')):
             projects.append(shell)
     return sorted(projects)
+
+
+def registered_tests(build_dir):
+    """The tests the project registered.
+
+    ctest says "No tests were found" and still returns zero, so a project
+    that registers no test would pass without running a single one. The
+    tests are listed first, and an empty list is a failure.
+    """
+    listed = subprocess.run(['ctest', '--test-dir', build_dir,
+                              '--show-only=json-v1'],
+                             capture_output=True, text=True)
+    try:
+        return json.loads(listed.stdout).get('tests', [])
+    except ValueError:
+        return []
 
 
 def run(cmd, log_path, timeout=None):
@@ -87,6 +104,10 @@ def main():
                log_path) != 0:
             failures.append((name, 'build', log_path))
             print('    build FAILED')
+            continue
+        if not registered_tests(build_dir):
+            failures.append((name, 'no test registered', log_path))
+            print('    NO TEST REGISTERED')
             continue
         # A test that hangs has to fail the run rather than fill the job's
         # whole timeout.

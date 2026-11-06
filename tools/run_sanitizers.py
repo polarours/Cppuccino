@@ -13,6 +13,7 @@ Usage: python3 tools/run_sanitizers.py [--jobs N] [--stage NAME] [--tsan]
 """
 import argparse
 import glob
+import json
 import os
 import shutil
 import subprocess
@@ -61,6 +62,19 @@ def run_one(project, workdir, sanitizers=ASAN, markers=None):
         return False, 'configure failed'
     if call(['cmake', '--build', build, '-j', '2']) != 0:
         return False, 'build failed'
+
+    # ctest says "No tests were found" and still returns zero, so a
+    # project that registers no test would pass without running a single
+    # one. The tests are listed first, and an empty list is a failure.
+    listed = subprocess.run(['ctest', '--test-dir', build,
+                              '--show-only=json-v1'],
+                             capture_output=True, text=True)
+    try:
+        tests = json.loads(listed.stdout).get('tests', [])
+    except ValueError:
+        tests = []
+    if not tests:
+        return False, 'the project registers no test'
 
     result = subprocess.run(['ctest', '--test-dir', build, '--output-on-failure'],
                             capture_output=True, text=True, timeout=300)
