@@ -14,11 +14,14 @@ Usage: python3 tools/check_demos.py [--jobs N]
 import argparse
 import json
 import os
+import re
 import resource
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,6 +31,13 @@ ROADMAP = os.path.join(REPO, 'cpp-mastery-roadmap')
 # fails instead of taking the machine down with it.
 ADDRESS_SPACE = 1024 * 1024 * 1024
 TIMEOUT = 10
+
+# The port a demo says it is listening on. Four demos of this repository
+# printed that the server had started and never started it, and nobody
+# noticed, because nothing checked.
+PORT_IN_OUTPUT = re.compile(
+    r'(?:port\s+|listening on\s+|localhost:|127\.0\.0\.1:)(\d{4,5})',
+    re.IGNORECASE)
 
 
 def limits():
@@ -39,6 +49,15 @@ def projects():
         dirnames[:] = [d for d in dirnames if d != 'build']
         if 'CMakeLists.txt' in filenames:
             yield dirpath
+
+
+def listening(port, host='127.0.0.1', timeout=1.0):
+    """Is something listening on the port?"""
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except OSError:
+        return False
 
 
 def one(project):
@@ -88,10 +107,24 @@ def one(project):
                 command = ['stdbuf', '-o0', demo]
             with open(out_path, 'wb') as out:
                 try:
-                    run = subprocess.run(command, cwd=workdir, stdout=out,
-                                         stderr=subprocess.STDOUT,
-                                         timeout=TIMEOUT, preexec_fn=limits)
-                except subprocess.TimeoutExpired:
+                    # The demo gets a pipe as its input, and the pipe
+                    # stays open: a demo that reads from the input then
+                    # waits for a reader instead of seeing the end of the
+                    # file at once and leaving.
+                    process = subprocess.Popen(command, cwd=workdir,
+                                               stdout=out,
+                                               stderr=subprocess.STDOUT,
+                                               stdin=subprocess.PIPE,
+                                               preexec_fn=limits)
+                except MemoryError:
+                    return name, 'fail', (f'{os.path.basename(demo)} ran out of '
+                                          'memory')
+
+                deadline = time.time() + TIMEOUT
+                while process.poll() is None and time.time() < deadline:
+                    time.sleep(0.1)
+
+                if process.poll() is None:
                     # A demo that does not finish is a server, or a program
                     # that waits for input. Either is fine, as long as it
                     # said something first: a demo that hangs before it
@@ -99,14 +132,29 @@ def one(project):
                     with open(out_path, encoding='utf-8',
                               errors='replace') as handle:
                         said = handle.read().strip()
-                    if said:
-                        return name, 'skip', (f'{os.path.basename(demo)}: it '
-                                              f'waits for input')
-                    return name, 'fail', (f'{os.path.basename(demo)} hung '
-                                          f'before it printed anything')
-                except MemoryError:
-                    return name, 'fail', (f'{os.path.basename(demo)} ran out of '
-                                          'memory')
+                    if not said:
+                        process.kill()
+                        process.wait()
+                        return name, 'fail', (f'{os.path.basename(demo)} hung '
+                                              f'before it printed anything')
+
+                    # A demo that says it is listening has to be listening.
+                    match = PORT_IN_OUTPUT.search(said)
+                    if match:
+                        port = int(match.group(1))
+                        if not listening(port):
+                            process.kill()
+                            process.wait()
+                            return name, 'fail', (
+                                f'{os.path.basename(demo)} says it is '
+                                f'listening on port {port}, but nothing is '
+                                f'listening there')
+                    process.kill()
+                    process.wait()
+                    return name, 'skip', (f'{os.path.basename(demo)}: it '
+                                          f'waits for input')
+
+                run = subprocess.CompletedProcess(command, process.returncode)
             with open(out_path, encoding='utf-8', errors='replace') as handle:
                 lines = handle.read().splitlines()
             if run.returncode == 0:

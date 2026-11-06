@@ -24,7 +24,7 @@ tools/run_all_checks.sh --full   # 外加全部项目的构建与测试
 | `check_tests.py` | 定义了却从来没被调用的测试函数，什么都不检查的测试，或者报不出自己失败的测试 |
 | `check_callback_under_lock.py` | 回调在类还持有自己的锁时被调用，于是回调一旦回调回类里就死锁 |
 | `check_test_ports.py` | 两个项目在测试或 demo 里绑同一个端口，CI 并行跑时就会互相抢 |
-| `check_demos.py` | 一启动就崩掉的 demo，什么都没做的 demo，或者还没打印任何东西就卡住的 demo |
+| `check_demos.py` | 一启动就崩掉的 demo，什么都没做的 demo，还没打印任何东西就卡住的 demo，或者声称在监听某个端口而那里其实什么都没有的 demo |
 | `check_overview_parity.py` | 中英两份路线图索引列出的阶段或项目不一致 |
 | `build_all_projects.py` | 配置、构建或测试失败的项目 |
 | `run_sanitizers.py` | 读了已释放内存、越界写入或泄漏，却仍然跑通的测试 |
