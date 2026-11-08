@@ -32,6 +32,45 @@ MEMBER_RE = re.compile(r'std::function<[^;{]*?>\s+(\w+)\s*;')
 # A lock that is taken.
 LOCK_RE = re.compile(r'(?:lock_guard|unique_lock)\s*<[^>]*>\s*\w+\s*\(')
 
+# A function definition, with its parameters.
+DEFINITION_RE = re.compile(
+    r'(?:^|\n)[ \t]*(?:[A-Za-z_][\w:<>~\s*&]*?)\b(\w+)\s*\(([^;{}]*?)\)\s*'
+    r'(?:const\s*)?(?:noexcept\s*)?(?:override\s*)?(?:->[^;{]*)?\{',
+    re.M)
+
+
+def split_parameters(text):
+    """The parameters of a function, one by one.
+
+    The commas inside a template argument list or inside parentheses do
+    not separate them.
+    """
+    parts = []
+    depth = 0
+    current = ''
+    for char in text:
+        if char in '<([':
+            depth += 1
+        elif char in '>)]':
+            depth -= 1
+        if char == ',' and depth == 0:
+            parts.append(current)
+            current = ''
+        else:
+            current += char
+    if current.strip():
+        parts.append(current)
+    return [p.strip() for p in parts if p.strip()]
+
+
+def parameter_name(text):
+    """The name of a parameter and the type it has."""
+    text = text.split('=')[0].strip()
+    match = re.match(r'([\w:]+(?:\s*<[^>]*>)?(?:\s*\*|&)?)\s+(\w+)$', text)
+    if not match:
+        return None, None
+    return match.group(1).strip(), match.group(2)
+
 
 def block_end(text, start):
     """The position of the brace that closes the block opening at start."""
@@ -150,12 +189,42 @@ def main():
                 r')\s+(\w+)\s*;')
             for text in texts.values():
                 members |= set(alias_re.findall(text))
-        if not members:
+        # A callback can also arrive as a parameter, and a condition
+        # variable calls the predicate of its wait with the lock held.
+        # The guarded suspension of this repository had one: the predicate
+        # of waitFor() asked the object about itself and waited for the
+        # lock the thread already had.
+        #
+        # So the parameters are collected before the project is counted:
+        # a project whose only callback is a parameter has no member
+        # callback at all.
+        callbacks = set(members)
+        for path, text in texts.items():
+            for definition in DEFINITION_RE.finditer(text):
+                body_start = text.find('{', definition.end() - 1)
+                if body_start == -1:
+                    continue
+                depth, index = 1, body_start + 1
+                while index < len(text) and depth > 0:
+                    if text[index] == '{':
+                        depth += 1
+                    elif text[index] == '}':
+                        depth -= 1
+                    index += 1
+                body = text[body_start:index]
+                for parameter in split_parameters(definition.group(2)):
+                    kind, name = parameter_name(parameter)
+                    if kind is None:
+                        continue
+                    if kind in callbacks or kind.split('::')[-1] in aliases:
+                        callbacks.add(name)
+
+        if not callbacks:
             continue
         checked += 1
 
         for path, text in texts.items():
-            for member in sorted(members):
+            for member in sorted(callbacks):
                 for match in re.finditer(r'\b' + re.escape(member) + r'\s*\(',
                                         text):
                     for start, end, body in enclosing_blocks(text,
@@ -180,7 +249,7 @@ def main():
     stale = sorted(excused - used)
 
     print('== callbacks under a lock ==')
-    print(f'  {checked} project(s) with a callback member')
+    print(f'  {checked} project(s) with a callback')
     print(f'  {len(excused)} callback(s) excused on purpose')
     if stale:
         print(f'\n{len(stale)} excused callback(s) that are not under a lock '

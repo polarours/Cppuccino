@@ -19,3 +19,4 @@ cpp-mastery-roadmap/08-stage8/object-pool/include/object_pool.hpp	deleter_	the p
 cpp-mastery-roadmap/16-stage16/object-pool-advanced/include/object_pool_advanced.hpp	creator_	the pool hands out an object while it holds the lock, so the factory runs under it
 cpp-mastery-roadmap/16-stage16/object-pool-advanced/include/object_pool_advanced.hpp	deleter_	the pool empties itself while it holds the lock, so the deleter runs under it
 cpp-mastery-roadmap/16-stage16/object-pool-advanced/include/object_pool_advanced.hpp	validator_	an object that the validator rejects is deleted while the pool still holds the lock
+cpp-mastery-roadmap/32-stage32/guarded-suspension/include/guarded_suspension.hpp	pred	a condition variable calls the predicate of its wait with the lock held, so the state the predicate looks at is atomic and can be read without the lock
