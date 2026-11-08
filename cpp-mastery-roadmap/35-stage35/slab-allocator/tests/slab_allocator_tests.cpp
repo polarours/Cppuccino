@@ -1,6 +1,9 @@
 #include "slab_allocator.hpp"
 
+#include <cstring>
 #include <iostream>
+#include <limits>
+#include <new>
 #include <stdexcept>
 #include <string>
 
@@ -51,6 +54,38 @@ void test_reset() {
     expect(p != nullptr, "expected alloc after reset");
 }
 
+// Regression: a block that is bigger than the slab was handed a pointer
+// into a buffer of the size of the slab, so writing the block wrote past
+// the end of it. The address sanitizer found it.
+void test_block_bigger_than_the_slab() {
+    slab_allocator::SlabAllocator alloc(1024);
+
+    void* p = alloc.allocate(4096);
+    expect(p != nullptr, "expected a block");
+
+    // The block has to be big enough for what was asked for. The
+    // sanitizer checks that the memory behind it is really there.
+    std::memset(p, 0xAB, 4096);
+    const auto* bytes = static_cast<const unsigned char*>(p);
+    expect(bytes[0] == 0xAB, "expected the first byte to be written");
+    expect(bytes[4095] == 0xAB, "expected the last byte to be written");
+}
+
+// Regression: the loop that rounds a size up to a power of two shifted
+// past the highest bit for a size that cannot be served, left zero
+// behind and never ended.
+void test_a_size_that_cannot_be_served() {
+    slab_allocator::SlabAllocator alloc(1024);
+
+    bool threw = false;
+    try {
+        alloc.allocate(std::numeric_limits<std::size_t>::max());
+    } catch (const std::bad_alloc&) {
+        threw = true;
+    }
+    expect(threw, "expected an allocation that cannot be served to throw");
+}
+
 } // namespace
 
 int main() {
@@ -67,6 +102,12 @@ int main() {
 
         test_reset();
         std::cout << "  test_reset: PASS\n";
+
+        test_block_bigger_than_the_slab();
+        std::cout << "  test_block_bigger_than_the_slab: PASS\n";
+
+        test_a_size_that_cannot_be_served();
+        std::cout << "  test_a_size_that_cannot_be_served: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "slab_allocator_tests failed: " << exception.what() << std::endl;

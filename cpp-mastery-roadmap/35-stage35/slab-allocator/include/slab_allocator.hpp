@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include <limits>
+#include <new>
 
 namespace slab_allocator {
 
@@ -22,6 +24,15 @@ public:
             void* ptr = freeList.back();
             freeList.pop_back();
             return ptr;
+        }
+
+        // A slab has to be at least as big as the block it holds. A
+        // block that does not fit in a slab of the usual size gets a slab
+        // of its own: handing out a pointer into a buffer that is too
+        // small means that the caller writes past the end of it.
+        if (blockSize > slabSize_) {
+            slabs_.push_back(std::vector<std::byte>(blockSize));
+            return slabs_.back().data();
         }
 
         if (slabOffset_ + blockSize > slabSize_) {
@@ -47,7 +58,14 @@ public:
 private:
     static std::size_t nextPowerOf2(std::size_t n) {
         std::size_t power = 1;
-        while (power < n) power <<= 1;
+        while (power < n) {
+            // Shifting past the highest bit would leave zero behind, and
+            // the loop would never end.
+            if (power > std::numeric_limits<std::size_t>::max() / 2) {
+                throw std::bad_alloc();
+            }
+            power <<= 1;
+        }
         return power;
     }
 
