@@ -13,7 +13,10 @@ int main() {
         obj.set(42);
     });
 
-    bool result = obj.waitFor([]() { return true; });
+    // The predicate asks the object about itself. That is the natural
+    // thing to write, and it works: the state of the object is atomic, so
+    // the predicate does not wait for the lock the waiting thread holds.
+    bool result = obj.waitFor([&obj]() { return obj.isReady(); });
     std::cout << "Wait result: " << std::boolalpha << result << "\n";
     std::cout << "Value: " << obj.get() << "\n";
 
