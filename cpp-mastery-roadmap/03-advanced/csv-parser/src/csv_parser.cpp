@@ -60,6 +60,13 @@ std::vector<std::string> parseRow(const std::string& text, std::size_t& pos) {
             ++pos;
         }
     }
+    if (inQuotes) {
+        // The input ended in the middle of a quoted field. The header of
+        // this file promises that malformed input is reported, and a
+        // caller that gets a field back cannot tell that the input was
+        // broken.
+        throw std::runtime_error("unterminated quote in the CSV input");
+    }
     row.push_back(field);  // last row without trailing newline
     return row;
 }

@@ -64,18 +64,21 @@ void test_format_roundtrip() {
 }
 
 void test_unterminated_quote_throws() {
+    // The header of the parser promises that malformed input is
+    // reported. The test used to throw the exception away and accept
+    // either answer, so it never checked anything.
     bool threw = false;
     try {
         csv_parser::parse("a\n\"unterminated");
-    } catch (const std::exception&) {
+    } catch (const std::runtime_error&) {
         threw = true;
     }
-    // Accept either strict throw or graceful fallback; document behavior.
-    (void)threw;
-    // Current implementation: quote opened but EOF -> field returned as-is.
-    // The contract is "no crash"; assert parse returns without UB.
-    auto t = csv_parser::parse("a\n\"unterminated");
-    expect(t.rows.size() == 1, "graceful handling of EOF in quote");
+    expect(threw, "expected an unterminated quote to be reported");
+
+    // A quoted field that is closed before the end of the line is fine.
+    auto ok = csv_parser::parse("a\n\"closed\"");
+    expect(ok.rows.size() == 1, "expected the closed quote to parse");
+    expect(ok.rows[0][0] == "closed", "expected the quoted field");
 }
 
 }  // namespace
