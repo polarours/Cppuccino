@@ -52,6 +52,19 @@ void test_block_size() {
     expect(pool.totalBlocks() == 10, "expected 10");
 }
 
+// Regression: a pool of blocks of no bytes took the address of the first
+// element of an empty pool, which is undefined. The undefined behaviour
+// sanitizer found it.
+void test_a_block_of_no_bytes_is_refused() {
+    bool threw = false;
+    try {
+        memory_pool::MemoryPool pool(0, 10);
+    } catch (const std::invalid_argument&) {
+        threw = true;
+    }
+    expect(threw, "expected a pool of empty blocks to be refused");
+}
+
 } // namespace
 
 int main() {
@@ -68,6 +81,9 @@ int main() {
 
         test_block_size();
         std::cout << "  test_block_size: PASS\n";
+
+        test_a_block_of_no_bytes_is_refused();
+        std::cout << "  test_a_block_of_no_bytes_is_refused: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "memory_pool_tests failed: " << exception.what() << std::endl;

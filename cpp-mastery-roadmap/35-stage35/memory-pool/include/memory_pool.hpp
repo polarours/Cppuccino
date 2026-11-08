@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstddef>
+#include <limits>
+#include <stdexcept>
 #include <vector>
 #include <iostream>
 
@@ -10,6 +12,17 @@ class MemoryPool {
 public:
     explicit MemoryPool(std::size_t blockSize, std::size_t blockCount)
         : blockSize_(blockSize) {
+        if (blockSize == 0) {
+            // A block of no bytes is not a block, and the address of the
+            // first element of an empty pool is not an address at all.
+            throw std::invalid_argument("a pool needs blocks that are not "
+                                        "empty");
+        }
+        if (blockCount > std::numeric_limits<std::size_t>::max() / blockSize) {
+            // The multiplication below would wrap around and the pool
+            // would be smaller than it says it is.
+            throw std::bad_alloc();
+        }
         memory_.resize(blockCount * blockSize);
         for (std::size_t i = 0; i < blockCount; ++i) {
             freeList_.push_back(&memory_[i * blockSize]);
