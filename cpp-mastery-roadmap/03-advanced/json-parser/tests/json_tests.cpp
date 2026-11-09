@@ -162,6 +162,48 @@ void test_parse_error() {
     expect(threw, "expected trailing comma error");
 }
 
+// Regression: the serializer wrote the characters of a string as they
+// were, so a string with a quote or a newline in it came out as JSON
+// that could not be parsed again.
+void test_stringify_escapes_the_string() {
+    const std::string original = "say \"hi\"\n\tand \u0001 more";
+    json::JsonValue value(original);
+
+    const std::string serialized = value.stringify();
+    auto reparsed = json::JsonValue::parse(serialized);
+
+    expect(reparsed.asString() == original,
+           "expected the string to survive the roundtrip, got [" +
+               reparsed.asString() + "]");
+}
+
+// Regression: a number that does not fit in an int was cast to one
+// anyway, which is undefined. The undefined behaviour sanitizer found
+// it on 1e10.
+void test_stringify_a_number_that_is_too_big_for_an_int() {
+    auto value = json::JsonValue::parse("1e10");
+
+    // A whole number is written without a decimal point.
+    expect(value.stringify() == "10000000000",
+           "expected 10000000000, got " + value.stringify());
+
+    // And it still parses back to the same number.
+    auto reparsed = json::JsonValue::parse(value.stringify());
+    expect(reparsed.asNumber() == 1e10, "expected 1e10");
+}
+
+// Regression: the input ended in the middle of a string, and the half
+// string was handed back as if the document were complete.
+void test_unterminated_string_throws() {
+    bool threw = false;
+    try {
+        json::JsonValue::parse("\"unterminated");
+    } catch (const std::runtime_error&) {
+        threw = true;
+    }
+    expect(threw, "expected an unterminated string to be reported");
+}
+
 } // namespace
 
 int main() {
@@ -214,6 +256,15 @@ int main() {
 
         test_parse_error();
         std::cout << "  test_parse_error: PASS\n";
+
+        test_stringify_escapes_the_string();
+        std::cout << "  test_stringify_escapes_the_string: PASS\n";
+
+        test_stringify_a_number_that_is_too_big_for_an_int();
+        std::cout << "  test_stringify_a_number_that_is_too_big_for_an_int: PASS\n";
+
+        test_unterminated_string_throws();
+        std::cout << "  test_unterminated_string_throws: PASS\n";
     } catch (const std::exception& exception) {
         std::cerr << "json_parser_tests failed: " << exception.what() << std::endl;
         return 1;

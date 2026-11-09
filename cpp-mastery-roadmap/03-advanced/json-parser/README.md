@@ -23,6 +23,11 @@ A simple JSON parser and serializer in modern C++.
 - Pretty-print with indentation
 - Escape sequence handling in strings
 
+The serializer escapes the characters that need it as well, so a value
+that was parsed can be written out and parsed again. A whole number is
+written without a decimal point, as long as the double holds it
+exactly.
+
 ## Build
 
 ```bash

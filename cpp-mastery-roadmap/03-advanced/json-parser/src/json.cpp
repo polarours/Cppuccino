@@ -3,8 +3,46 @@
 #include <sstream>
 #include <stdexcept>
 #include <cmath>
+#include <cstdint>
 
 namespace json {
+
+namespace {
+
+// The characters a JSON string has to escape, and the ones that have no
+// literal form at all.
+std::string escapeString(const std::string& value) {
+    static const char* kHex = "0123456789abcdef";
+    std::string out;
+    for (char c : value) {
+        switch (c) {
+            case '"': out += "\\\""; break;
+            case '\\': out += "\\\\"; break;
+            case '\b': out += "\\b"; break;
+            case '\f': out += "\\f"; break;
+            case '\n': out += "\\n"; break;
+            case '\r': out += "\\r"; break;
+            case '\t': out += "\\t"; break;
+            default:
+                if (static_cast<unsigned char>(c) < 0x20) {
+                    // A control character has no literal form in a JSON
+                    // string, so it is written as a code point.
+                    out += "\\u00";
+                    out += kHex[(static_cast<unsigned char>(c) >> 4) & 0xF];
+                    out += kHex[static_cast<unsigned char>(c) & 0xF];
+                } else {
+                    out += c;
+                }
+        }
+    }
+    return out;
+}
+
+// The largest integer a double holds exactly. Above it a double cannot
+// tell one whole number from the next, so it is written as a double.
+constexpr double kExactIntegerLimit = 9007199254740992.0;  // 2^53
+
+}  // namespace
 
 // --- JsonValue ---
 
@@ -94,15 +132,20 @@ std::string JsonValue::stringify(int indent) const {
             oss << (boolValue_ ? "true" : "false");
             break;
         case Type::number: {
-            if (numberValue_ == static_cast<int>(numberValue_)) {
-                oss << static_cast<int>(numberValue_);
+            // A whole number is written without a decimal point, as long
+            // as the double can tell it apart from its neighbour.
+            // Casting a big double to an int is undefined.
+            if (std::isfinite(numberValue_) &&
+                numberValue_ == std::trunc(numberValue_) &&
+                std::fabs(numberValue_) < kExactIntegerLimit) {
+                oss << static_cast<std::int64_t>(numberValue_);
             } else {
                 oss << numberValue_;
             }
             break;
         }
         case Type::string:
-            oss << "\"" << stringValue_ << "\"";
+            oss << "\"" << escapeString(stringValue_) << "\"";
             break;
         case Type::array:
             oss << "[";
@@ -300,10 +343,14 @@ bool Parser::match(const std::string& expected) {
 std::string Parser::parseStringContent() {
     if (!match('"')) throw std::runtime_error("Expected '\"'");
     std::string result;
+    bool closed = false;
 
     while (position_ < input_->size()) {
         char c = advance();
-        if (c == '"') break;
+        if (c == '"') {
+            closed = true;
+            break;
+        }
         if (c == '\\') {
             c = advance();
             switch (c) {
@@ -336,6 +383,13 @@ std::string Parser::parseStringContent() {
         } else {
             result += c;
         }
+    }
+
+    if (!closed) {
+        // The input ended in the middle of a string. Handing the half
+        // string back would make a truncated document look like a
+        // complete one.
+        throw std::runtime_error("Unterminated string in the JSON input");
     }
 
     return result;
