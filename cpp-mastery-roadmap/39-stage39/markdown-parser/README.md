@@ -7,6 +7,9 @@ code blocks, inline links and formatting.
 
 - Parse line-oriented text formats with a state machine (in-code fence state)
 - Keep code fences verbatim so inner syntax is not reinterpreted
+
+The content of a fenced code block is kept as it was written, and the
+language that was written after the opening fence is kept next to it.
 - Extract inline links with a small scanner
 - Strip inline markers without touching surrounding text
 

@@ -52,6 +52,27 @@ void test_paragraph_merge() {
     expect(blocks[0].text == "line one line two", "merged text");
 }
 
+// Regression: a fenced code block was pushed out with an empty text,
+// so the code itself was thrown away and only the language survived.
+void test_code_block_keeps_its_content() {
+    auto blocks = markdown_parser::parseBlocks(
+        "```cpp\nint x = 1;\nreturn x;\n```\n");
+    expect(blocks.size() == 1, "expected 1 block");
+    expect(blocks[0].type == markdown_parser::BlockType::CodeBlock, "code block");
+    expect(blocks[0].text == "int x = 1;\nreturn x;",
+           "expected the code to be there, got [" + blocks[0].text + "]");
+    expect(blocks[0].lang == "cpp", "expected the language, got [" +
+                                        blocks[0].lang + "]");
+}
+
+// The fence that is never closed is handled the same way.
+void test_unclosed_code_block_keeps_its_content() {
+    auto blocks = markdown_parser::parseBlocks("```\nint x = 1;\n");
+    expect(blocks.size() == 1, "expected 1 block");
+    expect(blocks[0].text == "int x = 1;",
+           "expected the code to be there, got [" + blocks[0].text + "]");
+}
+
 }  // namespace
 
 int main() {
@@ -59,6 +80,8 @@ int main() {
         test_headings();
         test_list_items();
         test_code_fence_not_parsed();
+        test_code_block_keeps_its_content();
+        test_unclosed_code_block_keeps_its_content();
         test_links();
         test_strip_inline();
         test_paragraph_merge();

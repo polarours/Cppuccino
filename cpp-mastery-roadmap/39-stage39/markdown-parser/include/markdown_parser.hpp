@@ -9,7 +9,7 @@ enum class BlockType { Heading, ListItem, Paragraph, CodeBlock, Quote };
 
 struct Block {
     BlockType type;
-    int level;          // heading level 1-6, list indent depth for items
+    int level;          // heading level 1-6; 0 for the other blocks
     std::string text;   // stripped content
     std::string lang;   // code fence language ("" if none)
 };

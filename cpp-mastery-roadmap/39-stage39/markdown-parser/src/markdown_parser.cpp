@@ -36,7 +36,9 @@ std::vector<Block> parseBlocks(const std::string& source) {
     while (std::getline(in, line)) {
         if (startsWith(line, "```")) {
             if (inCode) {
-                blocks.push_back({BlockType::CodeBlock, 0, "", para.lang});
+                // The text of the block is the code itself; the language
+                // is what was written after the opening fence.
+                blocks.push_back({BlockType::CodeBlock, 0, para.text, para.lang});
                 para = {BlockType::Paragraph, 0, "", ""};
                 inCode = false;
             } else {
