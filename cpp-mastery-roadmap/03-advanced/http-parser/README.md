@@ -19,6 +19,11 @@ A simple HTTP request/response parser.
 
 - Parse HTTP requests (GET, POST, PUT, DELETE, HEAD)
 - Parse request headers and body
+
+The body is taken from the raw text after the empty line that ends the
+head, so it keeps its line endings and its last newline: a request that
+says how long its body is comes back with exactly that many bytes.
+Parsing a request a second time starts from scratch.
 - Build HTTP responses with status codes
 - Case-insensitive header lookup
 - Response serialization

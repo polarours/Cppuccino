@@ -26,7 +26,29 @@ std::string toLower(const std::string& str) {
 // --- Request ---
 
 bool Request::parse(const std::string& raw) {
-    std::istringstream stream(raw);
+    // A request that is parsed a second time must not keep anything from
+    // the first one.
+    headers.clear();
+    body.clear();
+
+    // The head and the body are separated by an empty line. The body is
+    // taken from the raw text and not read line by line, so that it
+    // keeps its line endings and its last newline: a server that reads
+    // the body by its content length has to get exactly as many bytes
+    // as the header says.
+    std::string head = raw;
+    std::size_t bodyStart = std::string::npos;
+    const std::size_t crlf = raw.find("\r\n\r\n");
+    const std::size_t lf = raw.find("\n\n");
+    if (crlf != std::string::npos && (lf == std::string::npos || crlf <= lf)) {
+        head = raw.substr(0, crlf);
+        bodyStart = crlf + 4;
+    } else if (lf != std::string::npos) {
+        head = raw.substr(0, lf);
+        bodyStart = lf + 2;
+    }
+
+    std::istringstream stream(head);
     std::string line;
 
     // Parse request line
@@ -54,11 +76,8 @@ bool Request::parse(const std::string& raw) {
         headers[toLower(name)] = value;
     }
 
-    // Parse body
-    std::string bodyLine;
-    while (std::getline(stream, bodyLine)) {
-        if (!body.empty()) body += "\n";
-        body += bodyLine;
+    if (bodyStart != std::string::npos) {
+        body = raw.substr(bodyStart);
     }
 
     return true;

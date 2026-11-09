@@ -141,6 +141,31 @@ void test_response_internal_error() {
     expect(serialized.find("500 Internal Server Error") != std::string::npos, "expected 500");
 }
 
+// Regression: the body was read line by line and put back together, so
+// it lost its last newline. A request that says how long its body is
+// has to come back with exactly that many bytes, or a server that reads
+// the body waits for a byte that never comes.
+void test_body_keeps_its_last_newline() {
+    http::Request req;
+    req.parse("POST /x HTTP/1.1\r\nContent-Length: 6\r\n\r\nhello\n");
+
+    expect(req.body.size() == 6, "expected 6 bytes, got " +
+                                       std::to_string(req.body.size()));
+    expect(req.body == "hello\n", "expected the newline to be there");
+}
+
+// Regression: a request that was parsed twice kept the headers and the
+// body of the first one.
+void test_parsing_twice_starts_from_scratch() {
+    http::Request req;
+    req.parse("GET /a HTTP/1.1\r\nX-First: 1\r\n\r\nfirst body");
+    req.parse("GET /b HTTP/1.1\r\n\r\n");
+
+    expect(req.getHeader("X-First").empty(), "expected the old header to be gone");
+    expect(req.body.empty(), "expected the old body to be gone");
+    expect(req.path == "/b", "expected the new path");
+}
+
 } // namespace
 
 int main() {
@@ -181,6 +206,12 @@ int main() {
 
         test_response_internal_error();
         std::cout << "  test_response_internal_error: PASS\n";
+
+        test_body_keeps_its_last_newline();
+        std::cout << "  test_body_keeps_its_last_newline: PASS\n";
+
+        test_parsing_twice_starts_from_scratch();
+        std::cout << "  test_parsing_twice_starts_from_scratch: PASS\n";
     } catch (const std::exception& exception) {
         std::cerr << "http_parser_tests failed: " << exception.what() << std::endl;
         return 1;
