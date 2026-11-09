@@ -3,6 +3,9 @@
 Line-based diff using the classic longest-common-subsequence algorithm,
 with rendering and a similarity score.
 
+A blank line is a line: splitting a document keeps the empty lines, so
+that the two documents that are compared line up the same way.
+
 ## Learning Goals
 
 - LCS dynamic programming (bottom-up backtrack to an edit script)

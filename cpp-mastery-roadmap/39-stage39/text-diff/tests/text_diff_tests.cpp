@@ -62,6 +62,33 @@ void test_similarity_partial() {
     expect(s > 0.59 && s < 0.61, "similarity == 0.6 (3 equal of 5 hunks)");
 }
 
+// Regression: a blank line in the middle of a document was dropped, so
+// the lines of the two documents that were compared did not line up.
+void test_blank_lines_are_kept() {
+    auto lines = text_diff::splitLines("a\n\nb\n");
+    expect(lines.size() == 3, "expected 3 lines, got " +
+                                  std::to_string(lines.size()));
+    expect(lines[0] == "a", "expected a");
+    expect(lines[1].empty(), "expected the blank line to be there");
+    expect(lines[2] == "b", "expected b");
+}
+
+// The two documents have to be lined up the same way, blank lines and
+// all.
+void test_a_blank_line_is_a_difference() {
+    auto a = text_diff::splitLines("a\nb\nc\n");
+    auto b = text_diff::splitLines("a\n\nb\nc\n");
+    auto hunks = text_diff::diffLines(a, b);
+
+    bool sawInsert = false;
+    for (const auto& hunk : hunks) {
+        if (hunk.op == text_diff::Op::Insert && hunk.line.empty()) {
+            sawInsert = true;
+        }
+    }
+    expect(sawInsert, "expected the blank line to show up as an insertion");
+}
+
 }  // namespace
 
 int main() {
@@ -72,6 +99,8 @@ int main() {
         test_empty_sides();
         test_render();
         test_similarity_partial();
+        test_blank_lines_are_kept();
+        test_a_blank_line_is_a_difference();
         std::cout << "All text_diff tests passed\n";
         return 0;
     } catch (const std::exception& e) {

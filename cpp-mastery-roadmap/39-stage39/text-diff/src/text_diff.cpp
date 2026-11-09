@@ -9,12 +9,18 @@ std::vector<std::string> splitLines(const std::string& text) {
     std::string cur;
     for (char c : text) {
         if (c == '\n') {
-            if (!cur.empty() || out.empty()) out.push_back(cur);
+            // Every newline ends a line, and a line can be empty. The
+            // old code only kept the empty first line, so a blank line
+            // in the middle of a document vanished -- and a diff of two
+            // documents then lined up the wrong lines up.
+            out.push_back(cur);
             cur.clear();
         } else {
             cur.push_back(c);
         }
     }
+    // The text did not end with a newline, so the last line is still
+    // being built.
     if (!cur.empty()) out.push_back(cur);
     return out;
 }
