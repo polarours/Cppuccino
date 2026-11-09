@@ -44,6 +44,19 @@ void test_parse_int_failure() {
     expect(result.error().message().find("abc") != std::string::npos, "expected error with input");
 }
 
+// Regression: std::stoi stops at the first character that is not a
+// digit, so "12abc" was read as 12 and the rest of the text was thrown
+// away without a word.
+void test_parse_int_rejects_trailing_garbage() {
+    auto result = result_type::parseInt("123abc");
+    expect(result.isFailure(), "expected the trailing garbage to be refused");
+    expect(result.error().message().find("123abc") != std::string::npos,
+           "expected the error to name the input");
+
+    auto spaced = result_type::parseInt("12 34");
+    expect(spaced.isFailure(), "expected the text after the number to be refused");
+}
+
 } // namespace
 
 int main() {
@@ -62,6 +75,8 @@ int main() {
         std::cout << "  test_parse_int_success: PASS\n";
 
         test_parse_int_failure();
+        test_parse_int_rejects_trailing_garbage();
+        std::cout << "  test_parse_int_rejects_trailing_garbage: PASS\n";
         std::cout << "  test_parse_int_failure: PASS\n";
 
     } catch (const std::exception& exception) {

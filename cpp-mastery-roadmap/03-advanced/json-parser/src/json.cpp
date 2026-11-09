@@ -224,13 +224,29 @@ JsonValue Parser::parseBoolean() {
 JsonValue Parser::parseNumber() {
     std::size_t start = position_;
     if (peek() == '-') advance();
+
+    const std::size_t intStart = position_;
     while (position_ < input_->size() && (*input_)[position_] >= '0' && (*input_)[position_] <= '9') {
         advance();
     }
+    const std::size_t intDigits = position_ - intStart;
+    if (intDigits == 0) {
+        throw std::runtime_error("Expected a digit in the number");
+    }
+    if (intDigits > 1 && (*input_)[intStart] == '0') {
+        // A number does not begin with a zero: "01" is not one.
+        throw std::runtime_error("A number does not start with a zero");
+    }
     if (position_ < input_->size() && (*input_)[position_] == '.') {
         advance();
+        const std::size_t fracStart = position_;
         while (position_ < input_->size() && (*input_)[position_] >= '0' && (*input_)[position_] <= '9') {
             advance();
+        }
+        if (position_ == fracStart) {
+            // A point needs digits behind it: "1." is not a number.
+            throw std::runtime_error("Expected a digit after the point of the "
+                                     "number");
         }
     }
     if (position_ < input_->size() && ((*input_)[position_] == 'e' || (*input_)[position_] == 'E')) {
@@ -242,8 +258,21 @@ JsonValue Parser::parseNumber() {
             advance();
         }
     }
-    std::string numStr = input_->substr(start, position_ - start);
-    return JsonValue(std::stod(numStr));
+    const std::string numStr = input_->substr(start, position_ - start);
+
+    // std::stod stops at the first character it cannot read, so "1e"
+    // would be read as 1 without this check.
+    std::size_t consumed = 0;
+    double value = 0;
+    try {
+        value = std::stod(numStr, &consumed);
+    } catch (const std::exception&) {
+        throw std::runtime_error("Invalid number: " + numStr);
+    }
+    if (consumed != numStr.size()) {
+        throw std::runtime_error("Invalid number: " + numStr);
+    }
+    return JsonValue(value);
 }
 
 JsonValue Parser::parseString() {

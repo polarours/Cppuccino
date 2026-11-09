@@ -204,6 +204,26 @@ void test_unterminated_string_throws() {
     expect(threw, "expected an unterminated string to be reported");
 }
 
+// Regression: a number that was cut short was accepted. std::stod stops
+// at the first character it cannot read, so "1e" was read as 1, and "1."
+// is a number in C but not in JSON.
+void test_malformed_numbers_are_refused() {
+    for (const char* text : {"1.", "1e", "01", "-", "1e+"}) {
+        bool threw = false;
+        try {
+            json::JsonValue::parse(text);
+        } catch (const std::runtime_error&) {
+            threw = true;
+        }
+        expect(threw, std::string("expected ") + text + " to be refused");
+    }
+
+    // The numbers that are proper are still read.
+    expect(json::JsonValue::parse("1").asNumber() == 1, "expected 1");
+    expect(json::JsonValue::parse("1.5").asNumber() == 1.5, "expected 1.5");
+    expect(json::JsonValue::parse("1e10").asNumber() == 1e10, "expected 1e10");
+}
+
 } // namespace
 
 int main() {
@@ -255,6 +275,8 @@ int main() {
         std::cout << "  test_roundtrip: PASS\n";
 
         test_parse_error();
+        test_malformed_numbers_are_refused();
+        std::cout << "  test_malformed_numbers_are_refused: PASS\n";
         std::cout << "  test_parse_error: PASS\n";
 
         test_stringify_escapes_the_string();

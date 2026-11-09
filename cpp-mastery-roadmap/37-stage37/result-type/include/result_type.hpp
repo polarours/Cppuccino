@@ -58,7 +58,15 @@ private:
 
 inline Result<int> parseInt(const std::string& str) {
     try {
-        return Result<int>::ok(std::stoi(str));
+        // std::stoi stops at the first character that is not a digit, so
+        // without this check "12abc" would be read as 12 and the rest of
+        // the text would be thrown away.
+        std::size_t pos = 0;
+        const int value = std::stoi(str, &pos);
+        if (pos != str.size()) {
+            return Result<int>::fail("Invalid integer: " + str);
+        }
+        return Result<int>::ok(value);
     } catch (...) {
         return Result<int>::fail("Invalid integer: " + str);
     }

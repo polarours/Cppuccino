@@ -9,6 +9,9 @@ A simple JSON parser and serializer in modern C++.
 - Learn JSON format specification
 - Implement a state machine parser
 
+A number that is cut short is not a number: "1e", "1." and "01" are
+refused rather than read as something close to them.
+
 ## Non-Goals
 
 - Building a production-grade JSON parser

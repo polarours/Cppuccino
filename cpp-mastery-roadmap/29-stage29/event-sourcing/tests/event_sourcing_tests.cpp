@@ -108,6 +108,23 @@ void test_clear() {
     expect(store.version() == 1, "expected version 1");
 }
 
+// Regression: the amount of an event was read with a function that stops
+// at the first character it cannot read, so "10.50abc" was read as
+// 10.50. An event that was stored is replayed later, and it would be
+// wrong for ever.
+void test_an_amount_with_garbage_behind_it_is_refused() {
+    event_sourcing::Account account;
+
+    bool threw = false;
+    try {
+        account.applyEvent({"Created", "Bob", 1});
+        account.applyEvent({"Deposited", "10.50abc", 2});
+    } catch (const std::exception&) {
+        threw = true;
+    }
+    expect(threw, "expected the amount with garbage behind it to be refused");
+}
+
 } // namespace
 
 int main() {
@@ -130,6 +147,9 @@ int main() {
 
         test_clear();
         std::cout << "  test_clear: PASS\n";
+
+        test_an_amount_with_garbage_behind_it_is_refused();
+        std::cout << "  test_an_amount_with_garbage_behind_it_is_refused: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "event_sourcing_tests failed: " << exception.what() << std::endl;

@@ -5,8 +5,26 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 
 namespace event_sourcing {
+
+namespace {
+
+// The amount of an event is a number and nothing else. The functions of
+// the standard library stop at the first character they cannot read, so
+// "10.50abc" would be read as 10.50 without this check -- and an event
+// that was stored and is replayed later would be wrong for ever.
+double amountOf(const std::string& data) {
+    std::size_t pos = 0;
+    const double value = std::stod(data, &pos);
+    if (pos != data.size()) {
+        throw std::runtime_error("not an amount: " + data);
+    }
+    return value;
+}
+
+}  // namespace
 
 struct Event {
     std::string type;
@@ -47,9 +65,9 @@ public:
         if (event.type == "Created") {
             name_ = event.data;
         } else if (event.type == "Deposited") {
-            balance_ += std::stod(event.data);
+            balance_ += amountOf(event.data);
         } else if (event.type == "Withdrawn") {
-            balance_ -= std::stod(event.data);
+            balance_ -= amountOf(event.data);
         }
     }
 
