@@ -70,6 +70,41 @@ void test_string_generator() {
     expect(!gen.next(), "expected done");
 }
 
+// Regression: a move constructor takes the move assignment away, and the
+// copy assignment is deleted, so a generator could not be given to
+// another variable at all.
+void test_generator_can_be_moved_into() {
+    auto first = countTo(3);
+    auto second = std::move(first);
+
+    expect(second.next(), "expected the second generator to work");
+    expect(second.value() == 1, "expected 1");
+
+    // Moving into a generator that already holds one has to destroy the
+    // coroutine that was there, or it is never destroyed at all.
+    auto third = countTo(2);
+    auto fourth = countTo(5);
+    fourth = std::move(third);
+
+    expect(fourth.next(), "expected the fourth generator to work");
+    expect(fourth.value() == 1, "expected 1");
+}
+
+// A generator that was moved from holds nothing. Asking it for its value
+// used to reach into a handle that was not there.
+void test_a_generator_that_was_moved_from_says_so() {
+    auto first = countTo(2);
+    auto second = std::move(first);
+
+    bool threw = false;
+    try {
+        (void)first.value();
+    } catch (const std::logic_error&) {
+        threw = true;
+    }
+    expect(threw, "expected the moved-from generator to say so");
+}
+
 } // namespace
 
 int main() {
@@ -83,6 +118,12 @@ int main() {
 
         test_string_generator();
         std::cout << "  test_string_generator: PASS\n";
+
+        test_generator_can_be_moved_into();
+        std::cout << "  test_generator_can_be_moved_into: PASS\n";
+
+        test_a_generator_that_was_moved_from_says_so();
+        std::cout << "  test_a_generator_that_was_moved_from_says_so: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "coroutine_pattern_tests failed: " << exception.what() << std::endl;

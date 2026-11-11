@@ -2,6 +2,11 @@
 
 C++20 coroutines for lazy evaluation and generators.
 
+A generator can be moved into another variable, and moved over one that
+already holds a generator: the coroutine that was there is destroyed, so
+it is not left behind. A generator that was moved from holds nothing, and
+says so when it is asked for its value.
+
 ## Build
 
 ```bash
