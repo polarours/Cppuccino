@@ -70,6 +70,23 @@ void test_empty_string_edge() {
     expect(!t.contains(""), "still does not contain empty word");
 }
 
+// Regression: a word that was not made of lowercase letters was
+// ignored half way through, so the counters of the nodes on the way were
+// already raised and a path that was never inserted stayed in the tree.
+void test_a_word_that_is_ignored_leaves_nothing_behind() {
+    trie::Trie t;
+    t.insert("apple");
+
+    t.insert("abC");
+
+    expect(t.size() == 1, "expected the word to be ignored");
+    expect(t.countWordsWithPrefix("") == 1, "expected one word in the trie");
+    expect(t.countWordsWithPrefix("a") == 1, "expected one word under a");
+    expect(t.countWordsWithPrefix("ab") == 0, "expected nothing under ab");
+    expect(!t.startsWith("ab"), "expected no path under ab");
+    expect(!t.contains("ab"), "expected the word to be absent");
+}
+
 }  // namespace
 
 int main() {
@@ -80,6 +97,7 @@ int main() {
         test_count_prefix();
         test_words_with_prefix_sorted();
         test_empty_string_edge();
+        test_a_word_that_is_ignored_leaves_nothing_behind();
         std::cout << "All trie tests passed\n";
         return 0;
     } catch (const std::exception& e) {

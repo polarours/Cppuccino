@@ -3,6 +3,9 @@
 Lowercase prefix tree with word counts, prefix counting and prefix
 enumeration in lexicographic order.
 
+A word that is not made of lowercase letters is ignored, and it leaves
+nothing behind: not a count, and not a path in the tree either.
+
 ## Learning Goals
 
 - Node structure: children[26] + endsHere + passes counters

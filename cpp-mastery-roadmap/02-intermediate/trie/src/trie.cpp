@@ -8,11 +8,19 @@ inline bool valid(char c) { return c >= 'a' && c <= 'z'; }
 }  // namespace
 
 void Trie::insert(const std::string& word) {
+    // A word that is not made of lowercase letters is ignored. The whole
+    // word is looked at before anything is changed, because the counters
+    // of the nodes on the way are the number of words that pass through
+    // them: a word that is thrown away half way must not leave a count
+    // behind, and must not leave a path in the tree either.
+    for (char c : word) {
+        if (!valid(c)) return;
+    }
+
     Node* cur = root_.get();
     // Root passes = total insertions (so countWordsWithPrefix("") works)
     ++root_->passes;
     for (char c : word) {
-        if (!valid(c)) return;  // lowercase-only; ignore invalid input
         int i = idx(c);
         if (!cur->children[i]) cur->children[i] = std::make_unique<Node>();
         cur = cur->children[i].get();
