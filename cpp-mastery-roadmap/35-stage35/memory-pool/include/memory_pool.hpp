@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <limits>
 #include <stdexcept>
@@ -38,11 +39,25 @@ public:
 
     void deallocate(void* ptr) {
         if (!ptr) return;
+
         auto* bytePtr = static_cast<std::byte*>(ptr);
-        auto offset = bytePtr - memory_.data();
-        if (offset >= 0 && static_cast<std::size_t>(offset) < memory_.size()) {
-            freeList_.push_back(ptr);
+        const std::size_t total = memory_.size();
+        if (bytePtr < memory_.data() || bytePtr >= memory_.data() + total) {
+            // The pointer is not inside the pool at all.
+            return;
         }
+        const std::size_t offset =
+            static_cast<std::size_t>(bytePtr - memory_.data());
+        if (offset % blockSize_ != 0) {
+            // The pointer is inside a block, not the start of one.
+            return;
+        }
+        if (std::find(freeList_.begin(), freeList_.end(), ptr) != freeList_.end()) {
+            // The block is free already. Handing it out a second time
+            // would give it to two owners at once.
+            return;
+        }
+        freeList_.push_back(ptr);
     }
 
     std::size_t blockSize() const { return blockSize_; }

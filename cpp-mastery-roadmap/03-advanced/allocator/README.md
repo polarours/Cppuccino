@@ -2,6 +2,11 @@
 
 A simple fixed-block memory allocator with STL allocator interface.
 
+A block that is given back twice is refused: putting it on the free list
+a second time would put a loop in the list, and counting the list would
+never end. A pointer into the middle of a block is not the start of a
+block, so it is not owned either.
+
 ## Learning Goals
 
 - Understand memory allocation at a low level

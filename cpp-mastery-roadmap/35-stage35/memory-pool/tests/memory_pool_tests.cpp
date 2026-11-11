@@ -65,6 +65,34 @@ void test_a_block_of_no_bytes_is_refused() {
     expect(threw, "expected a pool of empty blocks to be refused");
 }
 
+// Regression: a block that was given back twice went onto the free list
+// twice, and it was then handed out to two owners at the same time.
+void test_a_block_that_is_freed_twice_is_refused() {
+    memory_pool::MemoryPool pool(sizeof(int), 4);
+
+    void* p = pool.allocate();
+    pool.deallocate(p);
+    pool.deallocate(p);
+
+    expect(pool.freeBlocks() == 4, "expected 4 free blocks, got " +
+                                       std::to_string(pool.freeBlocks()));
+
+    void* first = pool.allocate();
+    void* second = pool.allocate();
+    expect(first != second, "expected two different blocks");
+}
+
+// A pointer into the middle of a block is inside the pool, but it is not
+// the start of a block.
+void test_a_pointer_into_a_block_is_refused() {
+    memory_pool::MemoryPool pool(sizeof(int), 4);
+    void* p = pool.allocate();
+    auto* inside = static_cast<char*>(p) + 1;
+
+    pool.deallocate(inside);
+    expect(pool.freeBlocks() == 3, "expected the block to stay in use");
+}
+
 } // namespace
 
 int main() {
@@ -84,6 +112,12 @@ int main() {
 
         test_a_block_of_no_bytes_is_refused();
         std::cout << "  test_a_block_of_no_bytes_is_refused: PASS\n";
+
+        test_a_block_that_is_freed_twice_is_refused();
+        std::cout << "  test_a_block_that_is_freed_twice_is_refused: PASS\n";
+
+        test_a_pointer_into_a_block_is_refused();
+        std::cout << "  test_a_pointer_into_a_block_is_refused: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "memory_pool_tests failed: " << exception.what() << std::endl;

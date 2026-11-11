@@ -45,6 +45,15 @@ void SimpleAllocator::deallocate(void* ptr) {
         return;
     }
 
+    // A block that is already free must not go onto the free list a
+    // second time. The list would have a loop in it, and counting it
+    // would never end.
+    for (Block* current = freeList_; current; current = current->next) {
+        if (current == static_cast<Block*>(ptr)) {
+            return;
+        }
+    }
+
     Block* block = static_cast<Block*>(ptr);
     block->next = freeList_;
     freeList_ = block;
@@ -75,7 +84,11 @@ std::size_t SimpleAllocator::usedBlocks() const {
 
 bool SimpleAllocator::owns(void* ptr) const {
     char* p = static_cast<char*>(ptr);
-    return p >= memory_ && p < memory_ + blockSize_ * blockCount_;
+    // The pointer has to be the start of a block. A pointer into the
+    // middle of one is inside the memory, but handing it out would give
+    // back something that is not aligned to a block.
+    return p >= memory_ && p < memory_ + blockSize_ * blockCount_ &&
+           (p - memory_) % blockSize_ == 0;
 }
 
 void SimpleAllocator::reset() {

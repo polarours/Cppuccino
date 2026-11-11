@@ -128,6 +128,39 @@ void test_stl_list() {
     expect(sum == 45, "expected sum 45");
 }
 
+// Regression: a block that was freed twice went onto the free list twice,
+// and the list had a loop in it -- counting it never ended, and the
+// counter of the used blocks ran off the end of the range.
+void test_a_block_that_is_freed_twice_is_refused() {
+    simple_allocator::SimpleAllocator alloc(64, 4);
+
+    void* p = alloc.allocate(32);
+    alloc.deallocate(p);
+    alloc.deallocate(p);
+
+    expect(alloc.usedBlocks() == 0, "expected no used blocks");
+    expect(alloc.freeBlocks() == 4, "expected 4 free blocks, got " +
+                                        std::to_string(alloc.freeBlocks()));
+
+    // And the block can still be handed out, exactly once.
+    void* q = alloc.allocate(32);
+    expect(q == p, "expected the same block back");
+    expect(alloc.freeBlocks() == 3, "expected 3 free blocks");
+}
+
+// A pointer into the middle of a block is inside the memory, but it is
+// not the start of a block.
+void test_a_pointer_into_a_block_is_not_owned() {
+    simple_allocator::SimpleAllocator alloc(64, 4);
+    void* p = alloc.allocate(32);
+    char* inside = static_cast<char*>(p) + 8;
+
+    expect(!alloc.owns(inside), "expected the middle of a block not to be owned");
+
+    alloc.deallocate(inside);
+    expect(alloc.usedBlocks() == 1, "expected the block to stay in use");
+}
+
 } // namespace
 
 int main() {
@@ -156,6 +189,12 @@ int main() {
 
         test_stl_list();
         std::cout << "  test_stl_list: PASS\n";
+
+        test_a_block_that_is_freed_twice_is_refused();
+        std::cout << "  test_a_block_that_is_freed_twice_is_refused: PASS\n";
+
+        test_a_pointer_into_a_block_is_not_owned();
+        std::cout << "  test_a_pointer_into_a_block_is_not_owned: PASS\n";
     } catch (const std::exception& exception) {
         std::cerr << "allocator_tests failed: " << exception.what() << std::endl;
         return 1;

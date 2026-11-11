@@ -39,6 +39,17 @@ void test_padded_counter() {
     counter.increment();
     counter.increment();
     expect(counter.count() == 2, "expected 2");
+
+    // The padding is there so that two counters next to each other do
+    // not share a cache line. That only works when the counter fills a
+    // whole line and starts on one.
+    expect(sizeof(memory_alignment::PaddedCounter) == 64,
+           "expected the padded counter to be 64 bytes, got " +
+               std::to_string(sizeof(memory_alignment::PaddedCounter)));
+    expect(alignof(memory_alignment::PaddedCounter) == 64,
+           "expected the padded counter to be 64-byte aligned");
+    expect(sizeof(memory_alignment::UnpaddedCounter) < 64,
+           "expected the unpadded counter to share a line");
 }
 
 void test_aligned_allocator() {
