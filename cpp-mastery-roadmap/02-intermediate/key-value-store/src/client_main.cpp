@@ -1,6 +1,8 @@
 #include "client/client.hpp"
 #include "protocol/protocol.hpp"
+#include "cli_options.hpp"
 
+#include <exception>
 #include <iostream>
 #include <string>
 
@@ -30,7 +32,15 @@ int main(int argc, char* argv[]) {
         if (arg == "-h" || arg == "--host") {
             if (i + 1 < argc) host = argv[++i];
         } else if (arg == "-p" || arg == "--port") {
-            if (i + 1 < argc) port = std::stoi(argv[++i]);
+            if (i + 1 < argc) {
+                try {
+                    port = key_value_store::parsePort(argv[++i]);
+                } catch (const std::exception& error) {
+                    std::cerr << error.what() << "\n";
+                    printUsage(argv[0]);
+                    return 1;
+                }
+            }
         } else if (arg == "-n" || arg == "--no-echo") {
             echo = false;
         } else if (arg == "--help") {

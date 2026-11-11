@@ -95,6 +95,10 @@ PING
 - `LOAD` and `SAVE` operate on one current persistence file path
 - no transactions, snapshots, or concurrency control
 
+The port on the command line has to be a port: "-p 8080abc" is refused with a
+line that says why, instead of being taken as 8080, and "-p abc" no longer
+ends the program with an exception from the standard library.
+
 ## Build
 
 ```bash

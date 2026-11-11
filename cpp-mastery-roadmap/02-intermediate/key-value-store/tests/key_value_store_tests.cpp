@@ -5,6 +5,7 @@
 #include "protocol/protocol.hpp"
 #include "server/server.hpp"
 #include "client/client.hpp"
+#include "cli_options.hpp"
 
 #include <cstdio>
 #include <cstring>
@@ -881,6 +882,26 @@ void test_concurrent_read_write() {
     expect(store.size() >= 100, "expected at least 100 entries");
 }
 
+// Regression: the port was read with a function that stops at the first
+// character it cannot read, so "8080abc" was taken as 8080 and the rest
+// of the text was dropped without a word. A text that was not a number
+// at all ended the program with an exception from the standard library.
+void test_parse_port() {
+    expect(key_value_store::parsePort("6379") == 6379, "expected 6379");
+    expect(key_value_store::parsePort("1") == 1, "expected 1");
+    expect(key_value_store::parsePort("65535") == 65535, "expected 65535");
+
+    for (const char* text : {"abc", "8080abc", "99999", "0", "-1", ""}) {
+        bool threw = false;
+        try {
+            key_value_store::parsePort(text);
+        } catch (const std::runtime_error&) {
+            threw = true;
+        }
+        expect(threw, std::string("expected ") + text + " to be refused");
+    }
+}
+
 } // namespace
 
 int main() {
@@ -927,6 +948,9 @@ int main() {
         test_protocol_response_parse();
         test_the_server_answers_over_a_socket();
         std::cout << "  test_the_server_answers_over_a_socket: PASS\n";
+
+        test_parse_port();
+        std::cout << "  test_parse_port: PASS\n";
 
         test_server_protocol_integration();
         test_store_manager_with_protocol();

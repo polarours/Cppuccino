@@ -49,6 +49,30 @@ void test_separation() {
     expect(balance.find("500") != std::string::npos, "expected 500");
 }
 
+// Regression: the number functions of the standard library stop at the
+// first character they cannot read, so "1abc" was read as 1 and the rest
+// of the text was dropped without a word.
+void test_a_payload_with_garbage_behind_the_number_is_refused() {
+    cqrs_pattern::AccountService service;
+    service.commands().dispatch("create", "Alice");
+
+    bool threw = false;
+    try {
+        service.commands().dispatch("deposit", "1abc:100.50");
+    } catch (const std::exception&) {
+        threw = true;
+    }
+    expect(threw, "expected the garbage behind the number to be refused");
+
+    threw = false;
+    try {
+        service.commands().dispatch("deposit", "1:100.50xyz");
+    } catch (const std::exception&) {
+        threw = true;
+    }
+    expect(threw, "expected the garbage behind the amount to be refused");
+}
+
 } // namespace
 
 int main() {
@@ -65,6 +89,9 @@ int main() {
 
         test_separation();
         std::cout << "  test_separation: PASS\n";
+
+        test_a_payload_with_garbage_behind_the_number_is_refused();
+        std::cout << "  test_a_payload_with_garbage_behind_the_number_is_refused: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "cqrs_pattern_tests failed: " << exception.what() << std::endl;
