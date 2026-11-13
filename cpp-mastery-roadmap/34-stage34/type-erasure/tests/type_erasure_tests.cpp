@@ -1,5 +1,6 @@
 #include "type_erasure.hpp"
 
+#include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -65,6 +66,41 @@ void test_vector_of_actions_grows() {
     expect(hits == 10, "10 copies all work (clone on growth)");
 }
 
+// Regression: an action that was moved from holds nothing, and calling
+// it went straight through a null pointer. The empty std::function this
+// class is modelled on throws when it is called, and so does this one
+// now.
+void test_calling_an_empty_action_is_reported() {
+    type_erasure::AnyAction action([]() {});
+    type_erasure::AnyAction moved = std::move(action);
+
+    expect(!static_cast<bool>(action),
+           "expected the moved-from action to be empty");
+
+    bool threw = false;
+    try {
+        action();
+    } catch (const std::bad_function_call&) {
+        threw = true;
+    }
+    expect(threw, "expected calling the empty action to be reported");
+}
+
+// The same for a value that was moved from: it holds nothing, and saying
+// so is better than a crash.
+void test_asking_an_empty_value_is_reported() {
+    type_erasure::AnyPrintable value(std::string("text"));
+    type_erasure::AnyPrintable moved = std::move(value);
+
+    bool threw = false;
+    try {
+        (void)value.str();
+    } catch (const std::logic_error&) {
+        threw = true;
+    }
+    expect(threw, "expected asking the empty value to be reported");
+}
+
 }  // namespace
 
 int main() {
@@ -74,6 +110,8 @@ int main() {
         test_bool_conversion();
         test_printable_values();
         test_vector_of_actions_grows();
+        test_calling_an_empty_action_is_reported();
+        test_asking_an_empty_value_is_reported();
         std::cout << "All type_erasure tests passed\n";
         return 0;
     } catch (const std::exception& e) {

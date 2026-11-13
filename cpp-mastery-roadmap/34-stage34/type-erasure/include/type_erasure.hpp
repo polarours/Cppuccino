@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -33,7 +34,16 @@ public:
     AnyAction(AnyAction&&) noexcept = default;
     AnyAction& operator=(AnyAction&&) noexcept = default;
 
-    void operator()() { holder_->invoke(); }
+    void operator()() {
+        if (!holder_) {
+            // An action that was moved from holds nothing. This class is
+            // modelled on std::function, and an empty std::function
+            // throws when it is called: the mistake has to be reported
+            // rather than crash.
+            throw std::bad_function_call();
+        }
+        holder_->invoke();
+    }
     explicit operator bool() const { return static_cast<bool>(holder_); }
     std::string label() const { return holder_ ? holder_->label() : ""; }
 
@@ -80,8 +90,19 @@ public:
     AnyPrintable(AnyPrintable&&) noexcept = default;
     AnyPrintable& operator=(AnyPrintable&&) noexcept = default;
 
-    std::string str() const { return self_->str(); }
-    std::string typeName() const { return self_->typeName(); }
+    std::string str() const {
+        if (!self_) {
+            // The value was moved from, so there is nothing to show.
+            throw std::logic_error("the value was moved from");
+        }
+        return self_->str();
+    }
+    std::string typeName() const {
+        if (!self_) {
+            throw std::logic_error("the value was moved from");
+        }
+        return self_->typeName();
+    }
 
 private:
     struct Interface {

@@ -3,6 +3,10 @@
 手写 std::function 风格包装（AnyAction）与类型擦除的可打印值
 （AnyPrintable）：Concept 接口 + 模板 Holder/Model。
 
+被移走的 action 什么也没有了，调用它会抛 `std::bad_function_call` —— 跟空的
+`std::function` 一样，而这个类正是照着它写的。被移走的值在被问起文本时会说
+一声。
+
 ## 学习目标
 
 - Concept/Holder 分工：外层虚接口，内层模板实现

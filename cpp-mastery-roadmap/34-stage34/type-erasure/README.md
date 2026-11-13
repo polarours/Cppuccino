@@ -3,6 +3,11 @@
 Hand-rolled std::function-style wrapper (AnyAction) and a type-erased
 printable value (AnyPrintable): Concept interface + templated Holder/Model.
 
+An action that was moved from holds nothing, and calling it throws
+`std::bad_function_call` -- the same as an empty `std::function`, which
+this class is modelled on. A value that was moved from says so when it
+is asked for its text.
+
 ## Learning Goals
 
 - The Concept/Holder split: virtual dispatch outside, template inside
