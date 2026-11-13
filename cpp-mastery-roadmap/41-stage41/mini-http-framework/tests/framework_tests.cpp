@@ -19,6 +19,38 @@ void expect(bool condition, const std::string& message) {
     }
 }
 
+// Regression: the value of a header was read with a fixed offset of two
+// characters behind the colon, so a header without a space behind the
+// colon -- which the standard allows -- lost its first character.
+void test_request_header_without_a_space() {
+    std::string raw = "GET / HTTP/1.1\r\nX-Test:value\r\n\r\n";
+    auto req = mini_http::Request::parse(raw);
+
+    expect(req.header("X-Test") == "value",
+           "expected value, got [" + req.header("X-Test") + "]");
+}
+
+// And the spaces behind the colon are not part of the value.
+void test_request_header_with_extra_spaces() {
+    std::string raw = "GET / HTTP/1.1\r\nX-Test:   value\r\n\r\n";
+    auto req = mini_http::Request::parse(raw);
+
+    expect(req.header("X-Test") == "value",
+           "expected value, got [" + req.header("X-Test") + "]");
+}
+
+// Regression: the body was read line by line and put back together, so
+// it lost the line endings. A server that reads the body by its content
+// length waits for a byte that never comes.
+void test_request_body_keeps_its_line_endings() {
+    std::string raw = "POST / HTTP/1.1\r\nContent-Length: 12\r\n\r\nline1\nline2\n";
+    auto req = mini_http::Request::parse(raw);
+
+    expect(req.body().size() == 12, "expected 12 bytes, got " +
+                                        std::to_string(req.body().size()));
+    expect(req.body() == "line1\nline2\n", "expected the line endings to be there");
+}
+
 // --- Request Tests ---
 void test_request_parse() {
     std::string raw = "GET /hello HTTP/1.1\r\nHost: localhost\r\nAccept: text/html\r\n\r\n";
@@ -268,6 +300,15 @@ int main() {
         std::cout << "  test_app_handle_raw: PASS\n";
         test_app_events();
         std::cout << "  test_app_events: PASS\n";
+
+        test_request_header_without_a_space();
+        std::cout << "  test_request_header_without_a_space: PASS\n";
+
+        test_request_header_with_extra_spaces();
+        std::cout << "  test_request_header_with_extra_spaces: PASS\n";
+
+        test_request_body_keeps_its_line_endings();
+        std::cout << "  test_request_body_keeps_its_line_endings: PASS\n";
         test_app_serve();
         std::cout << "  test_app_serve: PASS\n";
 
@@ -276,6 +317,8 @@ int main() {
         return 1;
     }
 
-    std::cout << "\n=== All 19 tests passed ===" << std::endl;
+    // The number of tests is not written down here: it goes stale as
+    // soon as one is added.
+    std::cout << "\n=== All tests passed ===" << std::endl;
     return 0;
 }

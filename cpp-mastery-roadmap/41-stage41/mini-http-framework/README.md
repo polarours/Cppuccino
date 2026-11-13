@@ -2,6 +2,11 @@
 
 A capstone project combining design patterns into a practical HTTP framework.
 
+The request parser follows the standard closely: the space behind the
+colon of a header is optional, and the body keeps its line endings and
+its last newline, so a server that reads the body by its content length
+gets exactly as many bytes as the header says.
+
 ## Patterns Used
 
 | Pattern | Where | Purpose |
