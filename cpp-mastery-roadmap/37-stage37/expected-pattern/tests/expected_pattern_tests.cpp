@@ -1,6 +1,7 @@
 #include "expected_pattern.hpp"
 
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <string>
 
@@ -42,6 +43,39 @@ void test_map() {
     expect(!errResult.hasValue(), "expected error propagated");
 }
 
+// Regression: the result of the division is not a number an int can
+// hold, and the processor traps on it -- the program died with a
+// floating point exception.
+void test_divide_that_does_not_fit() {
+    volatile int a = std::numeric_limits<int>::min();
+    volatile int b = -1;
+
+    auto result = expected_pattern::divide(a, b);
+    expect(!result.hasValue(), "expected the division to be refused");
+    expect(!result.error().empty(), "expected a reason");
+}
+
+// A function with an overload for lvalues and one for rvalues. The type
+// of the result was worked out from a call with an rvalue, while the
+// call itself went with an lvalue -- so the two named different
+// overloads and the code did not even compile.
+struct Overloaded {
+    expected_pattern::Expected<int, std::string> operator()(int&) const {
+        return expected_pattern::Expected<int, std::string>::success(1);
+    }
+    expected_pattern::Expected<long, std::string> operator()(int&&) const {
+        return expected_pattern::Expected<long, std::string>::success(2);
+    }
+};
+
+void test_and_then_with_an_overloaded_function() {
+    auto value = expected_pattern::Expected<int, std::string>::success(5);
+
+    auto result = value.andThen(Overloaded{});
+    expect(result.hasValue(), "expected the lvalue overload to be used");
+    expect(result.value() == 1, "expected 1");
+}
+
 void test_read_file() {
     auto ok = expected_pattern::readFile("test.txt");
     expect(ok.hasValue(), "expected success");
@@ -71,6 +105,12 @@ int main() {
 
         test_read_file();
         std::cout << "  test_read_file: PASS\n";
+
+        test_divide_that_does_not_fit();
+        std::cout << "  test_divide_that_does_not_fit: PASS\n";
+
+        test_and_then_with_an_overloaded_function();
+        std::cout << "  test_and_then_with_an_overloaded_function: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "expected_pattern_tests failed: " << exception.what() << std::endl;

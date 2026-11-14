@@ -1,5 +1,6 @@
 #pragma once
 
+#include <limits>
 #include <string>
 #include <variant>
 #include <stdexcept>
@@ -43,20 +44,24 @@ public:
         return err_;
     }
 
+    // The type of the result is worked out from a call with an lvalue,
+    // because that is what the call below actually does. Writing
+    // declval<T>() instead said "an rvalue", and a function that takes
+    // one could not be used at all.
     template <typename F>
-    auto map(F func) -> Expected<decltype(func(std::declval<T>())), E> {
+    auto map(F func) -> Expected<decltype(func(std::declval<T&>())), E> {
         if (hasValue_) {
-            return Expected<decltype(func(std::declval<T>())), E>::success(func(data_));
+            return Expected<decltype(func(std::declval<T&>())), E>::success(func(data_));
         }
-        return Expected<decltype(func(std::declval<T>())), E>::error(err_);
+        return Expected<decltype(func(std::declval<T&>())), E>::error(err_);
     }
 
     template <typename F>
-    auto andThen(F func) -> decltype(func(std::declval<T>())) {
+    auto andThen(F func) -> decltype(func(std::declval<T&>())) {
         if (hasValue_) {
             return func(data_);
         }
-        return decltype(func(std::declval<T>()))::error(err_);
+        return decltype(func(std::declval<T&>()))::error(err_);
     }
 
 private:
@@ -73,6 +78,12 @@ inline Expected<std::string, std::string> readFile(const std::string& path) {
 
 inline Expected<int, std::string> divide(int a, int b) {
     if (b == 0) return Expected<int, std::string>::error("division by zero");
+    if (a == std::numeric_limits<int>::min() && b == -1) {
+        // The result of this division is not a number an int can hold,
+        // and the processor traps on it.
+        return Expected<int, std::string>::error(
+            "the result does not fit in an int");
+    }
     return Expected<int, std::string>::success(a / b);
 }
 
