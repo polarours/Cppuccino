@@ -798,7 +798,7 @@ void test_basic_observe() {
 | 陷阱文章 | 37 | 37 | 74 | 正文均为英文/中文 |
 | 示例代码 | - | - | 161 | 全部可编译、可运行、sanitizer 干净 |
 | 项目练习 | - | - | 151 | 全部构建通过、ctest 全绿 |
-| 测试函数 | - | - | 943 | 全部通过，且每一条都真的检查了东西 |
+| 测试函数 | - | - | 945 | 全部通过，且每一条都真的检查了东西 |
 
 ## 第十阶段：两处真实数据竞争（2026-10-31）
 
@@ -1405,4 +1405,53 @@ auto map(F func) -> Expected<decltype(func(std::declval<T>())), E> {
 现在返回类型按左值算，和实际调用一致。
 
 两个回归测试分别盯住这两处。
+
+## 第二十七阶段：示例要跟着库一起改（2026-11-15）
+
+前几轮修了几处"数字读得太松"，修的是**库**。过了两天回头一看，`examples/` 里
+演示同一个东西的三份代码**还停在修之前的样子** —— 库改了，示例没改。读者照
+着示例抄，就会把刚修掉的毛病抄回去。
+
+- `examples/event-sourcing-demo.cpp`：事件的金额还是 `std::stod(e.data)`；
+- `examples/cqrs-pattern-demo.cpp`：payload 里的 id 还是 `std::stoi(...)`；
+- `examples/std-expected.cpp`：那个叫 `parseInt` 的函数还是直接 `std::stoi(str)`。
+
+三处都按库里的写法改了：读完整个字符串才算数，后面有别的东西就拒绝。
+
+**顺带记下还没动的**（都是 demo 内部、不对应仓库里的库，先记着）：
+`examples/std-optional.cpp` 的 `parseAge`、`examples/testing-patterns.cpp` 的
+`square`。
+
+## 第二十八阶段：生成的 CMakeLists 自己跑不起来（2026-11-15）
+
+`cmake-pattern` 是个生成器：给它一个工程的样子，它吐出一份 CMakeLists.txt。
+那份文件**自己跑不起来**。
+
+**一、测试链接到一个谁也没建的目标。**
+
+```cmake
+target_link_libraries(mylib_tests PRIVATE DemoProject_core)
+```
+
+`DemoProject_core` 这个 target 从来没被创建过 —— 生成器里写死了这个后缀。
+于是生成的工程**配置能过**（CMake 到链接那一步才发现），**构建时失败**：
+
+```
+/usr/bin/ld: cannot find -lDemoProject_core: No such file or directory
+```
+
+现在测试链接的是**项目里那些库**本身 —— 这才是 `_core` 这个名字本来想说的
+意思。
+
+（中间试过做一个 `add_library(<名字>_core INTERFACE)` 来聚合：INTERFACE 库只能
+用 INTERFACE 关键字链接，而测试那里写的是 PRIVATE，又不行。所以聚合这条路走
+不通，直接链库才对。）
+
+**二、宏存了，从来没被写出来。**
+
+`setDefine("MY_DEFINE", "42")` 把宏收进 `defines_`，而 `generate()` 里根本没
+提它 —— 设了等于没设。现在用 `add_compile_definitions` 写出来。
+
+**验证方式**：让生成器写出一份真的 CMakeLists.txt，给它配上源文件，然后拿真
+的 cmake 去配置、去构建、去跑 ctest —— 配置、构建、测试全过。
 
