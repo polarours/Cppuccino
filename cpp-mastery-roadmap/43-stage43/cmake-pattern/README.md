@@ -2,6 +2,10 @@
 
 Programmatic CMakeLists.txt generation.
 
+The generated file is meant to work: the tests link against the libraries
+of the project, the defines are written out with `add_compile_definitions`,
+and the whole thing configures, builds and passes its tests.
+
 ## Build
 
 ```bash

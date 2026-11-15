@@ -65,6 +65,35 @@ void test_multiple_options() {
     expect(project.optionCount() == 2, "expected 2 options");
 }
 
+// Regression: the tests were told to link against a core library that
+// nobody ever made. The generated file configured and then failed at the
+// link step, because the target it named did not exist.
+void test_the_tests_link_the_libraries_of_the_project() {
+    cmake_pattern::CMakeProject project;
+    project.setName("TestProject");
+    project.addLibrary("mylib");
+    project.addTest("mylib_tests");
+
+    auto output = project.generate();
+    expect(output.find("target_link_libraries(mylib_tests PRIVATE mylib)") !=
+               std::string::npos,
+           "expected the test to link the library, got:\n" + output);
+    expect(output.find("_core") == std::string::npos,
+           "expected no made-up core library, got:\n" + output);
+}
+
+// Regression: the defines were collected and then never written out.
+void test_the_defines_are_written_out() {
+    cmake_pattern::CMakeProject project;
+    project.setName("TestProject");
+    project.setDefine("MY_DEFINE", "42");
+
+    auto output = project.generate();
+    expect(output.find("add_compile_definitions(MY_DEFINE=42)") !=
+               std::string::npos,
+           "expected the define to be there, got:\n" + output);
+}
+
 } // namespace
 
 int main() {
@@ -84,6 +113,12 @@ int main() {
 
         test_multiple_options();
         std::cout << "  test_multiple_options: PASS\n";
+
+        test_the_tests_link_the_libraries_of_the_project();
+        std::cout << "  test_the_tests_link_the_libraries_of_the_project: PASS\n";
+
+        test_the_defines_are_written_out();
+        std::cout << "  test_the_defines_are_written_out: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "cmake_pattern_tests failed: " << exception.what() << std::endl;

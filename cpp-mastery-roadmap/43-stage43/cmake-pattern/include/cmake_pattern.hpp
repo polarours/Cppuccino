@@ -55,11 +55,33 @@ public:
         }
         if (!executables_.empty()) out += "\n";
 
+        // The defines were collected and then never written out.
+        if (!defines_.empty()) {
+            out += "add_compile_definitions(";
+            bool first = true;
+            for (const auto& [key, val] : defines_) {
+                if (!first) out += " ";
+                out += key + "=" + val;
+                first = false;
+            }
+            out += ")\n\n";
+        }
+
         out += "enable_testing()\n\n";
 
         for (const auto& test : tests_) {
             out += "add_executable(" + test + " tests/" + test + ".cpp)\n";
-            out += "target_link_libraries(" + test + " PRIVATE " + name_ + "_core)\n";
+            // The tests link against the libraries of the project. The
+            // name of the core library was made up, and no target of that
+            // name was ever made: the generated file configured and then
+            // failed at the link step.
+            if (!libraries_.empty()) {
+                out += "target_link_libraries(" + test + " PRIVATE";
+                for (const auto& lib : libraries_) {
+                    out += " " + lib;
+                }
+                out += ")\n";
+            }
             out += "add_test(NAME " + test + " COMMAND " + test + ")\n";
         }
 
