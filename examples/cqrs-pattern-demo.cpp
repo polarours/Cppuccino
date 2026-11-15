@@ -6,9 +6,32 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 namespace cqrs_pattern {
+
+// The numbers in a payload are numbers and nothing else. The functions of
+// the standard library stop at the first character they cannot read, so
+// "1abc" would be read as 1 and the rest of the text would be dropped
+// without a word.
+static int wholeNumber(const std::string& text) {
+    std::size_t pos = 0;
+    const int value = std::stoi(text, &pos);
+    if (pos != text.size()) {
+        throw std::runtime_error("not a whole number: " + text);
+    }
+    return value;
+}
+
+static double decimalNumber(const std::string& text) {
+    std::size_t pos = 0;
+    const double value = std::stod(text, &pos);
+    if (pos != text.size()) {
+        throw std::runtime_error("not a number: " + text);
+    }
+    return value;
+}
 
 struct Account {
     int id;
@@ -55,10 +78,10 @@ public:
         commands_.registerHandler("create", [this](const std::string& name){ createAccount(name); });
         commands_.registerHandler("deposit", [this](const std::string& p){
             auto sep = p.find(':');
-            deposit(std::stoi(p.substr(0,sep)), std::stod(p.substr(sep+1)));
+            deposit(wholeNumber(p.substr(0,sep)), decimalNumber(p.substr(sep+1)));
         });
         queries_.registerHandler("get", [this](const std::string& id){
-            auto acc = getAccount(std::stoi(id));
+            auto acc = getAccount(wholeNumber(id));
             return acc ? acc->name + ":" + std::to_string(acc->balance) : "";
         });
         queries_.registerHandler("list", [this](const std::string&){

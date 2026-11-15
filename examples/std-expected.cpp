@@ -28,7 +28,15 @@ std::string errorMessage(ErrorCode code) {
 
 std::expected<int, ErrorCode> parseInt(const std::string& str) {
     try {
-        return std::stoi(str);
+        // std::stoi stops at the first character it cannot read, so
+        // "12abc" would be read as 12 and the rest of the text would be
+        // dropped without a word. The whole string has to be read.
+        std::size_t pos = 0;
+        const int value = std::stoi(str, &pos);
+        if (pos != str.size()) {
+            return std::unexpected(ErrorCode::InvalidInput);
+        }
+        return value;
     } catch (...) {
         return std::unexpected(ErrorCode::InvalidInput);
     }

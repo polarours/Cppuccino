@@ -5,6 +5,7 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -31,12 +32,25 @@ private:
     std::size_t nextVersion_ = 1;
 };
 
+// The amount of an event is a number and nothing else. The functions of
+// the standard library stop at the first character they cannot read, so
+// "10.50abc" would be read as 10.50 and the rest of the text would be
+// dropped without a word.
+static double amountOf(const std::string& data) {
+    std::size_t pos = 0;
+    const double value = std::stod(data, &pos);
+    if (pos != data.size()) {
+        throw std::runtime_error("not an amount: " + data);
+    }
+    return value;
+}
+
 class Account {
 public:
     void applyEvent(const Event& e) {
         if (e.type == "Created")    { name_ = e.data; }
-        else if (e.type == "Deposited")  { balance_ += std::stod(e.data); }
-        else if (e.type == "Withdrawn")  { balance_ -= std::stod(e.data); }
+        else if (e.type == "Deposited")  { balance_ += amountOf(e.data); }
+        else if (e.type == "Withdrawn")  { balance_ -= amountOf(e.data); }
     }
     const std::string& name()   const { return name_; }
     double              balance() const { return balance_; }
