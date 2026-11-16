@@ -62,6 +62,39 @@ void test_move_subscription() {
     expect(count == 1, "expected still 1");
 }
 
+// Regression: a handler that unsubscribes itself while the event is
+// being delivered changed the list the loop was walking. The handlers
+// after it were moved out of the way, and calling one of them threw
+// std::bad_function_call -- the program died.
+void test_a_handler_may_unsubscribe_itself() {
+    observer_subscription::EventBus bus;
+    int calls = 0;
+
+    observer_subscription::Subscription* firstPtr = nullptr;
+    auto first = bus.subscribe("tick", [&](const observer_subscription::Event&) {
+        calls++;
+        if (firstPtr) firstPtr->unsubscribe();
+    });
+    firstPtr = first.get();
+
+    auto second = bus.subscribe("tick", [&](const observer_subscription::Event&) {
+        calls++;
+    });
+
+    bus.publish({"tick", "1"});
+    expect(calls == 2,
+           "expected both subscribers to be called, got " +
+               std::to_string(calls));
+
+    bus.publish({"tick", "2"});
+    expect(calls == 3,
+           "expected the second subscriber to be called again, got " +
+               std::to_string(calls));
+
+    // The first one left, the second one stayed.
+    expect(bus.handlerCount("tick") == 1, "expected 1 subscriber left");
+}
+
 } // namespace
 
 int main() {
@@ -75,6 +108,9 @@ int main() {
 
         test_move_subscription();
         std::cout << "  test_move_subscription: PASS\n";
+
+        test_a_handler_may_unsubscribe_itself();
+        std::cout << "  test_a_handler_may_unsubscribe_itself: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "observer_subscription_tests failed: " << exception.what() << std::endl;

@@ -64,11 +64,18 @@ public:
     }
 
     void publish(const Event& event) {
+        // The handlers are copied before they are called. A handler is
+        // allowed to unsubscribe itself while the event is being
+        // delivered, and that changes the list the loop walks -- the
+        // subscribers after it were skipped, and never called again.
+        std::vector<Entry> entries;
         auto it = handlers_.find(event.type);
         if (it != handlers_.end()) {
-            for (const auto& entry : it->second) {
-                entry.handler(event);
-            }
+            entries = it->second;
+        }
+
+        for (const auto& entry : entries) {
+            entry.handler(event);
         }
     }
 
