@@ -798,7 +798,7 @@ void test_basic_observe() {
 | 陷阱文章 | 37 | 37 | 74 | 正文均为英文/中文 |
 | 示例代码 | - | - | 161 | 全部可编译、可运行、sanitizer 干净 |
 | 项目练习 | - | - | 151 | 全部构建通过、ctest 全绿 |
-| 测试函数 | - | - | 945 | 全部通过，且每一条都真的检查了东西 |
+| 测试函数 | - | - | 947 | 全部通过，且每一条都真的检查了东西 |
 
 ## 第十阶段：两处真实数据竞争（2026-10-31）
 
@@ -1454,4 +1454,52 @@ target_link_libraries(mylib_tests PRIVATE DemoProject_core)
 
 **验证方式**：让生成器写出一份真的 CMakeLists.txt，给它配上源文件，然后拿真
 的 cmake 去配置、去构建、去跑 ctest —— 配置、构建、测试全过。
+
+## 第二十九阶段：退订时把正在派发的事件搅乱了（2026-11-17）
+
+`observer-subscription` 的 `publish()` 直接遍历订阅者的列表：
+
+```cpp
+for (const auto& entry : it->second) {
+    entry.handler(event);
+}
+```
+
+而 handler 是**可以在派发过程中退订自己**的 —— "收到这条就不再要了"是最自然的
+用法。退订会把那个 vector 里的元素搬动（`remove_if` + `erase`），于是：
+
+- 排在后面的订阅者被**整个跳过**，而且之后再也不会被调用；
+- 更糟的是，循环手里那个引用已经指向一个被搬空的 `std::function`，调用它就抛
+  `std::bad_function_call` —— 程序直接 terminate（实测 core dump）。
+
+**处理**：派发之前先把 handler 抄一份，遍历那份。改动订阅列表就不会影响正在
+进行的这次派发。
+
+**一个自己踩的坑**：第一次写复现时，第二个订阅的 `unique_ptr` 是临时的，当场
+就被销毁、于是当场退订了 —— 于是复现"证明"的其实是一个**本来就正确**的行为。
+把两个订阅都留着，真正的 bug 才露出来。**先确认复现本身是对的**，再动手改。
+
+顺带把一条限制写进了 README：订阅不能比总线活得久（它握着一���回到总线的路）。
+
+### 同一家里的另一处：`observer-event`
+
+顺着同一类问题往family 里看了一眼，`17-stage17/observer-event` 也是一样的
+形状 —— `emit()` 直接遍历 handler 列表，而它有一个 `off()` 可以把整个事件类型
+删掉。于是 handler 在派发过程中调 `off()`，**正在遍历的那个 vector 被释放了**，
+循环接着调用了一个已释放的 `std::function`：
+
+```
+ERROR: AddressSanitizer: heap-use-after-free
+  #1 std::function<...>::operator()(...) const
+  #2 observer_event::EventDispatcher::emit(...) observer_event.hpp:36
+```
+
+这一处比订阅那个还重：订阅那个是抛了 `std::bad_function_call`，这个是直接
+用了已释放的内存。
+
+修法一样：派发之前先抄一份。
+
+**注意**：这一处的回归测试在**普通构建下是抓不住的** —— 释放掉的内存里还留着
+旧数据，handler 照样被调用，测试照样通过。只有在 ASan 那一关才现形（CI 里
+本来就有这一关 ✓）。
 
