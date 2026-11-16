@@ -2,6 +2,10 @@
 
 An observer event system for event-driven architecture.
 
+A handler may remove the subscription while the event is being
+delivered: the handlers are copied before the delivery starts, so that
+changing the subscription list does not free the list the delivery walks.
+
 ## Learning Goals
 
 - Understand event-driven architecture

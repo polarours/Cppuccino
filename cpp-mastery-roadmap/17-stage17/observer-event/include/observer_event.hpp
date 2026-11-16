@@ -30,11 +30,17 @@ public:
     }
 
     void emit(const Event& event) {
+        // The handlers are copied before they are called. A handler is
+        // allowed to remove the subscription while the event is being
+        // delivered, and that frees the very list the loop walks.
+        std::vector<EventHandler> handlers;
         auto it = handlers_.find(event.type);
         if (it != handlers_.end()) {
-            for (auto& handler : it->second) {
-                handler(event);
-            }
+            handlers = it->second;
+        }
+
+        for (auto& handler : handlers) {
+            handler(event);
         }
     }
 
