@@ -34,19 +34,39 @@ void test_generator_basic() {
     expect(!gen.next(), "expected done");
 }
 
-coroutine_pattern::Generator<int> fibonacci(int max) {
-    int a = 0, b = 1;
+coroutine_pattern::Generator<long long> fibonacci(long long max) {
+    // The numbers grow past what an int can hold at the 47th one, so
+    // they are counted in something bigger.
+    long long a = 0, b = 1;
     while (a <= max) {
         co_yield a;
-        int next = a + b;
+        const long long next = a + b;
         a = b;
         b = next;
     }
 }
 
+// Regression: the numbers were counted in an int, and the 47th
+// Fibonacci number does not fit in one. The signed overflow was undefined
+// behaviour, and the last number came out wrong. The argument here is an
+// upper bound, not a count, so it has to be the value itself.
+void test_fibonacci_past_what_an_int_can_hold() {
+    auto gen = fibonacci(2971215073LL);
+    long long last = 0;
+    std::size_t count = 0;
+    while (gen.next()) {
+        last = gen.value();
+        ++count;
+    }
+
+    expect(count == 48, "expected 48 numbers, got " + std::to_string(count));
+    expect(last == 2971215073LL,
+           "expected 2971215073, got " + std::to_string(last));
+}
+
 void test_fibonacci() {
     auto gen = fibonacci(10);
-    std::vector<int> results;
+    std::vector<long long> results;
     while (gen.next()) {
         results.push_back(gen.value());
     }
@@ -124,6 +144,9 @@ int main() {
 
         test_a_generator_that_was_moved_from_says_so();
         std::cout << "  test_a_generator_that_was_moved_from_says_so: PASS\n";
+
+        test_fibonacci_past_what_an_int_can_hold();
+        std::cout << "  test_fibonacci_past_what_an_int_can_hold: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "coroutine_pattern_tests failed: " << exception.what() << std::endl;

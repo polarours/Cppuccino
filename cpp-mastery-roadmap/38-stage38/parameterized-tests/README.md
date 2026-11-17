@@ -2,6 +2,10 @@
 
 Data-driven test execution.
 
+The numbers the tests are about do not overflow: the loop of `isPrime()`
+asks the division instead of multiplying, and `fibonacci()` counts in a
+`long long`, because the 47th Fibonacci number does not fit in an `int`.
+
 ## Build
 
 ```bash

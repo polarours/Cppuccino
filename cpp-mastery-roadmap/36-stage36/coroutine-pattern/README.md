@@ -7,6 +7,9 @@ already holds a generator: the coroutine that was there is destroyed, so
 it is not left behind. A generator that was moved from holds nothing, and
 says so when it is asked for its value.
 
+The Fibonacci generator counts in a `long long` and takes a `long long` upper
+bound: the 47th Fibonacci number does not fit in an `int`.
+
 ## Build
 
 ```bash

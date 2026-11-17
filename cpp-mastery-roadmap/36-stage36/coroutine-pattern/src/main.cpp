@@ -10,11 +10,13 @@ Generator<int> countTo(int n) {
     }
 }
 
-Generator<int> fibonacci(int max) {
-    int a = 0, b = 1;
+Generator<long long> fibonacci(long long max) {
+    // The numbers grow past what an int can hold at the 47th one, so
+    // they are counted in something bigger.
+    long long a = 0, b = 1;
     while (a <= max) {
         co_yield a;
-        int next = a + b;
+        const long long next = a + b;
         a = b;
         b = next;
     }

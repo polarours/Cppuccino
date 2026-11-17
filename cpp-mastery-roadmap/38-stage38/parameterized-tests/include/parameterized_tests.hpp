@@ -49,18 +49,24 @@ private:
 
 inline bool isPrime(int n) {
     if (n < 2) return false;
-    for (int i = 2; i * i <= n; ++i) {
+    // The square of the divisor does not fit in an int once the divisor
+    // passes 46340, so the loop condition asks the division instead.
+    // With the multiplication, a prime as large as 2147483647 was
+    // reported as a composite.
+    for (int i = 2; i <= n / i; ++i) {
         if (n % i == 0) return false;
     }
     return true;
 }
 
-inline int fibonacci(int n) {
+inline long long fibonacci(int n) {
     if (n <= 0) return 0;
     if (n == 1) return 1;
-    int a = 0, b = 1;
+    // The numbers grow past what an int can hold at the 47th one, so
+    // they are counted in something bigger.
+    long long a = 0, b = 1;
     for (int i = 2; i <= n; ++i) {
-        int next = a + b;
+        const long long next = a + b;
         a = b;
         b = next;
     }

@@ -41,7 +41,11 @@ void test_parameterized_prime() {
 
     std::vector<std::pair<int, bool>> cases = {
         {0, false}, {1, false}, {2, true}, {3, true}, {4, false},
-        {5, true}, {10, false}, {13, true}, {17, true}, {20, false}
+        {5, true}, {10, false}, {13, true}, {17, true}, {20, false},
+        // The square of the divisor does not fit in an int once the
+        // divisor passes 46340. With the multiplication, this prime was
+        // reported as a composite.
+        {2147483647, true}
     };
 
     for (auto [n, expected] : cases) {
@@ -50,15 +54,18 @@ void test_parameterized_prime() {
     }
 
     auto results = runner.run();
-    expect(results.total == 10, "expected 10 tests");
-    expect(results.passed == 10, "expected all 10 passed");
+    expect(results.total == 11, "expected 11 tests");
+    expect(results.passed == 11, "expected all 11 passed");
 }
 
 void test_parameterized_fibonacci() {
     parameterized_tests::TestRunner runner;
 
-    std::vector<std::pair<int, int>> cases = {
-        {0, 0}, {1, 1}, {2, 1}, {3, 2}, {4, 3}, {5, 5}, {10, 55}
+    // The numbers grow past what an int can hold at the 47th one, so the
+    // expected values are counted in something bigger too.
+    std::vector<std::pair<int, long long>> cases = {
+        {0, 0}, {1, 1}, {2, 1}, {3, 2}, {4, 3}, {5, 5}, {10, 55},
+        {47, 2971215073}
     };
 
     for (auto [input, expected] : cases) {
@@ -69,8 +76,8 @@ void test_parameterized_fibonacci() {
     }
 
     auto results = runner.run();
-    expect(results.total == 7, "expected 7 tests");
-    expect(results.passed == 7, "expected all 7 passed");
+    expect(results.total == 8, "expected 8 tests");
+    expect(results.passed == 8, "expected all 8 passed");
 }
 
 } // namespace
