@@ -71,6 +71,19 @@ void test_undo_empty_history() {
     expect(memento == nullptr, "expected nullptr for empty history");
 }
 
+// Regression: undo() on an empty history hands back nothing, and
+// restore() went straight through it -- the program died with a
+// segmentation fault.
+void test_restore_from_an_empty_history() {
+    memento_pattern::Editor editor;
+    memento_pattern::EditorHistory history;
+
+    editor.type("hello");
+    editor.restore(history.undo());
+
+    expect(editor.getContent() == "hello", "expected the content to stay");
+}
+
 } // namespace
 
 int main() {
@@ -87,6 +100,8 @@ int main() {
 
         test_undo_empty_history();
         std::cout << "  test_undo_empty_history: PASS\n";
+
+        test_restore_from_an_empty_history();
 
     } catch (const std::exception& exception) {
         std::cerr << "memento_pattern_tests failed: " << exception.what() << std::endl;

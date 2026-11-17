@@ -46,6 +46,11 @@ public:
     }
 
     void restore(const std::shared_ptr<EditorMemento>& memento) {
+        // There may be nothing to restore: the history was empty. That is
+        // not a reason to bring the program down.
+        if (!memento) {
+            return;
+        }
         content_ = memento->state();
     }
 

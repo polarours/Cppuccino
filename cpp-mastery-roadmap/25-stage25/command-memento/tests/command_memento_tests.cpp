@@ -64,6 +64,19 @@ void test_remove() {
     expect(editor.content() == "Hello", "expected Hello");
 }
 
+// Regression: pop() on an empty history hands back nothing, and
+// restore() went straight through it -- the program died with a
+// segmentation fault.
+void test_restore_from_an_empty_history() {
+    command_memento::Editor editor;
+    command_memento::History history;
+
+    editor.type("hello");
+    editor.restore(history.pop());
+
+    expect(editor.content() == "hello", "expected the content to stay");
+}
+
 } // namespace
 
 int main() {
@@ -77,6 +90,8 @@ int main() {
 
         test_remove();
         std::cout << "  test_remove: PASS\n";
+
+        test_restore_from_an_empty_history();
 
     } catch (const std::exception& exception) {
         std::cerr << "command_memento_tests failed: " << exception.what() << std::endl;

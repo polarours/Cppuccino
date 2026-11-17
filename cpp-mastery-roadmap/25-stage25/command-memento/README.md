@@ -2,6 +2,10 @@
 
 Command pattern with memento for state preservation.
 
+`pop()` on an empty history hands back nothing, and `restore()` with
+nothing to restore leaves the editor alone instead of bringing the
+program down.
+
 ## Build
 
 ```bash
