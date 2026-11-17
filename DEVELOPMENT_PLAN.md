@@ -798,7 +798,7 @@ void test_basic_observe() {
 | 陷阱文章 | 37 | 37 | 74 | 正文均为英文/中文 |
 | 示例代码 | - | - | 161 | 全部可编译、可运行、sanitizer 干净 |
 | 项目练习 | - | - | 151 | 全部构建通过、ctest 全绿 |
-| 测试函数 | - | - | 947 | 全部通过，且每一条都真的检查了东西 |
+| 测试函数 | - | - | 949 | 全部通过，且每一条都真的检查了东西 |
 
 ## 第十阶段：两处真实数据竞争（2026-10-31）
 
@@ -1502,4 +1502,31 @@ ERROR: AddressSanitizer: heap-use-after-free
 **注意**：这一处的回归测试在**普通构建下是抓不住的** —— 释放掉的内存里还留着
 旧数据，handler 照样被调用，测试照样通过。只有在 ASan 那一关才现形（CI 里
 本来就有这一关 ✓）。
+
+## 第三十阶段：没有快照可恢复的时候（2026-11-17）
+
+两个"备忘录"项目，同一个毛病：
+
+```cpp
+void restore(std::shared_ptr<EditorMemento> memento) {
+    content_ = memento->getContent();     // memento 可能是空的
+}
+```
+
+而它们的"撤销栈"在**空的时候正好返回 nullptr**
+（`memento-pattern` 的 `undo()` 和 `command-memento` 的 `pop()`）。
+
+于是最自然的写法 —— "恢复��上一个快照，没有就算了" —— 直接段错误（实测
+exit=139）：
+
+```cpp
+editor.restore(history.undo());
+```
+
+现在 `restore()` 拿着空快照就原样返回 ✓。
+
+**一个提醒**：这个 bug 用普通的测试是**抓不住**的（段错误会让测试进程直接死，
+但 ctest 会报 FAILED ✓ —— 这个是抓得住的）。真正难的是另一种：像上一轮
+`observer-event` 那样，释放掉的内存里还留着旧数据，测试照样通过，只有 ASan
+才现形。
 
