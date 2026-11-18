@@ -16,10 +16,8 @@ public:
 
     // slots: wheel size; tickIntervalMs: real ms each tick covers.
     explicit TimerWheel(std::size_t slots = 64, std::uint64_t tickIntervalMs = 10)
-        : slots_(slots), interval_(tickIntervalMs),
-          buckets_(slots) {
-        if (slots_ == 0) slots_ = 1;
-    }
+        : slots_(slots == 0 ? 1 : slots), interval_(tickIntervalMs),
+          buckets_(slots == 0 ? 1 : slots) {}
 
     // Schedule fireAtTickAbs -> returns a timer id.
     std::uint64_t scheduleAt(std::uint64_t fireAtTickAbs, Callback cb);

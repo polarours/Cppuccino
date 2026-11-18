@@ -3,6 +3,9 @@
 Probabilistic membership structure: no false negatives, tunable false
 positives, k hash functions via double hashing over a packed bit array.
 
+With zero bits the filter simply stores nothing: `add()` does nothing and
+`contains()` is always false (matching the false-positive rate of 1).
+
 ## Learning Goals
 
 - Why bloom filters never false-negative (bits are only set, never cleared)

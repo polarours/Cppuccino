@@ -82,6 +82,28 @@ void test_the_event_reaches_the_handler_unchanged() {
     expect(received.data == "clicked", "expected the data");
 }
 
+// Registering a handler from inside a handler used to invalidate the
+// vector being iterated. The new handler belongs to the next dispatch.
+void test_register_during_notify() {
+    observer_mediator::Mediator mediator;
+
+    int calls = 0;
+    int extra = 0;
+    mediator.registerHandler("e", [&calls](const observer_mediator::Event&) { ++calls; });
+    mediator.registerHandler("e", [&calls, &mediator, &extra](const observer_mediator::Event&) {
+        ++calls;
+        mediator.registerHandler("e", [&extra](const observer_mediator::Event&) { ++extra; });
+    });
+
+    mediator.notify("src", {"e", "x"});
+    expect(calls == 2, "only the handlers present at dispatch time run now");
+    expect(extra == 0, "the new handler does not join this dispatch");
+
+    mediator.notify("src", {"e", "y"});
+    expect(calls == 4, "the original two handlers run again");
+    expect(extra == 1, "the new handler runs on the next notify");
+}
+
 } // namespace
 
 int main() {
@@ -101,6 +123,9 @@ int main() {
 
         test_the_event_reaches_the_handler_unchanged();
         std::cout << "  test_the_event_reaches_the_handler_unchanged: PASS\n";
+
+        test_register_during_notify();
+        std::cout << "  test_register_during_notify: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "observer_mediator_tests failed: " << exception.what() << std::endl;

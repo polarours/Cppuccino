@@ -23,6 +23,10 @@ and the validator therefore run under that lock: they must not call back
 into the pool, because the mutex is not recursive and the call would
 wait for itself.
 
+An object checked out of the pool may outlive the pool itself: the returned
+`shared_ptr` keeps the shared state alive. Releasing it after the pool is gone
+deletes the object instead of trying to return it to a dead pool.
+
 
 ## Features
 

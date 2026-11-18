@@ -22,10 +22,16 @@ public:
 
     void publish(const Event& event) {
         auto it = handlers_.find(event.type);
-        if (it != handlers_.end()) {
-            for (auto& handler : it->second) {
-                handler(event);
-            }
+        if (it == handlers_.end()) {
+            return;
+        }
+
+        // A handler may subscribe to the same event while this dispatch is
+        // running. Iterate over a snapshot so a reallocation of the map's
+        // vector cannot invalidate the loop.
+        std::vector<Handler> snapshot = it->second;
+        for (auto& handler : snapshot) {
+            handler(event);
         }
     }
 

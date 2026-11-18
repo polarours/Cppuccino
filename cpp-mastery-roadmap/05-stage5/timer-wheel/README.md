@@ -3,6 +3,8 @@
 Single-level timing wheel: O(1) schedule/cancel by absolute tick, with
 re-check on rotation so far-future timers survive a full lap.
 
+Zero slots are clamped to one, so a wheel built that way stays in bounds.
+
 ## Learning Goals
 
 - Slot index = absolute tick modulo wheel size

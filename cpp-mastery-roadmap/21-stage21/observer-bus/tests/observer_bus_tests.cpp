@@ -51,6 +51,29 @@ void test_handler_count() {
     expect(bus.handlerCount("scroll") == 0, "expected no handlers for scroll");
 }
 
+// A handler that subscribes during a dispatch must not invalidate the
+// loop. The new handler starts with the next publish, not this one.
+void test_subscribe_during_publish() {
+    observer_bus::EventBus bus;
+
+    int calls = 0;
+    int extra = 0;
+    bus.subscribe("e", [&calls](const observer_bus::Event&) { ++calls; });
+    bus.subscribe("e", [&calls, &bus, &extra](const observer_bus::Event&) {
+        ++calls;
+        bus.subscribe("e", [&extra](const observer_bus::Event&) { ++extra; });
+    });
+
+    bus.publish({"e", "x"});
+    expect(calls == 2, "only the handlers present at dispatch time run now");
+    expect(extra == 0, "the new handler does not join this dispatch");
+    expect(bus.handlerCount("e") == 3, "the new handler is registered");
+
+    bus.publish({"e", "y"});
+    expect(calls == 4, "the original two handlers run again");
+    expect(extra == 1, "the new handler runs on the next publish");
+}
+
 } // namespace
 
 int main() {
@@ -64,6 +87,9 @@ int main() {
 
         test_handler_count();
         std::cout << "  test_handler_count: PASS\n";
+
+        test_subscribe_during_publish();
+        std::cout << "  test_subscribe_during_publish: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "observer_bus_tests failed: " << exception.what() << std::endl;

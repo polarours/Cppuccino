@@ -78,6 +78,15 @@ void test_interval_reported() {
     expect(w.intervalMs() == 25, "interval stored");
 }
 
+void test_zero_slots_clamped() {
+    timer_wheel::TimerWheel w(0, 1);
+    int fired = 0;
+    w.scheduleIn(1, [&] { ++fired; });
+    w.tick(1);
+    expect(fired == 1, "a zero-slot wheel behaves as a one-slot wheel");
+    expect(w.pendingCount() == 0, "nothing left pending");
+}
+
 }  // namespace
 
 int main() {
@@ -89,6 +98,7 @@ int main() {
         test_same_slot_different_times();
         test_cancel_all_then_tick_idempotent();
         test_interval_reported();
+        test_zero_slots_clamped();
         std::cout << "All timer_wheel tests passed\n";
         return 0;
     } catch (const std::exception& e) {

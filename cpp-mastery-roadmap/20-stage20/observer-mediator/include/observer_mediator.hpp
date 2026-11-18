@@ -29,10 +29,15 @@ public:
 
     void notify([[maybe_unused]] const std::string& sender, const Event& event) {
         auto it = handlers_.find(event.type);
-        if (it != handlers_.end()) {
-            for (auto& handler : it->second) {
-                handler(event);
-            }
+        if (it == handlers_.end()) {
+            return;
+        }
+
+        // A handler can register another handler for the same event while
+        // this dispatch is running; copy first so the loop stays valid.
+        std::vector<EventHandler> snapshot = it->second;
+        for (auto& handler : snapshot) {
+            handler(event);
         }
     }
 

@@ -30,6 +30,12 @@ public:
     void put(const Key& key, Value value) {
         std::lock_guard<std::mutex> lock(mutex_);
 
+        // There is no entry to evict when the capacity is zero. Going on
+        // would call back() on an empty list and abort the process.
+        if (capacity_ == 0) {
+            return;
+        }
+
         auto it = map_.find(key);
         if (it != map_.end()) {
             // Update existing entry

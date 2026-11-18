@@ -20,7 +20,8 @@ A generic thread-safe cache with TTL support and eviction policies.
 - Generic template-based cache
 - Thread-safe with read-write locks
 - TTL-based expiration
-- LRU eviction when at capacity
+- LRU eviction when at capacity; `get()` refreshes recency and takes the write lock
+- Zero capacity stores nothing, with or without a TTL
 - getOrElse and getOrCreate helpers
 
 ## Build

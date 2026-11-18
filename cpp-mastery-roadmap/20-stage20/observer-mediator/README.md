@@ -2,6 +2,10 @@
 
 An observer pattern combined with mediator for event coordination.
 
+Notification goes through a snapshot of the handler list, so a handler can
+register another handler for the same event during dispatch; it starts with
+the next notify.
+
 ## Learning Goals
 
 - Understand observer-mediator combination

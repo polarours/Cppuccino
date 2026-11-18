@@ -113,6 +113,30 @@ void test_shared_ptr_ownership() {
     obj2.reset();  // Returns to pool when last shared_ptr is destroyed
 }
 
+// Regression: the deleter used to capture `this`. Returning an object
+// after the pool was gone wrote into a dead pool. Under ASan that was a
+// stack-use-after-scope; here we also check that it is deleted exactly once.
+void test_shared_ptr_outliving_pool() {
+    std::atomic<int> deleted{0};
+    std::shared_ptr<TestObject> escaped;
+
+    {
+        object_pool::ObjectPool<TestObject> pool(
+            []() { return new TestObject(7); },
+            [&deleted](TestObject* p) {
+                ++deleted;
+                delete p;
+            },
+            1
+        );
+        escaped = pool.acquire();
+    }
+
+    expect(deleted == 0, "expected the checked-out object to outlive the pool");
+    escaped.reset();
+    expect(deleted == 1, "expected the object to be deleted exactly once");
+}
+
 void test_pool_clear() {
     int nextId = 0;
     object_pool::ObjectPool<TestObject> pool(
@@ -148,6 +172,9 @@ int main() {
 
         test_shared_ptr_ownership();
         std::cout << "  test_shared_ptr_ownership: PASS\n";
+
+        test_shared_ptr_outliving_pool();
+        std::cout << "  test_shared_ptr_outliving_pool: PASS\n";
 
         test_pool_clear();
         std::cout << "  test_pool_clear: PASS\n";

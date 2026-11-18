@@ -117,6 +117,39 @@ void test_get_or_create() {
     expect(createCount == 1, "expected creator not to be called again");
 }
 
+// Regression: capacity() said zero, but set() still stored an entry
+// because there was nothing there to evict.
+void test_zero_capacity_set() {
+    thread_safe_cache::Cache<std::string, int> cache(0);
+
+    cache.set("a", 1);
+    cache.set("b", 2, std::chrono::seconds(1));
+
+    expect(cache.capacity() == 0, "expected a zero capacity");
+    expect(cache.size() == 0, "expected a zero-capacity cache to stay empty");
+    expect(!cache.contains("a"), "expected nothing to be stored");
+    expect(!cache.get("b").has_value(), "expected no value to come back");
+    expect(cache.getOrElse("a", 42) == 42, "expected the default value");
+}
+
+// Regression: eviction used to remove map.begin(), which is the smallest
+// key rather than the least recently used one.
+void test_eviction_uses_recency_not_key_order() {
+    thread_safe_cache::Cache<std::string, int> cache(2);
+
+    cache.set("b", 1);
+    cache.set("a", 2);
+    cache.set("c", 3);
+    expect(!cache.contains("b"), "expected 'b' to be evicted, not the smallest key");
+    expect(cache.contains("a") && cache.contains("c"), "expected 'a' and 'c' to remain");
+
+    // A read makes 'a' recent again, so 'c' is the next victim.
+    cache.get("a");
+    cache.set("d", 4);
+    expect(!cache.contains("c"), "expected 'c' to be evicted after the read of 'a'");
+    expect(cache.contains("a") && cache.contains("d"), "expected 'a' and 'd' to remain");
+}
+
 void test_concurrent_access() {
     thread_safe_cache::Cache<int, int> cache(100);
     std::atomic<int> completed{0};
@@ -184,6 +217,12 @@ int main() {
 
         test_get_or_create();
         std::cout << "  test_get_or_create: PASS\n";
+
+        test_zero_capacity_set();
+        std::cout << "  test_zero_capacity_set: PASS\n";
+
+        test_eviction_uses_recency_not_key_order();
+        std::cout << "  test_eviction_uses_recency_not_key_order: PASS\n";
 
         test_concurrent_access();
         std::cout << "  test_concurrent_access: PASS\n";

@@ -19,6 +19,7 @@ A thread-safe Least Recently Used (LRU) cache implementation.
 
 - O(1) get and put operations
 - LRU eviction when at capacity
+- A zero-capacity cache stores nothing
 - Thread-safe with mutex
 - Contains and size queries
 - Clear operation

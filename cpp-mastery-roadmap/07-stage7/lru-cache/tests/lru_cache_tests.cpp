@@ -120,6 +120,20 @@ void test_get_or_else() {
     expect(cache.getOrElse("key", 42) == 100, "expected stored value");
 }
 
+// Regression: with no capacity there is nothing to evict. put() used to
+// call back() on an empty list and abort the process.
+void test_zero_capacity_put() {
+    lru_cache::LRUCache<int, int> cache(0);
+
+    cache.put(1, 10);
+    cache.put(2, 20);
+
+    expect(cache.size() == 0, "expected a zero-capacity cache to stay empty");
+    expect(!cache.contains(1), "expected nothing to be stored");
+    expect(!cache.get(2).has_value(), "expected no value to come back");
+    expect(cache.getOrElse(1, 7) == 7, "expected the default value");
+}
+
 void test_concurrent_access() {
     lru_cache::LRUCache<int, int> cache(100);
     std::atomic<int> completed{0};
@@ -185,6 +199,9 @@ int main() {
 
         test_get_or_else();
         std::cout << "  test_get_or_else: PASS\n";
+
+        test_zero_capacity_put();
+        std::cout << "  test_zero_capacity_put: PASS\n";
 
         test_concurrent_access();
         std::cout << "  test_concurrent_access: PASS\n";

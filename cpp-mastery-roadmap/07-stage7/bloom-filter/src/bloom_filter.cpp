@@ -38,6 +38,10 @@ bool BloomFilter::testBit(std::size_t idx) const {
 }
 
 void BloomFilter::add(const std::string& item) {
+    // With no bits there is nowhere to store anything. The hashes would
+    // divide by m_ == 0 otherwise.
+    if (m_ == 0) return;
+
     auto [h1, h2] = baseHashes(item);
     for (std::size_t i = 0; i < k_; ++i) {
         setBit((h1 + i * h2) % m_);
@@ -45,6 +49,8 @@ void BloomFilter::add(const std::string& item) {
 }
 
 bool BloomFilter::contains(const std::string& item) const {
+    if (m_ == 0) return false;  // nothing was ever added
+
     auto [h1, h2] = baseHashes(item);
     for (std::size_t i = 0; i < k_; ++i) {
         if (!testBit((h1 + i * h2) % m_)) return false;

@@ -66,6 +66,14 @@ void test_deterministic() {
     expect(a.contains("same") == b.contains("same"), "deterministic across instances");
 }
 
+void test_zero_bits() {
+    bloom_filter::BloomFilter bf(0, 3);
+    bf.add("x");
+    expect(!bf.contains("x"), "a filter with no bits stores nothing");
+    expect(bf.bitCount() == 0, "bit count stays zero");
+    expect(bf.falsePositiveRate(1) == 1.0, "false-positive rate stays 1");
+}
+
 }  // namespace
 
 int main() {
@@ -76,6 +84,7 @@ int main() {
         test_set_bits_grow();
         test_dimensions();
         test_deterministic();
+        test_zero_bits();
         std::cout << "All bloom_filter tests passed\n";
         return 0;
     } catch (const std::exception& e) {
