@@ -8,7 +8,7 @@
 | 陷阱文章 (pitfalls) | 37 篇 | 37 篇 | 74 篇 |
 | 示例代码 (examples) | - | - | 161 个 |
 | 项目练习 | - | - | 151 个 |
-| 测试函数 | - | - | 950 个 |
+| 测试函数 | - | - | 958 个 |
 
 ## 第一阶段：补充核心概念文档 (预计 2-3 天)
 
@@ -1565,4 +1565,67 @@ demo 和测试里的生成器签名都同步了，两个项目的 README 双语�
 
 **统计跟着变**：回归测试让测试函数从 949 个变成 950 个，README 两版和计划顶部的
 「当前状态」表都已同步（顺带修掉 README 正文里 158/159 个示例的旧数字）。
+
+## 第三十二阶段：容量为零的缓存（2026-11-17）
+
+两个缓存都允许构造时传 0，都没准备好。
+
+**一、`lru-cache` 直接崩。** `put()` 发现 `map_.size() >= capacity_` 就拿
+`order_.back()` 当牺牲品；容量 0 时链表是空的，`back()` 断言失败
+（`Assertion '!this->empty()' failed`），进程 abort（exit=134）。现在容量为 0 时
+`put()` 直接返回，回归测试断言 `size() == 0` 且 `get()` 落空。
+
+**二、`thread-safe-cache` 嘴上说 0，手里存一个。** `set()` 看到
+`data_.size() >= 0` 就调 `evictOldest()`，而它对空表什么都不做，条目照样写进去。
+实测 `capacity=0 size=1`。两个 `set()` 重载现在都在容量为 0 时直接返回。
+
+**三、它的 "LRU" 其实是按 key 排序。** `evictOldest()` 删的是 `std::map::begin()`，
+也就是键最小的那条；容量 2 下依次放 `b, a, c`，留下的是 `a, c` 而不是 `b, c`
+（实测 `b=1 a=0 c=1`）。现在用一条链表记最近使用顺序：`get()` 命中会把它挪到链首
+（所以读也拿写锁），`set()` 更新同样刷新，驱逐删链尾；`erase()` / `clear()` 一起维护
+这条链。回归测试同时覆盖"按 key 驱逐"和"读之后刷新"两个场景。
+
+**四、`object-pool` 的删除器抓着死掉的池。** `acquire()` 返回的 `shared_ptr` 用
+`[this]` 当删除器：对象比池活得久时，释放它会往已经析构的 `queue` 里 push。
+实测 ASan 报 `stack-use-after-scope`（object_pool.hpp:43），退出码 1。
+现在队列、锁、工厂、删除器放进一个 `shared_ptr<State>`，删除器持有这份状态；
+池析构时标记 `closed` 并清空空闲对象，之后归还的对象直接删除。回归测试断言
+对象只被删一次，stage 8 的 ASan/UBSan 和 TSan 全绿（4/4）。
+
+**五、`bloom-filter` 的零位过滤器除以零。** `falsePositiveRate()` 明确判断了
+`m_ == 0`，说明代码本意容许零位，但 `baseHashes()` 直接 `h % m_`；
+`BloomFilter(0, 3).add("x")` 实测 SIGFPE（exit=136）。现在 `add()` 在零位时
+直接返回，`contains()` 返回 false，和已有的 FPR=1.0 口径一致。
+
+**六、`timer-wheel` 的零槽轮盘越界。** 构造函数把 `slots_ == 0` 修正成 1，却用
+**修正前**的入参构建 `buckets_`，于是桶数是 0 而取模是 1。`scheduleIn(1, ...)` +
+`tick(1)` 实测 `operator[] Assertion '__n < this->size()' failed`（exit=134）。
+现在初始化列表里两处都用同一个钳制后的槽数。
+
+**验证**：五个项目 CMake + CTest 全绿，stage 5 / 7 / 8 的 ASan/UBSan 与 TSan
+全绿。测试函数 950 → 956，README 两版和计划顶部表格同步。
+
+## 第三十三阶段：派发过程中又注册了一个 handler（2026-11-17）
+
+第二十九阶段修过 `observer-subscription` / `observer-event` 的同类问题，同一
+family 里还有两个项目没修。
+
+**一、`observer-bus`** 的 `publish()` 直接 range-for 遍历 `it->second`；handler
+在回调里 `subscribe()` 同一事件会让 vector 重分配，正在用的迭代器失效。
+`_GLIBCXX_DEBUG` 实测 `attempt to increment a singular iterator`，exit=134；
+普通 ASan 构建静默通过（calls=2），又是"测试绿但 UB 在"的那类。
+
+**二、`observer-mediator`** 的 `notify()` 一模一样，handler 回调里
+`registerHandler()` 同一事件触发同一问题，实测也是 singular iterator（exit=134）。
+
+两处都在派发前把 handler vector 拷成局部快照，遍历快照；新注册的 handler
+从下一次派发开始生效，双语 README 写明了语义。
+
+**回归测试也写错过一次**：最初断言第二次派发后 `calls == 5`，实际是 4——
+第二个 handler 每次派发都会再订阅一个，但只有原来的两个会增加 `calls`。
+改成用独立的 `extra` 计数确认新 handler 在下一轮确实被调用，断言才真的
+检验了"新订阅下一轮生效"。
+
+**验证**：两个项目 CMake + CTest 全绿，两个 stage 的 ASan/UBSan 全绿（各 3/3）。
+测试函数 956 → 958，README 两版和计划顶部表格同步。
 

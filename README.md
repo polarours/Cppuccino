@@ -20,7 +20,7 @@ public learning resource.
 | Pitfalls | 74 articles (37 en + 37 zh) |
 | Examples | 161 runnable examples |
 | Projects | 151 projects across 43 stages |
-| Tests | 950 (all passing) |
+| Tests | 958 (all passing) |
 
 ## Start Here
 
