@@ -107,7 +107,7 @@ def main():
     args = parser.parse_args()
     root = os.path.abspath(args.root)
 
-    skip_dirs = {'.git', 'build', '.workbuddy'}
+    skip_dirs = {'.git', 'build'}
     md_files = []
     for dirpath, dirnames, filenames in os.walk(root):
         dirnames[:] = [d for d in dirnames if d not in skip_dirs]

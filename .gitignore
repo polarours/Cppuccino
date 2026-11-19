@@ -51,9 +51,6 @@ build/
 *.swp
 cmake-build-*
 
-# WorkBuddy assistant working memory (not part of the project source)
-.workbuddy/
-
 # Python bytecode from the tools
 __pycache__/
 *.pyc
