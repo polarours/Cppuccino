@@ -95,12 +95,10 @@ long long Store::ttlSeconds(const std::string& key, Clock::time_point now) const
     auto it = kv_.find(key);
     if (it == kv_.end() || expired(it->second, now)) return -2;
     if (!it->second.expiresAt) return -1;
-    auto remain = std::chrono::duration_cast<std::chrono::seconds>(
-        *it->second.expiresAt - now);
-    long long secs = remain.count();
-    // round up sub-second remainders (Redis behaves this way)
-    if (*it->second.expiresAt > now && secs * 1000000000LL == 0) secs = 1;
-    if (*it->second.expiresAt - now > remain) ++secs;
+    auto remain = *it->second.expiresAt - now;
+    long long secs = std::chrono::duration_cast<std::chrono::seconds>(remain).count();
+    // round up a sub-second remainder (Redis rounds TTL up)
+    if (remain > std::chrono::seconds(secs)) ++secs;
     return secs < 0 ? 0 : secs;
 }
 

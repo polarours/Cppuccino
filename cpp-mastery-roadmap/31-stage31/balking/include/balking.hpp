@@ -28,13 +28,15 @@ public:
         saved_ = false;
     }
 
-    bool isOpen() const { return opened_; }
-    bool isSaved() const { return saved_; }
+    // The state is atomic so isOpen()/isSaved() can be read from another
+    // thread; the mutex keeps the transitions themselves exclusive.
+    bool isOpen() const { return opened_.load(); }
+    bool isSaved() const { return saved_.load(); }
 
 private:
     std::mutex mutex_;
-    bool opened_ = false;
-    bool saved_ = false;
+    std::atomic<bool> opened_{false};
+    std::atomic<bool> saved_{false};
 };
 
 class Sensor {

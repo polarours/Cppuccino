@@ -31,6 +31,48 @@ void test_lru_cache() {
     expect(cache.size() == 3, "expected size 3");
 }
 
+// Regression: eviction removed map.begin(), the smallest key, not the least
+// recently used one, and a read did not count as a use.
+void test_lru_evicts_by_recency() {
+    strategy_cache::LRUStrategy<std::string, int> lru(3);
+
+    lru.put("a", 1);
+    lru.put("b", 2);
+    lru.put("c", 3);
+    lru.get("a");  // 'a' becomes the most recently used
+    lru.put("d", 4);
+
+    expect(lru.get("a").has_value(), "expected 'a' to survive the read");
+    expect(!lru.get("b").has_value(), "expected 'b' to be evicted, not 'a'");
+    expect(lru.get("c").has_value(), "expected 'c' to survive");
+    expect(lru.get("d").has_value(), "expected 'd' to be stored");
+}
+
+// A put over an existing key refreshes it too. Separate instance, so the
+// get() calls in the assertions above cannot shape this eviction.
+void test_lru_put_refreshes() {
+    strategy_cache::LRUStrategy<std::string, int> lru(3);
+
+    lru.put("x", 1);
+    lru.put("y", 2);
+    lru.put("z", 3);
+    lru.put("x", 10);  // refresh 'x', so 'y' is the least recently used
+    lru.put("w", 4);
+
+    expect(lru.get("x").has_value(), "expected refreshed 'x' to survive");
+    expect(!lru.get("y").has_value(), "expected 'y' to be evicted");
+    expect(lru.get("z").has_value(), "expected 'z' to survive");
+    expect(lru.get("w").has_value(), "expected 'w' to be stored");
+}
+
+// Regression: a zero-capacity strategy used to call map::erase(end()).
+void test_lru_zero_capacity() {
+    strategy_cache::LRUStrategy<std::string, int> lru(0);
+    lru.put("x", 1);
+    expect(lru.size() == 0, "expected a zero-capacity strategy to store nothing");
+    expect(!lru.get("x").has_value(), "expected nothing to come back");
+}
+
 void test_ttl_cache() {
     strategy_cache::Cache<std::string, int> cache;
     cache.setStrategy(std::make_shared<strategy_cache::TTLStrategy<std::string, int>>(
@@ -71,6 +113,15 @@ int main() {
         std::cout << "Strategy Cache Tests:\n";
         test_lru_cache();
         std::cout << "  test_lru_cache: PASS\n";
+
+        test_lru_evicts_by_recency();
+        std::cout << "  test_lru_evicts_by_recency: PASS\n";
+
+        test_lru_put_refreshes();
+        std::cout << "  test_lru_put_refreshes: PASS\n";
+
+        test_lru_zero_capacity();
+        std::cout << "  test_lru_zero_capacity: PASS\n";
 
         test_ttl_cache();
         std::cout << "  test_ttl_cache: PASS\n";

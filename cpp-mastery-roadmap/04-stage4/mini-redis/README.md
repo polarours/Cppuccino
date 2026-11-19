@@ -8,6 +8,7 @@ TTL/DBSIZE), RESP-style replies, and lazy TTL expiry.
 - Command dispatch table with arity checks and uniform error replies
 - Lazy expiration: why access-time checks are enough for correctness
 - TTL semantics: -2/-1/rounding, expiry on write paths
+  (a sub-second remainder rounds up once, so 900 ms left reports 1)
 - Integer-parsing discipline for INCR (reject trailing garbage)
 
 ## Non-Goals

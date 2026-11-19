@@ -1,5 +1,6 @@
 #include "arena_allocator.hpp"
 
+#include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -52,6 +53,21 @@ void test_oom() {
     expect(p2 == nullptr, "expected null when full");
 }
 
+// Regression: a huge request used to wrap alignedOffset + size around and
+// slip past the capacity check, returning a pointer into the arena and
+// even rewinding the offset.
+void test_huge_request_returns_null() {
+    arena_allocator::Arena arena(64);
+    arena.allocate(16);
+
+    void* huge = arena.allocate(SIZE_MAX - 8, 1);
+    expect(huge == nullptr, "expected a huge request to be refused");
+    expect(arena.used() == 16, "expected the offset to be left alone");
+
+    void* small = arena.allocate(8);
+    expect(small != nullptr, "expected a small request to still work");
+}
+
 } // namespace
 
 int main() {
@@ -68,6 +84,9 @@ int main() {
 
         test_oom();
         std::cout << "  test_oom: PASS\n";
+
+        test_huge_request_returns_null();
+        std::cout << "  test_huge_request_returns_null: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "arena_allocator_tests failed: " << exception.what() << std::endl;

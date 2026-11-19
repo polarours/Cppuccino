@@ -2,6 +2,9 @@
 
 Manual SIMD-style vectorization for math operations.
 
+The element-wise operations read both vectors at the same index, so a
+shorter operand limits the result instead of reading past its end.
+
 ## Build
 
 ```bash

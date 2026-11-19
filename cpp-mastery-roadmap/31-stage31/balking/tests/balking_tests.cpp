@@ -1,8 +1,10 @@
 #include "balking.hpp"
 
+#include <atomic>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <thread>
 
 namespace {
 
@@ -38,6 +40,28 @@ void test_close_balking() {
     expect(!doc.isOpen(), "expected still closed");
 }
 
+// Regression: isOpen()/isSaved() read plain bools that another thread wrote
+// under the mutex, which was a data race. The state is atomic now.
+void test_concurrent_reader() {
+    balking_pattern::Document doc;
+    doc.open();
+
+    std::atomic<int> openReads{0};
+    std::thread writer([&doc] {
+        for (int i = 0; i < 1000; ++i) {
+            doc.close();
+            doc.open();
+        }
+    });
+    for (int i = 0; i < 1000; ++i) {
+        if (doc.isOpen()) ++openReads;
+        (void)doc.isSaved();
+    }
+    writer.join();
+
+    expect(openReads.load() > 0, "expected the reader to see the document open");
+}
+
 void test_sensor_threshold() {
     balking_pattern::Sensor sensor(100);
 
@@ -65,6 +89,9 @@ int main() {
 
         test_close_balking();
         std::cout << "  test_close_balking: PASS\n";
+
+        test_concurrent_reader();
+        std::cout << "  test_concurrent_reader: PASS\n";
 
         test_sensor_threshold();
         std::cout << "  test_sensor_threshold: PASS\n";

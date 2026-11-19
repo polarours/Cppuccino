@@ -2,6 +2,10 @@
 
 A cache with configurable strategies (LRU, TTL).
 
+The LRU strategy evicts by recency: a read or a put moves the key to the
+front, and the back is what gets evicted. A zero-capacity strategy stores
+nothing.
+
 ## Learning Goals
 
 - Understand cache strategy patterns

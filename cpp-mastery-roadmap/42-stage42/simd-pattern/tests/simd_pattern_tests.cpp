@@ -80,6 +80,29 @@ void test_unaligned_sizes() {
     expect(result[2] == 9, "expected 9");
 }
 
+// Regression: the loops ran to a.size() while reading b[i..i+3], so a
+// longer a read past the end of a shorter b. A shorter operand now limits
+// the result.
+void test_unequal_lengths() {
+    std::vector<float> a = {1, 2, 3, 4, 5, 6, 7, 8};
+    std::vector<float> b = {10, 20, 30, 40};
+
+    auto sum = simd_pattern::VectorMath::add(a, b);
+    expect(sum.size() == 4, "expected 4 results");
+    expect(sum[0] == 11 && sum[3] == 44, "expected element-wise add");
+
+    auto prod = simd_pattern::VectorMath::multiply(a, b);
+    expect(prod.size() == 4, "expected 4 results");
+    expect(prod[2] == 90, "expected element-wise multiply");
+
+    expectNear(simd_pattern::VectorMath::dotProduct(a, b), 300.0f,
+               "expected dot over the common length");
+
+    auto mix = simd_pattern::VectorMath::lerp(a, b, 0.5f);
+    expect(mix.size() == 4, "expected 4 results");
+    expectNear(mix[0], 5.5f, "expected lerp");
+}
+
 } // namespace
 
 int main() {
@@ -102,6 +125,9 @@ int main() {
 
         test_unaligned_sizes();
         std::cout << "  test_unaligned_sizes: PASS\n";
+
+        test_unequal_lengths();
+        std::cout << "  test_unequal_lengths: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "simd_pattern_tests failed: " << exception.what() << std::endl;

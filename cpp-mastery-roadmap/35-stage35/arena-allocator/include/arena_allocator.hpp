@@ -12,7 +12,10 @@ public:
 
     void* allocate(std::size_t size, std::size_t alignment = alignof(std::max_align_t)) {
         std::size_t alignedOffset = (offset_ + alignment - 1) & ~(alignment - 1);
-        if (alignedOffset + size > memory_.size()) return nullptr;
+        // alignedOffset + size can wrap around on a huge request and slip
+        // past the check, so subtract instead of adding.
+        if (alignedOffset > memory_.size() || size > memory_.size() - alignedOffset)
+            return nullptr;
         void* ptr = &memory_[alignedOffset];
         offset_ = alignedOffset + size;
         return ptr;

@@ -44,6 +44,20 @@ void test_ttl_semantics() {
     expect(s.ttlSeconds("withTtl", now + seconds(31)) == -2, "expired -> -2");
 }
 
+// Regression: a sub-second remainder was rounded up twice, so any TTL with
+// less than a second left reported 2 seconds instead of 1.
+void test_ttl_rounds_up_sub_second() {
+    mini_redis::Store s;
+    auto now = Clock::now();
+    s.set("k", "v", seconds(1), now);
+    for (int ms : {100, 500, 900}) {
+        long t = s.ttlSeconds("k", now + milliseconds(ms));
+        expect(t == 1, "expected 1 at +" + std::to_string(ms) + "ms (got " +
+                           std::to_string(t) + ")");
+    }
+    expect(s.ttlSeconds("k", now + seconds(1)) == -2, "expired at the deadline");
+}
+
 void test_incr() {
     mini_redis::Store s;
     auto now = Clock::now();
@@ -112,6 +126,7 @@ int main() {
         test_set_get_del();
         test_expiry_on_access();
         test_ttl_semantics();
+        test_ttl_rounds_up_sub_second();
         test_incr();
         test_expire_command();
         test_purge_removes_expired();
