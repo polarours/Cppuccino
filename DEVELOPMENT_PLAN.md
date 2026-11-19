@@ -8,7 +8,7 @@
 | 陷阱文章 (pitfalls) | 37 篇 | 37 篇 | 74 篇 |
 | 示例代码 (examples) | - | - | 161 个 |
 | 项目练习 | - | - | 151 个 |
-| 测试函数 | - | - | 958 个 |
+| 测试函数 | - | - | 965 个 |
 
 ## 第一阶段：补充核心概念文档 (预计 2-3 天)
 
@@ -1628,4 +1628,42 @@ family 里还有两个项目没修。
 
 **验证**：两个项目 CMake + CTest 全绿，两个 stage 的 ASan/UBSan 全绿（各 3/3）。
 测试函数 956 → 958，README 两版和计划顶部表格同步。
+
+## 第三十四阶段：审计清单上的五个（2026-11-19）
+
+并行审计留下的候选，逐条自己跑 repro 确认后修掉。
+
+**一、`arena-allocator` 的加法回绕。** `alignedOffset + size > capacity` 在
+`size = SIZE_MAX - 8` 时回绕成 7，检查通过：返回指针、`offset_` 倒退、调用方一写
+就是堆越界（实测 ASan `heap-buffer-overflow`，exit=1）。现在检查用减法：
+`size > capacity - alignedOffset`，放不下返回 `nullptr`。
+
+**二、`simd-pattern` 读短的一方越界。** 循环上界是 `a.size()`，下标却同时读
+`b[i..i+3]`；`b` 比 `a` 短时直接越界（实测 `operator[]` assertion abort，
+exit=134）。现在 `add/multiply/dotProduct/lerp` 都以 `min(a.size(), b.size())`
+为界，结果长度也跟着取短的一方。
+
+**三、`balking` 的无锁读取。** `open/save/close` 在 mutex 下写普通 `bool`，
+`isOpen()/isSaved()` 却不加锁直接读——数据竞争。有意思的是 TSan 在 **-O1 下
+看不见**（读被编译器hoist出循环），**-O0 才报**（`data race ... isOpen()`）。
+状态改成 `std::atomic<bool>`，读取不再需要锁。
+
+**四、`mini-redis` 的 TTL 双重进位。** 不足一秒的余量先被置 1、又被 ++，
+`TTL` 剩 100/500/900ms 实测都报 **2**（契约是 rounded up，应报 1）。现在只
+进位一次。
+
+**五、`strategy-cache` 的假 LRU 和零容量。** `LRUStrategy` 淘汰
+`map.begin()`（键最小的），`get()` 也不刷新顺序——和第三十二阶段
+`thread-safe-cache` 同一款假 LRU；容量 0 时更会 `map::erase(end())` 直接
+abort（实测 exit=134）。重写为 `list<Key>` 记顺序 + map 存迭代器：读和写都
+刷新到队首，淘汰队尾；零容量直接不存。
+
+**回归测试又写错过一次**：LRU 测试第二段的期望被第一段断言里的 `get()`
+刷新顺序搅乱了（每次 `get` 都会 splice）。改成独立实例才真正检验
+"put 刷新"。
+
+**验证**：五个项目 CMake + CTest 全绿；五个 stage 的 ASan/UBSan 全绿
+（35: 4/4、42: 3/3、31: 3/3、04: 4/4、17: 3/3），31 的 TSan 全绿；
+修复前的五个 repro 修复后全部退出码 0。测试函数 958 → 965，README 两版和
+计划顶部表格同步。
 
