@@ -58,6 +58,17 @@ void test_section_close_without_open_ignored() {
     expect(template_engine::render("x{{/nope}}y", ctx) == "xy", "stray close ignored");
 }
 
+// Regression: an inverted section with the same key was not counted while
+// looking for the outer close, so C was rendered twice.
+void test_inverted_section_with_the_same_key() {
+    template_engine::Context ctx;
+    ctx["a"] = Value::boolean(true);
+    expect(template_engine::render("{{#a}}A{{^a}}B{{/a}}C{{/a}}", ctx) == "AC",
+           "nested inverted section must not steal the outer close");
+    expect(template_engine::render("{{#a}}A{{/b}}B{{/a}}", ctx) == "AB",
+           "a stray close of another key must not end the section");
+}
+
 }  // namespace
 
 int main() {
@@ -68,6 +79,7 @@ int main() {
         test_nested_sections();
         test_unclosed_variable_stays_literal();
         test_section_close_without_open_ignored();
+        test_inverted_section_with_the_same_key();
         std::cout << "All template_engine tests passed\n";
         return 0;
     } catch (const std::exception& e) {

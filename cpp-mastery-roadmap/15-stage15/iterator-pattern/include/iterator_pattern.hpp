@@ -33,41 +33,47 @@ template <typename T>
 class ConcreteAggregate : public Aggregate<T> {
 public:
     void add(T item) {
-        items_.push_back(item);
+        data_->items.push_back(item);
     }
 
     std::shared_ptr<Iterator<T>> createIterator() override {
-        return std::make_shared<ConcreteIterator>(this);
+        // The iterator owns the data, not the aggregate. It can outlive the
+        // object that created it.
+        return std::make_shared<ConcreteIterator>(data_);
     }
 
     std::size_t size() const override {
-        return items_.size();
+        return data_->items.size();
     }
 
     T getItem(std::size_t index) const {
-        return items_.at(index);
+        return data_->items.at(index);
     }
 
 private:
+    struct Data {
+        std::vector<T> items;
+    };
+
     class ConcreteIterator : public Iterator<T> {
     public:
-        ConcreteIterator(ConcreteAggregate* aggregate)
-            : aggregate_(aggregate), index_(0) {}
+        explicit ConcreteIterator(std::shared_ptr<Data> data)
+            : data_(std::move(data)), index_(0) {}
 
         bool hasNext() const override {
-            return index_ < aggregate_->size();
+            return index_ < data_->items.size();
         }
 
         T next() override {
-            return aggregate_->getItem(index_++);
+            return data_->items.at(index_++);
         }
 
     private:
-        ConcreteAggregate* aggregate_;
+        std::shared_ptr<Data> data_;
         std::size_t index_;
     };
 
-    std::vector<T> items_;
+    std::shared_ptr<Data> data_ = std::make_shared<Data>();
 };
 
 } // namespace iterator_pattern

@@ -98,6 +98,22 @@ void test_stop_idempotent_and_send_after_stop() {
     expect(!mb.running(), "not running");
 }
 
+// Regression: a poison-pill handler calling stop() used to join its own
+// thread and terminate with "Resource deadlock avoided".
+void test_handler_can_stop_its_own_mailbox() {
+    actor::Mailbox<int> mb;
+    std::atomic<int> handled{0};
+    mb.start([&](int&) {
+        ++handled;
+        mb.stop();
+    });
+
+    expect(mb.send(1), "expected the message to be accepted");
+    for (int i = 0; i < 500 && mb.running(); ++i) std::this_thread::sleep_for(2ms);
+    expect(!mb.running(), "expected the self-stop to finish");
+    expect(handled.load() == 1, "expected the handler to run once");
+}
+
 }  // namespace
 
 int main() {
@@ -108,6 +124,7 @@ int main() {
         test_handler_runs_without_lock();
         test_mpmc_no_loss_no_dup();
         test_stop_idempotent_and_send_after_stop();
+        test_handler_can_stop_its_own_mailbox();
         std::cout << "All actor_mailbox tests passed\n";
         return 0;
     } catch (const std::exception& e) {

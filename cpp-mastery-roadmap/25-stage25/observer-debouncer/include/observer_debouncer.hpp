@@ -55,20 +55,14 @@ public:
         reap();
 
         auto timer = std::make_shared<Timer>();
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            pending_ = event;
-            // A new dispatch undoes an earlier cancel().
-            cancelled_ = false;
-        }
 
         timer->thread = std::thread([this, event, timer]() {
             std::this_thread::sleep_for(delay_);
             Handler handler;
             {
                 std::lock_guard<std::mutex> lock(mutex_);
-                // A dispatch that was cancelled does not reach the handler.
-                if (cancelled_) {
+                // This dispatch was cancelled before it reached the handler.
+                if (timer->cancelled) {
                     timer->finished = true;
                     return;
                 }
@@ -94,10 +88,13 @@ public:
         timers_.push_back(timer);
     }
 
-    // Stops the dispatches that have not happened yet.
+    // Stops the dispatches that have not happened yet. A later emit is a
+    // new dispatch and is not affected by an earlier cancel().
     void cancel() {
         std::lock_guard<std::mutex> lock(mutex_);
-        cancelled_ = true;
+        for (auto& timer : timers_) {
+            timer->cancelled = true;
+        }
     }
 
     std::size_t emitCount() const { return emitCount_.load(); }
@@ -105,8 +102,9 @@ public:
 private:
     struct Timer {
         std::thread thread;
-        // Guarded by mutex_.
+        // Both guarded by mutex_.
         bool finished = false;
+        bool cancelled = false;
     };
 
     // Joins the dispatches that have already run.
@@ -132,9 +130,7 @@ private:
 
     std::chrono::milliseconds delay_;
     Handler handler_;
-    Event pending_;
     std::vector<std::shared_ptr<Timer>> timers_;
-    bool cancelled_ = false;
     mutable std::mutex mutex_;
     std::atomic<std::size_t> emitCount_{0};
 };

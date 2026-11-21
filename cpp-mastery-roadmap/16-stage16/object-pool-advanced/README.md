@@ -2,6 +2,9 @@
 
 An advanced object pool with validation and health checks.
 
+The returned `shared_ptr` keeps the pool's state alive, so an object checked
+out of the pool can be released after the pool itself is gone.
+
 ## Learning Goals
 
 - Understand advanced object pooling

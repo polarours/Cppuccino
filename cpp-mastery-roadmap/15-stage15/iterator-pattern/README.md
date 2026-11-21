@@ -2,6 +2,9 @@
 
 An iterator pattern implementation for traversing collections.
 
+An iterator owns the data it walks, so it may outlive the aggregate that
+created it.
+
 ## Learning Goals
 
 - Understand iterator pattern design

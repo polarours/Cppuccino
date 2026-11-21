@@ -3,6 +3,9 @@
 A minimal mustache-like engine: `{{var}}`, truthy sections `{{#k}}...{{/k}}`,
 inverted sections `{{^k}}...{{/k}}`, and per-item list rendering.
 
+An inverted section with the same key counts toward nesting depth, and a
+body stops only at its own closing tag.
+
 ## Learning Goals
 
 - Tokenizing `{{tags}}` while keeping literal text intact

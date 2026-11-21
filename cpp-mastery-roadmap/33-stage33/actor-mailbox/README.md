@@ -3,6 +3,9 @@
 Bounded mailbox with a single actor thread: handlers run without holding
 the lock, producers never block the actor.
 
+A handler may call `stop()` on its own mailbox (a poison pill); it must not
+join the very thread it is running on.
+
 ## Learning Goals
 
 - Why "one consumer thread" removes locks inside message handling

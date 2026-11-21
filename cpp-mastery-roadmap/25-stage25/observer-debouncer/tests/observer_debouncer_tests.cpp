@@ -123,6 +123,30 @@ void test_handler_may_ask_for_one_more_dispatch() {
     delete dispatcher;
 }
 
+// Regression: cancel() used to set one global flag that the next emit()
+// cleared, so a cancelled dispatch was delivered after all.
+void test_cancel_does_not_resurrect_pending_dispatch() {
+    using namespace std::chrono_literals;
+    observer_debouncer::DebouncedDispatcher dispatcher(100ms);
+    std::mutex mutex;
+    std::vector<std::string> got;
+    dispatcher.setHandler([&](const observer_debouncer::Event& e) {
+        std::lock_guard<std::mutex> lock(mutex);
+        got.push_back(e.data);
+    });
+
+    dispatcher.emit({"tick", "A"});
+    std::this_thread::sleep_for(20ms);
+    dispatcher.cancel();
+    std::this_thread::sleep_for(10ms);
+    dispatcher.emit({"tick", "B"});
+    std::this_thread::sleep_for(250ms);
+
+    std::lock_guard<std::mutex> lock(mutex);
+    expect(got.size() == 1 && got[0] == "B",
+           "expected only B, not the cancelled A");
+}
+
 } // namespace
 
 int main() {
@@ -139,6 +163,9 @@ int main() {
 
         test_handler_may_ask_for_one_more_dispatch();
         std::cout << "  test_handler_may_ask_for_one_more_dispatch: PASS\n";
+
+        test_cancel_does_not_resurrect_pending_dispatch();
+        std::cout << "  test_cancel_does_not_resurrect_pending_dispatch: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "observer_debouncer_tests failed: " << exception.what() << std::endl;

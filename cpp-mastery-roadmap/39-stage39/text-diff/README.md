@@ -3,6 +3,9 @@
 Line-based diff using the classic longest-common-subsequence algorithm,
 with rendering and a similarity score.
 
+Similarity is equal lines / max(lines in each file) — not equal hunks / hunk
+count, which double-counts a delete+insert pair.
+
 A blank line is a line: splitting a document keeps the empty lines, so
 that the two documents that are compared line up the same way.
 

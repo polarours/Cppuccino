@@ -129,6 +129,29 @@ void test_active_count_and_clear() {
     expect(pool.poolSize() == 0, "expected the pool to be cleared");
 }
 
+// Regression: the deleter captured a raw `this`, so releasing an object
+// after the pool was gone wrote into a dead pool.
+void test_checked_out_object_outlives_pool() {
+    std::atomic<int> deleted{0};
+    std::shared_ptr<TestObject> escaped;
+
+    {
+        auto* pool = new object_pool_advanced::ObjectPool<TestObject>(
+            []() { return new TestObject(); },
+            [&deleted](TestObject* p) {
+                ++deleted;
+                delete p;
+            },
+            [](const TestObject*) { return true; }, 1, 4);
+        escaped = pool->acquire();
+        delete pool;
+    }
+
+    expect(deleted == 0, "expected the checked-out object to outlive the pool");
+    escaped.reset();
+    expect(deleted == 1, "expected the object to be deleted exactly once");
+}
+
 } // namespace
 
 int main() {
@@ -148,6 +171,9 @@ int main() {
 
         test_active_count_and_clear();
         std::cout << "  test_active_count_and_clear: PASS\n";
+
+        test_checked_out_object_outlives_pool();
+        std::cout << "  test_checked_out_object_outlives_pool: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "object_pool_advanced_tests failed: " << exception.what() << std::endl;

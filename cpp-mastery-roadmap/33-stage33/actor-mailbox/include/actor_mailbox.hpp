@@ -21,7 +21,13 @@ class Mailbox {
 public:
     explicit Mailbox(std::size_t bound = 1024) : bound_(bound) {}
 
-    ~Mailbox() { stop(); }
+    ~Mailbox() {
+        stop();
+        // A self-stopping handler leaves the thread joinable until the loop
+        // returns. Whoever destroys the mailbox after that must join it.
+        if (thread_.joinable() && thread_.get_id() != std::this_thread::get_id())
+            thread_.join();
+    }
 
     // Non-blocking send: false when the mailbox is full or stopped.
     bool send(Message msg) {
@@ -42,7 +48,8 @@ public:
         thread_ = std::thread([this] { loop(); });
     }
 
-    // Stop: drain nothing, discard pending, join the actor thread.
+    // Stop: no new messages; drain what is already queued, then exit.
+    // Calling it from the actor's own handler must not join that thread.
     void stop() {
         {
             std::lock_guard<std::mutex> lock(m_);
@@ -50,10 +57,14 @@ public:
             stopped_ = true;
         }
         cv_.notify_all();
-        if (thread_.joinable()) thread_.join();
-        std::lock_guard<std::mutex> lock(m_);
-        running_ = false;
-        queue_.clear();
+        if (thread_.joinable() &&
+            thread_.get_id() != std::this_thread::get_id()) {
+            thread_.join();
+            std::lock_guard<std::mutex> lock(m_);
+            running_ = false;
+            queue_.clear();
+        }
+        // On a self-stop the loop sets running_ = false as it exits.
     }
 
     std::size_t pending() const {
@@ -74,7 +85,10 @@ private:
             {
                 std::unique_lock<std::mutex> lock(m_);
                 cv_.wait(lock, [this] { return stopped_ || !queue_.empty(); });
-                if (stopped_ && queue_.empty()) return;  // graceful: drain first
+                if (stopped_ && queue_.empty()) {
+                    running_ = false;  // possibly set by a self-stop
+                    return;             // graceful: drain first
+                }
                 if (queue_.empty()) continue;
                 msg = std::move(queue_.front());
                 queue_.pop_front();

@@ -2,6 +2,9 @@
 
 Observer that delivers an event to its handler after a delay.
 
+`cancel()` stops the pending dispatches only; a later `emit()` is a new
+dispatch and is still delivered.
+
 ## Learning Goals
 
 - Deliver an event from another thread

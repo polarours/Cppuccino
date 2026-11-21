@@ -1,6 +1,7 @@
 #include "iterator_pattern.hpp"
 
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -46,6 +47,23 @@ void test_aggregate_size() {
     expect(agg.size() == 2, "expected size 2");
 }
 
+// Regression: the iterator used to hold a raw pointer to the aggregate, so
+// using it after the aggregate was gone read freed memory.
+void test_iterator_outlives_the_aggregate() {
+    std::shared_ptr<iterator_pattern::Iterator<int>> it;
+    {
+        iterator_pattern::ConcreteAggregate<int> agg;
+        agg.add(1);
+        agg.add(2);
+        it = agg.createIterator();
+    }
+
+    expect(it->hasNext(), "expected the first item");
+    expect(it->next() == 1, "expected 1");
+    expect(it->next() == 2, "expected 2");
+    expect(!it->hasNext(), "expected the iterator to be done");
+}
+
 } // namespace
 
 int main() {
@@ -59,6 +77,9 @@ int main() {
 
         test_aggregate_size();
         std::cout << "  test_aggregate_size: PASS\n";
+
+        test_iterator_outlives_the_aggregate();
+        std::cout << "  test_iterator_outlives_the_aggregate: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "iterator_pattern_tests failed: " << exception.what() << std::endl;

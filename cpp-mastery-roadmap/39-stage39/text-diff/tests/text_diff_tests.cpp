@@ -57,9 +57,19 @@ void test_render() {
 void test_similarity_partial() {
     auto hunks = text_diff::diffLines(text_diff::splitLines("a\nb\nc\nd"),
                                        text_diff::splitLines("a\nb\nc\ne"));
-    // 3 equal + 1 delete + 1 insert => 3/5
+    // 3 equal lines out of 4 lines in each file => 0.75, not 3 of 5 hunks
     double s = text_diff::similarity(hunks);
-    expect(s > 0.59 && s < 0.61, "similarity == 0.6 (3 equal of 5 hunks)");
+    expect(s > 0.74 && s < 0.76, "similarity == 0.75 (3 equal of 4 lines)");
+}
+
+// Regression: the denominator used to be the number of hunks, so a
+// delete+insert pair inflated it and made the ratio too small.
+void test_similarity_counts_lines_not_hunks() {
+    auto hunks = text_diff::diffLines(text_diff::splitLines("a\nb"),
+                                      text_diff::splitLines("b\na"));
+    // one equal line out of two lines in either file, three hunks
+    double s = text_diff::similarity(hunks);
+    expect(s > 0.49 && s < 0.51, "expected 0.5, not 1/3");
 }
 
 // Regression: a blank line in the middle of a document was dropped, so
@@ -99,6 +109,7 @@ int main() {
         test_empty_sides();
         test_render();
         test_similarity_partial();
+        test_similarity_counts_lines_not_hunks();
         test_blank_lines_are_kept();
         test_a_blank_line_is_a_difference();
         std::cout << "All text_diff tests passed\n";

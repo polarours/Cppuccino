@@ -118,8 +118,11 @@ def too_old(stderr):
 
 # A compiler can accept -std=c++23 and still not ship the newer library
 # headers. That is a toolchain limitation, not a defect in the example.
+NEW_STD_HEADERS = ('print', 'expected', 'flat_map', 'flat_set', 'mdspan',
+                   'inplace_vector', 'generator', 'stacktrace', 'format')
 MISSING_STD_HEADER = re.compile(
-    r'fatal error: (?:mdspan|inplace_vector): No such file or directory')
+    r'fatal error: (?:' + '|'.join(NEW_STD_HEADERS) +
+    r'): No such file or directory')
 
 
 def toolchain_limitation(stderr):

@@ -69,13 +69,20 @@ std::string render(const std::vector<Hunk>& hunks) {
 }
 
 double similarity(const std::vector<Hunk>& hunks) {
-    std::size_t eq = 0, total = 0;
+    std::size_t equal = 0, removed = 0, added = 0;
     for (const auto& h : hunks) {
-        ++total;
-        if (h.op == Op::Equal) ++eq;
+        if (h.op == Op::Equal) ++equal;
+        else if (h.op == Op::Delete) ++removed;
+        else if (h.op == Op::Insert) ++added;
     }
-    if (total == 0) return 1.0;
-    return static_cast<double>(eq) / static_cast<double>(total);
+    // The contract is equal lines / max(lines in a, lines in b). A hunk is
+    // not a line: a delete+insert pair can make the hunk count larger than
+    // either file.
+    const std::size_t left = equal + removed;
+    const std::size_t right = equal + added;
+    const std::size_t denominator = left > right ? left : right;
+    if (denominator == 0) return 1.0;
+    return static_cast<double>(equal) / static_cast<double>(denominator);
 }
 
 }  // namespace text_diff

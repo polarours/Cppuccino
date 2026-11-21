@@ -54,12 +54,15 @@ std::string lookup(const Context& ctx, const std::string& key) {
 
 // Recursive render with a cursor; sections consume their body.
 void renderRange(const std::vector<Segment>& segs, std::size_t& i,
-                 const Context& ctx, std::string& out, bool stopAtClose) {
+                 const Context& ctx, std::string& out, bool stopAtClose,
+                 const std::string& stopKey = "") {
     while (i < segs.size()) {
         const auto& s = segs[i];
         if (s.kind == Segment::Kind::SectionClose) {
-            if (stopAtClose) return;  // caller consumes its matching close
-            ++i;                      // stray close at top level: ignore
+            // A body stops at its own closing tag. A stray close of another
+            // key inside the body is not the end of this section.
+            if (stopAtClose && (stopKey.empty() || s.key == stopKey)) return;
+            ++i;
             continue;
         }
         if (s.kind == Segment::Kind::Text) {
@@ -83,6 +86,8 @@ void renderRange(const std::vector<Segment>& segs, std::size_t& i,
             while (i < segs.size() && depth > 0) {
                 if (segs[i].kind == Segment::Kind::SectionOpen &&
                     segs[i].key == key) ++depth;
+                else if (segs[i].kind == Segment::Kind::InvertOpen &&
+                         segs[i].key == key) ++depth;
                 else if (segs[i].kind == Segment::Kind::SectionClose &&
                          segs[i].key == key) --depth;
                 if (depth > 0) ++i;
@@ -98,7 +103,7 @@ void renderRange(const std::vector<Segment>& segs, std::size_t& i,
                 bool falsy = !present || !v->truthy();
                 if (falsy) {
                     std::size_t j = bodyStart;
-                    renderRange(segs, j, ctx, out, true);
+                    renderRange(segs, j, ctx, out, true, key);
                 }
             } else {
                 if (present && v->kind == Value::Kind::List) {
@@ -108,11 +113,11 @@ void renderRange(const std::vector<Segment>& segs, std::size_t& i,
                         Context merged = ctx;
                         for (const auto& [k, val] : item) merged[k] = val;
                         std::size_t j = bodyStart;
-                        renderRange(segs, j, merged, out, true);
+                        renderRange(segs, j, merged, out, true, key);
                     }
                 } else if (present && v->truthy()) {
                     std::size_t j = bodyStart;
-                    renderRange(segs, j, ctx, out, true);
+                    renderRange(segs, j, ctx, out, true, key);
                 }
             }
             continue;
