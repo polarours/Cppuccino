@@ -116,6 +116,16 @@ def too_old(stderr):
     return any(marker in stderr for marker in TOOLCHAIN_TOO_OLD)
 
 
+# A compiler can accept -std=c++23 and still not ship the newer library
+# headers. That is a toolchain limitation, not a defect in the example.
+MISSING_STD_HEADER = re.compile(
+    r'fatal error: (?:mdspan|inplace_vector): No such file or directory')
+
+
+def toolchain_limitation(stderr):
+    return too_old(stderr) or bool(MISSING_STD_HEADER.search(stderr))
+
+
 def check_one(path, workdir):
     """Return (status, detail). status is 'ok', 'skip' or 'fail'."""
     name = os.path.basename(path)
@@ -126,9 +136,9 @@ def check_one(path, workdir):
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode == 0:
             return 'ok', f'ok (-std=c++{standard})'
-        if too_old(result.stderr):
-            return 'skip', (f'the toolchain has no -std=c++{standard}, '
-                            'so this example was not checked')
+        if toolchain_limitation(result.stderr):
+            return 'skip', (f'the toolchain cannot build -std=c++{standard} '
+                            '(missing compiler option or library header)')
         first = next((l for l in result.stderr.splitlines() if ' error:' in l),
                      result.stderr.splitlines()[0] if result.stderr else '?')
         return 'fail', f'failed with the declared -std=c++{standard}: {first.strip()[:110]}'
@@ -139,7 +149,7 @@ def check_one(path, workdir):
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode == 0:
             return 'ok', f'ok (-std=c++{candidate})'
-        if too_old(result.stderr):
+        if toolchain_limitation(result.stderr):
             continue
         first = next((l for l in result.stderr.splitlines() if ' error:' in l),
                      result.stderr.splitlines()[0] if result.stderr else '?')
@@ -378,6 +388,8 @@ def main():
                 print(f'  {name:<48} FAIL {detail}')
                 failures.append((name, detail))
 
+        skipped = {os.path.basename(path)
+                   for path, (status, _) in results if status == 'skip'}
         passes = []
         if args.run:
             passes.append(('run check', None))
@@ -389,11 +401,16 @@ def main():
             print(f'\n== {title} ==')
             with ThreadPoolExecutor(max_workers=args.jobs) as pool:
                 runs = list(pool.map(
-                    lambda p: (p, run_example(
-                        p, declared_standard(p) or '20', workdir,
-                        sanitizer=flags)),
+                    lambda p: (p, ('skip', 'the toolchain cannot build it')
+                               if os.path.basename(p) in skipped
+                               else run_example(
+                                   p, declared_standard(p) or '20', workdir,
+                                   sanitizer=flags)),
                     sources))
             for path, (status, detail) in runs:
+                if status == 'skip':
+                    print(f"  {os.path.basename(path):<44} SKIP {detail}")
+                    continue
                 if status != 'ok':
                     failures.append((os.path.basename(path), detail))
                     print(f"  {os.path.basename(path):<44} "
