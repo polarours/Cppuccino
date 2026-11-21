@@ -27,7 +27,7 @@ Counts are recomputed by `tools/check_stats.py`, so they stay in step with the r
 | Pitfalls | 74 articles (37 en + 37 zh) |
 | Examples | 161 runnable examples |
 | Projects | 151 projects across 43 stages |
-| Tests | 965 (all passing) |
+| Tests | 971 (all passing) |
 
 ## Start Here
 

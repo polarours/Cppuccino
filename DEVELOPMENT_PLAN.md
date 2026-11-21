@@ -8,7 +8,7 @@
 | 陷阱文章 (pitfalls) | 37 篇 | 37 篇 | 74 篇 |
 | 示例代码 (examples) | - | - | 161 个 |
 | 项目练习 | - | - | 151 个 |
-| 测试函数 | - | - | 965 个 |
+| 测试函数 | - | - | 971 个 |
 
 ## 第一阶段：补充核心概念文档 (预计 2-3 天)
 
@@ -1666,4 +1666,37 @@ abort（实测 exit=134）。重写为 `list<Key>` 记顺序 + map 存迭代器�
 （35: 4/4、42: 3/3、31: 3/3、04: 4/4、17: 3/3），31 的 TSan 全绿；
 修复前的五个 repro 修复后全部退出码 0。测试函数 958 → 965，README 两版和
 计划顶部表格同步。
+
+## 第三十五阶段：全量质量复核（2026-11-21）
+
+**CI 为什么还是红的**：用 GitHub API 的 annotation 查到三处根因——
+`apt-get --no-recommends` 是不存在的参数（正确是 `--no-install-recommends`），
+分片脚本默认输出人类可读文本而 CI 当 JSON 解析，`check_examples.py --run`
+又把旧工具链缺标准库头文件的例子判成失败，并且拿已跳过的例子再跑一遍。
+改完后 Build workflow 全绿；Documentation 和 sanitizers 仍红，根因是 SKIP
+名单只覆盖了 `mdspan`/`inplace_vector`，而 `cpp23-features-complete.cpp`
+还用了 `<print>`/`<flat_map>`/`<expected>`。名单已扩展为这组新标准库头文件。
+本地用 `CXX=g++-15` 模拟旧工具链，run / sanitize / tsan 三关全部 161/161。
+
+**README 视觉**：用户选了 C 品牌横幅方案。新增明暗两张 SVG 横幅，用
+`#gh-dark-mode-only`/`#gh-light-mode-only` 按主题切换；字用 SVG `<text>`，
+不用生成图。首屏收敛为横幅 + 主张 + 语言入口 + 数字细线 + 文字链接。
+
+**审计清单剩下的六个，全部 repro 确认后修掉**：
+1. `object-pool-advanced`：删除器捕获裸 `this`，对象晚于池释放即 UAF
+   （ASan heap-use-after-free）→ 与 `object-pool` 同款共享状态方案。
+2. `iterator-pattern`：迭代器持有聚合裸指针，聚合先死即 UAF
+   （ASan stack-use-after-scope）→ 迭代器改为持有数据的 `shared_ptr`。
+3. `observer-debouncer`：`cancel()` 设全局标志、下一次 `emit()` 把它清零，
+   已取消的投递复活（实测 `delivered=2: A B`）→ 每个 Timer 独立取消标志。
+4. `actor-mailbox`：handler 调 `stop()` 时 join 自己，
+   `std::system_error: Resource deadlock avoided` → 自停时交给 loop 收尾。
+5. `template-engine`：找闭合标签时没把同名 `^` 段计入深度，
+   `{{#a}}A{{^a}}B{{/a}}C{{/a}}` 实测输出 `ACC`（应 `AC`）；
+   段体遇到异名 stray close 也提前结束 → 计数与 stopKey 都修。
+6. `text-diff`：`similarity` 分母用 hunk 数而非行数，
+   `a,b` vs `b,a` 实测 0.333（契约 0.5）→ 按 `max(两边行数)` 计算。
+
+六个项目各补一条回归测试；修复前 repro 全部复现问题，修复后全部通过。
+测试函数 965 → 971。
 
