@@ -1,18 +1,24 @@
-[中文](README_zh-CN.md) | [English](README.md)
+<p align="center">
+  <img src="assets/images/cppuccino-mark.svg" alt="Cppuccino" width="64">
+</p>
 
 # Cppuccino
 
-Cppuccino is a curated bilingual (English/Chinese) C++ learning repository.
-It combines concept notes, pitfalls, runnable examples, and project-driven practice
-into a single place.
+*One C++ idea, in two languages, with runnable proof.*
 
-Think of it as a personal C++ study log that is gradually being shaped into a
-public learning resource.
+[English](README.md) · [中文](README_zh-CN.md)
 
-> This project reflects the author's current understanding of C++.
-> It is still evolving, and corrections or discussion are always welcome.
+[![Build](https://github.com/polarours/Cppuccino/actions/workflows/build.yml/badge.svg)](https://github.com/polarours/Cppuccino/actions/workflows/build.yml)
+[![Documentation](https://github.com/polarours/Cppuccino/actions/workflows/docs.yml/badge.svg)](https://github.com/polarours/Cppuccino/actions/workflows/docs.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-6f7f8f.svg)](LICENSE)
+
+> A study log of concept essays, failure modes, examples, and staged projects.
+> It reflects the author's current understanding of C++; corrections and discussion
+> are welcome.
 
 ## Quick Stats
+
+Counts are recomputed by `tools/check_stats.py`, so they stay in step with the repository.
 
 | Category | Count |
 |----------|-------|
@@ -24,6 +30,7 @@ public learning resource.
 
 ## Start Here
 
+One cycle at a time: read an idea, inspect how it fails, then change code.
 If this is your first visit, use this order:
 
 1. Read the [Roadmap Overview](cpp-mastery-roadmap/00-overview.md).
@@ -33,29 +40,30 @@ If this is your first visit, use this order:
 
 ### Suggested Entry Points
 
-- **Ownership and lifetime:**
-  [Ownership - Starting from Here](docs/en/ownership-starts-here.md),
-  [Ownership and Lifetime](docs/en/ownership-and-lifetime.md),
-  [RAII and Exception Safety](docs/en/raii-and-exception-safety.md),
-  [Dangling Pointer](pitfalls/en/dangling-pointer.md),
-  [ownership-and-lifetime.cpp](examples/ownership-and-lifetime.cpp)
+- **Ownership and lifetime**
+  - Read: [Ownership - Starting from Here](docs/en/ownership-starts-here.md),
+    [Ownership and Lifetime](docs/en/ownership-and-lifetime.md),
+    [RAII and Exception Safety](docs/en/raii-and-exception-safety.md)
+  - Failure mode: [Dangling Pointer](pitfalls/en/dangling-pointer.md)
+  - Code: [ownership-and-lifetime.cpp](examples/ownership-and-lifetime.cpp)
 
-- **References, move semantics, and value categories:**
-  [Lvalue and Rvalue References](docs/en/lvalue-and-rvalue-references.md),
-  [Understanding the Semantics of `std::move`](docs/en/understanding-the-semantics-of-std::move.md),
-  [Forwarding References and Perfect Forwarding](docs/en/understanding-forwarding-references-and-perfect-forwarding.md),
-  [move-semantics-example.cpp](examples/move-semantics-example.cpp)
+- **References, move semantics, and value categories**
+  - Read: [Lvalue and Rvalue References](docs/en/lvalue-and-rvalue-references.md),
+    [Understanding the Semantics of `std::move`](docs/en/understanding-the-semantics-of-std::move.md),
+    [Forwarding References and Perfect&nbsp;Forwarding](docs/en/understanding-forwarding-references-and-perfect-forwarding.md)
+  - Code: [move-semantics-example.cpp](examples/move-semantics-example.cpp)
 
-- **Object model and deeper semantics:**
-  [Virtual Dispatch and Object Model](docs/en/virtual-dispatch-and-object-model.md),
-  [Understanding the C++ Object Model](docs/en/understanding-the-cpp-object-model.md),
-  [Undefined Behavior](docs/en/undefined-behavior.md),
-  [C++ Memory Model and Atomics Basics](docs/en/cpp-memory-model-and-atomics-basics.md),
-  [virtual-dispatch-and-slicing.cpp](examples/virtual-dispatch-and-slicing.cpp)
+- **Object model and deeper semantics**
+  - Read: [Virtual Dispatch and Object Model](docs/en/virtual-dispatch-and-object-model.md),
+    [Understanding the C++ Object Model](docs/en/understanding-the-cpp-object-model.md),
+    [Undefined Behavior](docs/en/undefined-behavior.md),
+    [C++ Memory Model and Atomics Basics](docs/en/cpp-memory-model-and-atomics-basics.md)
+  - Code: [virtual-dispatch-and-slicing.cpp](examples/virtual-dispatch-and-slicing.cpp)
 
 ## Roadmap Overview
 
-The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning path:
+The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged path through
+the material — an index, not a syllabus to finish.
 
 | Stages | Theme | Projects |
 |--------|-------|----------|
@@ -75,6 +83,8 @@ The [Mastery Roadmap](cpp-mastery-roadmap/00-overview.md) is a staged learning p
 | 43 | Toolchain Patterns (CMake, CI/CD, Package Manager) | 3 |
 
 ## Repository Map
+
+Four kinds of material, cross-linked so an idea can be read, tested, and then used.
 
 ### Documentation
 
@@ -127,6 +137,9 @@ tools/run_all_checks.sh --full   # and every project build
 
 ### Projects
 
+<details>
+<summary>Beginner · Stage 1</summary>
+
 #### Stage 1: Beginner
 
 - [student-management/v1](cpp-mastery-roadmap/01-beginner/student-management/v1):
@@ -135,6 +148,11 @@ tools/run_all_checks.sh --full   # and every project build
   Improved version with better I/O and tests
 - [student-management/v3](cpp-mastery-roadmap/01-beginner/student-management/v3):
   Borrowing parameters with std::string_view
+
+</details>
+
+<details>
+<summary>Intermediate · Stage 2</summary>
 
 #### Stage 2: Intermediate
 
@@ -152,6 +170,11 @@ tools/run_all_checks.sh --full   # and every project build
   Disjoint set union with path compression
 - [binary-heap](cpp-mastery-roadmap/02-intermediate/binary-heap):
   Array-backed heap with bottom-up heapify
+
+</details>
+
+<details>
+<summary>Advanced · Stage 3</summary>
 
 #### Stage 3: Advanced
 
@@ -176,6 +199,11 @@ tools/run_all_checks.sh --full   # and every project build
 - [base64-codec](cpp-mastery-roadmap/03-advanced/base64-codec):
   RFC 4648 encode/decode with strict padding validation
 
+</details>
+
+<details>
+<summary>More practice · Stages 4–7</summary>
+
 #### Stages 4–7: More Practice
 
 - [simple-db](cpp-mastery-roadmap/04-stage4/simple-db):
@@ -197,6 +225,11 @@ tools/run_all_checks.sh --full   # and every project build
 - [bloom-filter](cpp-mastery-roadmap/07-stage7/bloom-filter):
   Probabilistic membership with double hashing
 
+</details>
+
+<details>
+<summary>Design patterns · Stages 8–27</summary>
+
 #### Stages 8–27: Design Patterns
 
 - [GoF 23 patterns](cpp-mastery-roadmap/00-overview.md#stage-8-projects-08-stage8):
@@ -206,6 +239,11 @@ tools/run_all_checks.sh --full   # and every project build
 - **Strategy pattern variants**: strategy-adapter, strategy-chain, strategy-combinator, strategy-decorator, strategy-evaluator, strategy-factory, strategy-pipeline, strategy-resolver
 - [rate-limiter](cpp-mastery-roadmap/08-stage8/rate-limiter):
   Token bucket, fixed window, and sliding window algorithms
+
+</details>
+
+<details>
+<summary>Architecture · Stages 28–31</summary>
 
 #### Stages 28–31: Architecture Patterns
 
@@ -234,6 +272,11 @@ tools/run_all_checks.sh --full   # and every project build
 - [balking](cpp-mastery-roadmap/31-stage31/balking):
   Guard-check pattern
 
+</details>
+
+<details>
+<summary>Concurrency · Stages 32–33</summary>
+
 #### Stages 32–33: Concurrency Patterns
 
 - [guarded-suspension](cpp-mastery-roadmap/32-stage32/guarded-suspension):
@@ -250,6 +293,11 @@ tools/run_all_checks.sh --full   # and every project build
   Task-based thread pool with futures
 - [actor-mailbox](cpp-mastery-roadmap/33-stage33/actor-mailbox):
   Bounded mailbox with a single-consumer actor loop
+
+</details>
+
+<details>
+<summary>Idioms, memory, modern C++ · Stages 34–38</summary>
 
 #### Stages 34–38: C++, Memory, Modern C++, Error, Testing
 
@@ -292,6 +340,11 @@ tools/run_all_checks.sh --full   # and every project build
 - [golden-file-testing](cpp-mastery-roadmap/38-stage38/golden-file-testing):
   Snapshot assertions with line diffs and UPDATE_GOLDEN flow
 
+</details>
+
+<details>
+<summary>Content tools · Stage 39</summary>
+
 #### Stage 39: Content Enhancement
 
 - [markdown-parser](cpp-mastery-roadmap/39-stage39/markdown-parser):
@@ -300,6 +353,11 @@ tools/run_all_checks.sh --full   # and every project build
   Relative link validation with lexical path normalization
 - [text-diff](cpp-mastery-roadmap/39-stage39/text-diff):
   LCS line diff with unified-style rendering
+
+</details>
+
+<details>
+<summary>C++23 · Stage 40</summary>
 
 #### Stage 40: C++23 Features
 
@@ -312,6 +370,11 @@ tools/run_all_checks.sh --full   # and every project build
 - [generator-pipeline](cpp-mastery-roadmap/40-stage40/generator-pipeline):
   Lazy std::generator pipelines with early-exit propagation
 
+</details>
+
+<details>
+<summary>Capstone · Stage 41</summary>
+
 #### Stage 41: Capstone Project
 
 - [mini-http-framework](cpp-mastery-roadmap/41-stage41/mini-http-framework):
@@ -320,6 +383,11 @@ tools/run_all_checks.sh --full   # and every project build
   Method+path routing with :param extraction
 - [template-engine](cpp-mastery-roadmap/41-stage41/template-engine):
   Mustache-like sections with context chaining
+
+</details>
+
+<details>
+<summary>Performance · Stage 42</summary>
 
 #### Stage 42: Performance Patterns
 
@@ -330,6 +398,11 @@ tools/run_all_checks.sh --full   # and every project build
 - [memory-alignment](cpp-mastery-roadmap/42-stage42/memory-alignment):
   Cache-line alignment and aligned allocation
 
+</details>
+
+<details>
+<summary>Toolchain · Stage 43</summary>
+
 #### Stage 43: Toolchain Patterns
 
 - [cmake-pattern](cpp-mastery-roadmap/43-stage43/cmake-pattern):
@@ -338,6 +411,8 @@ tools/run_all_checks.sh --full   # and every project build
   Dependency resolution and package management
 - [ci-cd-pattern](cpp-mastery-roadmap/43-stage43/ci-cd-pattern):
   Pipeline pattern for build/test/deploy workflows
+
+</details>
 
 ### Other
 
