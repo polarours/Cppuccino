@@ -1,20 +1,21 @@
-<p align="center">
-  <img src="assets/images/cppuccino-mark.svg" alt="Cppuccino" width="64">
-</p>
+<a id="cppuccino"></a>
 
-# Cppuccino
+![Cppuccino banner](assets/images/cppuccino-banner-light.svg#gh-light-mode-only)
+![Cppuccino banner](assets/images/cppuccino-banner-dark.svg#gh-dark-mode-only)
 
-*One C++ idea, in two languages, with runnable proof.*
+<p align="center">One C++ idea, in two languages, with runnable proof.</p>
 
-[English](README.md) · [中文](README_zh-CN.md)
+<p align="center"><a href="README.md">English</a> · <a href="README_zh-CN.md">中文</a></p>
 
-[![Build](https://github.com/polarours/Cppuccino/actions/workflows/build.yml/badge.svg)](https://github.com/polarours/Cppuccino/actions/workflows/build.yml)
-[![Documentation](https://github.com/polarours/Cppuccino/actions/workflows/docs.yml/badge.svg)](https://github.com/polarours/Cppuccino/actions/workflows/docs.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-6f7f8f.svg)](LICENSE)
+<div align="center">
 
-> A study log of concept essays, failure modes, examples, and staged projects.
-> It reflects the author's current understanding of C++; corrections and discussion
-> are welcome.
+| 140 docs | 74 pitfalls | 161 examples | 151 projects |
+|:--------:|:-----------:|:------------:|:------------:|
+| concepts  | failure modes | runnable code | across 43 stages |
+
+</div>
+
+<p align="center"><a href="https://github.com/polarours/Cppuccino/actions">Actions</a> · <a href="CONTRIBUTING.md">Contributing</a> · MIT</p>
 
 ## Quick Stats
 

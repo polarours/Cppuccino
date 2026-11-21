@@ -1,19 +1,21 @@
-<p align="center">
-  <img src="assets/images/cppuccino-mark.svg" alt="Cppuccino" width="64">
-</p>
+<a id="cppuccino"></a>
 
-# Cppuccino
+![Cppuccino banner](assets/images/cppuccino-banner-light.svg#gh-light-mode-only)
+![Cppuccino banner](assets/images/cppuccino-banner-dark.svg#gh-dark-mode-only)
 
-*一个 C++ 概念，两种语言，配一份能跑起来的证明。*
+<p align="center">一个 C++ 概念，两种语言，配一份能跑起来的证明。</p>
 
-[English](README.md) · [中文](README_zh-CN.md)
+<p align="center"><a href="README.md">English</a> · <a href="README_zh-CN.md">中文</a></p>
 
-[![Build](https://github.com/polarours/Cppuccino/actions/workflows/build.yml/badge.svg)](https://github.com/polarours/Cppuccino/actions/workflows/build.yml)
-[![Documentation](https://github.com/polarours/Cppuccino/actions/workflows/docs.yml/badge.svg)](https://github.com/polarours/Cppuccino/actions/workflows/docs.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-6f7f8f.svg)](LICENSE)
+<div align="center">
 
-> 概念文章、踩坑总结、独立示例与分阶段的小项目。内容反映作者当前对 C++ 的理解，
-> 欢迎指正与讨论。
+| 140 篇文档 | 74 篇陷阱 | 161 个示例 | 151 个项目 |
+|:----------:|:---------:|:----------:|:----------:|
+| 概念文章   | 失败模式   | 可运行代码  | 横跨 43 个阶段 |
+
+</div>
+
+<p align="center"><a href="https://github.com/polarours/Cppuccino/actions">Actions</a> · <a href="CONTRIBUTING.md">Contributing</a> · MIT</p>
 
 ## 快速统计
 
