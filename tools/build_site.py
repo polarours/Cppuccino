@@ -7,7 +7,7 @@ pages and the nav, then writes a JSON (valid YAML) MkDocs config there.
 
 Usage:
     python3 tools/build_site.py
-    mkdocs build -f .site/mkdocs.yml --strict --site-dir site
+    mkdocs build -f .site/mkdocs.yml --strict --site-dir ../site
 """
 from __future__ import annotations
 

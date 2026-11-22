@@ -33,7 +33,7 @@ jobs:
       - name: Build the static site
         run: |
           set +e
-          mkdocs build -f .site/mkdocs.yml --strict --site-dir site 2>&1 | tee mkdocs.log
+          mkdocs build -f .site/mkdocs.yml --strict --site-dir ../site 2>&1 | tee mkdocs.log
           status=${PIPESTATUS[0]}
           if [ "$status" -ne 0 ]; then
             grep -E 'WARNING|ERROR' mkdocs.log | head -20 | while IFS= read -r line; do

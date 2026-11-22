@@ -134,7 +134,7 @@ The site is assembled from the existing Markdown, not from a second copy:
 
 ```bash
 python3 tools/build_site.py
-mkdocs build -f .site/mkdocs.yml --strict --site-dir site
+mkdocs build -f .site/mkdocs.yml --strict --site-dir ../site
 ```
 
 `requirements-docs.txt` lists the only extra dependency (MkDocs Material).
