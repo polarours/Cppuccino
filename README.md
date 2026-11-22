@@ -44,6 +44,9 @@ If this is your first visit, use this order:
 The [devcontainer](.devcontainer/devcontainer.json) ships GCC 15, clang, CMake
 and Python; run `tools/run_all_checks.sh` inside it.
 
+The published site is at
+[polarours.github.io/Cppuccino](https://polarours.github.io/Cppuccino/).
+
 ### Suggested Entry Points
 
 - **Ownership and lifetime**

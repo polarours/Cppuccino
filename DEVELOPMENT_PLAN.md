@@ -1737,3 +1737,23 @@ git、sudo 与 VS Code C++ 扩展；`devcontainer.json` 的 `postCreateCommand`
 镜像未能在本机实际构建；已验证 `devcontainer.json` 是合法 JSON、所有新增相对
 链接存在、全量仓库检查通过。容器构建需在联网环境或 Codespaces 中确认。
 
+## 第三十八阶段：P1 第二项 — 文档站（2026-11-22）
+
+新增 MkDocs Material 站点，`tools/build_site.py` 把现有 `docs/`、`pitfalls/`、
+`examples/*.cpp` 临时组装到 `.site/`，再生成落地页、示例/项目索引和 JSON 格式的
+MkDocs 配置；**文章不复制第二份**，落地页数字用 `{{TOKEN}}` 从 `check_stats.py`
+注入。`site-src/` 只存落地页模板与 CSS；`.site/` 与 `site/` 都 gitignore。
+
+视觉沿用品牌横幅和咖啡色强调色：账本式数字栏、三段式 "read / inspect /
+touch code" 序列、发丝级分隔线；不是模板化的卡片堆叠。
+
+`pages.yml` 用 checkout/setup-python v7 + configure-pages v6 +
+upload-pages-artifact v5 + deploy-pages v5，在 master 推送时构建并部署。
+`run_all_checks.sh` 增加一条：组装站点后用 `check_links.py .site` 校验链接。
+`check_links.py` 跳过 `.site/`、`site/`、`site-src/` 这些生成/模板目录。
+
+**验证限制**：本机无代理，装不了 `mkdocs-material`，所以 `mkdocs build --strict`
+只会在 Pages workflow 里首次真实运行；本地已验证组装脚本、生成配置合法性、
+以及组装后站点的全部相对链接。需要先在 GitHub Settings → Pages → Source 选
+GitHub Actions，工作流才有权限部署。
+

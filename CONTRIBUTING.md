@@ -128,6 +128,18 @@ CMake, Python and the VS Code C++ extensions. Its `postCreateCommand` fetches
 the tinyshell submodule and runs a quick statistics check, so the environment
 is ready for the commands below as soon as the container starts.
 
+### Documentation site
+
+The site is assembled from the existing Markdown, not from a second copy:
+
+```bash
+python3 tools/build_site.py
+mkdocs build -f .site/mkdocs.yml --strict --site-dir site
+```
+
+`requirements-docs.txt` lists the only extra dependency (MkDocs Material).
+The `Pages` workflow runs the same commands and deploys to GitHub Pages.
+
 Most projects use CMake:
 
 ```bash

@@ -18,6 +18,7 @@ tools/run_all_checks.sh --full   # and every project build and test
 | `check_doc_examples.py` | A complete example inside a document that no longer compiles or runs, or that reads freed memory |
 | `check_examples.py` | A standalone file in `examples/` that no longer compiles, a header that no longer describes how to build it, two examples writing to the same binary, a body that is still in Chinese, or an example that leaks |
 | `check_stats.py` | A statistic in the READMEs that no longer matches the repository |
+| `build_site.py` | Broken links or a stale nav in the generated documentation site |
 | `check_project_readmes.py` | A project README that drifted from its twin, that names a binary the project does not build, or that is written in the wrong language |
 | `check_readme_examples.py` | A C++ example in a project README that no longer compiles |
 | `check_warnings.py` | A warning the compiler found in a project or an example, other than the ones that are on purpose |

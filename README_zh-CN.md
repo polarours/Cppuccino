@@ -44,6 +44,9 @@
 [devcontainer](.devcontainer/devcontainer.json) 里已经装好 GCC 15、clang、CMake 和
 Python，进去跑 `tools/run_all_checks.sh` 即可。
 
+站点已发布在
+[polarours.github.io/Cppuccino](https://polarours.github.io/Cppuccino/)。
+
 ### 建议入口
 
 - **所有权与生命周期**

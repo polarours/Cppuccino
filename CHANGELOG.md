@@ -8,6 +8,10 @@ index for readers and for stable references.
 
 ### Added
 
+- A **documentation site** built from the existing Markdown by
+  `tools/build_site.py` and MkDocs Material, deployed to GitHub Pages by the
+  `Pages` workflow. No article is duplicated; the landing pages and nav are
+  generated from the repository, and their numbers come from `check_stats.py`.
 - A **devcontainer / GitHub Codespaces** environment: GCC 15, clang, CMake,
   Python and the C++ VS Code extensions, with a `postCreateCommand` that
   initialises the tinyshell submodule and checks the README statistics.
