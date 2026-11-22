@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -29,6 +30,7 @@ SITE_URL = 'https://polarours.github.io/Cppuccino/'
 
 sys.path.insert(0, str(TOOLS))
 import check_stats  # noqa: E402  (local helper, not a third-party package)
+from check_links import strip_code  # noqa: E402
 
 
 def write(path: Path, text: str) -> None:
@@ -67,6 +69,15 @@ def markdown_files(folder: str, lang: str) -> list[tuple[str, str]]:
             title = title.replace('-', ' ').replace('_', ' ')
         out.append((title, f'{folder}/{path.name}'))
     return out
+
+
+def article_index(folder: str, heading: str, intro: str, lang: str) -> str:
+    """A real index page so /docs/en/ and friends do not 404."""
+    lines = [f'# {heading}', '', intro, '']
+    for title, path in markdown_files(folder, lang):
+        name = path.rsplit('/', 1)[-1]
+        lines.append(f'- [{title}]({name})')
+    return '\n'.join(lines)
 
 
 def example_rows() -> list[tuple[str, str]]:
@@ -165,6 +176,57 @@ def projects_page(lang: str) -> str:
     return '\n'.join(lines)
 
 
+def directory_link_targets():
+    """Collect every internal trailing-slash link in the assembled site."""
+    targets = set()
+    for path in SITE.rglob('*.md'):
+        text = strip_code(path.read_text(encoding='utf-8', errors='replace'))
+        for match in re.finditer(r'\]\(([^)\s]+)\)', text):
+            link = match.group(1)
+            if link.startswith(('http://', 'https://', 'mailto:', '#')):
+                continue
+            raw = link.partition('#')[0]
+            if not raw.endswith('/'):
+                continue
+            resolved = (path.parent / raw).resolve()
+            if SITE in resolved.parents:
+                targets.add(resolved)
+    return targets
+
+
+def ensure_directory_indexes() -> None:
+    """Give every linked directory a page instead of a 404."""
+    for directory in sorted(directory_link_targets()):
+        index = directory / 'index.md'
+        if index.is_file():
+            continue
+        rel = directory.relative_to(SITE).as_posix()
+        github = f'{REPO_URL}/tree/master/{quote(rel)}'
+        write(index, f'# {directory.name}\n\n'
+                     f'This directory is part of the repository: '
+                     f'[view it on GitHub]({github}).\n')
+
+
+def validate_directory_links() -> None:
+    """A link ending in '/' needs a real index page, or the site 404s."""
+    broken = []
+    for path in SITE.rglob('*.md'):
+        text = strip_code(path.read_text(encoding='utf-8', errors='replace'))
+        for match in re.finditer(r'\]\(([^)\s]+)\)', text):
+            target = match.group(1)
+            if target.startswith(('http://', 'https://', 'mailto:', '#')):
+                continue
+            raw = target.partition('#')[0]
+            if not raw.endswith('/'):
+                continue
+            resolved = (path.parent / raw).resolve()
+            if not (resolved / 'index.md').is_file():
+                broken.append(f'{path.relative_to(SITE)} -> {target}')
+    if broken:
+        raise SystemExit('directory links without an index page:\n  ' +
+                         '\n  '.join(broken))
+
+
 def build_config() -> dict:
     en_concepts = markdown_files('docs/en', 'en')
     zh_concepts = markdown_files('docs/中文版', 'zh')
@@ -175,15 +237,19 @@ def build_config() -> dict:
         {'Home': 'index.md'},
         {'English': [
             {'Start here': 'en/index.md'},
-            {'Concepts': [{title: path} for title, path in en_concepts]},
-            {'Pitfalls': [{title: path} for title, path in en_pitfalls]},
+            {'Concepts': [{'All concepts': 'docs/en/index.md'}] +
+             [{title: path} for title, path in en_concepts]},
+            {'Pitfalls': [{'All pitfalls': 'pitfalls/en/index.md'}] +
+             [{title: path} for title, path in en_pitfalls]},
             {'Examples': 'en/examples/index.md'},
             {'Projects': 'en/projects/index.md'},
         ]},
         {'中文': [
             {'从这里开始': 'zh/index.md'},
-            {'概念文档': [{title: path} for title, path in zh_concepts]},
-            {'陷阱文章': [{title: path} for title, path in zh_pitfalls]},
+            {'概念文档': [{'全部概念': 'docs/中文版/index.md'}] +
+             [{title: path} for title, path in zh_concepts]},
+            {'陷阱文章': [{'全部陷阱': 'pitfalls/中文版/index.md'}] +
+             [{title: path} for title, path in zh_pitfalls]},
             {'示例': 'zh/examples/index.md'},
             {'项目': 'zh/projects/index.md'},
         ]},
@@ -291,6 +357,15 @@ def main() -> int:
         for path in sorted((REPO / folder).glob('*.md')):
             shutil.copy2(path, target / path.name)
 
+    write(SITE / 'docs' / 'en' / 'index.md', article_index(
+        'docs/en', 'Concepts', 'Every English concept article, one per idea.', 'en'))
+    write(SITE / 'docs' / '中文版' / 'index.md', article_index(
+        'docs/中文版', '概念文档', '每篇只讲一个想法的中文概念文章。', 'zh'))
+    write(SITE / 'pitfalls' / 'en' / 'index.md', article_index(
+        'pitfalls/en', 'Pitfalls', 'Every English failure mode, with the fix it implies.', 'en'))
+    write(SITE / 'pitfalls' / '中文版' / 'index.md', article_index(
+        'pitfalls/中文版', '陷阱文章', '每种失败模式，以及它指向的修复方式。', 'zh'))
+
     examples = SITE / 'examples'
     examples.mkdir(parents=True, exist_ok=True)
     for path in sorted((REPO / 'examples').glob('*.cpp')):
@@ -321,6 +396,9 @@ def main() -> int:
         for key, value in tokens.items():
             text = text.replace('{{' + key + '}}', value)
         path.write_text(text, encoding='utf-8')
+
+    ensure_directory_indexes()
+    validate_directory_links()
 
     # JSON is a subset of YAML, so MkDocs reads this without a YAML dependency.
     config = json.dumps(build_config(), indent=2, ensure_ascii=False)
