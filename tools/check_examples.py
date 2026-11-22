@@ -22,6 +22,7 @@ import sys
 import tempfile
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXAMPLES = os.path.join(REPO, 'examples')
@@ -128,6 +129,18 @@ MISSING_STD_HEADER_CLANG = re.compile(
     "fatal error: '(?:{})' file not found".format('|'.join(NEW_STD_HEADERS)))
 
 
+@lru_cache(maxsize=None)
+def compiler_major():
+    """The compiler's major version, for skipping standards it cannot check."""
+    try:
+        out = subprocess.run([CXX, '-dumpversion'], capture_output=True,
+                             text=True, errors='replace').stdout.strip()
+        match = re.match(r'\d+', out)
+        return int(match.group()) if match else 0
+    except (OSError, ValueError):
+        return 0
+
+
 def toolchain_limitation(stderr):
     return (too_old(stderr) or bool(MISSING_STD_HEADER_GCC.search(stderr)) or
             bool(MISSING_STD_HEADER_CLANG.search(stderr)))
@@ -137,6 +150,13 @@ def check_one(path, workdir):
     """Return (status, detail). status is 'ok', 'skip' or 'fail'."""
     name = os.path.basename(path)
     standard = declared_standard(path)
+
+    # A runner with an older libstdc++ cannot reliably check C++23/26
+    # library examples. The modern toolchain job does; here they are skipped
+    # rather than reported as source defects.
+    if standard and int(standard) >= 23 and compiler_major() < 15:
+        return 'skip', ('compiler major ' + str(compiler_major()) +
+                        ' cannot check the C++' + standard + ' library')
 
     if standard:
         cmd = compile_commands(path, standard, workdir)

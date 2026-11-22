@@ -26,6 +26,8 @@ import subprocess
 import sys
 import tempfile
 
+from check_examples import compiler_major, toolchain_limitation
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # The compiler to use; CXX follows the usual convention.
@@ -50,8 +52,8 @@ def applies(entry, sanitizer):
     # A crash from undefined behaviour is a property of the compiler and
     # standard library, not of the example. The article says the program
     # may also appear to work, so a clang run that survives is not a
-    # stale expectation.
-    if kind == 'segfault' and CXX != 'g++':
+    # stale expectation. gcc-14 / gcc-15 are still gcc.
+    if kind == 'segfault' and 'clang' in os.path.basename(CXX).lower():
         return False
     return where == 'any' or sanitizer is not None
 
@@ -237,6 +239,7 @@ def check(path, sanitizer=None):
         run_args = [str(free_port())]
 
     last_error = ''
+    last_stderr = ''
     for start in starts:
         prog = assemble(bl, start)
         if prog is None:
@@ -259,8 +262,13 @@ def check(path, sanitizer=None):
                     return 'fail', f'run: exit {r.returncode}'
                 return 'ok', f'{len(r.stdout.strip().splitlines())} output lines'
             lines = c.stderr.strip().splitlines()
+            last_stderr = c.stderr
             last_error = next((l for l in lines if ' error:' in l),
                               lines[0] if lines else '?')
+    if compiler_major() < 15 or toolchain_limitation(last_stderr):
+        # The runner's compiler cannot check this document's C++23/26
+        # example. The clang/modern job checks it instead.
+        return 'skip', 'the runner toolchain cannot build this example'
     return 'fail', f'compile: {last_error.strip()[:100]}'
 
 
