@@ -39,6 +39,11 @@ If this is your first visit, use this order:
 3. Read one related pitfall article.
 4. Finish by touching code in an example or project.
 
+**No toolchain at hand?** Open the repo in
+[GitHub Codespaces](https://codespaces.new/polarours/Cppuccino?quickstart=1).
+The [devcontainer](.devcontainer/devcontainer.json) ships GCC 15, clang, CMake
+and Python; run `tools/run_all_checks.sh` inside it.
+
 ### Suggested Entry Points
 
 - **Ownership and lifetime**

@@ -39,6 +39,11 @@
 3. 配套读一篇相关陷阱文章。
 4. 最后到示例或小项目里动手。
 
+**本地没装工具链？** 直接用
+[GitHub Codespaces](https://codespaces.new/polarours/Cppuccino?quickstart=1) 打开。
+[devcontainer](.devcontainer/devcontainer.json) 里已经装好 GCC 15、clang、CMake 和
+Python，进去跑 `tools/run_all_checks.sh` 即可。
+
 ### 建议入口
 
 - **所有权与生命周期**

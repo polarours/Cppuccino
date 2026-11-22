@@ -8,6 +8,10 @@ index for readers and for stable references.
 
 ### Added
 
+- A **devcontainer / GitHub Codespaces** environment: GCC 15, clang, CMake,
+  Python and the C++ VS Code extensions, with a `postCreateCommand` that
+  initialises the tinyshell submodule and checks the README statistics.
+  "Start Here" and `CONTRIBUTING.md` link to it.
 - A **Clang portability** CI job: the examples and document examples are
   compiled and run with `clang++` in addition to GCC. Code that only one
   compiler accepts is not good teaching material.

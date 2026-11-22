@@ -1726,3 +1726,14 @@ abort（实测 exit=134）。重写为 `list<Key>` 记顺序 + map 存迭代器�
 仍需用户在网页手动完成的发现性设置：仓库 topics、homepage、第一个 Release；
 这些没有写进仓库文件，因为 API 需要登录态。
 
+## 第三十七阶段：P1 第一项 — 一键开发环境（2026-11-21）
+
+新增 `.devcontainer/`：`Dockerfile` 基于 `gcc:15`，装 clang、CMake、Python、
+git、sudo 与 VS Code C++ 扩展；`devcontainer.json` 的 `postCreateCommand`
+初始化 tinyshell 子模块并跑 `check_stats.py` 做环境自检。README 双语版和
+`CONTRIBUTING.md` 已链接到 Codespaces 入口。
+
+**验证限制**：本机没有 HTTP 代理，Docker 拉不到 `gcc:15` 基础镜像，所以容器
+镜像未能在本机实际构建；已验证 `devcontainer.json` 是合法 JSON、所有新增相对
+链接存在、全量仓库检查通过。容器构建需在联网环境或 Codespaces 中确认。
+

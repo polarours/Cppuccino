@@ -119,6 +119,15 @@ and that you agree to license it under the project's license.
 
 ## Building and Testing
 
+### One-click environment
+
+If you do not want to install the toolchain locally, open the repository in
+[GitHub Codespaces](https://codespaces.new/polarours/Cppuccino?quickstart=1).
+The [devcontainer](.devcontainer/devcontainer.json) installs GCC 15, clang,
+CMake, Python and the VS Code C++ extensions. Its `postCreateCommand` fetches
+the tinyshell submodule and runs a quick statistics check, so the environment
+is ready for the commands below as soon as the container starts.
+
 Most projects use CMake:
 
 ```bash
