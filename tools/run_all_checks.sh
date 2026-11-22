@@ -54,6 +54,9 @@ run "examples: compile and run" \
 run "statistics: the READMEs agree with the repository" \
     python3 tools/check_stats.py
 
+run "site: assembled pages have no broken links" \
+    bash -c 'python3 tools/build_site.py >/dev/null && python3 tools/check_links.py .site'
+
 run "projects: the READMEs agree with their twin and their build" \
     python3 tools/check_project_readmes.py
 

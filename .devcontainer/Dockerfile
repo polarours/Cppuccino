@@ -10,8 +10,16 @@ RUN apt-get update \
       git \
       ninja-build \
       python3 \
+      python3-pip \
+      python3-venv \
       sudo \
  && rm -rf /var/lib/apt/lists/*
+
+COPY requirements-docs.txt /tmp/requirements-docs.txt
+RUN python3 -m venv /opt/docs-venv \
+ && /opt/docs-venv/bin/pip install --no-cache-dir -r /tmp/requirements-docs.txt \
+ && rm /tmp/requirements-docs.txt
+ENV PATH="/opt/docs-venv/bin:${PATH}"
 
 RUN useradd -m -s /bin/bash vscode \
  && usermod -aG sudo vscode \

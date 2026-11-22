@@ -1,0 +1,2 @@
+# Documentation site. Kept in Python so it matches the rest of the tooling.
+mkdocs-material>=9.6,<10

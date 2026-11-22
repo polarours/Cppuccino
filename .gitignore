@@ -55,6 +55,10 @@ cmake-build-*
 __pycache__/
 *.pyc
 
+# Generated documentation site
+.site/
+site/
+
 # Files written by the example programs in docs/ and examples/
 database.txt
 
