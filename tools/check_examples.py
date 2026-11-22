@@ -330,7 +330,11 @@ def run_example(path, standard, workdir, sanitizer=None):
     built = subprocess.run(cmd, capture_output=True, text=True,
                            errors='replace')
     if built.returncode != 0:
-        return 'compile', 'the example does not compile'
+        # Keep the compiler's own error so CI annotations can show which
+        # header or feature the runner's toolchain is missing.
+        first = next((l for l in built.stderr.splitlines() if ' error:' in l),
+                     built.stderr.splitlines()[0] if built.stderr else '?')
+        return 'compile', first.strip()[:200]
     try:
         result = subprocess.run([binary], cwd=workdir, capture_output=True,
                                 text=True, errors='replace', timeout=20)
@@ -431,6 +435,10 @@ def main():
         print(f'\n{len(failures)} failure(s):')
         for name, detail in failures:
             print(f'  {name}: {detail}')
+            if os.environ.get('GITHUB_ACTIONS'):
+                # Annotations are visible through the public check-runs API,
+                # so a failure can be diagnosed from outside the repo.
+                print(f'::error file=examples/{name}::{detail}')
     if collisions:
         print(f'\n{len(collisions)} output name collision(s)')
         for c in collisions:
