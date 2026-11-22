@@ -251,7 +251,7 @@ def build_config() -> dict:
         'extra_css': ['assets/stylesheets/extra.css'],
         'validation': {
             'links': {'not_found': 'warn'},
-            'anchors': {'not_found': 'info'},
+            'anchors': 'info',
         },
         'extra': {
             'social': [
