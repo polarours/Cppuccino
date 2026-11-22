@@ -24,6 +24,8 @@ jobs:
         with:
           python-version: '3.13'
       - uses: actions/configure-pages@v6
+        with:
+          enablement: true
       - name: Install the documentation toolchain
         run: python3 -m pip install -r requirements-docs.txt
       - name: Assemble the single-source site

@@ -1754,6 +1754,6 @@ upload-pages-artifact v5 + deploy-pages v5，在 master 推送时构建并部署
 
 **验证限制**：本机无代理，装不了 `mkdocs-material`，所以 `mkdocs build --strict`
 只会在 Pages workflow 里首次真实运行；本地已验证组装脚本、生成配置合法性、
-以及组装后站点的全部相对链接。需要先在 GitHub Settings → Pages → Source 选
-GitHub Actions，工作流才有权限部署。
+以及组装后站点的全部相对链接。`configure-pages` 用 `enablement: true`，
+所以仓库尚未启用 Pages 时也能由工作流自行开启，无需手动点设置。
 
