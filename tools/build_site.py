@@ -28,6 +28,75 @@ TEMPLATES = REPO / 'site-src'
 REPO_URL = 'https://github.com/polarours/Cppuccino'
 SITE_URL = 'https://polarours.github.io/Cppuccino/'
 
+WORLDS = [
+    {
+        'key': 'ownership',
+        'en': 'Ownership & Lifetime',
+        'zh': '所有权与生命周期',
+        'tagline_en': 'Who owns it, and when does it die?',
+        'tagline_zh': '谁拥有它，它什么时候结束？',
+        'keywords': ['ownership', 'lifetime', 'raii', 'move', 'dangling',
+                     'use-after-move', 'unique_ptr', 'shared_ptr',
+                     'reference', 'rvalue', 'lvalue', 'value-categor',
+                     'forwarding', 'copy elision', 'rule of zero',
+                     'object model', 'const',
+                     '所有权', '生命周期', '悬垂', '移动', '智能指针',
+                     '引用', '右值', '左值', '转发', '拷贝', '零三五',
+                     '对象模型'],
+    },
+    {
+        'key': 'patterns',
+        'en': 'Design Patterns',
+        'zh': '设计模式',
+        'tagline_en': 'Names for recurring shapes of code.',
+        'tagline_zh': '给反复出现的代码形状起名字。',
+        'keywords': ['pattern', 'factory', 'strategy', 'observer', 'command',
+                     'visitor', 'decorator', 'singleton', 'dispatch', 'pimpl',
+                     'abi', '模式', '策略', '命令', '观察者', '分派', '双重分派'],
+    },
+    {
+        'key': 'memory',
+        'en': 'Memory & Allocators',
+        'zh': '内存与分配器',
+        'tagline_en': 'Every byte has an address and a cost.',
+        'tagline_zh': '每个字节都有地址和代价。',
+        'keywords': ['allocat', 'memory', 'arena', 'slab', 'pool', 'object-pool',
+                     'allocation', 'double free', 'delete', 'free',
+                     '内存', '分配', '对象池', '内存池', '重复释放'],
+    },
+    {
+        'key': 'systems',
+        'en': 'Systems & Concurrency',
+        'zh': '系统与并发',
+        'tagline_en': 'Processes, signals, threads, and shared state.',
+        'tagline_zh': '进程、信号、线程与共享状态。',
+        'keywords': ['thread', 'mutex', 'atomic', 'signal', 'process', 'shell',
+                     'concurrency', 'lock', 'data race', 'simd', 'scheduler',
+                     'server', '线程', '并发', '信号', '原子', '内存序',
+                     '互斥', '数据竞争', '调度', '服务器'],
+    },
+    {
+        'key': 'modern',
+        'en': 'Modern C++',
+        'zh': '现代 C++',
+        'tagline_en': 'What C++20 and C++23 actually changed.',
+        'tagline_zh': 'C++20 与 C++23 到底改变了什么。',
+        'keywords': ['cpp20', 'cpp23', 'concept', 'coroutine', 'range', 'print',
+                     'mdspan', 'span', 'optional', 'expected', 'generator',
+                     'template', 'fold expression', 'two phase',
+                     '概念', '协程', '范围', '模板', '折叠', '两阶段'],
+    },
+    {
+        'key': 'craft',
+        'en': 'Craft & Tooling',
+        'zh': '工程与工具',
+        'tagline_en': 'Build it, test it, document it, keep it honest.',
+        'tagline_zh': '构建、测试、写文档，让它保持诚实。',
+        'keywords': ['cmake', 'test', 'ci', 'doc', 'parser', 'link', 'diff',
+                     'build', 'markdown', '测试', '构建', '文档', '工具'],
+    },
+]
+
 sys.path.insert(0, str(TOOLS))
 import check_stats  # noqa: E402  (local helper, not a third-party package)
 from check_links import strip_code  # noqa: E402
@@ -246,11 +315,86 @@ def validate_directory_links() -> None:
             if not raw.endswith('/'):
                 continue
             resolved = (path.parent / raw).resolve()
-            if not (resolved / 'index.md').is_file():
+            if not ((resolved / 'index.md').is_file() or
+                    (resolved / 'index.html').is_file()):
                 broken.append(f'{path.relative_to(SITE)} -> {target}')
     if broken:
         raise SystemExit('directory links without an index page:\n  ' +
                          '\n  '.join(broken))
+
+
+def classify(text: str) -> str:
+    lowered = text.lower()
+    for world in WORLDS:
+        if any(keyword in lowered for keyword in world['keywords']):
+            return world['key']
+    return 'craft'
+
+
+def quest(kind: str, lang: str, title: str, url: str, xp: int,
+          source: str, description: str = '') -> dict:
+    return {
+        'id': f'{kind}-{lang}-{source}'.replace('/', '-').replace(' ', '-'),
+        'kind': kind,
+        'lang': lang,
+        'title': title,
+        'url': url,
+        'xp': xp,
+        'world': classify(title + ' ' + source),
+        'description': description,
+    }
+
+
+def build_quests() -> dict:
+    """Turn real repository content into game levels, without duplicating it."""
+    quests = []
+
+    for title, path in markdown_files('docs/en', 'en'):
+        stem = path.rsplit('/', 1)[-1][:-3]
+        quests.append(quest('intel', 'en', title,
+                            '../docs/en/' + quote(stem) + '/', 10, path))
+
+    for title, path in markdown_files('docs/中文版', 'zh'):
+        stem = path.rsplit('/', 1)[-1][:-3]
+        quests.append(quest('intel', 'zh', title,
+                            '../docs/中文版/' + quote(stem) + '/', 10, path))
+
+    for title, path in markdown_files('pitfalls/en', 'en'):
+        stem = path.rsplit('/', 1)[-1][:-3]
+        quests.append(quest('boss', 'en', title,
+                            '../pitfalls/en/' + quote(stem) + '/', 20, path))
+
+    for title, path in markdown_files('pitfalls/中文版', 'zh'):
+        stem = path.rsplit('/', 1)[-1][:-3]
+        quests.append(quest('boss', 'zh', title,
+                            '../pitfalls/中文版/' + quote(stem) + '/', 20, path))
+
+    for name, description in example_rows():
+        quests.append(quest('loot', 'en', name[:-4].replace('-', ' '),
+                            '../examples/' + quote(name), 15,
+                            'examples/' + name, description))
+
+    exercises = REPO / 'tinyshell' / 'tests' / 'exercises'
+    if exercises.is_dir():
+        for path in sorted(exercises.glob('*.cpp')):
+            name = path.name
+            url = (f'https://github.com/polarours/tinyshell/blob/v1/'
+                   f'tests/exercises/{quote(name)}')
+            quests.append(quest('challenge', 'en',
+                                path.stem.replace('_', ' ').replace('-', ' '),
+                                url, 30, 'tinyshell/tests/exercises/' + name))
+
+    return {
+        'worlds': [{k: v for k, v in world.items() if k != 'keywords'}
+                   for world in WORLDS],
+        'quests': quests,
+        'legend': {
+            'intel': {'en': 'Read', 'zh': '阅读'},
+            'boss': {'en': 'Boss', 'zh': 'Boss'},
+            'loot': {'en': 'Loot', 'zh': '掉落'},
+            'challenge': {'en': 'Clear', 'zh': '通关'},
+        },
+    }
 
 
 def build_config() -> dict:
@@ -426,6 +570,10 @@ def main() -> int:
     normalize_directory_links()
     ensure_directory_indexes()
     validate_directory_links()
+
+    # Game data for the Play mode: real content, no duplicated articles.
+    write(SITE / 'assets' / 'quests.json',
+          json.dumps(build_quests(), indent=2, ensure_ascii=False))
 
     # JSON is a subset of YAML, so MkDocs reads this without a YAML dependency.
     config = json.dumps(build_config(), indent=2, ensure_ascii=False)

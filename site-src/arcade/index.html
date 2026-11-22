@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" data-theme="arcade" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Cppuccino Arcade — Select Your Stage</title>
+  <link rel="stylesheet" href="../assets/arcade.css">
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="../">CPPUCCINO<span>// ARCADE</span></a>
+    <nav class="controls" aria-label="Play mode controls">
+      <button id="themeBtn" type="button" aria-label="Switch visual theme">RETRO</button>
+      <button id="langBtn" type="button" aria-label="Switch language">中文</button>
+      <a href="../">READ MODE ↗</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow" id="heroEyebrow">INSERT CURIOSITY · PRESS START</p>
+      <h1 id="heroTitle">SELECT YOUR STAGE</h1>
+      <p class="hero-sub" id="heroSub">One C++ idea, in two languages, with runnable proof. Clear a stage by reading, fighting a bug, and shipping the code.</p>
+    </section>
+
+    <section class="hud" aria-label="Progress">
+      <div class="hud-cell"><span class="hud-label" id="labelLevel">LEVEL</span><strong id="hudLevel">01</strong></div>
+      <div class="hud-cell"><span class="hud-label" id="labelXp">XP</span><strong id="hudXp">0</strong></div>
+      <div class="hud-cell"><span class="hud-label" id="labelCleared">CLEARED</span><strong id="hudCleared">0 / 0</strong></div>
+      <div class="hud-cell"><span class="hud-label" id="labelStages">STAGES</span><strong id="hudStages">6</strong></div>
+    </section>
+
+    <section class="section-head">
+      <h2 id="worldsTitle">WORLD MAP</h2>
+      <p id="worldsHint">Every stage points at real articles, pitfalls and runnable examples.</p>
+    </section>
+
+    <section id="worlds" class="worlds" aria-label="World map"></section>
+
+    <section id="stage" class="stage" hidden>
+      <div class="stage-head">
+        <button id="backBtn" type="button">← WORLD MAP</button>
+        <div>
+          <p class="eyebrow" id="stageCode">STAGE 01</p>
+          <h2 id="stageTitle">OWNERSHIP &amp; LIFETIME</h2>
+          <p id="stageTagline"></p>
+        </div>
+      </div>
+      <div id="stageGroups" class="stage-groups"></div>
+    </section>
+  </main>
+
+  <footer>
+    <span id="footerNote">Progress stays in this browser. No account, no leaderboard.</span>
+    <a href="../">Back to the notebook →</a>
+  </footer>
+
+  <script src="../assets/arcade.js"></script>
+</body>
+</html>

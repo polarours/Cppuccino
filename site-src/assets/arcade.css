@@ -1,0 +1,433 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&family=VT323&display=swap');
+
+:root {
+  --bg: #17110d;
+  --surface: #221913;
+  --surface-2: #2d2118;
+  --ink: #f5e9d6;
+  --muted: #a9967c;
+  --accent: #f2b84b;
+  --signal: #7cffb2;
+  --danger: #ff7a6b;
+  --line: rgba(242, 184, 75, 0.28);
+  --font-display: 'Press Start 2P', 'Courier New', 'Noto Sans SC', monospace;
+  --font-mono: 'VT323', 'Courier New', 'Noto Sans SC', monospace;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+html[data-theme='retro'] {
+  --bg: #f3e7d3;
+  --surface: #fbf4e7;
+  --surface-2: #ede0c8;
+  --ink: #241b14;
+  --muted: #6b5a47;
+  --accent: #a36d2f;
+  --signal: #3e5d4b;
+  --danger: #a33b2a;
+  --line: rgba(36, 27, 20, 0.24);
+  --font-display: 'Courier New', 'Noto Sans SC', monospace;
+  --font-mono: 'Courier New', 'Noto Sans SC', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(242, 184, 75, 0.10), transparent 42%),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+html[data-theme='retro'] body {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(36, 27, 20, 0.025) 3px 4px),
+    var(--bg);
+}
+
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.16) 0px,
+    rgba(0, 0, 0, 0.16) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  opacity: 0.42;
+}
+
+html[data-theme='retro'] .scanlines { display: none; }
+
+a { color: inherit; }
+
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem clamp(1rem, 4vw, 3rem);
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.brand span {
+  margin-left: 0.6rem;
+  color: var(--accent);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  letter-spacing: 0.06em;
+}
+
+.controls button,
+.controls a,
+.stage-head button {
+  appearance: none;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  text-decoration: none;
+  font: inherit;
+  transition: background 160ms ease-out, color 160ms ease-out,
+              transform 160ms ease-out;
+}
+
+.controls button:hover,
+.controls a:hover,
+.stage-head button:hover {
+  background: var(--accent);
+  color: var(--bg);
+  transform: translateY(-1px);
+}
+
+main {
+  width: min(1100px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: clamp(2rem, 6vw, 5rem) 0 4rem;
+}
+
+.hero { margin-bottom: 2.6rem; }
+
+.eyebrow {
+  margin: 0 0 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+html[data-theme='retro'] .eyebrow { color: var(--accent); }
+
+.hero h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 4.4vw, 3.1rem);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  text-shadow: 0 0 18px rgba(242, 184, 75, 0.28);
+}
+
+html[data-theme='retro'] .hero h1 {
+  color: var(--ink);
+  text-shadow: none;
+  letter-spacing: -0.04em;
+}
+
+.hero-sub {
+  max-width: 62ch;
+  margin: 1.4rem 0 0;
+  font-size: 1.08rem;
+  color: var(--muted);
+}
+
+.hud {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--line);
+  margin-bottom: 3.4rem;
+}
+
+.hud-cell {
+  padding: 1rem 1.1rem;
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.hud-cell:last-child { border-right: 0; }
+
+.hud-label {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.hud-cell strong {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--signal);
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-theme='retro'] .hud-cell strong { color: var(--ink); }
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.8rem;
+  margin-bottom: 1.4rem;
+}
+
+.section-head h2,
+.stage-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+.section-head p,
+.stage-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.worlds {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.world {
+  appearance: none;
+  text-align: left;
+  border: 0;
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  transition: background 160ms ease-out, transform 160ms ease-out;
+}
+
+.world:hover {
+  background: var(--surface-2);
+  transform: translateY(-3px);
+}
+
+.world-code {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+
+.world-title {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.world-tagline {
+  font-size: 0.9rem;
+  color: var(--muted);
+  min-height: 2.8em;
+}
+
+.meter {
+  height: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+.meter > span {
+  display: block;
+  height: 100%;
+  background: var(--signal);
+}
+
+html[data-theme='retro'] .meter > span { background: var(--accent); }
+
+.world-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  color: var(--muted);
+}
+
+.world-enter {
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  letter-spacing: 0.1em;
+  color: var(--signal);
+}
+
+html[data-theme='retro'] .world-enter { color: var(--accent); }
+
+.stage { padding-top: 0.5rem; }
+
+.stage-head {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 1.2rem;
+  margin-bottom: 1.6rem;
+}
+
+.stage-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.4rem;
+}
+
+.group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.group-head small { color: var(--muted); }
+
+.quest {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.quest a {
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.quest a:hover { color: var(--accent); }
+
+.quest .xp {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+
+.quest button {
+  appearance: none;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.quest button[aria-pressed='true'] {
+  color: var(--bg);
+  background: var(--signal);
+  border-color: var(--signal);
+}
+
+html[data-theme='retro'] .quest button[aria-pressed='true'] {
+  color: var(--surface);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+footer {
+  width: min(1100px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1.5rem 0 2.5rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--muted);
+}
+
+footer a { color: var(--accent); text-decoration: none; }
+
+@media (max-width: 640px) {
+  .hud { grid-template-columns: repeat(2, 1fr); }
+  .hud-cell:nth-child(2) { border-right: 0; }
+  .hud-cell:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
+  .stage-head { flex-direction: column; align-items: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+  .scanlines { display: none; }
+}
