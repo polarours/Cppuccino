@@ -194,11 +194,37 @@ def directory_link_targets():
     return targets
 
 
+def normalize_directory_links() -> None:
+    """Point directory links at the README MkDocs already publishes there."""
+    for path in SITE.rglob('*.md'):
+        text = path.read_text(encoding='utf-8', errors='replace')
+        changed = False
+
+        def rewrite(match):
+            nonlocal changed
+            link = match.group(1)
+            if link.startswith(('http://', 'https://', 'mailto:', '#')):
+                return match.group(0)
+            raw, sep, anchor = link.partition('#')
+            if not raw.endswith('/'):
+                return match.group(0)
+            directory = (path.parent / raw).resolve()
+            if SITE not in directory.parents or not (directory / 'README.md').is_file():
+                return match.group(0)
+            changed = True
+            tail = 'README.md' + ('#' + anchor if sep else '')
+            return f']({raw}{tail})'
+
+        updated = re.sub(r'\]\(([^)\s]+)\)', rewrite, text)
+        if changed:
+            path.write_text(updated, encoding='utf-8')
+
+
 def ensure_directory_indexes() -> None:
     """Give every linked directory a page instead of a 404."""
     for directory in sorted(directory_link_targets()):
         index = directory / 'index.md'
-        if index.is_file():
+        if index.is_file() or (directory / 'README.md').is_file():
             continue
         rel = directory.relative_to(SITE).as_posix()
         github = f'{REPO_URL}/tree/master/{quote(rel)}'
@@ -397,6 +423,7 @@ def main() -> int:
             text = text.replace('{{' + key + '}}', value)
         path.write_text(text, encoding='utf-8')
 
+    normalize_directory_links()
     ensure_directory_indexes()
     validate_directory_links()
 
