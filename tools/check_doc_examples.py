@@ -46,7 +46,13 @@ def applies(entry, sanitizer):
     what used to be there. Only the address sanitizer sees it, so the
     entry says which run the failure belongs to.
     """
-    _, where = entry
+    kind, where = entry
+    # A crash from undefined behaviour is a property of the compiler and
+    # standard library, not of the example. The article says the program
+    # may also appear to work, so a clang run that survives is not a
+    # stale expectation.
+    if kind == 'segfault' and CXX != 'g++':
+        return False
     return where == 'any' or sanitizer is not None
 
 
@@ -237,11 +243,12 @@ def check(path, sanitizer=None):
             continue
         open(src, 'w').write(prog)
         for std_flag in STANDARDS:
-            c = subprocess.run(base_cmd + [std_flag, src], capture_output=True, text=True)
+            c = subprocess.run(base_cmd + [std_flag, src], capture_output=True,
+                               text=True, errors='replace')
             if c.returncode == 0:
                 try:
                     r = subprocess.run([exe] + run_args, capture_output=True,
-                                       text=True, timeout=30)
+                                       text=True, errors='replace', timeout=30)
                 except subprocess.TimeoutExpired:
                     return 'fail', 'run: timed out'
                 if sanitizer:

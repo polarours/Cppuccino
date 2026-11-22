@@ -133,4 +133,9 @@ CXX=g++-14 tools/check_examples.py
 
 An example that needs a standard the compiler does not know is reported as
 skipped rather than as broken, so a runner with an older compiler does not
-fail over it.
+fail over it. Missing standard-library headers (`mdspan`, `print`, ...) are
+skipped the same way, for both GCC and clang diagnostics.
+
+CI also runs a separate **Clang portability** job with `CXX=clang++`: GCC
+accepts a few extensions that clang rejects, and a learning repo should not
+teach code that only one compiler happens to accept.

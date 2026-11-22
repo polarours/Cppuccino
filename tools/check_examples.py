@@ -109,7 +109,8 @@ def compile_commands(path, standard, workdir):
 # The compiler rejecting the -std= flag means the toolchain is too old for
 # the example, which is not a defect in the example.
 TOOLCHAIN_TOO_OLD = ('unrecognized command-line option',
-                      'invalid value', 'unknown argument')
+                      'invalid value', 'unknown argument',
+                      'unsupported option', "invalid argument '-std=")
 
 
 def too_old(stderr):
@@ -120,13 +121,16 @@ def too_old(stderr):
 # headers. That is a toolchain limitation, not a defect in the example.
 NEW_STD_HEADERS = ('print', 'expected', 'flat_map', 'flat_set', 'mdspan',
                    'inplace_vector', 'generator', 'stacktrace', 'format')
-MISSING_STD_HEADER = re.compile(
+MISSING_STD_HEADER_GCC = re.compile(
     r'fatal error: (?:' + '|'.join(NEW_STD_HEADERS) +
     r'): No such file or directory')
+MISSING_STD_HEADER_CLANG = re.compile(
+    "fatal error: '(?:{})' file not found".format('|'.join(NEW_STD_HEADERS)))
 
 
 def toolchain_limitation(stderr):
-    return too_old(stderr) or bool(MISSING_STD_HEADER.search(stderr))
+    return (too_old(stderr) or bool(MISSING_STD_HEADER_GCC.search(stderr)) or
+            bool(MISSING_STD_HEADER_CLANG.search(stderr)))
 
 
 def check_one(path, workdir):

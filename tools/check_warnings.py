@@ -17,10 +17,15 @@ import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
+# The same toolchain-limitation rules the example checker uses: a compiler
+# that accepts -std=c++23 but lacks <print> is not a warning in our code.
+from check_examples import toolchain_limitation
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROADMAP = os.path.join(REPO, 'cpp-mastery-roadmap')
 EXAMPLES = os.path.join(REPO, 'examples')
 ALLOWLIST = os.path.join(REPO, 'tools', 'known_warnings.tsv')
+CXX = os.environ.get('CXX', 'g++')
 
 WARNINGS = ['-Wall', '-Wextra', '-Wpedantic', '-Wshadow', '-Wnon-virtual-dtor',
             '-Wnull-dereference', '-Wold-style-cast', '-Wunused-variable',
@@ -163,7 +168,7 @@ def standard(path):
 
 def check(path):
     """Return the warnings of one file, as (kind, line) pairs."""
-    command = ['g++', f'-std=c++{standard(path)}', '-fsyntax-only']
+    command = [CXX, f'-std=c++{standard(path)}', '-fsyntax-only']
     command += WARNINGS
     command += [f'-I{d}' for d in include_dirs(path)]
     command.append(path)
@@ -183,6 +188,10 @@ def check(path):
             name = text.split(' [-W', 1)[0][:40] if ' [-W' in text else text[:40]
         found.append((name, line.strip()[:150]))
     if result.returncode != 0 and not found:
+        if toolchain_limitation(result.stderr):
+            # The runner's compiler cannot build this file; the example
+            # checker skips it too. It is not a warning in our source.
+            return []
         # A file that does not compile is a problem of its own. Reporting
         # only the warnings would let it pass as a quiet one.
         first = next((l for l in result.stderr.splitlines() if ' error:' in l),

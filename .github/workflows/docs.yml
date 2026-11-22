@@ -29,13 +29,13 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Fetch the tinyshell submodule
         run: git submodule update --init --recursive
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.x'
 
@@ -92,3 +92,28 @@ jobs:
 
       - name: The two roadmap indexes agree
         run: python3 tools/check_overview_parity.py
+
+  clang:
+    name: Clang portability
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Install clang
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends clang
+
+      - name: Standalone examples with clang++
+        # GCC accepts a few extensions that clang rejects. A learning repo
+        # should not teach code that only one compiler happens to accept.
+        env:
+          CXX: clang++
+        run: python3 tools/check_examples.py --run --jobs 2
+
+      - name: Document examples with clang++
+        env:
+          CXX: clang++
+        run: python3 tools/check_doc_examples.py

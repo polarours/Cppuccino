@@ -115,4 +115,8 @@ CXX=g++-14 tools/check_examples.py
 ```
 
 如果示例需要的标准编译器不认识，会报告为"跳过"而不是"失败"，
-这样用较旧编译器的 runner 不会因此挂掉。
+这样用较旧编译器的 runner 不会因此挂掉。缺少新标准库头文件（`mdspan`、
+`print` 等）也一样跳过，GCC 与 clang 的诊断格式都认。
+
+CI 还有单独的 **Clang portability** job（`CXX=clang++`）：GCC 接受的一些扩展
+clang 会拒绝，学习仓库不该教只能在某个编译器下通过的代码。

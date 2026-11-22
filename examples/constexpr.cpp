@@ -171,10 +171,16 @@ public:
     constexpr double x() const { return x_; }
     constexpr double y() const { return y_; }
 
-    constexpr double distanceTo(const Point& other) const {
+    // std::sqrt is not constexpr in C++17, so the squared distance is the
+    // part that can be computed at compile time.
+    constexpr double squaredDistanceTo(const Point& other) const {
         double dx = x_ - other.x_;
         double dy = y_ - other.y_;
-        return std::sqrt(dx * dx + dy * dy);
+        return dx * dx + dy * dy;
+    }
+
+    double distanceTo(const Point& other) const {
+        return std::sqrt(squaredDistanceTo(other));
     }
 
 private:
@@ -187,8 +193,9 @@ void constexprConstructors() {
     constexpr Point p1(0.0, 0.0);
     constexpr Point p2(3.0, 4.0);
 
-    constexpr double dist = p1.distanceTo(p2);
-    std::cout << "Distance: " << dist << "\n";
+    constexpr double dist2 = p1.squaredDistanceTo(p2);
+    std::cout << "Squared distance: " << dist2 << "\n";
+    std::cout << "Distance: " << p1.distanceTo(p2) << "\n";
 
     constexpr Point mid((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2);
     std::cout << "Midpoint: (" << mid.x() << ", " << mid.y() << ")\n";
