@@ -22,10 +22,14 @@ index for readers and for stable references.
   `-std=`" diagnostics, so an older toolchain skips those examples instead
   of failing the whole job. `check_warnings.py` shares those rules, so an
   older compiler missing a new standard-library header is not reported as
-  a warning in our source.
+  a warning in our source. When the runner's compiler is older than GCC 15,
+  C++23/26 examples are skipped outright — the modern toolchain job checks
+  them instead of reporting a false source defect.
 - `check_doc_examples.py` tolerates non-UTF-8 program output and no longer
   treats a compiler-dependent "expected segfault" as stale on clang: the
-  article itself says the program may also appear to work.
+  article itself says the program may also appear to work. Compiler family
+  is detected by name, so `g++-14` is still GCC (an earlier string compare
+  wrongly treated it as clang and broke the sanitizer job).
 - GitHub Actions upgraded to `actions/checkout@v7` and
   `actions/setup-python@v7` (Dependabot issues #1 and #2), removing the
   Node 20 deprecation warnings.

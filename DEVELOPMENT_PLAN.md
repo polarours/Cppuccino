@@ -1714,6 +1714,11 @@ abort（实测 exit=134）。重写为 `list<Key>` 记顺序 + map 存迭代器�
   且不再把"UB 导致的 segfault 在 clang 下没出现"误判为过期条目。`check_warnings.py`
   复用同一套工具链判断，CI 的 g++-14 缺 `<print>` 等新头文件时不再把
   "编不过"当成源码警告——这是 Documentation workflow 最后一处红的原因。
+  之后 CI 又暴露出示例/文档示例仍会在旧工具链下失败：现在按编译器主版本
+  判断，低于 15 的 runner 直接跳过 C++23/26 示例，由 Clang/现代工具链 job
+  负责验证；失败详情也会作为 GitHub annotation 输出，便于外部诊断。
+  最后一处红来自 `CXX=g++-14` 被字符串比较误判成 clang，导致"预期 segfault"
+  在 sanitizer job 里变成真失败；改为按编译器家族名判断。
   本地 `CXX=clang++` 的 run / doc 两关全绿，全量检查全绿。
 - **CHANGELOG.md**：给读者和外部引用一个简短、稳定的变更入口，README 双语版
   的 Tooling 段落已链接。
