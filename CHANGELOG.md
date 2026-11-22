@@ -1,8 +1,7 @@
 # Changelog
 
-Notable changes to Cppuccino. Older rounds are recorded in
-[DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md); this file is the short, readable
-index for readers and for stable references.
+Notable changes to Cppuccino. This file is the short, readable index for
+readers and for stable references.
 
 ## [Unreleased]
 

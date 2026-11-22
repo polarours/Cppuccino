@@ -59,6 +59,9 @@ __pycache__/
 .site/
 site/
 
+# Local-only development plan; never publish it.
+/DEVELOPMENT_PLAN.md
+
 # Files written by the example programs in docs/ and examples/
 database.txt
 

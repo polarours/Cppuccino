@@ -5,10 +5,10 @@
 
 int main() {
     const std::string line =
-        "See [plan](../DEVELOPMENT_PLAN.md) and [site](https://example.com) "
+        "See [plan](../CHANGELOG.md) and [site](https://example.com) "
         "and [broken](missing/file.md)";
 
-    std::unordered_set<std::string> known = {"../DEVELOPMENT_PLAN.md"};
+    std::unordered_set<std::string> known = {"../CHANGELOG.md"};
 
     auto refs = link_checker::extractFromLine("README.md", line, 1);
     std::cout << "extracted " << refs.size() << " links\n";
