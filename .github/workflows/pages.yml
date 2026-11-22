@@ -31,7 +31,16 @@ jobs:
       - name: Assemble the single-source site
         run: python3 tools/build_site.py
       - name: Build the static site
-        run: mkdocs build -f .site/mkdocs.yml --strict --site-dir site
+        run: |
+          set +e
+          mkdocs build -f .site/mkdocs.yml --strict --site-dir site 2>&1 | tee mkdocs.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            grep -E 'WARNING|ERROR' mkdocs.log | head -20 | while IFS= read -r line; do
+              echo "::error::${line}"
+            done
+            exit "$status"
+          fi
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site
