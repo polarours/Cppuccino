@@ -7,6 +7,10 @@ readers and for stable references.
 
 ### Added
 
+- A **Play mode / arcade** at `/arcade/`: a level-select shell over the real
+  articles, pitfalls, examples and tinyshell labs. Quests are generated from
+  the repository by `tools/build_site.py`; progress lives only in the browser.
+  Two switchable themes (ARCADE / RETRO CLASSIC) share one layout.
 - A **documentation site** built from the existing Markdown by
   `tools/build_site.py` and MkDocs Material, deployed to GitHub Pages by the
   `Pages` workflow. No article is duplicated; the landing pages and nav are
