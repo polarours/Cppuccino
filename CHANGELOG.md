@@ -7,6 +7,10 @@ readers and for stable references.
 
 ### Added
 
+- A **Dangling Pointer boss fight** at `/arcade/boss/`: a split-screen battle
+  where the player writes a small C++ lifetime spell to control the hero.
+  Wrong lifetimes trigger a glitch and a real `-fsanitize=address` report;
+  clearing the boss feeds XP into the existing arcade progress.
 - A **Play mode / arcade** at `/arcade/`: a level-select shell over the real
   articles, pitfalls, examples and tinyshell labs. Quests are generated from
   the repository by `tools/build_site.py`; progress lives only in the browser.

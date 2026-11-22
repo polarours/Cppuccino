@@ -374,6 +374,9 @@ def build_quests() -> dict:
                             '../examples/' + quote(name), 15,
                             'examples/' + name, description))
 
+    quests.append(quest('challenge', 'en', 'Dangling Pointer Boss',
+                        '../arcade/boss/', 40, 'boss/dangling-pointer'))
+
     exercises = REPO / 'tinyshell' / 'tests' / 'exercises'
     if exercises.is_dir():
         for path in sorted(exercises.glob('*.cpp')):

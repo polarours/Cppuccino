@@ -31,6 +31,17 @@ html[data-theme='retro'] {
 
 * { box-sizing: border-box; }
 
+html {
+  scrollbar-color: var(--accent) var(--bg);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border: 2px solid var(--bg);
+}
+
 html, body { margin: 0; padding: 0; }
 
 body {
