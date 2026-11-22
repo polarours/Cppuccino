@@ -102,7 +102,8 @@ Four kinds of material, cross-linked so an idea can be read, tested, and then us
 
 ### Tooling
 
-See [tools/README.md](tools/README.md) for what each check does and why.
+See [tools/README.md](tools/README.md) for what each check does and why, and
+[CHANGELOG.md](CHANGELOG.md) for the short list of notable changes.
 
 - [tools/run_all_checks.sh](tools/run_all_checks.sh):
   one entry point for every repository check, the same one CI runs

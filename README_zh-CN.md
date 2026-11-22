@@ -102,7 +102,8 @@
 
 ### 工具
 
-每项检查查什么、为什么这么查，见 [tools/README.zh-CN.md](tools/README.zh-CN.md)。
+每项检查查什么、为什么这么查，见 [tools/README.zh-CN.md](tools/README.zh-CN.md)；
+值得注意的变更见 [CHANGELOG.md](CHANGELOG.md)。
 
 - [tools/run_all_checks.sh](tools/run_all_checks.sh)：
   所有仓库检查的统一入口，CI 跑的就是它

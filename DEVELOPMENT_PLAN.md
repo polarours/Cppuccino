@@ -1700,3 +1700,24 @@ abort（实测 exit=134）。重写为 `list<Key>` 记顺序 + map 存迭代器�
 六个项目各补一条回归测试；修复前 repro 全部复现问题，修复后全部通过。
 测试函数 965 → 971。
 
+## 第三十六阶段：质量门升级（P0，2026-11-21）
+
+调研同类高星仓库后先做低成本高收益的部分：
+
+- **CI 依赖升级**：`actions/checkout@v4` → `v7`、`actions/setup-python@v5`
+  → `v7`（对应 Dependabot #1/#2），去掉 annotation 里的 Node 20 弃用警告。
+- **新增 Clang portability job**：`CXX=clang++` 跑示例与文档示例。它立刻抓到一个
+  GCC Extension：`constexpr.cpp` 在 `constexpr` 函数里调 `std::sqrt`
+  （C++17 下不是 constexpr）。改为编译期算平方距离、运行期开方。
+- **检查器兼容 clang**：识别 clang 的 `fatal error: 'mdspan' file not found` 与
+  `unsupported option -std=`；`check_doc_examples.py` 容忍非 UTF-8 程序输出，
+  且不再把"UB 导致的 segfault 在 clang 下没出现"误判为过期条目。`check_warnings.py`
+  复用同一套工具链判断，CI 的 g++-14 缺 `<print>` 等新头文件时不再把
+  "编不过"当成源码警告——这是 Documentation workflow 最后一处红的原因。
+  本地 `CXX=clang++` 的 run / doc 两关全绿，全量检查全绿。
+- **CHANGELOG.md**：给读者和外部引用一个简短、稳定的变更入口，README 双语版
+  的 Tooling 段落已链接。
+
+仍需用户在网页手动完成的发现性设置：仓库 topics、homepage、第一个 Release；
+这些没有写进仓库文件，因为 API 需要登录态。
+

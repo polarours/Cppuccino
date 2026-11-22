@@ -1,0 +1,36 @@
+# Changelog
+
+Notable changes to Cppuccino. Older rounds are recorded in
+[DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md); this file is the short, readable
+index for readers and for stable references.
+
+## [Unreleased]
+
+### Added
+
+- A **Clang portability** CI job: the examples and document examples are
+  compiled and run with `clang++` in addition to GCC. Code that only one
+  compiler accepts is not good teaching material.
+- This changelog.
+
+### Fixed
+
+- `examples/constexpr.cpp` called `std::sqrt` from a `constexpr` function,
+  which GCC accepts as an extension and clang rejects. The squared distance
+  is computed at compile time; the square root happens at run time.
+- `check_examples.py` now recognises clang's "missing header" and "unsupported
+  `-std=`" diagnostics, so an older toolchain skips those examples instead
+  of failing the whole job. `check_warnings.py` shares those rules, so an
+  older compiler missing a new standard-library header is not reported as
+  a warning in our source.
+- `check_doc_examples.py` tolerates non-UTF-8 program output and no longer
+  treats a compiler-dependent "expected segfault" as stale on clang: the
+  article itself says the program may also appear to work.
+- GitHub Actions upgraded to `actions/checkout@v7` and
+  `actions/setup-python@v7` (Dependabot issues #1 and #2), removing the
+  Node 20 deprecation warnings.
+
+### Changed
+
+- CI shard planning now uses the script's `--json` output, and apt installs
+  use the correct `--no-install-recommends` flag.
