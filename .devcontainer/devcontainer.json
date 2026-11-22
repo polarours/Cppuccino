@@ -1,0 +1,27 @@
+{
+  "name": "Cppuccino — Modern C++",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "vscode",
+  "containerUser": "vscode",
+  "workspaceFolder": "/workspaces/Cppuccino",
+  "waitFor": "postCreateCommand",
+  "postCreateCommand": "git submodule update --init --recursive && g++ --version | head -1 && cmake --version | head -1 && python3 --version && python3 tools/check_stats.py",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "ms-python.python",
+        "github.vscode-pull-request-github"
+      ],
+      "settings": {
+        "C_Cpp.default.cppStandard": "c++23",
+        "cmake.buildDirectory": "${workspaceFolder}/build",
+        "files.trimTrailingWhitespace": true
+      }
+    }
+  }
+}
