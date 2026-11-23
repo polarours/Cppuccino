@@ -226,3 +226,17 @@
   .arrow { transform: rotate(90deg); justify-self: center; }
   .step-counter { margin-left: 0; width: 100%; }
 }
+
+/* Embedded inside an article: keep the instrument, drop the page chrome. */
+body.embed .topbar,
+body.embed footer,
+body.embed .lab-head {
+  display: none;
+}
+
+body.embed .lab {
+  width: 100%;
+  padding: 0;
+}
+
+body.embed .lab-toolbar { border-top: 0; }
