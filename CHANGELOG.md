@@ -7,6 +7,9 @@ readers and for stable references.
 
 ### Changed
 
+- A canonical bilingual **terminology glossary** at `docs/i18n/terminology.md`,
+  enforced by `tools/check_terminology.py` and published in the site nav. AI or
+  human translations now share one vocabulary and update incrementally.
 - Read mode now has a three-theme switcher in the header: **CAPPUCCINO**
   (the original warm palette), **ARCADE** (CRT dark with pixel headings),
   and **RETRO CLASSIC** (paper and copper). The choice is saved locally.

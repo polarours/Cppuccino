@@ -54,6 +54,9 @@ Cppuccino/
 - Filename: lowercase-kebab-case, e.g., `ownership-and-lifetime.md`
 - The two halves keep the same heading skeleton and the same code; only the
   prose and the printed messages are translated
+- Preferred Chinese terms are listed in
+  [`docs/i18n/terminology.md`](docs/i18n/terminology.md); run
+  `python3 tools/check_terminology.py` before opening a PR
 
 ### Pitfalls Convention
 

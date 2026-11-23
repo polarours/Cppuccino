@@ -426,6 +426,7 @@ def build_config() -> dict:
             {'示例': 'zh/examples/index.md'},
             {'项目': 'zh/projects/index.md'},
         ]},
+        {'Glossary': 'docs/i18n/terminology.md'},
         {'Tooling': 'tooling/index.md'},
     ]
 
@@ -525,6 +526,11 @@ def main() -> int:
         'pitfalls/en', 'Pitfalls', 'Every English failure mode, with the fix it implies.', 'en'))
     write(SITE / 'pitfalls' / '中文版' / 'index.md', article_index(
         'pitfalls/中文版', '陷阱文章', '每种失败模式，以及它指向的修复方式。', 'zh'))
+
+    i18n = SITE / 'docs' / 'i18n'
+    i18n.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(REPO / 'docs' / 'i18n' / 'terminology.md',
+                 i18n / 'terminology.md')
 
     examples = SITE / 'examples'
     examples.mkdir(parents=True, exist_ok=True)

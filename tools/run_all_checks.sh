@@ -54,6 +54,9 @@ run "examples: compile and run" \
 run "statistics: the READMEs agree with the repository" \
     python3 tools/check_stats.py
 
+run "terminology: bilingual docs use one vocabulary" \
+    python3 tools/check_terminology.py
+
 run "site: assembled pages have no broken links" \
     bash -c 'python3 tools/build_site.py >/dev/null && python3 tools/check_links.py .site'
 

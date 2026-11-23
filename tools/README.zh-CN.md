@@ -17,6 +17,7 @@ tools/run_all_checks.sh --full   # 外加全部项目的构建与测试
 | `check_doc_examples.py` | 文档里已编不过、跑不通，或者读了已释放内存的完整示例 |
 | `check_examples.py` | `examples/` 下编不过的独立示例，头注释已经描述不准构建方式的示例，两个示例写同一个可执行文件，正文还是中文的示例，或泄漏的示例 |
 | `check_stats.py` | README 里已经和仓库实际对不上的统计数字 |
+| `check_terminology.py` | 中文内容没有遵循 `docs/i18n/terminology.md` 的首选译法 |
 | `build_site.py` | 生成站点里的断链或过期的导航 |
 | `check_project_readmes.py` | 项目 README 与它的中英另一半脱节，或写了项目并不构建的可执行文件，或语言用错了 |
 | `check_readme_examples.py` | 项目 README 里的 C++ 示例已经编不过 |
