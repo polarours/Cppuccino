@@ -20,6 +20,10 @@ readers and for stable references.
   shows an object dying and a reference becoming dangling, with a real ASan
   report in the failing scenario. It is a separate static page, so the
   documentation stays readable without JavaScript.
+- A **Data Race boss fight** at `/arcade/boss/data-race/`: two threads execute
+  your worker body; a bare shared increment triggers a real ThreadSanitizer
+  report captured locally. Guarding the counter with `lock(m)` clears the boss.
+  This completes the lifetime / iterator / concurrency UB trio.
 - An **Iterator Invalidation boss fight** at `/arcade/boss/iterator-invalidation/`:
   the vector grows, your iterator becomes singular, and the debugger shows a
   real `-D_GLIBCXX_DEBUG` report captured locally. It appears as a Systems

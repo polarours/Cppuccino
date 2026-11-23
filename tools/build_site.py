@@ -410,6 +410,8 @@ def build_quests() -> dict:
     quests.append(quest('challenge', 'en', 'Iterator Invalidation Boss',
                         '../arcade/boss/iterator-invalidation/', 40,
                         'boss/iterator-invalidation'))
+    quests.append(quest('challenge', 'en', 'Data Race Boss',
+                        '../arcade/boss/data-race/', 40, 'boss/data-race'))
 
     exercises = REPO / 'tinyshell' / 'tests' / 'exercises'
     if exercises.is_dir():
