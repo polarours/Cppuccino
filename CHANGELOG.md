@@ -7,6 +7,10 @@ readers and for stable references.
 
 ### Changed
 
+- The dangling-pointer pitfall (EN + ZH) now embeds the Lifetime Timeline lab
+  inline. It is progressive enhancement: the article is complete without
+  JavaScript, and the embedded instrument follows the page's theme and
+  language.
 - A canonical bilingual **terminology glossary** at `docs/i18n/terminology.md`,
   enforced by `tools/check_terminology.py` and published in the site nav. AI or
   human translations now share one vocabulary and update incrementally.

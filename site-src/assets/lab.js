@@ -105,10 +105,21 @@
     }
   } catch (_) {}
 
-  var $ = function (id) { return document.getElementById(id); };
+  const params = new URLSearchParams(location.search);
+  const embedded = params.get('embed') === '1';
+  if (embedded) document.body.classList.add('embed');
+  if (params.get('lang') === 'zh' || params.get('lang') === 'en') {
+    state.lang = params.get('lang');
+  }
+  if (['cappuccino', 'arcade', 'retro'].indexOf(params.get('theme')) >= 0) {
+    state.theme = params.get('theme');
+  }
+
+  const $ = function (id) { return document.getElementById(id); };
   var t = function () { return TEXT[state.lang]; };
 
   function save() {
+    if (embedded) return;
     try {
       localStorage.setItem(LANG_KEY, state.lang);
       localStorage.setItem(THEME_KEY, state.theme);

@@ -1,0 +1,33 @@
+.inline-lab {
+  margin: 1.8rem 0 2.4rem;
+  border: 1px solid var(--md-default-fg-color--lightest, #d8d3cc);
+  background: var(--md-default-bg-color, #fbf9f5);
+}
+
+.inline-lab-wrap { width: 100%; }
+
+.inline-lab-head {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest, #d8d3cc);
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--md-accent-fg-color, #a36d2f);
+}
+
+.inline-lab-frame {
+  display: block;
+  width: 100%;
+  height: 620px;
+  border: 0;
+  background: var(--md-default-bg-color, #fbf9f5);
+}
+
+@media screen and (max-width: 760px) {
+  .inline-lab-frame { height: 760px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inline-lab-frame { scroll-behavior: auto; }
+}

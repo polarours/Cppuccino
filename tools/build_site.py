@@ -303,6 +303,24 @@ def ensure_directory_indexes() -> None:
                      f'[view it on GitHub]({github}).\n')
 
 
+def validate_inline_labs() -> None:
+    """Embedded lab src paths must resolve from the article's own directory."""
+    broken = []
+    pattern = re.compile(r'data-inline-lab[^>]*?data-src="([^"]+)"')
+    for path in SITE.rglob('*.md'):
+        text = path.read_text(encoding='utf-8', errors='replace')
+        for match in pattern.finditer(text):
+            raw = match.group(1).split('?')[0]
+            # MkDocs serves foo.md at /foo/, one level deeper than the file.
+            base = path.parent / path.stem
+            resolved = (base / raw).resolve()
+            if not (resolved / 'index.html').is_file() and \
+               not (resolved / 'index.md').is_file():
+                broken.append(f'{path.relative_to(SITE)} -> {raw}')
+    if broken:
+        raise SystemExit('broken inline lab sources:\n  ' + '\n  '.join(broken))
+
+
 def validate_html_assets() -> None:
     """Standalone pages need their CSS/JS/links to exist at their real depth."""
     broken = []
@@ -510,8 +528,12 @@ def build_config() -> dict:
         'extra_css': [
             'assets/stylesheets/extra.css',
             'assets/read-theme.css',
+            'assets/inline-lab.css',
         ],
-        'extra_javascript': ['assets/read-theme.js'],
+        'extra_javascript': [
+            'assets/read-theme.js',
+            'assets/inline-lab.js',
+        ],
         'validation': {
             'links': {'not_found': 'warn'},
             'anchors': 'info',
@@ -602,6 +624,7 @@ def main() -> int:
     normalize_directory_links()
     ensure_directory_indexes()
     validate_directory_links()
+    validate_inline_labs()
     validate_html_assets()
 
     # Game data for the Play mode: real content, no duplicated articles.
