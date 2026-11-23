@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en" data-theme="arcade" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Cppuccino Arcade — Double Free Boss</title>
+  <link rel="stylesheet" href="../../../assets/arcade.css">
+  <link rel="stylesheet" href="../../../assets/boss.css">
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="../">CPPUCCINO<span>// BOSS FIGHT 04</span></a>
+    <nav class="controls" aria-label="Boss fight controls">
+      <button id="themeBtn" type="button">RETRO</button>
+      <button id="langBtn" type="button">中文</button>
+      <a href="../../../lab/">LAB ↗</a>
+      <a href="../../">← ARCADE</a>
+    </nav>
+  </header>
+
+  <main class="battle">
+    <section class="arena" id="arena">
+      <div class="arena-head">
+        <p class="eyebrow" id="stageCode">STAGE 03 · BOSS</p>
+        <h1 id="bossName">DOUBLE FREE</h1>
+        <p class="arena-sub" id="bossSub">It convinces you that releasing the same object twice is harmless.</p>
+      </div>
+
+      <div class="combatants">
+        <div class="fighter">
+          <div class="sprite" aria-hidden="true">@</div>
+          <div class="fighter-name" id="heroLabel">YOU</div>
+          <div class="hpbar"><span id="heroHp" style="width:100%"></span></div>
+          <div class="hptext" id="heroHpText">100 / 100</div>
+        </div>
+        <div class="versus" aria-hidden="true">VS</div>
+        <div class="fighter boss">
+          <div class="sprite" aria-hidden="true">☠</div>
+          <div class="fighter-name" id="bossLabel">DOUBLE FREE</div>
+          <div class="hpbar"><span id="bossHp" style="width:100%"></span></div>
+          <div class="hptext" id="bossHpText">100 / 100</div>
+        </div>
+      </div>
+
+      <div class="dialogue" id="dialogue" aria-live="polite"></div>
+      <div class="battle-log" id="battleLog" aria-live="polite"></div>
+    </section>
+
+    <section class="editor-panel">
+      <div class="editor-head">
+        <span id="editorTitle">YOUR SPELL · OWNERSHIP</span>
+        <div class="editor-actions">
+          <button id="debugBtn" type="button">Q · DEBUG</button>
+          <button id="runBtn" type="button">RUN ▶</button>
+        </div>
+      </div>
+
+      <textarea id="code" spellcheck="false" aria-label="C++ code editor">auto p = new Resource();
+delete p;
+delete p;</textarea>
+
+      <p class="editor-hint" id="editorHint"></p>
+
+      <div class="debugger" id="debugger" hidden>
+        <div class="debugger-head" id="debuggerHead">DEBUGGER · SANITIZER REPORT</div>
+        <pre id="debuggerReport"></pre>
+        <button id="closeDebug" type="button">CLOSE</button>
+      </div>
+
+      <div class="allowed" id="allowed"></div>
+
+      <div class="editor-foot">
+        <a id="articleLink" href="../../../pitfalls/en/double-free/" target="_blank" rel="noopener">READ THE REAL PITFALL ↗</a>
+        <a id="exampleLink" href="../../../examples/pitfall-double-free.cpp" target="_blank" rel="noopener">RUNNABLE EXAMPLE ↗</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span id="footerNote">The browser runs a small teaching DSL. It cannot compile arbitrary C++; the links above open the real pitfall and example.</span>
+    <a href="../../">Back to the arcade →</a>
+  </footer>
+
+  <script src="../../../assets/double-free-boss.js"></script>
+</body>
+</html>
