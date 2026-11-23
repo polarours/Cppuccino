@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+/* Three switchable skins for the Read mode. Material keeps its own layout and
+   search; these override only the palette and a few display details. */
+
+:root,
+html[data-read-theme='cappuccino'],
+html[data-read-theme='cappuccino'] body {
+  --rd-accent: #a36d2f;
+  --md-primary-fg-color: #795548;
+  --md-primary-bg-color: #ffffff;
+  --md-accent-fg-color: var(--rd-accent);
+  --md-default-bg-color: #fbf9f5;
+  --md-default-fg-color: #24201c;
+  --md-default-fg-color--light: #6b6560;
+  --md-default-fg-color--lightest: #e3dbcf;
+  --md-typeset-color: #24201c;
+  --md-typeset-a-color: #8a5a24;
+  --md-footer-bg-color: #f3ede4;
+  --rd-display-font: 'Inter', sans-serif;
+  --cpp-ink: #1f2328;
+  --cpp-copper: #a36d2f;
+}
+
+html[data-read-theme='arcade'],
+html[data-read-theme='arcade'] body {
+  --rd-accent: #7cffb2;
+  --md-primary-fg-color: #17110d;
+  --md-primary-bg-color: #f2b84b;
+  --md-accent-fg-color: var(--rd-accent);
+  --md-default-bg-color: #17110d;
+  --md-default-fg-color: #f5e9d6;
+  --md-default-fg-color--light: #a9967c;
+  --md-default-fg-color--lightest: #3a2c20;
+  --md-typeset-color: #f5e9d6;
+  --md-typeset-a-color: var(--rd-accent);
+  --md-footer-bg-color: #221913;
+  --rd-display-font: 'Press Start 2P', 'Courier New', monospace;
+  --cpp-ink: #f5e9d6;
+  --cpp-copper: #7cffb2;
+}
+
+html[data-read-theme='retro'],
+html[data-read-theme='retro'] body {
+  --rd-accent: #a36d2f;
+  --md-primary-fg-color: #f3e7d3;
+  --md-primary-bg-color: #241b14;
+  --md-accent-fg-color: var(--rd-accent);
+  --md-default-bg-color: #f3e7d3;
+  --md-default-fg-color: #241b14;
+  --md-default-fg-color--light: #6b5a47;
+  --md-default-fg-color--lightest: #d9c9ad;
+  --md-typeset-color: #241b14;
+  --md-typeset-a-color: #8a5a24;
+  --md-footer-bg-color: #ede0c8;
+  --rd-display-font: 'Courier New', monospace;
+  --cpp-ink: #241b14;
+  --cpp-copper: #a36d2f;
+}
+
+html[data-read-theme='cappuccino'] body,
+html[data-read-theme='arcade'] body,
+html[data-read-theme='retro'] body {
+  background-color: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+}
+
+html[data-read-theme='arcade'] body {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(242, 184, 75, 0.10), transparent 40%),
+    var(--md-default-bg-color);
+}
+
+html[data-read-theme='arcade'] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.16) 0px,
+    rgba(0, 0, 0, 0.16) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  opacity: 0.16;
+}
+
+html[data-read-theme='retro'] body {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(36, 27, 20, 0.025) 3px 4px),
+    var(--md-default-bg-color);
+}
+
+html[data-read-theme='arcade'] .md-typeset h1,
+html[data-read-theme='arcade'] .md-typeset h2,
+html[data-read-theme='arcade'] .md-header__title {
+  font-family: var(--rd-display-font);
+  letter-spacing: -0.01em;
+}
+
+html[data-read-theme='retro'] .md-typeset h1,
+html[data-read-theme='retro'] .md-typeset h2,
+html[data-read-theme='retro'] .md-header__title {
+  font-family: var(--rd-display-font);
+  letter-spacing: -0.04em;
+}
+
+.read-theme-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.6rem;
+}
+
+.read-theme-switch button {
+  appearance: none;
+  border: 1px solid currentColor;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-family: 'JetBrains Mono', 'VT323', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  padding: 0.22rem 0.42rem;
+  cursor: pointer;
+  opacity: 0.72;
+  transition: opacity 140ms ease-out, background 140ms ease-out;
+}
+
+.read-theme-switch button:hover,
+.read-theme-switch button[aria-pressed='true'] {
+  opacity: 1;
+  background: var(--rd-accent);
+  color: var(--md-primary-fg-color);
+}
+
+@media screen and (max-width: 760px) {
+  .read-theme-switch button {
+    font-size: 0.55rem;
+    padding: 0.18rem 0.3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .read-theme-switch button { transition: none; }
+  html[data-read-theme='arcade'] body::before { display: none; }
+}

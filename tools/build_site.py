@@ -440,28 +440,11 @@ def build_config() -> dict:
         'theme': {
             'name': 'material',
             'language': 'en',
-            'palette': [
-                {
-                    'media': '(prefers-color-scheme: light)',
-                    'scheme': 'default',
-                    'primary': 'brown',
-                    'accent': 'amber',
-                    'toggle': {
-                        'icon': 'material/brightness-7',
-                        'name': 'Switch to dark mode',
-                    },
-                },
-                {
-                    'media': '(prefers-color-scheme: dark)',
-                    'scheme': 'slate',
-                    'primary': 'brown',
-                    'accent': 'amber',
-                    'toggle': {
-                        'icon': 'material/brightness-4',
-                        'name': 'Switch to light mode',
-                    },
-                },
-            ],
+            'palette': {
+                'scheme': 'default',
+                'primary': 'brown',
+                'accent': 'amber',
+            },
             'font': {'text': 'Inter', 'code': 'JetBrains Mono'},
             'features': [
                 'navigation.instant',
@@ -487,7 +470,11 @@ def build_config() -> dict:
             {'pymdownx.highlight': {'anchor_linenums': True}},
             {'pymdownx.tabbed': {'alternate_style': True}},
         ],
-        'extra_css': ['assets/stylesheets/extra.css'],
+        'extra_css': [
+            'assets/stylesheets/extra.css',
+            'assets/read-theme.css',
+        ],
+        'extra_javascript': ['assets/read-theme.js'],
         'validation': {
             'links': {'not_found': 'warn'},
             'anchors': 'info',

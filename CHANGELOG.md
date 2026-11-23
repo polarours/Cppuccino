@@ -5,6 +5,12 @@ readers and for stable references.
 
 ## [Unreleased]
 
+### Changed
+
+- Read mode now has a three-theme switcher in the header: **CAPPUCCINO**
+  (the original warm palette), **ARCADE** (CRT dark with pixel headings),
+  and **RETRO CLASSIC** (paper and copper). The choice is saved locally.
+
 ### Added
 
 - A **Dangling Pointer boss fight** at `/arcade/boss/`: a split-screen battle
