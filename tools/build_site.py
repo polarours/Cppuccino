@@ -72,8 +72,9 @@ WORLDS = [
         'tagline_zh': '进程、信号、线程与共享状态。',
         'keywords': ['thread', 'mutex', 'atomic', 'signal', 'process', 'shell',
                      'concurrency', 'lock', 'data race', 'simd', 'scheduler',
-                     'server', '线程', '并发', '信号', '原子', '内存序',
-                     '互斥', '数据竞争', '调度', '服务器'],
+                     'server', 'iterator',
+                     '线程', '并发', '信号', '原子', '内存序',
+                     '互斥', '数据竞争', '调度', '服务器', '迭代器'],
     },
     {
         'key': 'modern',
@@ -302,6 +303,36 @@ def ensure_directory_indexes() -> None:
                      f'[view it on GitHub]({github}).\n')
 
 
+def validate_html_assets() -> None:
+    """Standalone pages need their CSS/JS/links to exist at their real depth."""
+    broken = []
+    for path in SITE.rglob('*.html'):
+        text = path.read_text(encoding='utf-8', errors='replace')
+        for match in re.finditer(r'(?:href|src)="([^"]+)"', text):
+            target = match.group(1)
+            if target.startswith(('http://', 'https://', 'mailto:', '#', '//',
+                                  'data:')):
+                continue
+            raw = target.partition('#')[0]
+            if not raw:
+                continue
+            resolved = (path.parent / raw).resolve()
+            if not resolved.exists() and raw.endswith('/'):
+                # MkDocs turns foo.md into /foo/ with directory URLs.
+                markdown = Path(str(resolved).rstrip('/') + '.md')
+                if markdown.is_file():
+                    continue
+            if not resolved.exists():
+                broken.append(f'{path.relative_to(SITE)} -> {target}')
+            elif resolved.is_dir() and not (
+                    (resolved / 'index.html').is_file() or
+                    (resolved / 'index.md').is_file()):
+                broken.append(f'{path.relative_to(SITE)} -> {target} (no index)')
+    if broken:
+        raise SystemExit('broken standalone-page links:\n  ' +
+                         '\n  '.join(broken))
+
+
 def validate_directory_links() -> None:
     """A link ending in '/' needs a real index page, or the site 404s."""
     broken = []
@@ -376,6 +407,9 @@ def build_quests() -> dict:
 
     quests.append(quest('challenge', 'en', 'Dangling Pointer Boss',
                         '../arcade/boss/', 40, 'boss/dangling-pointer'))
+    quests.append(quest('challenge', 'en', 'Iterator Invalidation Boss',
+                        '../arcade/boss/iterator-invalidation/', 40,
+                        'boss/iterator-invalidation'))
 
     exercises = REPO / 'tinyshell' / 'tests' / 'exercises'
     if exercises.is_dir():
@@ -566,6 +600,7 @@ def main() -> int:
     normalize_directory_links()
     ensure_directory_indexes()
     validate_directory_links()
+    validate_html_assets()
 
     # Game data for the Play mode: real content, no duplicated articles.
     write(SITE / 'assets' / 'quests.json',

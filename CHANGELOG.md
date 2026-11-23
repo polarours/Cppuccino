@@ -20,6 +20,10 @@ readers and for stable references.
   shows an object dying and a reference becoming dangling, with a real ASan
   report in the failing scenario. It is a separate static page, so the
   documentation stays readable without JavaScript.
+- An **Iterator Invalidation boss fight** at `/arcade/boss/iterator-invalidation/`:
+  the vector grows, your iterator becomes singular, and the debugger shows a
+  real `-D_GLIBCXX_DEBUG` report captured locally. It appears as a Systems
+  world challenge in the arcade.
 - A **Dangling Pointer boss fight** at `/arcade/boss/`: a split-screen battle
   where the player writes a small C++ lifetime spell to control the hero.
   Wrong lifetimes trigger a glitch and a real `-fsanitize=address` report;
