@@ -7,7 +7,7 @@
 
 <p class="eyebrow">One C++ idea, in two languages, with runnable proof.</p>
 
-<p class="lang-switch"><a href="arcade/"><strong>▶ ENTER THE ARCADE</strong></a> · <a href="en/">English</a> · <a href="zh/">中文</a> · <a href="https://github.com/polarours/Cppuccino">GitHub</a></p>
+<p class="lang-switch"><a href="arcade/"><strong>▶ ENTER THE ARCADE</strong></a> · <a href="lab/"><strong>LIFETIME LAB</strong></a> · <a href="en/">English</a> · <a href="zh/">中文</a> · <a href="https://github.com/polarours/Cppuccino">GitHub</a></p>
 
 </div>
 

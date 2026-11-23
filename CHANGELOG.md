@@ -13,6 +13,10 @@ readers and for stable references.
 
 ### Added
 
+- A **Lifetime Timeline lab** at `/lab/`: a step-through, bilingual widget that
+  shows an object dying and a reference becoming dangling, with a real ASan
+  report in the failing scenario. It is a separate static page, so the
+  documentation stays readable without JavaScript.
 - A **Dangling Pointer boss fight** at `/arcade/boss/`: a split-screen battle
   where the player writes a small C++ lifetime spell to control the hero.
   Wrong lifetimes trigger a glitch and a real `-fsanitize=address` report;
