@@ -38,6 +38,9 @@ readers and for stable references.
   PROVE**. Camp article links carry `?camp=1`; the article's inline lab records
   READ when it mounts and LAB when the iframe loads, while the boss fight
   records FIGHT. PROVE is derived once all three are true.
+- Every boss page now has a **CAMP** link in the header and a **BACK TO CAMP**
+  link beside the editor. After a win, the reader can return to the camp and
+  see the card advance to PROVE / CLEARED without using the browser back button.
 - A **Double Free boss fight** at `/arcade/boss/double-free/`: use the resource
   while it lives, release it once, and set the pointer to `nullptr`. A second
   `delete` triggers a real ASan `attempting double-free` report captured locally.
