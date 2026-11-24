@@ -192,6 +192,32 @@ html[data-theme='retro'] .camp-hero h1 { text-shadow: 3px 3px 0 rgba(36, 27, 20,
 
 .camp-card-links a:hover { border-bottom-color: currentColor; }
 
+.camp-card-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.9rem;
+}
+
+.camp-card-steps span {
+  padding: 0.08rem 0.35rem;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+}
+
+.camp-card-steps span.done {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+.camp-card-steps span.current {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .camp-card-status {
   grid-column: 2;
   justify-self: start;

@@ -52,9 +52,15 @@
           <h2>DANGLING POINTER</h2>
           <p class="camp-card-symptom" data-en="A reference outlives the object. ASan reports heap-use-after-free." data-zh="引用活得比对象久。ASan 报 heap-use-after-free。">A reference outlives the object. ASan reports heap-use-after-free.</p>
           <div class="camp-card-links">
-            <a href="../../pitfalls/en/dangling-pointer/" data-article-en="../../pitfalls/en/dangling-pointer/" data-article-zh="../../pitfalls/中文版/悬垂指针/" target="_blank" rel="noopener" data-en="READ ↗" data-zh="阅读 ↗">READ ↗</a>
+            <a href="../../pitfalls/en/dangling-pointer/?camp=1" data-article-en="../../pitfalls/en/dangling-pointer/?camp=1" data-article-zh="../../pitfalls/中文版/悬垂指针/?camp=1" target="_blank" rel="noopener" data-en="READ ↗" data-zh="阅读 ↗">READ ↗</a>
             <a href="../../examples/pitfall-dangling-pointer.cpp" target="_blank" rel="noopener" data-en="EXAMPLE ↗" data-zh="示例 ↗">EXAMPLE ↗</a>
             <a href="../boss/" data-en="FIGHT ↗" data-zh="战斗 ↗">FIGHT ↗</a>
+          </div>
+          <div class="camp-card-steps" aria-label="Route progress">
+            <span data-step="read" data-en="READ" data-zh="阅读">READ</span>
+            <span data-step="lab" data-en="LAB" data-zh="实验">LAB</span>
+            <span data-step="fight" data-en="FIGHT" data-zh="战斗">FIGHT</span>
+            <span data-step="prove" data-en="PROVE" data-zh="证明">PROVE</span>
           </div>
         </div>
         <div class="camp-card-status" data-en="OPEN" data-zh="待挑战">OPEN</div>
@@ -67,9 +73,15 @@
           <h2>ITERATOR INVALIDATION</h2>
           <p class="camp-card-symptom" data-en="push_back moves the buffer. The old iterator still points into it." data-zh="push_back 搬走缓冲区，旧迭代器还指着原地。">push_back moves the buffer. The old iterator still points into it.</p>
           <div class="camp-card-links">
-            <a href="../../pitfalls/en/iterator-invalidation/" data-article-en="../../pitfalls/en/iterator-invalidation/" data-article-zh="../../pitfalls/中文版/迭代器失效/" target="_blank" rel="noopener" data-en="READ ↗" data-zh="阅读 ↗">READ ↗</a>
+            <a href="../../pitfalls/en/iterator-invalidation/?camp=1" data-article-en="../../pitfalls/en/iterator-invalidation/?camp=1" data-article-zh="../../pitfalls/中文版/迭代器失效/?camp=1" target="_blank" rel="noopener" data-en="READ ↗" data-zh="阅读 ↗">READ ↗</a>
             <a href="../../examples/pitfall-iterator-invalidation.cpp" target="_blank" rel="noopener" data-en="EXAMPLE ↗" data-zh="示例 ↗">EXAMPLE ↗</a>
             <a href="../boss/iterator-invalidation/" data-en="FIGHT ↗" data-zh="战斗 ↗">FIGHT ↗</a>
+          </div>
+          <div class="camp-card-steps" aria-label="Route progress">
+            <span data-step="read" data-en="READ" data-zh="阅读">READ</span>
+            <span data-step="lab" data-en="LAB" data-zh="实验">LAB</span>
+            <span data-step="fight" data-en="FIGHT" data-zh="战斗">FIGHT</span>
+            <span data-step="prove" data-en="PROVE" data-zh="证明">PROVE</span>
           </div>
         </div>
         <div class="camp-card-status" data-en="OPEN" data-zh="待挑战">OPEN</div>
@@ -82,9 +94,15 @@
           <h2>DATA RACE</h2>
           <p class="camp-card-symptom" data-en="Two threads touch one counter. TSan reports a data race." data-zh="两个线程碰同一个计数器。TSan 报 data race。">Two threads touch one counter. TSan reports a data race.</p>
           <div class="camp-card-links">
-            <a href="../../pitfalls/en/data-race/" data-article-en="../../pitfalls/en/data-race/" data-article-zh="../../pitfalls/中文版/数据竞态/" target="_blank" rel="noopener" data-en="READ ↗" data-zh="阅读 ↗">READ ↗</a>
+            <a href="../../pitfalls/en/data-race/?camp=1" data-article-en="../../pitfalls/en/data-race/?camp=1" data-article-zh="../../pitfalls/中文版/数据竞态/?camp=1" target="_blank" rel="noopener" data-en="READ ↗" data-zh="阅读 ↗">READ ↗</a>
             <a href="../../examples/pitfall-data-race.cpp" target="_blank" rel="noopener" data-en="EXAMPLE ↗" data-zh="示例 ↗">EXAMPLE ↗</a>
             <a href="../boss/data-race/" data-en="FIGHT ↗" data-zh="战斗 ↗">FIGHT ↗</a>
+          </div>
+          <div class="camp-card-steps" aria-label="Route progress">
+            <span data-step="read" data-en="READ" data-zh="阅读">READ</span>
+            <span data-step="lab" data-en="LAB" data-zh="实验">LAB</span>
+            <span data-step="fight" data-en="FIGHT" data-zh="战斗">FIGHT</span>
+            <span data-step="prove" data-en="PROVE" data-zh="证明">PROVE</span>
           </div>
         </div>
         <div class="camp-card-status" data-en="OPEN" data-zh="待挑战">OPEN</div>
@@ -97,9 +115,15 @@
           <h2>DOUBLE FREE</h2>
           <p class="camp-card-symptom" data-en="The same object is released twice. ASan reports attempting double-free." data-zh="同一个对象被释放两次。ASan 报 attempting double-free。">The same object is released twice. ASan reports attempting double-free.</p>
           <div class="camp-card-links">
-            <a href="../../pitfalls/en/double-free/" data-article-en="../../pitfalls/en/double-free/" data-article-zh="../../pitfalls/中文版/双重释放/" target="_blank" rel="noopener" data-en="READ ↗" data-zh="阅读 ↗">READ ↗</a>
+            <a href="../../pitfalls/en/double-free/?camp=1" data-article-en="../../pitfalls/en/double-free/?camp=1" data-article-zh="../../pitfalls/中文版/双重释放/?camp=1" target="_blank" rel="noopener" data-en="READ ↗" data-zh="阅读 ↗">READ ↗</a>
             <a href="../../examples/pitfall-double-free.cpp" target="_blank" rel="noopener" data-en="EXAMPLE ↗" data-zh="示例 ↗">EXAMPLE ↗</a>
             <a href="../boss/double-free/" data-en="FIGHT ↗" data-zh="战斗 ↗">FIGHT ↗</a>
+          </div>
+          <div class="camp-card-steps" aria-label="Route progress">
+            <span data-step="read" data-en="READ" data-zh="阅读">READ</span>
+            <span data-step="lab" data-en="LAB" data-zh="实验">LAB</span>
+            <span data-step="fight" data-en="FIGHT" data-zh="战斗">FIGHT</span>
+            <span data-step="prove" data-en="PROVE" data-zh="证明">PROVE</span>
           </div>
         </div>
         <div class="camp-card-status" data-en="OPEN" data-zh="待挑战">OPEN</div>

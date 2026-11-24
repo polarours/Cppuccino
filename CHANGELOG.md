@@ -34,6 +34,10 @@ readers and for stable references.
   read → reproduce → repair → prove, with links to the real pitfall article,
   runnable example, and boss fight. It reads the arcade's local progress and
   marks cleared bosses in place.
+- The camp now tracks a four-step chain per boss: **READ → LAB → FIGHT →
+  PROVE**. Camp article links carry `?camp=1`; the article's inline lab records
+  READ when it mounts and LAB when the iframe loads, while the boss fight
+  records FIGHT. PROVE is derived once all three are true.
 - A **Double Free boss fight** at `/arcade/boss/double-free/`: use the resource
   while it lives, release it once, and set the pointer to `nullptr`. A second
   `delete` triggers a real ASan `attempting double-free` report captured locally.

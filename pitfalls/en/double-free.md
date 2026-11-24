@@ -6,7 +6,7 @@ A *double free* occurs when `delete` is called on the same pointer (or a copy of
 
 Double frees are especially sneaky because the program often *appears* to work for a while — the corruption may only bite much later, far from the buggy line.
 
-<div data-inline-lab data-src="../../../lab/double-free/" data-lang="en" data-label="INTERACTIVE · DOUBLE FREE"></div>
+<div data-inline-lab data-src="../../../lab/double-free/" data-lang="en" data-camp-boss="challenge-en-boss-double-free" data-label="INTERACTIVE · DOUBLE FREE"></div>
 
 ## The Problem
 

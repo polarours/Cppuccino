@@ -331,7 +331,7 @@ def validate_html_assets() -> None:
             if target.startswith(('http://', 'https://', 'mailto:', '#', '//',
                                   'data:')):
                 continue
-            raw = target.partition('#')[0]
+            raw = target.partition('#')[0].partition('?')[0]
             if not raw:
                 continue
             resolved = (path.parent / raw).resolve()

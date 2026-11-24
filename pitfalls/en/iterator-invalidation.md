@@ -7,7 +7,7 @@ Container mutations can invalidate some or all of them.
 
 Using an invalidated iterator/reference/pointer is undefined behavior.
 
-<div data-inline-lab data-src="../../../lab/iterator/" data-lang="en" data-label="INTERACTIVE · ITERATOR INVALIDATION"></div>
+<div data-inline-lab data-src="../../../lab/iterator/" data-lang="en" data-camp-boss="challenge-en-boss-iterator-invalidation" data-label="INTERACTIVE · ITERATOR INVALIDATION"></div>
 
 This pitfall is common because APIs often look symmetric:
 

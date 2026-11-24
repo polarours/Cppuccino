@@ -1,6 +1,22 @@
 (function () {
   'use strict';
 
+  var CAMP_KEY = 'cppuccino-camp-v1';
+
+  function campMode() {
+    return location.search.indexOf('camp=1') >= 0;
+  }
+
+  function markCamp(bossId, field) {
+    if (!bossId || !campMode()) return;
+    try {
+      var camp = JSON.parse(localStorage.getItem(CAMP_KEY) || '{}');
+      camp[field] = camp[field] || {};
+      camp[field][bossId] = true;
+      localStorage.setItem(CAMP_KEY, JSON.stringify(camp));
+    } catch (_) {}
+  }
+
   function mount() {
     var host = document.querySelectorAll('[data-inline-lab]');
     Array.prototype.forEach.call(host, function (placeholder) {
@@ -12,6 +28,7 @@
       var theme = document.documentElement.dataset.readTheme || 'cappuccino';
       var base = placeholder.dataset.src || '../../lab/';
       var separator = base.indexOf('?') >= 0 ? '&' : '?';
+      var bossId = placeholder.dataset.campBoss || '';
 
       var frame = document.createElement('iframe');
       frame.src = base + separator + 'embed=1&lang=' +
@@ -20,6 +37,9 @@
       frame.loading = 'lazy';
       frame.className = 'inline-lab-frame';
       frame.dataset.labBase = base;
+      frame.addEventListener('load', function () {
+        markCamp(bossId, 'lab');
+      });
 
       var wrap = document.createElement('div');
       wrap.className = 'inline-lab-wrap';
@@ -31,6 +51,7 @@
       wrap.appendChild(head);
       wrap.appendChild(frame);
       placeholder.appendChild(wrap);
+      markCamp(bossId, 'read');
     });
   }
 
