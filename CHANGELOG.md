@@ -37,7 +37,11 @@ readers and for stable references.
 - The camp now tracks a four-step chain per boss: **READ → LAB → FIGHT →
   PROVE**. Camp article links carry `?camp=1`; the article's inline lab records
   READ when it mounts and LAB when the iframe loads, while the boss fight
-  records FIGHT. PROVE is derived once all three are true.
+  records FIGHT; PROVE is written only by passing the Proof Gate.
+- A **Proof Gate** at `/arcade/camp/prove/`: three bilingual questions per boss
+  (12 total), with explanations after each answer. A 3/3 pass writes
+  `cppuccino-proof-v1`; the camp card only reaches PROVE / CLEARED after the
+  gate is stamped. Passing all four reveals a four-stamp camp completion panel.
 - Every boss page now has a **CAMP** link in the header and a **BACK TO CAMP**
   link beside the editor. After a win, the reader can return to the camp and
   see the card advance to PROVE / CLEARED without using the browser back button.

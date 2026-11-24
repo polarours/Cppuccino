@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="arcade" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Cppuccino Camp — Proof Gate</title>
+  <link rel="stylesheet" href="../../../assets/arcade.css">
+  <link rel="stylesheet" href="../../../assets/prove.css">
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="../../">CPPUCCINO<span>// PROOF GATE</span></a>
+    <nav class="controls" aria-label="Proof gate controls">
+      <button id="themeBtn" type="button">RETRO</button>
+      <button id="langBtn" type="button">中文</button>
+      <a href="../">← CAMP</a>
+      <a href="../../">ARCADE</a>
+    </nav>
+  </header>
+
+  <main class="proof">
+    <section class="proof-hero">
+      <p class="eyebrow" id="proofEyebrow">CAMP FINAL · READ → LAB → FIGHT → PROVE</p>
+      <h1 id="proofTitle">PROOF GATE</h1>
+      <p class="proof-sub" id="proofSub">Three questions per boss. Prove you can name the failure, explain the repair, and choose the safe code.</p>
+    </section>
+
+    <div id="proofApp" aria-live="polite"></div>
+  </main>
+
+  <footer>
+    <span id="footerNote">Proof results stay in this browser. No account, no leaderboard.</span>
+    <a href="../">Back to the camp →</a>
+  </footer>
+
+  <script src="../../../assets/prove.js"></script>
+</body>
+</html>

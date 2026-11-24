@@ -42,7 +42,10 @@ If this is your first visit, use this order:
 **Want the shortest path through failure modes?** The
 [UB Training Camp](https://polarours.github.io/Cppuccino/arcade/camp/) runs four
 bosses in order: lifetime → containers → concurrency → ownership. Each stop is
-read → reproduce → repair → prove.
+read → reproduce → repair → prove. The final
+[Proof Gate](https://polarours.github.io/Cppuccino/arcade/camp/prove/) asks
+three questions per boss; only a 3/3 pass stamps the proof and completes the
+camp.
 
 **No toolchain at hand?** Open the repo in
 [GitHub Codespaces](https://codespaces.new/polarours/Cppuccino?quickstart=1).

@@ -242,6 +242,52 @@ html[data-theme='retro'] .camp-hero h1 { text-shadow: 3px 3px 0 rgba(36, 27, 20,
   background: var(--surface);
 }
 
+.camp-complete {
+  margin-top: 2.6rem;
+  padding: 1.6rem;
+  border: 2px solid var(--signal);
+  background:
+    linear-gradient(120deg, rgba(124, 255, 178, 0.08), transparent 60%),
+    var(--surface);
+}
+
+.camp-complete-kicker {
+  margin: 0 0 0.4rem;
+  color: var(--signal);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+}
+
+.camp-complete h2 {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-display);
+  font-size: clamp(0.95rem, 2vw, 1.25rem);
+}
+
+.camp-complete p {
+  max-width: 70ch;
+  margin: 0;
+  color: var(--muted);
+}
+
+.camp-stamps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.camp-stamps span {
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--signal);
+  color: var(--signal);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  transform: rotate(-1deg);
+}
+
 .camp-note h2 {
   margin: 0 0 0.6rem;
   font-family: var(--font-display);

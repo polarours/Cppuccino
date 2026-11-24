@@ -3,6 +3,7 @@
 
   const STORE = 'cppuccino-arcade-v1';
   const CAMP_KEY = 'cppuccino-camp-v1';
+  const PROOF_KEY = 'cppuccino-proof-v1';
   const BOSSES = [
     'challenge-en-boss-dangling-pointer',
     'challenge-en-boss-iterator-invalidation',
@@ -47,6 +48,7 @@
   } catch (_) {}
 
   let camp = { read: {}, lab: {} };
+  let proofs = {};
   function loadCamp() {
     try {
       const saved = JSON.parse(localStorage.getItem(CAMP_KEY) || '{}');
@@ -57,6 +59,11 @@
     } catch (_) {
       camp = { read: {}, lab: {} };
     }
+    try {
+      proofs = JSON.parse(localStorage.getItem(PROOF_KEY) || '{}');
+    } catch (_) {
+      proofs = {};
+    }
   }
 
   const $ = (id) => document.getElementById(id);
@@ -66,7 +73,8 @@
     const read = !!camp.read[id];
     const lab = !!camp.lab[id];
     const fight = state.cleared.indexOf(id) >= 0;
-    return { read: read, lab: lab, fight: fight, prove: read && lab && fight };
+    const proof = !!(proofs[id] && proofs[id].passed);
+    return { read: read, lab: lab, fight: fight, prove: read && lab && fight && proof };
   }
 
   function save() {
@@ -128,6 +136,9 @@
         ? t().cleared
         : (completed ? t().inProgress : t().open);
     });
+
+    const complete = BOSSES.every((id) => stepStates(id).prove);
+    $('campComplete').hidden = !complete;
   }
 
   function applyTheme() {

@@ -41,7 +41,9 @@
 
 **想用最短路径看完失败模式？** [UB 训练营](https://polarours.github.io/Cppuccino/arcade/camp/)
 按顺序打四个 Boss：生命周期 → 容器 → 并发 → 所有权。每一站都是
-阅读 → 复现 → 修复 → 证明。
+阅读 → 复现 → 修复 → 证明。最后的
+[证明关卡](https://polarours.github.io/Cppuccino/arcade/camp/prove/)
+每个 Boss 三道题，3/3 才算盖章并完成训练营。
 
 **本地没装工具链？** 直接用
 [GitHub Codespaces](https://codespaces.new/polarours/Cppuccino?quickstart=1) 打开。
