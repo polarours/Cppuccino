@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en" data-read-theme="arcade" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Cppuccino Lab — Data Race</title>
+  <link rel="stylesheet" href="../../assets/arcade.css">
+  <link rel="stylesheet" href="../../assets/read-theme.css">
+  <link rel="stylesheet" href="../../assets/lab.css">
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="../../">CPPUCCINO<span>// LAB</span></a>
+    <nav class="controls" aria-label="Lab controls">
+      <button class="lab-theme" type="button" data-lab-theme="cappuccino">COFFEE</button>
+      <button class="lab-theme" type="button" data-lab-theme="arcade">ARCADE</button>
+      <button class="lab-theme" type="button" data-lab-theme="retro">RETRO</button>
+      <button id="langBtn" type="button">中文</button>
+      <a href="../../">READ MODE ↗</a>
+    </nav>
+  </header>
+
+  <main class="lab">
+    <section class="lab-head">
+      <p class="eyebrow" id="labEyebrow">INTERACTIVE / 03 · CONCURRENCY</p>
+      <h1 id="labTitle">DATA RACE</h1>
+      <p class="lab-sub" id="labSub">Two threads, one counter. Step through the interleaving that loses an update.</p>
+    </section>
+
+    <section class="lab-toolbar" aria-label="Scenario">
+      <button id="scenarioSafe" class="scenario active" type="button">MUTEX</button>
+      <button id="scenarioBad" class="scenario" type="button">RACE</button>
+      <span class="step-counter" id="stepCounter">STEP 0 / 5</span>
+    </section>
+
+    <section class="lab-grid">
+      <div class="code-panel">
+        <div class="panel-head" id="codeHead">SOURCE · ONE STEP AT A TIME</div>
+        <ol id="codeLines" class="code-lines"></ol>
+        <div class="lab-actions">
+          <button id="stepBtn" type="button">STEP →</button>
+          <button id="resetBtn" type="button">RESET ↺</button>
+        </div>
+      </div>
+
+      <div class="state-panel">
+        <div class="panel-head" id="stateHead">THREAD STATE</div>
+        <div class="thread-row">
+          <div class="thread-card" id="thread1">
+            <span class="object-label">T1</span>
+            <strong id="t1State">IDLE</strong>
+            <span class="object-note" id="t1Note"></span>
+          </div>
+          <div class="thread-card" id="thread2">
+            <span class="object-label">T2</span>
+            <strong id="t2State">IDLE</strong>
+            <span class="object-note" id="t2Note"></span>
+          </div>
+        </div>
+
+        <div class="counter-strip">
+          <div class="object-card" id="objectCard">
+            <span class="object-label" id="objectLabel">shared (int)</span>
+            <strong id="objectState">0</strong>
+            <span class="object-note" id="objectNote">no synchronization</span>
+          </div>
+        </div>
+
+        <div class="message" id="message" aria-live="polite"></div>
+        <pre class="asan" id="debugOut" hidden></pre>
+
+        <div class="lab-links">
+          <a id="articleLink" href="../../pitfalls/en/data-race/" target="_blank" rel="noopener">REAL PITFALL ↗</a>
+          <a id="bossLink" href="../../arcade/boss/data-race/" target="_blank" rel="noopener">BOSS FIGHT ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <noscript>
+      <p class="noscript">This lab needs JavaScript to step through the code.
+      The same content is available in the pitfall article linked at the bottom.</p>
+    </noscript>
+  </main>
+
+  <footer>
+    <span id="footerNote">Every state follows real interleaving rules. No account, no score, no external service.</span>
+    <a href="../../">Back to the notebook →</a>
+  </footer>
+
+  <script src="../../assets/race-lab.js"></script>
+</body>
+</html>

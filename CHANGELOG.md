@@ -24,6 +24,11 @@ readers and for stable references.
   shows an object dying and a reference becoming dangling, with a real ASan
   report in the failing scenario. It is a separate static page, so the
   documentation stays readable without JavaScript.
+- Three more inline labs, each embedded in its EN + ZH pitfall article:
+  `/lab/iterator/` (vector reallocation, `_GLIBCXX_DEBUG` singular-iterator
+  abort), `/lab/race/` (lost update, real TSan report), and
+  `/lab/double-free/` (second delete, real ASan double-free report). All three
+  share the same embed/theme/language contract as the lifetime lab.
 - A **UB Training Camp** at `/arcade/camp/`: a four-boss route through
   lifetime, containers, concurrency, and ownership. Each stop is
   read → reproduce → repair → prove, with links to the real pitfall article,

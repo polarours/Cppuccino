@@ -8,6 +8,8 @@ synchronization operation ordering those accesses. In C++, a data race is
 **undefined behavior** — the program may produce any result, crash, or appear to
 work correctly most of the time and fail only occasionally.
 
+<div data-inline-lab data-src="../../../lab/race/" data-lang="en" data-label="INTERACTIVE · DATA RACE"></div>
+
 This is one of the most common and most dangerous concurrency bugs, because it
 is often invisible in ordinary testing and only manifests under specific
 scheduling, on specific hardware, or after an innocent-looking compiler

@@ -187,6 +187,35 @@
   background: color-mix(in srgb, var(--danger, #ff7a6b) 8%, transparent);
 }
 
+.thread-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin-bottom: 0.8rem;
+}
+
+.thread-card {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--md-default-fg-color--lightest, #d8d3cc);
+  background: var(--md-code-bg-color, rgba(0, 0, 0, 0.18));
+}
+
+.thread-card strong {
+  display: block;
+  margin-top: 0.25rem;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 1rem;
+  color: var(--md-default-fg-color);
+}
+
+.thread-card.reading { border-color: var(--md-accent-fg-color, #a36d2f); }
+.thread-card.bad { border-color: var(--danger, #ff7a6b); }
+
+.thread-card.bad strong { color: var(--danger, #ff7a6b); }
+
+.counter-strip .object-card { width: 100%; }
+
+
 .asan {
   margin: 1rem 0 0;
   padding: 0.9rem;
