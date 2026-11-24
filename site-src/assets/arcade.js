@@ -7,6 +7,9 @@
       heroEyebrow: 'INSERT CURIOSITY · PRESS START',
       heroTitle: 'SELECT YOUR STAGE',
       heroSub: 'One C++ idea, in two languages, with runnable proof. Clear a stage by reading, fighting a bug, and shipping the code.',
+      campLabel: 'UB TRAINING CAMP',
+      campTitle: 'Four bosses. One learning loop.',
+      campCta: 'ENTER CAMP ↗',
       level: 'LEVEL', xp: 'XP', cleared: 'CLEARED', stages: 'STAGES',
       worldsTitle: 'WORLD MAP',
       worldsHint: 'Every stage points at real articles, pitfalls and runnable examples.',
@@ -22,6 +25,9 @@
       heroEyebrow: '投入好奇心 · 按 START',
       heroTitle: '选择你的关卡',
       heroSub: '一个 C++ 想法，两种语言，配一份能跑起来的证明。读文章、打 Bug、跑通代码，就算过关。',
+      campLabel: 'UB 训练营',
+      campTitle: '四个 Boss，一个学习循环。',
+      campCta: '进入训练营 ↗',
       level: '等级', xp: '经验', cleared: '已通关', stages: '关卡',
       worldsTitle: '世界地图',
       worldsHint: '每个关卡都指向真实的文章、陷阱和可运行示例。',
@@ -64,6 +70,9 @@
     $('heroEyebrow').textContent = s().heroEyebrow;
     $('heroTitle').textContent = s().heroTitle;
     $('heroSub').textContent = s().heroSub;
+    $('campLabel').textContent = s().campLabel;
+    $('campTitle').textContent = s().campTitle;
+    $('campCta').textContent = s().campCta;
     $('labelLevel').textContent = s().level;
     $('labelXp').textContent = s().xp;
     $('labelCleared').textContent = s().cleared;

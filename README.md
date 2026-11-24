@@ -15,7 +15,7 @@
 
 </div>
 
-<p align="center"><a href="https://polarours.github.io/Cppuccino/">Documentation</a> · <a href="https://polarours.github.io/Cppuccino/arcade/">Arcade</a> · <a href="https://github.com/polarours/Cppuccino/actions">Actions</a> · <a href="CONTRIBUTING.md">Contributing</a> · MIT</p>
+<p align="center"><a href="https://polarours.github.io/Cppuccino/">Documentation</a> · <a href="https://polarours.github.io/Cppuccino/arcade/">Arcade</a> · <a href="https://polarours.github.io/Cppuccino/arcade/camp/">UB Camp</a> · <a href="https://github.com/polarours/Cppuccino/actions">Actions</a> · <a href="CONTRIBUTING.md">Contributing</a> · MIT</p>
 
 ## Quick Stats
 
@@ -38,6 +38,11 @@ If this is your first visit, use this order:
 2. Pick one topic track from the concept docs.
 3. Read one related pitfall article.
 4. Finish by touching code in an example or project.
+
+**Want the shortest path through failure modes?** The
+[UB Training Camp](https://polarours.github.io/Cppuccino/arcade/camp/) runs four
+bosses in order: lifetime → containers → concurrency → ownership. Each stop is
+read → reproduce → repair → prove.
 
 **No toolchain at hand?** Open the repo in
 [GitHub Codespaces](https://codespaces.new/polarours/Cppuccino?quickstart=1).

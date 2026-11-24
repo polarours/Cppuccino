@@ -15,7 +15,7 @@
 
 </div>
 
-<p align="center"><a href="https://polarours.github.io/Cppuccino/">文档站</a> · <a href="https://polarours.github.io/Cppuccino/arcade/">街机模式</a> · <a href="https://github.com/polarours/Cppuccino/actions">Actions</a> · <a href="CONTRIBUTING.md">Contributing</a> · MIT</p>
+<p align="center"><a href="https://polarours.github.io/Cppuccino/">文档站</a> · <a href="https://polarours.github.io/Cppuccino/arcade/">街机模式</a> · <a href="https://polarours.github.io/Cppuccino/arcade/camp/">UB 训练营</a> · <a href="https://github.com/polarours/Cppuccino/actions">Actions</a> · <a href="CONTRIBUTING.md">Contributing</a> · MIT</p>
 
 ## 快速统计
 
@@ -38,6 +38,10 @@
 2. 选一个概念主题开始阅读。
 3. 配套读一篇相关陷阱文章。
 4. 最后到示例或小项目里动手。
+
+**想用最短路径看完失败模式？** [UB 训练营](https://polarours.github.io/Cppuccino/arcade/camp/)
+按顺序打四个 Boss：生命周期 → 容器 → 并发 → 所有权。每一站都是
+阅读 → 复现 → 修复 → 证明。
 
 **本地没装工具链？** 直接用
 [GitHub Codespaces](https://codespaces.new/polarours/Cppuccino?quickstart=1) 打开。

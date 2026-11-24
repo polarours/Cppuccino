@@ -24,6 +24,11 @@ readers and for stable references.
   shows an object dying and a reference becoming dangling, with a real ASan
   report in the failing scenario. It is a separate static page, so the
   documentation stays readable without JavaScript.
+- A **UB Training Camp** at `/arcade/camp/`: a four-boss route through
+  lifetime, containers, concurrency, and ownership. Each stop is
+  read → reproduce → repair → prove, with links to the real pitfall article,
+  runnable example, and boss fight. It reads the arcade's local progress and
+  marks cleared bosses in place.
 - A **Double Free boss fight** at `/arcade/boss/double-free/`: use the resource
   while it lives, release it once, and set the pointer to `nullptr`. A second
   `delete` triggers a real ASan `attempting double-free` report captured locally.

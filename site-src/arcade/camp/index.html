@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en" data-theme="arcade" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Cppuccino Arcade — UB Training Camp</title>
+  <link rel="stylesheet" href="../../assets/arcade.css">
+  <link rel="stylesheet" href="../../assets/camp.css">
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="../../">CPPUCCINO<span>// UB CAMP</span></a>
+    <nav class="controls" aria-label="Camp controls">
+      <button id="themeBtn" type="button">RETRO</button>
+      <button id="langBtn" type="button">中文</button>
+      <a href="../../lab/">LAB ↗</a>
+      <a href="../">← ARCADE</a>
+    </nav>
+  </header>
+
+  <main class="camp">
+    <section class="camp-hero">
+      <p class="eyebrow" id="campEyebrow" data-en="OWNERSHIP · CONTAINERS · CONCURRENCY" data-zh="所有权 · 容器 · 并发">OWNERSHIP · CONTAINERS · CONCURRENCY</p>
+      <h1 id="campTitle" data-en="UB TRAINING CAMP" data-zh="UB 训练营">UB TRAINING CAMP</h1>
+      <p class="camp-sub" id="campSub" data-en="Four bugs. Four real sanitizer reports. One loop: read the failure, reproduce it, repair it, prove the repair." data-zh="四类 Bug，四份真实 sanitizer 报告。一个循环：读失败、复现、修复、证明修复。">Four bugs. Four real sanitizer reports. One loop: read the failure, reproduce it, repair it, prove the repair.</p>
+    </section>
+
+    <section class="camp-progress" aria-label="Camp progress">
+      <div class="camp-progress-copy">
+        <span class="hud-label" id="progressLabel">BOSSES CLEARED</span>
+        <strong id="progressText">0 / 4</strong>
+      </div>
+      <div class="camp-progress-track"><span id="progressBar" style="width:0%"></span></div>
+      <p id="progressHint">Progress is stored in this browser by the arcade.</p>
+    </section>
+
+    <section class="camp-loop" aria-label="Learning loop">
+      <div><span>01</span><strong data-en="READ" data-zh="阅读">READ</strong><small data-en="the pitfall" data-zh="陷阱文章">the pitfall</small></div>
+      <div><span>02</span><strong data-en="RUN" data-zh="运行">RUN</strong><small data-en="the example" data-zh="示例">the example</small></div>
+      <div><span>03</span><strong data-en="FIGHT" data-zh="战斗">FIGHT</strong><small data-en="the boss" data-zh="Boss">the boss</small></div>
+      <div><span>04</span><strong data-en="PROVE" data-zh="证明">PROVE</strong><small data-en="the repair" data-zh="修复">the repair</small></div>
+    </section>
+
+    <section class="camp-route" aria-label="Boss route">
+      <article class="camp-card" data-quest="challenge-en-boss-dangling-pointer">
+        <div class="camp-card-index">01</div>
+        <div class="camp-card-body">
+          <p class="camp-card-tag" data-en="LIFETIME" data-zh="生命周期">LIFETIME</p>
+          <h2>DANGLING POINTER</h2>
+          <p class="camp-card-symptom" data-en="A reference outlives the object. ASan reports heap-use-after-free." data-zh="引用活得比对象久。ASan 报 heap-use-after-free。">A reference outlives the object. ASan reports heap-use-after-free.</p>
+          <div class="camp-card-links">
+            <a href="../../pitfalls/en/dangling-pointer/" data-article-en="../../pitfalls/en/dangling-pointer/" data-article-zh="../../pitfalls/中文版/悬垂指针/" target="_blank" rel="noopener" data-en="READ ↗" data-zh="阅读 ↗">READ ↗</a>
+            <a href="../../examples/pitfall-dangling-pointer.cpp" target="_blank" rel="noopener" data-en="EXAMPLE ↗" data-zh="示例 ↗">EXAMPLE ↗</a>
+            <a href="../boss/" data-en="FIGHT ↗" data-zh="战斗 ↗">FIGHT ↗</a>
+          </div>
+        </div>
+        <div class="camp-card-status" data-en="OPEN" data-zh="待挑战">OPEN</div>
+      </article>
+
+      <article class="camp-card" data-quest="challenge-en-boss-iterator-invalidation">
+        <div class="camp-card-index">02</div>
+        <div class="camp-card-body">
+          <p class="camp-card-tag" data-en="CONTAINERS" data-zh="容器">CONTAINERS</p>
+          <h2>ITERATOR INVALIDATION</h2>
+          <p class="camp-card-symptom" data-en="push_back moves the buffer. The old iterator still points into it." data-zh="push_back 搬走缓冲区，旧迭代器还指着原地。">push_back moves the buffer. The old iterator still points into it.</p>
+          <div class="camp-card-links">
+            <a href="../../pitfalls/en/iterator-invalidation/" data-article-en="../../pitfalls/en/iterator-invalidation/" data-article-zh="../../pitfalls/中文版/迭代器失效/" target="_blank" rel="noopener" data-en="READ ↗" data-zh="阅读 ↗">READ ↗</a>
+            <a href="../../examples/pitfall-iterator-invalidation.cpp" target="_blank" rel="noopener" data-en="EXAMPLE ↗" data-zh="示例 ↗">EXAMPLE ↗</a>
+            <a href="../boss/iterator-invalidation/" data-en="FIGHT ↗" data-zh="战斗 ↗">FIGHT ↗</a>
+          </div>
+        </div>
+        <div class="camp-card-status" data-en="OPEN" data-zh="待挑战">OPEN</div>
+      </article>
+
+      <article class="camp-card" data-quest="challenge-en-boss-data-race">
+        <div class="camp-card-index">03</div>
+        <div class="camp-card-body">
+          <p class="camp-card-tag" data-en="CONCURRENCY" data-zh="并发">CONCURRENCY</p>
+          <h2>DATA RACE</h2>
+          <p class="camp-card-symptom" data-en="Two threads touch one counter. TSan reports a data race." data-zh="两个线程碰同一个计数器。TSan 报 data race。">Two threads touch one counter. TSan reports a data race.</p>
+          <div class="camp-card-links">
+            <a href="../../pitfalls/en/data-race/" data-article-en="../../pitfalls/en/data-race/" data-article-zh="../../pitfalls/中文版/数据竞态/" target="_blank" rel="noopener" data-en="READ ↗" data-zh="阅读 ↗">READ ↗</a>
+            <a href="../../examples/pitfall-data-race.cpp" target="_blank" rel="noopener" data-en="EXAMPLE ↗" data-zh="示例 ↗">EXAMPLE ↗</a>
+            <a href="../boss/data-race/" data-en="FIGHT ↗" data-zh="战斗 ↗">FIGHT ↗</a>
+          </div>
+        </div>
+        <div class="camp-card-status" data-en="OPEN" data-zh="待挑战">OPEN</div>
+      </article>
+
+      <article class="camp-card" data-quest="challenge-en-boss-double-free">
+        <div class="camp-card-index">04</div>
+        <div class="camp-card-body">
+          <p class="camp-card-tag" data-en="OWNERSHIP" data-zh="所有权">OWNERSHIP</p>
+          <h2>DOUBLE FREE</h2>
+          <p class="camp-card-symptom" data-en="The same object is released twice. ASan reports attempting double-free." data-zh="同一个对象被释放两次。ASan 报 attempting double-free。">The same object is released twice. ASan reports attempting double-free.</p>
+          <div class="camp-card-links">
+            <a href="../../pitfalls/en/double-free/" data-article-en="../../pitfalls/en/double-free/" data-article-zh="../../pitfalls/中文版/重复释放/" target="_blank" rel="noopener" data-en="READ ↗" data-zh="阅读 ↗">READ ↗</a>
+            <a href="../../examples/pitfall-double-free.cpp" target="_blank" rel="noopener" data-en="EXAMPLE ↗" data-zh="示例 ↗">EXAMPLE ↗</a>
+            <a href="../boss/double-free/" data-en="FIGHT ↗" data-zh="战斗 ↗">FIGHT ↗</a>
+          </div>
+        </div>
+        <div class="camp-card-status" data-en="OPEN" data-zh="待挑战">OPEN</div>
+      </article>
+    </section>
+
+    <section class="camp-note">
+      <h2 id="noteTitle">WHY THIS CAMP EXISTS</h2>
+      <p id="noteBody">Every boss prints a sanitizer report captured from a local reproduction in this repository. The browser runs a small teaching DSL; the article and example are the real C++. Clear all four and you have a working mental model of lifetime, container, concurrency, and ownership bugs.</p>
+      <a href="../../docs/en/undefined-behavior/" id="noteLink" data-en="READ THE UB OVERVIEW ↗" data-zh="阅读未定义行为总览 ↗">READ THE UB OVERVIEW ↗</a>
+    </section>
+  </main>
+
+  <footer>
+    <span id="footerNote">No account, no leaderboard. Progress is local to this browser.</span>
+    <a href="../">Back to the arcade →</a>
+  </footer>
+
+  <script src="../../assets/camp.js"></script>
+</body>
+</html>
