@@ -48,6 +48,9 @@ readers and for stable references.
 - The camp now shows a **NEXT STEP** strip derived from the same progress state:
   it points directly at the first missing READ / LAB / FIGHT / PROVE action.
   A completed camp switches it to a proof-review link.
+- The arcade landing banner now shows live camp progress (`0 / 4 BOSSES`) and
+  changes its CTA from **ENTER CAMP** to **CONTINUE CAMP** or **REVIEW CAMP**
+  as proofs are stamped.
 - A **Double Free boss fight** at `/arcade/boss/double-free/`: use the resource
   while it lives, release it once, and set the pointer to `nullptr`. A second
   `delete` triggers a real ASan `attempting double-free` report captured locally.

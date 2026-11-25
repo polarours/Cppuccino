@@ -2,6 +2,14 @@
   'use strict';
 
   const STORE = 'cppuccino-arcade-v1';
+  const CAMP_KEY = 'cppuccino-camp-v1';
+  const PROOF_KEY = 'cppuccino-proof-v1';
+  const CAMP_BOSSES = [
+    'challenge-en-boss-dangling-pointer',
+    'challenge-en-boss-iterator-invalidation',
+    'challenge-en-boss-data-race',
+    'challenge-en-boss-double-free'
+  ];
   const STRINGS = {
     en: {
       heroEyebrow: 'INSERT CURIOSITY · PRESS START',
@@ -10,6 +18,9 @@
       campLabel: 'UB TRAINING CAMP',
       campTitle: 'Four bosses. One learning loop.',
       campCta: 'ENTER CAMP ↗',
+      campContinue: 'CONTINUE CAMP ↗',
+      campReview: 'REVIEW CAMP ↗',
+      campBosses: 'BOSSES',
       level: 'LEVEL', xp: 'XP', cleared: 'CLEARED', stages: 'STAGES',
       worldsTitle: 'WORLD MAP',
       worldsHint: 'Every stage points at real articles, pitfalls and runnable examples.',
@@ -28,6 +39,9 @@
       campLabel: 'UB 训练营',
       campTitle: '四个 Boss，一个学习循环。',
       campCta: '进入训练营 ↗',
+      campContinue: '继续训练营 ↗',
+      campReview: '回顾训练营 ↗',
+      campBosses: 'Boss',
       level: '等级', xp: '经验', cleared: '已通关', stages: '关卡',
       worldsTitle: '世界地图',
       worldsHint: '每个关卡都指向真实的文章、陷阱和可运行示例。',
@@ -61,6 +75,29 @@
     try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (_) {}
   }
 
+  function campProgressCount() {
+    try {
+      const camp = JSON.parse(localStorage.getItem(CAMP_KEY) || '{}');
+      const proof = JSON.parse(localStorage.getItem(PROOF_KEY) || '{}');
+      const read = camp.read || {};
+      const lab = camp.lab || {};
+      return CAMP_BOSSES.filter((id) =>
+        !!read[id] && !!lab[id] && state.cleared.indexOf(id) >= 0 &&
+        !!(proof[id] && proof[id].passed)
+      ).length;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  function applyCampProgress() {
+    const count = campProgressCount();
+    $('campProgress').textContent = count + ' / ' + CAMP_BOSSES.length + ' ' + s().campBosses;
+    $('campCta').textContent = count === CAMP_BOSSES.length
+      ? s().campReview
+      : (count > 0 ? s().campContinue : s().campCta);
+  }
+
   function applyChrome() {
     const root = document.documentElement;
     root.dataset.theme = state.theme;
@@ -73,6 +110,7 @@
     $('campLabel').textContent = s().campLabel;
     $('campTitle').textContent = s().campTitle;
     $('campCta').textContent = s().campCta;
+    applyCampProgress();
     $('labelLevel').textContent = s().level;
     $('labelXp').textContent = s().xp;
     $('labelCleared').textContent = s().cleared;

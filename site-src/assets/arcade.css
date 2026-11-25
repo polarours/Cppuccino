@@ -228,6 +228,14 @@ html[data-theme='retro'] .hero h1 {
   line-height: 1.6;
 }
 
+.camp-banner-progress {
+  color: var(--signal);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
 .camp-banner em {
   color: var(--accent);
   font-family: var(--font-mono);
