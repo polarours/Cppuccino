@@ -36,6 +36,15 @@ void test_adapter_interface() {
     expect(data[3] == 20, "expected 20");
 }
 
+void test_empty_input() {
+    auto legacy = std::make_shared<strategy_adapter::LegacySorter>();
+    auto adapter = std::make_shared<strategy_adapter::LegacySorterAdapter>(legacy);
+
+    std::vector<int> data;
+    adapter->sort(data);
+    expect(data.empty(), "expected the empty vector to stay empty");
+}
+
 } // namespace
 
 int main() {
@@ -46,6 +55,9 @@ int main() {
 
         test_adapter_interface();
         std::cout << "  test_adapter_interface: PASS\n";
+
+        test_empty_input();
+        std::cout << "  test_empty_input: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "strategy_adapter_tests failed: " << exception.what() << std::endl;

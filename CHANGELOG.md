@@ -35,6 +35,15 @@ readers and for stable references.
   Mono are self-hosted as small Latin WOFF2 subsets; Chinese text falls back to
   the reader's system CJK font. Material's `theme.font` is disabled so it
   cannot re-introduce the external request.
+- Every GitHub Action is pinned by commit SHA, not a movable major tag.
+  Dependabot now also watches `requirements-docs.txt`, the docs toolchain is
+  locked to exact versions, and build/docs runs share a concurrency group so a
+  new push cancels the previous run.
+- The build shards use a persistent ccache, Pages caches pip downloads, and a
+  new `coverage (tinyshell)` job publishes a gcovr XML report as a workflow
+  artifact. `tools/check_tests.py` now rejects any project with fewer than
+  three test functions; the four projects that had only two now cover empty
+  input, unknown factories, handler replacement, and empty-buffer flushes.
 
 ### Fixed
 

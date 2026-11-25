@@ -1,2 +1,3 @@
-# Documentation site. Kept in Python so it matches the rest of the tooling.
-mkdocs-material>=9.6,<10
+# Documentation site. Pinned so a Pages build cannot change under us.
+mkdocs==1.6.1
+mkdocs-material==9.8.2

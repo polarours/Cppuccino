@@ -41,6 +41,19 @@ void test_auto_flush() {
     expect(count == 2, "expected auto flush at buffer size");
 }
 
+void test_flush_empty_buffer() {
+    observer_buffer::BufferedDispatcher dispatcher(3);
+
+    int count = 0;
+    dispatcher.setHandler([&count](const observer_buffer::Event&) {
+        count++;
+    });
+
+    dispatcher.flush();
+    expect(count == 0, "expected no events from an empty flush");
+    expect(dispatcher.bufferSize() == 0, "expected an empty buffer after flush");
+}
+
 } // namespace
 
 int main() {
@@ -51,6 +64,9 @@ int main() {
 
         test_auto_flush();
         std::cout << "  test_auto_flush: PASS\n";
+
+        test_flush_empty_buffer();
+        std::cout << "  test_flush_empty_buffer: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "observer_buffer_tests failed: " << exception.what() << std::endl;

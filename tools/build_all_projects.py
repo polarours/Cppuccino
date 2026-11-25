@@ -95,7 +95,9 @@ def main():
         log_path = os.path.join(build_root, name.replace('/', '_') + '.log')
         print(f'[{index}/{len(projects)}] {name}', flush=True)
 
-        if run(['cmake', '-S', project, '-B', build_dir, '-DBUILD_TESTING=ON'],
+        if run(['cmake', '-S', project, '-B', build_dir, '-DBUILD_TESTING=ON'] +
+               (['-DCMAKE_CXX_COMPILER_LAUNCHER=ccache']
+                if os.environ.get('CCACHE_DIR') else []),
                log_path) != 0:
             failures.append((name, 'configure', log_path))
             print('    configure FAILED')

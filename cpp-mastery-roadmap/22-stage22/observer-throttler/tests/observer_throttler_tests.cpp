@@ -43,6 +43,26 @@ void test_throttle_after_interval() {
     expect(count == 2, "expected 2 emissions after interval");
 }
 
+void test_handler_replacement() {
+    observer_throttler::ThrottledDispatcher dispatcher(std::chrono::milliseconds(10));
+
+    int first = 0;
+    int second = 0;
+    dispatcher.setHandler([&first](const observer_throttler::Event&) {
+        first++;
+    });
+    dispatcher.emit({"event", "1"});
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    dispatcher.setHandler([&second](const observer_throttler::Event&) {
+        second++;
+    });
+    dispatcher.emit({"event", "2"});
+
+    expect(first == 1, "expected the old handler to receive only the first event");
+    expect(second == 1, "expected the replacement handler to receive the second event");
+}
+
 } // namespace
 
 int main() {
@@ -53,6 +73,9 @@ int main() {
 
         test_throttle_after_interval();
         std::cout << "  test_throttle_after_interval: PASS\n";
+
+        test_handler_replacement();
+        std::cout << "  test_handler_replacement: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "observer_throttler_tests failed: " << exception.what() << std::endl;

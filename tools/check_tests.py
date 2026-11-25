@@ -41,6 +41,26 @@ ASSERT_CALL_RE = re.compile(
     r'|verify[A-Za-z0-9_]*|check[A-Za-z0-9_]*)\s*\(')
 
 THROW_KEYWORD_RE = re.compile(r'\bthrow\b')
+MIN_TESTS = 3
+
+
+def check_minimum_tests(project, problems):
+    """A project's test binary should exercise more than two behaviours."""
+    tests_dir = os.path.join(project, 'tests')
+    if not os.path.isdir(tests_dir):
+        problems.append(f'{os.path.relpath(project, REPO)}: no tests directory')
+        return
+    text = ''
+    for name in sorted(os.listdir(tests_dir)):
+        if name.endswith('.cpp'):
+            with open(os.path.join(tests_dir, name), encoding='utf-8',
+                      errors='replace') as handle:
+                text += handle.read()
+    count = len(set(DEFINITION_RE.findall(text)))
+    if count < MIN_TESTS:
+        problems.append(
+            f'{os.path.relpath(project, REPO)}: only {count} test function(s), '
+            f'expected at least {MIN_TESTS}')
 
 
 def function_body(text, brace):
@@ -171,6 +191,7 @@ def main():
     count = 0
     for project in sorted(projects(roadmap)):
         count += 1
+        check_minimum_tests(project, problems)
         check_calls(project, problems)
         check_assertions(project, problems)
         check_failure_is_reported(project, problems)
@@ -181,8 +202,8 @@ def main():
         for problem in problems:
             print(f'  {problem}')
         return 1
-    print('\nevery test function is called and checks something, and every '
-          'failure can be reported')
+    print('\nevery project has at least three tests, every test function is '
+          'called and checks something, and every failure can be reported')
     return 0
 
 

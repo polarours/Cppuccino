@@ -39,6 +39,13 @@ void test_create_strategy() {
     expect(data[4] == 5, "expected 5");
 }
 
+void test_unknown_strategy() {
+    strategy_factory::StrategyFactory factory;
+    expect(!factory.hasStrategy("missing"), "expected missing to be unknown");
+    expect(factory.create("missing") == nullptr,
+           "expected an unknown strategy to return nullptr");
+}
+
 } // namespace
 
 int main() {
@@ -49,6 +56,9 @@ int main() {
 
         test_create_strategy();
         std::cout << "  test_create_strategy: PASS\n";
+
+        test_unknown_strategy();
+        std::cout << "  test_unknown_strategy: PASS\n";
 
     } catch (const std::exception& exception) {
         std::cerr << "strategy_factory_tests failed: " << exception.what() << std::endl;
