@@ -782,7 +782,7 @@ def build_config() -> dict:
                 'primary': 'brown',
                 'accent': 'amber',
             },
-            'font': {'text': 'Inter', 'code': 'JetBrains Mono'},
+            'font': False,
             'features': [
                 'navigation.instant',
                 'navigation.tracking',
@@ -809,6 +809,7 @@ def build_config() -> dict:
             {'pymdownx.tabbed': {'alternate_style': True}},
         ],
         'extra_css': [
+            'assets/fonts.css',
             'assets/stylesheets/extra.css',
             'assets/read-theme.css',
             'assets/inline-lab.css',
@@ -866,7 +867,8 @@ def main() -> int:
         shutil.rmtree(SITE)
     SITE.mkdir(parents=True)
 
-    shutil.copytree(TEMPLATES, SITE, dirs_exist_ok=True)
+    shutil.copytree(TEMPLATES, SITE, dirs_exist_ok=True,
+                    ignore=shutil.ignore_patterns('overrides'))
 
     for folder in ('docs/en', 'docs/中文版', 'pitfalls/en', 'pitfalls/中文版'):
         target = SITE / folder

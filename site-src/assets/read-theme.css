@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+@import url('fonts.css');
 
 /* Three switchable skins for the Read mode. Material keeps its own layout and
    search; these override only the palette and a few display details. */
@@ -17,7 +17,7 @@ html[data-read-theme='cappuccino'] body {
   --md-typeset-color: #24201c;
   --md-typeset-a-color: #8a5a24;
   --md-footer-bg-color: #f3ede4;
-  --rd-display-font: 'Inter', sans-serif;
+  --rd-display-font: 'Space Grotesk', 'Inter', sans-serif;
   --cpp-ink: #1f2328;
   --cpp-copper: #a36d2f;
 }
@@ -35,7 +35,7 @@ html[data-read-theme='arcade'] body {
   --md-typeset-color: #f5e9d6;
   --md-typeset-a-color: var(--rd-accent);
   --md-footer-bg-color: #221913;
-  --rd-display-font: 'Press Start 2P', 'Courier New', monospace;
+  --rd-display-font: 'Press Start 2P', 'Space Grotesk', 'JetBrains Mono', monospace;
   --cpp-ink: #f5e9d6;
   --cpp-copper: #7cffb2;
 }

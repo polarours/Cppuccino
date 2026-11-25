@@ -1,0 +1,42 @@
+/* Self-hosted Latin subsets. Chinese text falls through to the system CJK
+   font, which keeps the page usable offline and in mainland China without
+   shipping a multi-megabyte CJK webfont. */
+@font-face {
+  font-family: 'Inter';
+  src: url('fonts/inter-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0100-024F, U+2000-206F, U+20A0-20CF,
+    U+2100-214F, U+2190-21FF, U+25A0-25FF, U+2600-26FF;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('fonts/space-grotesk-latin.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0100-024F, U+2000-206F, U+20A0-20CF,
+    U+2100-214F, U+2190-21FF, U+25A0-25FF, U+2600-26FF;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('fonts/jetbrains-mono-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0100-024F, U+2000-206F, U+20A0-20CF,
+    U+2100-214F, U+2190-21FF, U+25A0-25FF, U+2600-26FF;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('fonts/jetbrains-mono-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0100-024F, U+2000-206F, U+20A0-20CF,
+    U+2100-214F, U+2190-21FF, U+25A0-25FF, U+2600-26FF;
+}

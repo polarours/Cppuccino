@@ -479,3 +479,4 @@ ctest --test-dir build --output-on-failure
 - [行为准则](CODE_OF_CONDUCT.md)
 - [安全策略](SECURITY.md)
 - [支持](SUPPORT.md)
+- [第三方声明](THIRD_PARTY_NOTICES.md)

@@ -1,8 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap');
+/* Self-hosted fonts are loaded by assets/fonts.css (see extra_css). */
 
 :root {
   --cpp-copper: #a36d2f;
   --cpp-ink: #1f2328;
+  --md-text-font: 'Inter', 'Noto Sans CJK SC', 'Noto Sans SC', system-ui, sans-serif;
+  --md-code-font: 'JetBrains Mono', 'Noto Sans Mono', 'Noto Sans CJK SC', monospace;
+  --font-body: var(--md-text-font);
+  --font-mono: var(--md-code-font);
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
 }
 
 [data-md-color-scheme='slate'] {

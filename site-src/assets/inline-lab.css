@@ -9,7 +9,7 @@
 .inline-lab-head {
   padding: 0.6rem 0.9rem;
   border-bottom: 1px solid var(--md-default-fg-color--lightest, #d8d3cc);
-  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Noto Sans Mono', 'Courier New', monospace;
   font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;

@@ -31,6 +31,10 @@ readers and for stable references.
   Open Graph and Twitter card tags, backed by a real 1200×630 branded social
   image. `robots.txt` points at the sitemap, and `404.html` gives lost readers
   a recovery path instead of a blank error.
+- The site no longer requests Google Fonts. Inter, Space Grotesk and JetBrains
+  Mono are self-hosted as small Latin WOFF2 subsets; Chinese text falls back to
+  the reader's system CJK font. Material's `theme.font` is disabled so it
+  cannot re-introduce the external request.
 
 ### Fixed
 
