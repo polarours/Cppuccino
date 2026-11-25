@@ -478,3 +478,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Technical corrections, simplifications, better examples, and thoughtful
 counterexamples are especially useful contributions.
+
+## Community
+
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md)
+- [Support](SUPPORT.md)

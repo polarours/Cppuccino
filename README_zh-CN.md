@@ -473,3 +473,9 @@ ctest --test-dir build --output-on-failure
 详细说明见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 特别欢迎这几类贡献：技术纠错、表述简化、更好的示例、严谨的反例与讨论。
+
+## 社区
+
+- [行为准则](CODE_OF_CONDUCT.md)
+- [安全策略](SECURITY.md)
+- [支持](SUPPORT.md)
