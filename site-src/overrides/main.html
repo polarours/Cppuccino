@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{#
+  Material already renders the page description from `page.meta.description`
+  (or the site description). This block only adds the social-preview tags that
+  Material does not emit by default. Keep it free of per-page hardcoding.
+#}
+{% block extrahead %}
+  {{ super() }}
+  {% set description = page.meta.description if page and page.meta and page.meta.description else config.site_description %}
+  {% set is_zh = page and ('/中文版/' in page.url or page.url.startswith('zh/')) %}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ config.site_name | e }}">
+  <meta property="og:title" content="{{ page.title | e if page and page.title else config.site_name | e }}">
+  <meta property="og:description" content="{{ description | e }}">
+  {% if page and page.canonical_url %}
+  <meta property="og:url" content="{{ page.canonical_url }}">
+  {% endif %}
+  <meta property="og:locale" content="{{ 'zh_CN' if is_zh else 'en_US' }}">
+  <meta property="og:image" content="{{ config.site_url }}assets/images/cppuccino-social.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Cppuccino — a bilingual C++ notebook">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ page.title | e if page and page.title else config.site_name | e }}">
+  <meta name="twitter:description" content="{{ description | e }}">
+  <meta name="twitter:image" content="{{ config.site_url }}assets/images/cppuccino-social.png">
+  <meta name="twitter:image:alt" content="Cppuccino — a bilingual C++ notebook">
+{% endblock %}

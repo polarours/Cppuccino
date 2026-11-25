@@ -26,6 +26,11 @@ readers and for stable references.
   link to the lifetime, iterator, data-race, and double-free experiments. The
   homepage label changed from `LIFETIME LAB` to `INTERACTIVE LABS`, and both
   READMEs link the Labs from the first screen.
+- Every generated page now carries a short, page-specific meta description
+  derived from its first paragraph. A Material `overrides/main.html` adds
+  Open Graph and Twitter card tags, backed by a real 1200×630 branded social
+  image. `robots.txt` points at the sitemap, and `404.html` gives lost readers
+  a recovery path instead of a blank error.
 
 ### Fixed
 

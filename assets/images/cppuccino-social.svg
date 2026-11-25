@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Cppuccino — bilingual C++ notebook">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#17110d"/>
+      <stop offset="0.55" stop-color="#1d1510"/>
+      <stop offset="1" stop-color="#2a1c12"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.9" cy="0.18" r="0.65">
+      <stop offset="0" stop-color="#c8a06a" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#c8a06a" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="scan" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="4" fill="none"/>
+      <rect y="3" width="4" height="1" fill="#000000"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect width="1200" height="630" fill="url(#scan)" opacity="0.14"/>
+
+  <text x="1124" y="452" fill="#c8a06a" fill-opacity="0.08" font-family="DejaVu Sans Mono, monospace" font-size="300" font-weight="700" letter-spacing="-18" text-anchor="end">C++</text>
+
+  <g font-family="DejaVu Sans Mono, monospace">
+    <text x="76" y="92" fill="#f5e9d6" font-size="30" font-weight="700" letter-spacing="5">CPPUCCINO</text>
+    <text x="1124" y="92" fill="#c8a06a" font-size="15" letter-spacing="2" text-anchor="end">C++ · BILINGUAL NOTEBOOK</text>
+  </g>
+
+  <g font-family="DejaVu Sans Mono, monospace" font-weight="700" font-size="92" letter-spacing="-3">
+    <text x="76" y="238" fill="#f2b84b">READ.</text>
+    <text x="76" y="330" fill="#f2b84b">BREAK.</text>
+    <text x="76" y="422" fill="#7cffb2">REPAIR.</text>
+  </g>
+
+  <g font-family="DejaVu Sans, sans-serif" fill="#d8c7ad">
+    <text x="76" y="474" font-size="25">One C++ idea, in two languages, with runnable proof.</text>
+    <text x="76" y="510" font-size="20" fill="#a9967c">140 articles · 74 pitfalls · 161 examples · 151 projects.</text>
+  </g>
+
+  <line x1="76" y1="544" x2="1124" y2="544" stroke="#c8a06a" stroke-opacity="0.65" stroke-width="1"/>
+
+  <g font-family="DejaVu Sans Mono, monospace">
+    <g fill="#f5e9d6" font-size="27">
+      <text x="76" y="581">140</text>
+      <text x="330" y="581">74</text>
+      <text x="560" y="581">161</text>
+      <text x="800" y="581">971</text>
+    </g>
+    <g fill="#a9967c" font-size="13" letter-spacing="1">
+      <text x="76" y="602">DOCS · EN + ZH</text>
+      <text x="330" y="602">PITFALLS</text>
+      <text x="560" y="602">RUNNABLE EXAMPLES</text>
+      <text x="800" y="602">TESTS</text>
+    </g>
+    <text x="76" y="622" fill="#c8a06a" font-size="14" letter-spacing="1">polarours.github.io/Cppuccino</text>
+    <text x="1124" y="622" fill="#6f604e" font-size="13" letter-spacing="1" text-anchor="end">MIT · C++17 / 20 / 23</text>
+  </g>
+</svg>

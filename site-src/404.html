@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="color-scheme" content="dark light">
+  <title>404 — Cppuccino</title>
+  <style>
+    :root {
+      --ink: #f5e9d6;
+      --muted: #a9967c;
+      --bg: #17110d;
+      --copper: #c8a06a;
+      --mint: #7cffb2;
+      --line: rgba(200, 160, 106, 0.28);
+      --mono: "DejaVu Sans Mono", "SFMono-Regular", Consolas, monospace;
+      --sans: "DejaVu Sans", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+      background:
+        radial-gradient(900px 500px at 80% 10%, rgba(200, 160, 106, .16), transparent 65%),
+        var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+    }
+    main { width: min(680px, 100%); }
+    .eyebrow {
+      margin: 0 0 1rem;
+      color: var(--mint);
+      font-family: var(--mono);
+      font-size: .8rem;
+      letter-spacing: .14em;
+    }
+    h1 {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: clamp(1.8rem, 6vw, 3rem);
+      line-height: 1.08;
+      letter-spacing: -.04em;
+    }
+    p {
+      max-width: 56ch;
+      margin: 1.2rem 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .7rem;
+      margin-top: 1.8rem;
+      font-family: var(--mono);
+      font-size: .9rem;
+    }
+    a {
+      padding: .7rem .9rem;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      text-decoration: none;
+    }
+    a.primary {
+      border-color: var(--copper);
+      background: var(--copper);
+      color: var(--bg);
+      font-weight: 700;
+    }
+    a:hover, a:focus-visible {
+      border-color: var(--copper);
+      color: var(--mint);
+      outline: none;
+    }
+    a.primary:hover, a.primary:focus-visible {
+      background: var(--mint);
+      border-color: var(--mint);
+      color: var(--bg);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">404 / LOST PAGE</p>
+    <h1>This page is not in the notebook.</h1>
+    <p>The link may be stale, or the page moved. Start from the notebook, or jump into the arcade or labs.</p>
+    <nav aria-label="Recovery links">
+      <a class="primary" href="https://polarours.github.io/Cppuccino/">Notebook</a>
+      <a href="https://polarours.github.io/Cppuccino/en/">Start here</a>
+      <a href="https://polarours.github.io/Cppuccino/arcade/">Arcade</a>
+      <a href="https://polarours.github.io/Cppuccino/lab/">Labs</a>
+    </nav>
+  </main>
+</body>
+</html>

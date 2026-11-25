@@ -358,6 +358,75 @@ def article_index(folder: str, heading: str, intro: str, lang: str,
     return '\n'.join(lines)
 
 
+def strip_inline_markdown(text: str) -> str:
+    text = re.sub(r'!\[[^\]]*\]\([^)]*\)', '', text)
+    text = re.sub(r'\[([^\]]+)\]\([^)]*\)', r'\1', text)
+    text = re.sub(r'`([^`]*)`', r'\1', text)
+    text = re.sub(r'<[^>]+>', '', text)
+    text = re.sub(r'[*_~]+', '', text)
+    return re.sub(r'\s+', ' ', text).strip()
+
+
+def markdown_description(text: str, fallback: str) -> str:
+    """Take the first readable paragraph after the H1, within SEO length."""
+    if text.startswith('---\n'):
+        return fallback
+    lines = text.splitlines()
+    start = 0
+    title = ''
+    for index, line in enumerate(lines):
+        match = re.match(r'^#\s+(.+?)\s*#*\s*$', line)
+        if match:
+            start = index + 1
+            title = clean_nav_title(match.group(1), '')
+            break
+    if not title:
+        return fallback
+
+    paragraph: list[str] = []
+    for line in lines[start:]:
+        stripped = line.strip()
+        if not stripped:
+            if paragraph:
+                break
+            continue
+        if stripped.startswith('```'):
+            break
+        if stripped.startswith(('#', '|', '---')):
+            continue
+        if not paragraph and re.match(r'^([-*+]|\d+\.)\s', stripped):
+            continue
+        if stripped.startswith('>'):
+            stripped = stripped.lstrip('>').strip()
+        if stripped:
+            paragraph.append(stripped)
+
+    description = strip_inline_markdown(' '.join(paragraph))
+    if not description:
+        return fallback
+    if len(description) < 40:
+        description = f'{title}: {description}'
+    if len(description) > 158:
+        shortened = description[:155].rsplit(' ', 1)[0].rstrip(' ,.;:，。；：')
+        description = shortened + '…'
+    return description
+
+
+def add_descriptions(fallback: str) -> None:
+    """Add page-level meta descriptions without touching the source files."""
+    for path in SITE.rglob('*.md'):
+        text = path.read_text(encoding='utf-8', errors='replace')
+        if text.startswith('---\n'):
+            continue
+        description = markdown_description(text, fallback)
+        # JSON strings are valid YAML double-quoted scalars and escape the
+        # colon/quote combinations that would make a plain scalar ambiguous.
+        description = re.sub(r'\s+', ' ', description).strip()
+        front = ('---\ndescription: ' + json.dumps(description, ensure_ascii=False)
+                 + '\n---\n\n')
+        path.write_text(front + text, encoding='utf-8')
+
+
 def example_rows() -> list[tuple[str, str]]:
     """Read the real one-line description each example puts at the top."""
     rows = []
@@ -502,7 +571,8 @@ def ensure_directory_indexes() -> None:
     """Give every linked directory a page instead of a 404."""
     for directory in sorted(directory_link_targets()):
         index = directory / 'index.md'
-        if index.is_file() or (directory / 'README.md').is_file():
+        if index.is_file() or (directory / 'README.md').is_file() or \
+           (directory / 'index.html').is_file():
             continue
         rel = directory.relative_to(SITE).as_posix()
         github = f'{REPO_URL}/tree/master/{quote(rel)}'
@@ -706,6 +776,7 @@ def build_config() -> dict:
         'theme': {
             'name': 'material',
             'language': 'en',
+            'custom_dir': '../site-src/overrides',
             'palette': {
                 'scheme': 'default',
                 'primary': 'brown',
@@ -728,6 +799,7 @@ def build_config() -> dict:
             'attr_list',
             'def_list',
             'footnotes',
+            'meta',
             'tables',
             {'toc': {'permalink': True}},
             'pymdownx.details',
@@ -828,7 +900,7 @@ def main() -> int:
     images = SITE / 'assets' / 'images'
     images.mkdir(parents=True, exist_ok=True)
     for name in ('cppuccino-banner-light.svg', 'cppuccino-banner-dark.svg',
-                 'value-categories.png'):
+                 'value-categories.png', 'cppuccino-social.png'):
         shutil.copy2(REPO / 'assets' / 'images' / name, images / name)
 
     # Concept articles link into the roadmap and tinyshell with relative
@@ -855,6 +927,9 @@ def main() -> int:
 
     normalize_directory_links()
     ensure_directory_indexes()
+    add_descriptions(
+        'One C++ idea, in two languages, with runnable proof.')
+
     validate_directory_links()
     validate_inline_labs()
     validate_html_assets()
