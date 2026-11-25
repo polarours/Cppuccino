@@ -2,9 +2,10 @@
 # Run every repository check, in the same order the CI does.
 #
 # Usage:
-#   tools/run_all_checks.sh            # documentation checks only
-#   tools/run_all_checks.sh --full     # also build and test every project
-#   tools/run_all_checks.sh --sanitize # also run every test under the sanitizers
+#   tools/run_all_checks.sh                       # documentation checks only
+#   tools/run_all_checks.sh --full                # also build and test every project
+#   tools/run_all_checks.sh --sanitize            # also run every test under the sanitizers
+#   tools/run_all_checks.sh --full --sanitize     # the full CI-equivalent run
 #
 # The documentation checks are fast enough to run before every commit. The
 # full run builds and tests all projects, which takes a while. The sanitizer
@@ -17,10 +18,21 @@ cd "$REPO_ROOT"
 
 FULL=0
 SANITIZE=0
-case "${1:-}" in
-    --full) FULL=1 ;;
-    --sanitize) SANITIZE=1 ;;
-esac
+for arg in "$@"; do
+    case "$arg" in
+        --full) FULL=1 ;;
+        --sanitize) SANITIZE=1 ;;
+        -h|--help)
+            sed -n '2,10p' "$0"
+            exit 0
+            ;;
+        *)
+            echo "unknown option: $arg" >&2
+            echo "usage: $0 [--full] [--sanitize]" >&2
+            exit 2
+            ;;
+    esac
+done
 
 FAILED=()
 

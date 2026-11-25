@@ -1,13 +1,26 @@
 # Contributing
 
-Thank you for your interest in this project.
+Thank you for taking the time to improve Cppuccino.
 
-This repository is a personal work-in-progress.
-All content reflects the author's current understanding of C++, which is
-necessarily limited and evolving. Mistakes and omissions are possible.
+Cppuccino is an open, bilingual C++ notebook: one idea per article, a real
+failure mode beside it, and code the reader can compile. The project is
+maintained by [@polarours](https://github.com/polarours), but the quality bar
+belongs to everyone who reads it.
 
-The project exists primarily as a way to learn by writing.
-If something is unclear or incorrect, pointing it out is genuinely appreciated.
+## Scope and quality bar
+
+- **One idea per article.** If a page needs two ideas, split it.
+- **Bilingual where possible.** English and Chinese halves keep the same
+  heading skeleton and the same code; only prose and printed messages differ.
+- **Runnable proof.** A claim about behavior should have an example, a test,
+  or a sanitizer report behind it.
+- **No invented output.** If a program is expected to crash, show the real
+  report from a real run and say which toolchain produced it.
+- **Small, focused changes.** A correction to one claim is easier to review
+  than a rewrite of ten articles.
+
+Mistakes and omissions are still possible. Pointing one out is a contribution,
+not an inconvenience.
 
 ---
 
@@ -118,6 +131,9 @@ are flat; `key-value-store` groups its sources by concern.
 By contributing, you confirm that your work is original or properly attributed
 and that you agree to license it under the project's license.
 
+Participation is covered by the [Code of Conduct](CODE_OF_CONDUCT.md). Please
+report security problems through [SECURITY.md](SECURITY.md), not a public issue.
+
 ---
 
 ## Building and Testing
@@ -159,15 +175,18 @@ g++ -std=c++17 examples/example-name.cpp -o /tmp/example && /tmp/example
 
 ### Repository Checks
 
-The scripts under `tools/` keep the repository honest. Run them before
-opening a pull request that touches `docs/`, `pitfalls/` or `examples/`:
+The scripts under `tools/` keep the repository honest. Run the command that
+matches your change before opening a pull request:
 
 ```bash
-# Everything the CI runs for the documentation set.
+# Documentation, pitfalls, and examples only.
 tools/run_all_checks.sh
 
-# Add the project builds and tests.
+# Add every project build and test.
 tools/run_all_checks.sh --full
+
+# Add the sanitizer run. Combine the flags; there is no separate CI-only step.
+tools/run_all_checks.sh --full --sanitize
 ```
 
 The individual checks can also be run on their own:

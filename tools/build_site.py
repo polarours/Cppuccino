@@ -535,6 +535,7 @@ def build_config() -> dict:
         'extra_javascript': [
             'assets/read-theme.js',
             'assets/inline-lab.js',
+            'assets/lang.js',
         ],
         'validation': {
             'links': {'not_found': 'warn'},
@@ -563,6 +564,20 @@ def stats_tokens() -> dict[str, str]:
         'STAGES': str(check_stats.count_stages()),
         'TESTS': str(check_stats.count_tests()),
     }
+
+
+def validate_template_tokens(tokens: dict[str, str]) -> None:
+    """A missing brace must fail the build, not ship as visible text."""
+    keys = '|'.join(re.escape(key) for key in tokens)
+    leftover = re.compile(r'\{\{(?:' + keys + r')\}(?!\})')
+    broken = []
+    for path in SITE.rglob('*.md'):
+        text = path.read_text(encoding='utf-8', errors='replace')
+        for match in leftover.finditer(text):
+            broken.append(f'{path.relative_to(SITE)} -> {match.group(0)}')
+    if broken:
+        raise SystemExit('unresolved template tokens:\n  ' +
+                         '\n  '.join(broken))
 
 
 def main() -> int:
@@ -622,6 +637,8 @@ def main() -> int:
         for key, value in tokens.items():
             text = text.replace('{{' + key + '}}', value)
         path.write_text(text, encoding='utf-8')
+
+    validate_template_tokens(tokens)
 
     normalize_directory_links()
     ensure_directory_indexes()

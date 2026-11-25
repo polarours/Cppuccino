@@ -102,6 +102,8 @@
     const root = document.documentElement;
     root.dataset.theme = state.theme;
     root.dataset.lang = state.lang;
+    root.setAttribute(
+      'lang', state.lang === 'zh' ? 'zh-CN' : 'en');
     $('themeBtn').textContent = state.theme === 'arcade' ? 'RETRO' : 'ARCADE';
     $('langBtn').textContent = state.lang === 'en' ? '中文' : 'EN';
     $('heroEyebrow').textContent = s().heroEyebrow;

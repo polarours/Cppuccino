@@ -7,6 +7,13 @@
 
 <p align="center"><a href="README.md">English</a> · <a href="README_zh-CN.md">中文</a></p>
 
+<p align="center">
+  <a href="https://github.com/polarours/Cppuccino/actions/workflows/build.yml"><img alt="Build status" src="https://github.com/polarours/Cppuccino/actions/workflows/build.yml/badge.svg?branch=master"></a>
+  <a href="https://github.com/polarours/Cppuccino/actions/workflows/docs.yml"><img alt="Documentation checks" src="https://github.com/polarours/Cppuccino/actions/workflows/docs.yml/badge.svg?branch=master"></a>
+  <a href="https://github.com/polarours/Cppuccino/actions/workflows/pages.yml"><img alt="Pages deployment" src="https://github.com/polarours/Cppuccino/actions/workflows/pages.yml/badge.svg?branch=master"></a>
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/github/license/polarours/Cppuccino?style=flat-square"></a>
+</p>
+
 <div align="center">
 
 | 140 docs | 74 pitfalls | 161 examples | 151 projects |
@@ -15,7 +22,7 @@
 
 </div>
 
-<p align="center"><a href="https://polarours.github.io/Cppuccino/">Documentation</a> · <a href="https://polarours.github.io/Cppuccino/arcade/">Arcade</a> · <a href="https://polarours.github.io/Cppuccino/arcade/camp/">UB Camp</a> · <a href="https://github.com/polarours/Cppuccino/actions">Actions</a> · <a href="CONTRIBUTING.md">Contributing</a> · MIT</p>
+<p align="center"><a href="https://polarours.github.io/Cppuccino/">Documentation</a> · <a href="https://polarours.github.io/Cppuccino/arcade/">Arcade</a> · <a href="https://polarours.github.io/Cppuccino/arcade/camp/">UB Camp</a> · <a href="https://github.com/polarours/Cppuccino/actions">Actions</a> · <a href="CONTRIBUTING.md">Contributing</a> · <a href="LICENSE">MIT</a></p>
 
 ## Quick Stats
 

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Read the documentation
+    url: https://polarours.github.io/Cppuccino/
+    about: Start here; the answer may already be in an article or a Lab.
+  - name: Report a security problem privately
+    url: https://github.com/polarours/Cppuccino/security/advisories/new
+    about: Please do not open a public issue for a vulnerability.

@@ -76,6 +76,8 @@
   function applyChrome() {
     document.documentElement.dataset.theme = state.theme;
     document.documentElement.dataset.lang = state.lang;
+    document.documentElement.setAttribute(
+      'lang', state.lang === 'zh' ? 'zh-CN' : 'en');
     $('themeBtn').textContent = state.theme === 'arcade' ? 'RETRO' : 'ARCADE';
     $('langBtn').textContent = state.lang === 'en' ? '中文' : 'EN';
     $('stageCode').textContent = t().stage;

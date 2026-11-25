@@ -12,11 +12,11 @@ One cycle at a time: read an idea, inspect how it fails, then change code.
 
 ## The whole ledger
 
-- {{DOCS} articles in [Concepts](../docs/en/) and the Chinese mirror
-- {{PITFALLS} failure modes in [Pitfalls](../pitfalls/en/)
-- {{EXAMPLES} runnable files in [Examples](examples/)
-- {{PROJECTS} projects across {{STAGES} stages in [Projects](projects/)
-- {{TESTS} test functions, all passing in CI
+- {{DOCS}} articles in [Concepts](../docs/en/) and the Chinese mirror
+- {{PITFALLS}} failure modes in [Pitfalls](../pitfalls/en/)
+- {{EXAMPLES}} runnable files in [Examples](examples/)
+- {{PROJECTS}} projects across {{STAGES}} stages in [Projects](projects/)
+- {{TESTS}} test functions, all passing in CI
 
 ## Other entry points
 

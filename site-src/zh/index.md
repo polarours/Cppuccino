@@ -10,11 +10,11 @@
 
 ## 全量账本
 
-- [概念文档](../docs/中文版/) 与英文镜像共 {{DOCS} 篇
-- [陷阱文章](../pitfalls/中文版/) {{PITFALLS} 篇
-- [可运行示例](examples/) {{EXAMPLES} 个
-- [小项目](projects/) {{PROJECTS} 个，横跨 {{STAGES} 个阶段
-- {{TESTS} 个测试函数，CI 里全部通过
+- [概念文档](../docs/中文版/) 与英文镜像共 {{DOCS}} 篇
+- [陷阱文章](../pitfalls/中文版/) {{PITFALLS}} 篇
+- [可运行示例](examples/) {{EXAMPLES}} 个
+- [小项目](projects/) {{PROJECTS}} 个，横跨 {{STAGES}} 个阶段
+- {{TESTS}} 个测试函数，CI 里全部通过
 
 ## 其他入口
 

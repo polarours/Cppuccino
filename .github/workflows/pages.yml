@@ -43,6 +43,8 @@ jobs:
             done
             exit "$status"
           fi
+      - name: Set the document language on Chinese pages
+        run: python3 tools/fix_html_lang.py site
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site

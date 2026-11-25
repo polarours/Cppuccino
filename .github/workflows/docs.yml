@@ -55,6 +55,9 @@ jobs:
       - name: Language and bilingual parity
         run: python3 tools/check_docs.py
 
+      - name: Assemble the site and validate template tokens
+        run: python3 tools/build_site.py && python3 tools/check_links.py .site
+
       - name: Relative links
         run: python3 tools/check_links.py
 

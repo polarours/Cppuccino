@@ -1,0 +1,79 @@
+name: Bug report
+description: Report a broken link, build failure, wrong claim, or site problem.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. A reproducible report is
+        worth more than a long one.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Documentation or a claim in an article
+        - Example or pitfall code
+        - Project under cpp-mastery-roadmap
+        - Tooling, checker, or CI
+        - Website, Arcade, Camp, or Lab
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Where is it?
+      description: URL, file path, workflow name, or command.
+      placeholder: "docs/en/undefined-behavior.md, line 56"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: The exact commands or steps. For code, paste the smallest complete program.
+      render: shell
+      placeholder: |
+        g++ -std=c++17 -fsanitize=address repro.cpp -o repro
+        ./repro
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Paste the error, sanitizer report, or screenshot description.
+      render: shell
+    validations:
+      required: true
+
+  - type: input
+    id: toolchain
+    attributes:
+      label: Compiler, standard, and OS
+      placeholder: "g++ 15.2, C++17, Arch Linux; or Chrome 140 / macOS 15"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues.
+          required: true
+        - label: I removed secrets, tokens, and personal data from the report.
+          required: true

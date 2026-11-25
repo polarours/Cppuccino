@@ -22,19 +22,23 @@ Link the issue or the documentation gap it closes.
 
 ## Checklist
 
-The repository checks run in CI. Run them locally first with:
+The repository checks run in CI. Run the command that matches your change
+locally first:
 
 ```bash
-tools/run_all_checks.sh
+tools/run_all_checks.sh                  # docs-only change
+tools/run_all_checks.sh --full           # examples, projects, or build files
+tools/run_all_checks.sh --full --sanitize  # lifetime/concurrency changes
 ```
 
-- [ ] `tools/run_all_checks.sh` passes
+- [ ] I ran the command above that matches this change and it passes
 - [ ] The English and Chinese halves of any document I touched still agree
       (heading skeleton and code)
 - [ ] Every code block I added or changed compiles
 - [ ] Relative links and anchors still resolve
 - [ ] A new project has `CMakeLists.txt`, `README.md`, `README.zh-CN.md`
-      and tests
+      and at least three tests
+- [ ] I did not add secrets, tokens, or personal data
 
 ## Notes for the reviewer
 

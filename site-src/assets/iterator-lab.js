@@ -126,6 +126,8 @@
   function applyChrome() {
     document.documentElement.dataset.readTheme = state.theme;
     document.documentElement.dataset.lang = state.lang;
+    document.documentElement.setAttribute(
+      'lang', state.lang === 'zh' ? 'zh-CN' : 'en');
     $('labEyebrow').textContent = t().eyebrow;
     $('labTitle').textContent = t().title;
     $('labSub').textContent = t().sub;

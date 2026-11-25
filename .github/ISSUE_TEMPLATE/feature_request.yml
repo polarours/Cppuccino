@@ -1,0 +1,60 @@
+name: Feature request
+description: Suggest a new article, example, project, or interaction.
+title: "[feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Cppuccino is deliberately small in scope: one idea per article,
+        bilingual where possible, and runnable proof. Please explain the gap
+        you are trying to close, not only the feature you want.
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of addition is this?
+      options:
+        - New concept article
+        - New pitfall article
+        - New runnable example
+        - New roadmap project
+        - New Lab or Arcade interaction
+        - Documentation/site improvement
+        - Tooling or CI improvement
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Who is stuck, and what are they trying to do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: A sketch is enough. Link related articles or issues if they exist.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What simpler or smaller change could solve the same problem?
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and the roadmap.
+          required: true
+        - label: This is not a request for private tutoring or paid support.
+          required: true

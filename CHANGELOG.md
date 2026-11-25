@@ -5,6 +5,31 @@ readers and for stable references.
 
 ## [Unreleased]
 
+### Added
+
+- Community health files: [Code of Conduct](CODE_OF_CONDUCT.md),
+  [Security Policy](SECURITY.md), [Support](SUPPORT.md), `CODEOWNERS`, and
+  structured GitHub issue forms for bugs and feature requests.
+- CI, documentation, Pages, and license badges at the top of both READMEs.
+- `tools/run_all_checks.sh` now accepts combined flags, so
+  `--full --sanitize` is one local command instead of two separate runs.
+- `tools/fix_html_lang.py` rewrites the generated Chinese pages to
+  `lang="zh-CN"`; `site-src/assets/lang.js` keeps the attribute correct during
+  Material instant navigation. Every Play-mode language toggle now updates the
+  document language as well as the visible text.
+
+### Fixed
+
+- The English and Chinese Start Here pages had malformed template tokens
+  (`{{DOCS}`), so the live pages showed literal placeholders instead of the
+  repository counts. `tools/build_site.py` now fails the build if a known
+  token is left unresolved.
+- Documentation and Play pages reported `<html lang="en">` even when the
+  reader selected Chinese. This is a WCAG language-of-page failure, not only
+  an SEO detail.
+
+## [1.0.0] - 2026-11-25
+
 ### Changed
 
 - The dangling-pointer pitfall (EN + ZH) now embeds the Lifetime Timeline lab
