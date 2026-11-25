@@ -240,6 +240,100 @@
 
 .lab-links a { color: var(--md-accent-fg-color); }
 
+.lab-more {
+  margin-top: clamp(2.5rem, 6vw, 5rem);
+}
+
+.lab-more-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.lab-more-head h2 {
+  margin: 0.25rem 0 0;
+  font-family: var(--rd-display-font, var(--font-display));
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  letter-spacing: 0.04em;
+  color: var(--md-default-fg-color);
+}
+
+.lab-more-note {
+  max-width: 42ch;
+  margin: 0;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  text-align: right;
+}
+
+.lab-more-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-top: 0;
+  background: var(--md-default-fg-color--lightest);
+}
+
+.lab-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-height: 13rem;
+  padding: 1.1rem;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  text-decoration: none;
+  transition: background 140ms ease-out, box-shadow 140ms ease-out;
+}
+
+.lab-card:hover,
+.lab-card:focus-visible {
+  background: var(--md-code-bg-color);
+  box-shadow: inset 0 0 0 1px var(--md-accent-fg-color);
+  outline: none;
+}
+
+.lab-card-index,
+.lab-card-tag {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+}
+
+.lab-card-index { color: var(--md-accent-fg-color); }
+
+.lab-card h3 {
+  margin: 0;
+  min-height: 2.6em;
+  font-family: var(--rd-display-font, var(--font-display));
+  font-size: 1rem;
+  line-height: 1.3;
+  letter-spacing: 0.03em;
+}
+
+.lab-card p {
+  flex: 1;
+  margin: 0;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.lab-card-tag {
+  color: var(--md-default-fg-color--light);
+}
+
+.lab-card.current {
+  box-shadow: inset 0 0 0 2px var(--md-accent-fg-color);
+}
+
+.lab-card.current .lab-card-tag { color: var(--md-accent-fg-color); }
+
 .noscript {
   border: 1px solid var(--md-default-fg-color--lightest);
   padding: 1rem;
@@ -248,12 +342,16 @@
 
 @media (max-width: 900px) {
   .lab-grid { grid-template-columns: 1fr; }
+  .lab-more-head { align-items: start; flex-direction: column; }
+  .lab-more-note { text-align: left; }
+  .lab-more-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 640px) {
   .object-row { grid-template-columns: 1fr; }
   .arrow { transform: rotate(90deg); justify-self: center; }
   .step-counter { margin-left: 0; width: 100%; }
+  .lab-more-grid { grid-template-columns: 1fr; }
 }
 
 /* Embedded inside an article: keep the instrument, drop the page chrome. */

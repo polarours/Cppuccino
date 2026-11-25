@@ -20,6 +20,7 @@ One cycle at a time: read an idea, inspect how it fails, then change code.
 
 ## Other entry points
 
+- [Interactive labs](../lab/) — four failure modes you can step through
 - [Strategy pattern](../docs/en/strategy-pattern.md)
 - [Undefined behavior](../docs/en/undefined-behavior.md)
 - [Move semantics](../docs/en/understanding-the-semantics-of-std::move.md)

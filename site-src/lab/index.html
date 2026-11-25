@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark light">
-  <title>Cppuccino Lab — Lifetime Timeline</title>
+  <title>Cppuccino Lab — Interactive Labs</title>
   <link rel="stylesheet" href="../assets/arcade.css">
   <link rel="stylesheet" href="../assets/read-theme.css">
   <link rel="stylesheet" href="../assets/lab.css">
@@ -19,6 +19,7 @@
       <button class="lab-theme" type="button" data-lab-theme="arcade">ARCADE</button>
       <button class="lab-theme" type="button" data-lab-theme="retro">RETRO</button>
       <button id="langBtn" type="button">中文</button>
+      <a href="#labs">ALL LABS ↓</a>
       <a href="../">READ MODE ↗</a>
     </nav>
   </header>
@@ -70,6 +71,42 @@
           <a id="articleLink" href="../pitfalls/en/dangling-pointer/" target="_blank" rel="noopener">REAL PITFALL ↗</a>
           <a id="bossLink" href="../arcade/boss/" target="_blank" rel="noopener">BOSS FIGHT ↗</a>
         </div>
+      </div>
+    </section>
+
+    <section class="lab-more" id="labs" aria-labelledby="labsTitle">
+      <div class="lab-more-head">
+        <div>
+          <p class="eyebrow">INTERACTIVE / INDEX</p>
+          <h2 id="labsTitle">FOUR WAYS TO BREAK C++</h2>
+        </div>
+        <p class="lab-more-note">Same rule every time: step the code, see the failure, repair it.<br>每次都是同一条规则：走代码、看失败、再修好。</p>
+      </div>
+      <div class="lab-more-grid">
+        <a class="lab-card current" href="./" aria-current="page">
+          <span class="lab-card-index">01 / LIFETIME</span>
+          <h3>LIFETIME TIMELINE</h3>
+          <p>A reference outlives its owner. Watch the ghost appear.<br>引用活得比对象久，看它变成幽灵。</p>
+          <span class="lab-card-tag">YOU ARE HERE</span>
+        </a>
+        <a class="lab-card" href="iterator/">
+          <span class="lab-card-index">02 / CONTAINERS</span>
+          <h3>ITERATOR INVALIDATION</h3>
+          <p>A vector grows; the old iterator becomes singular.<br>vector 增长，旧迭代器变成 singular。</p>
+          <span class="lab-card-tag">OPEN LAB ↗</span>
+        </a>
+        <a class="lab-card" href="race/">
+          <span class="lab-card-index">03 / CONCURRENCY</span>
+          <h3>DATA RACE</h3>
+          <p>Two threads, one lost increment, a real TSan report.<br>两个线程丢掉一次自增，TSan 真实报告。</p>
+          <span class="lab-card-tag">OPEN LAB ↗</span>
+        </a>
+        <a class="lab-card" href="double-free/">
+          <span class="lab-card-index">04 / OWNERSHIP</span>
+          <h3>DOUBLE FREE</h3>
+          <p>The same resource dies twice. ASan catches the second delete.<br>同一资源死两次，ASan 抓住第二次 delete。</p>
+          <span class="lab-card-tag">OPEN LAB ↗</span>
+        </a>
       </div>
     </section>
 

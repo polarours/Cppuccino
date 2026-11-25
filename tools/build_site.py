@@ -98,6 +98,133 @@ WORLDS = [
     },
 ]
 
+NAV_GROUPS = [
+    {
+        'key': 'modern',
+        'en': 'Modern C++',
+        'zh': '现代 C++',
+        'keywords': ['cpp20', 'cpp23', 'concept', 'ranges', 'std-expected',
+                     'expected', 'auto', 'decltype', 'coroutine', 'format',
+                     'span', 'optional', 'mdspan', 'template-instantiation',
+                     'two-phase', '概念', '范围', '协程', '自动', '推导',
+                     '模板实例化', '两阶段'],
+    },
+    {
+        'key': 'craft',
+        'en': 'Craft & Tooling',
+        'zh': '工程与工具',
+        'keywords': ['cmake', 'build-systems', 'testing', 'test', 'glossary',
+                     'tooling', '构建系统', '测试', '术语', '工具'],
+    },
+    {
+        'key': 'architecture',
+        'en': 'Architecture & Enterprise',
+        'zh': '架构与企业模式',
+        'keywords': ['active-record', 'cqrs', 'event-sourcing', 'mvc',
+                     'pimpl', 'repository', 'service-locator', 'specification',
+                     'unit-of-work', '活动记录', '事件溯源', '仓储',
+                     '服务定位器', '规范', '单元工作', '架构'],
+    },
+    {
+        'key': 'design',
+        'en': 'Design Patterns',
+        'zh': '设计模式',
+        'keywords': ['pattern', 'factory', 'adapter', 'bridge', 'builder',
+                     'chain-of', 'command', 'composite', 'decorator',
+                     'delegation', 'double-dispatch', 'facade', 'flyweight',
+                     'interpreter', 'mediator', 'memento', 'null-object',
+                     'observer', 'prototype', 'proxy', 'singleton',
+                     'strategy', 'template-method', 'type-object', 'visitor',
+                     'balking', 'iterator-pattern', '模式', '工厂', '适配器',
+                     '桥接', '建造者', '责任链', '命令', '组合', '装饰',
+                     '委托', '双重分派', '外观', '享元', '解释器', '中介者',
+                     '备忘录', '空对象', '观察者', '原型', '代理', '单例',
+                     '策略', '模板方法', '类型对象', '访问者', '推辞'],
+    },
+    {
+        'key': 'foundations',
+        'en': 'Foundations',
+        'zh': '基础',
+        'keywords': ['ownership', 'lifetime', 'raii', 'rule-of', 'copy-elision',
+                     'value-categor', 'lvalue', 'rvalue', 'reference', 'move',
+                     'forwarding', 'const', 'object-model', 'virtual-dispatch',
+                     'noexcept', 'undefined-behavior', '所有权', '生命周期',
+                     '零三五', '拷贝消除', '值类别', '左值', '右值', '引用',
+                     '移动', '转发', '对象模型', '虚函数', '未定义行为'],
+    },
+    {
+        'key': 'systems',
+        'en': 'Systems & Performance',
+        'zh': '系统与性能',
+        'keywords': ['chat-server', 'connection-pool', 'memory-pool',
+                     'allocator', 'simd', 'performance', 'database', 'db-api',
+                     'scheduler', 'memory-model', 'atomics', 'concurrency',
+                     'thread', 'server', 'api', '内存池', '分配器', '性能',
+                     '数据库', '调度', '内存模型', '原子', '并发', '线程',
+                     '服务器'],
+    },
+]
+
+NAV_DISPLAY_ORDER = ['foundations', 'modern', 'design', 'architecture',
+                     'systems', 'craft']
+
+# A few pages are the intended on-ramp, not alphabetical entries. Keep them
+# first inside their group without inventing a second ordering system.
+NAV_PINS = {
+    'docs/en': [
+        'ownership-starts-here.md',
+        'ownership-and-lifetime.md',
+        'raii-and-exception-safety.md',
+    ],
+    'docs/中文版': [
+        '所有权-从这里开始.md',
+        '所有权与生命周期.md',
+        'RAII与异常安全.md',
+    ],
+}
+
+PITFALL_GROUPS = [
+    {
+        'key': 'concurrency',
+        'en': 'Concurrency',
+        'zh': '并发',
+        'keywords': ['data-race', 'deadlock', 'livelock', 'priority-inversion',
+                     'memory-order', 'thread', 'double-checked', 'thread-safety',
+                     '数据竞态', '死锁', '活锁', '优先级反转', '内存序',
+                     '线程', '双重检查', '线程安全'],
+    },
+    {
+        'key': 'iterators',
+        'en': 'Containers & Iterators',
+        'zh': '容器与迭代器',
+        'keywords': ['iterator-invalidation', '迭代器失效'],
+    },
+    {
+        'key': 'templates',
+        'en': 'Templates & Language',
+        'zh': '模板与语言',
+        'keywords': ['fold-expression', 'implicit-conversions', 'macro',
+                     'narrowing', 'sfinae', 'signed-integer-overflow',
+                     'stack-overflow', 'template-deduction',
+                     'template-specialization', '折叠', '隐式转换', '宏',
+                     '窄化', '有符号整数', '栈溢出', '模板参数推导',
+                     '模板特化'],
+    },
+    {
+        'key': 'lifetime',
+        'en': 'Lifetime & Ownership',
+        'zh': '生命周期与所有权',
+        'keywords': ['dangling', 'double-free', 'memory-leak', 'const',
+                     'moving-from', 'object-lifetime', 'object-slicing',
+                     'returning-reference', 'throwing-from-destructor',
+                     'uninitialized', 'use-after-move', 'static-initialization',
+                     'deleting-through', 'memory-fragmentation', '悬垂',
+                     '双重释放', '内存泄漏', '对象生命周期', '对象切片',
+                     '返回局部', '析构', '未初始化', '移动后', '静态初始化',
+                     '非虚基类', '内存碎片'],
+    },
+]
+
 sys.path.insert(0, str(TOOLS))
 import check_stats  # noqa: E402  (local helper, not a third-party package)
 from check_links import strip_code  # noqa: E402
@@ -130,23 +257,104 @@ def copy_tracked(prefix: str) -> None:
         shutil.copy2(source, target)
 
 
-def markdown_files(folder: str, lang: str) -> list[tuple[str, str]]:
+def first_heading(path: Path) -> str:
+    for line in path.read_text(encoding='utf-8', errors='replace').splitlines():
+        match = re.match(r'^#\s+(.+?)\s*#*\s*$', line)
+        if match:
+            return match.group(1)
+    return ''
+
+
+def clean_nav_title(raw: str, fallback: str) -> str:
+    """Turn a page H1 into a short, human nav label."""
+    title = re.sub(r'`([^`]*)`', r'\1', raw).strip()
+    # Drop a trailing duplicate gloss such as "(C++20 Concepts)" or
+    # "（Object Slicing）"; keep tokens such as decltype(auto).
+    title = re.sub(r'\s*[\(（](?=[^()（）]*\s)[^()（）]*[\)）]\s*$', '', title)
+    # "Undefined Behavior — Hidden Traps" reads better in a sidebar than the
+    # full subtitle. The Chinese long dash is handled too.
+    title = re.split(r'\s+[—–]\s+|——', title, maxsplit=1)[0]
+    title = re.sub(r'\s+', ' ', title).strip()
+    return title or fallback
+
+
+def nav_group_key(title: str, path: str,
+                  groups: list[dict] = NAV_GROUPS) -> str:
+    text = f'{title} {path}'.lower()
+    for group in groups:
+        if any(word in text for word in group['keywords']):
+            return group['key']
+    return groups[-1]['key']
+
+
+def nav_group_label(key: str, lang: str,
+                    groups: list[dict] = NAV_GROUPS) -> str:
+    for group in groups:
+        if group['key'] == key:
+            return group[lang]
+    return key
+
+
+def markdown_files(folder: str, lang: str,
+                   use_heading: bool = True) -> list[tuple[str, str]]:
     """Return (nav title, path relative to .site) for one article folder."""
     out = []
-    for path in sorted((REPO / folder).glob('*.md')):
-        title = path.stem
+    pins = NAV_PINS.get(folder, [])
+    pin_order = {name: index for index, name in enumerate(pins)}
+    paths = sorted(
+        (REPO / folder).glob('*.md'),
+        key=lambda path: (pin_order.get(path.name, len(pins)), path.name),
+    )
+    for path in paths:
+        fallback = path.stem
         if lang == 'en':
-            title = title.replace('-', ' ').replace('_', ' ')
+            fallback = fallback.replace('-', ' ').replace('_', ' ')
+        title = (clean_nav_title(first_heading(path), fallback)
+                 if use_heading else fallback)
         out.append((title, f'{folder}/{path.name}'))
     return out
 
 
-def article_index(folder: str, heading: str, intro: str, lang: str) -> str:
+def grouped_markdown(folder: str, lang: str,
+                     groups: list[dict] = NAV_GROUPS,
+                     order: list[str] | None = None
+                     ) -> list[tuple[str, list[tuple[str, str]]]]:
+    grouped: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    for title, path in markdown_files(folder, lang):
+        grouped[nav_group_key(title, path, groups)].append((title, path))
+    if order:
+        by_key = {group['key']: group for group in groups}
+        ordered = [by_key[key] for key in order if key in by_key]
+    else:
+        ordered = groups
+    return [
+        (nav_group_label(group['key'], lang, groups), grouped[group['key']])
+        for group in ordered
+        if grouped[group['key']]
+    ]
+
+
+def nav_tree(folder: str, lang: str, all_label: str,
+             groups: list[dict] = NAV_GROUPS,
+             order: list[str] | None = None) -> list[dict]:
+    tree: list[dict] = [{all_label: f'{folder}/index.md'}]
+    for label, items in grouped_markdown(folder, lang, groups, order):
+        tree.append({label: [{title: path} for title, path in items]})
+    return tree
+
+
+def article_index(folder: str, heading: str, intro: str, lang: str,
+                  groups: list[dict] = NAV_GROUPS,
+                  order: list[str] | None = None) -> str:
     """A real index page so /docs/en/ and friends do not 404."""
     lines = [f'# {heading}', '', intro, '']
-    for title, path in markdown_files(folder, lang):
-        name = path.rsplit('/', 1)[-1]
-        lines.append(f'- [{title}]({name})')
+    for label, items in grouped_markdown(folder, lang, groups, order):
+        lines.append(f'## {label}')
+        lines.append('')
+        for title, path in items:
+            name = path.rsplit('/', 1)[-1]
+            lines.append(f'- [{title}]({name})')
+        lines.append('')
     return '\n'.join(lines)
 
 
@@ -398,22 +606,22 @@ def build_quests() -> dict:
     """Turn real repository content into game levels, without duplicating it."""
     quests = []
 
-    for title, path in markdown_files('docs/en', 'en'):
+    for title, path in markdown_files('docs/en', 'en', use_heading=False):
         stem = path.rsplit('/', 1)[-1][:-3]
         quests.append(quest('intel', 'en', title,
                             '../docs/en/' + quote(stem) + '/', 10, path))
 
-    for title, path in markdown_files('docs/中文版', 'zh'):
+    for title, path in markdown_files('docs/中文版', 'zh', use_heading=False):
         stem = path.rsplit('/', 1)[-1][:-3]
         quests.append(quest('intel', 'zh', title,
                             '../docs/中文版/' + quote(stem) + '/', 10, path))
 
-    for title, path in markdown_files('pitfalls/en', 'en'):
+    for title, path in markdown_files('pitfalls/en', 'en', use_heading=False):
         stem = path.rsplit('/', 1)[-1][:-3]
         quests.append(quest('boss', 'en', title,
                             '../pitfalls/en/' + quote(stem) + '/', 20, path))
 
-    for title, path in markdown_files('pitfalls/中文版', 'zh'):
+    for title, path in markdown_files('pitfalls/中文版', 'zh', use_heading=False):
         stem = path.rsplit('/', 1)[-1][:-3]
         quests.append(quest('boss', 'zh', title,
                             '../pitfalls/中文版/' + quote(stem) + '/', 20, path))
@@ -457,30 +665,31 @@ def build_quests() -> dict:
 
 
 def build_config() -> dict:
-    en_concepts = markdown_files('docs/en', 'en')
-    zh_concepts = markdown_files('docs/中文版', 'zh')
-    en_pitfalls = markdown_files('pitfalls/en', 'en')
-    zh_pitfalls = markdown_files('pitfalls/中文版', 'zh')
-
     nav = [
         {'Home': 'index.md'},
         {'English': [
             {'Start here': 'en/index.md'},
-            {'Concepts': [{'All concepts': 'docs/en/index.md'}] +
-             [{title: path} for title, path in en_concepts]},
-            {'Pitfalls': [{'All pitfalls': 'pitfalls/en/index.md'}] +
-             [{title: path} for title, path in en_pitfalls]},
+            {'Concepts': nav_tree('docs/en', 'en', 'All concepts',
+                                  order=NAV_DISPLAY_ORDER)},
+            {'Pitfalls': nav_tree('pitfalls/en', 'en', 'All pitfalls',
+                                  PITFALL_GROUPS)},
             {'Examples': 'en/examples/index.md'},
             {'Projects': 'en/projects/index.md'},
         ]},
         {'中文': [
             {'从这里开始': 'zh/index.md'},
-            {'概念文档': [{'全部概念': 'docs/中文版/index.md'}] +
-             [{title: path} for title, path in zh_concepts]},
-            {'陷阱文章': [{'全部陷阱': 'pitfalls/中文版/index.md'}] +
-             [{title: path} for title, path in zh_pitfalls]},
+            {'概念文档': nav_tree('docs/中文版', 'zh', '全部概念',
+                                  order=NAV_DISPLAY_ORDER)},
+            {'陷阱文章': nav_tree('pitfalls/中文版', 'zh', '全部陷阱',
+                                  PITFALL_GROUPS)},
             {'示例': 'zh/examples/index.md'},
             {'项目': 'zh/projects/index.md'},
+        ]},
+        {'Play': [
+            {'Arcade': SITE_URL + 'arcade/'},
+            {'UB Camp': SITE_URL + 'arcade/camp/'},
+            {'Proof Gate': SITE_URL + 'arcade/camp/prove/'},
+            {'Interactive Labs': SITE_URL + 'lab/'},
         ]},
         {'Glossary': 'docs/i18n/terminology.md'},
         {'Tooling': 'tooling/index.md'},
@@ -594,13 +803,17 @@ def main() -> int:
             shutil.copy2(path, target / path.name)
 
     write(SITE / 'docs' / 'en' / 'index.md', article_index(
-        'docs/en', 'Concepts', 'Every English concept article, one per idea.', 'en'))
+        'docs/en', 'Concepts', 'Every English concept article, one per idea.',
+        'en', order=NAV_DISPLAY_ORDER))
     write(SITE / 'docs' / '中文版' / 'index.md', article_index(
-        'docs/中文版', '概念文档', '每篇只讲一个想法的中文概念文章。', 'zh'))
+        'docs/中文版', '概念文档', '每篇只讲一个想法的中文概念文章。',
+        'zh', order=NAV_DISPLAY_ORDER))
     write(SITE / 'pitfalls' / 'en' / 'index.md', article_index(
-        'pitfalls/en', 'Pitfalls', 'Every English failure mode, with the fix it implies.', 'en'))
+        'pitfalls/en', 'Pitfalls', 'Every English failure mode, with the fix it implies.',
+        'en', PITFALL_GROUPS))
     write(SITE / 'pitfalls' / '中文版' / 'index.md', article_index(
-        'pitfalls/中文版', '陷阱文章', '每种失败模式，以及它指向的修复方式。', 'zh'))
+        'pitfalls/中文版', '陷阱文章', '每种失败模式，以及它指向的修复方式。',
+        'zh', PITFALL_GROUPS))
 
     i18n = SITE / 'docs' / 'i18n'
     i18n.mkdir(parents=True, exist_ok=True)

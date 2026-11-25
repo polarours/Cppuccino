@@ -17,6 +17,15 @@ readers and for stable references.
   `lang="zh-CN"`; `site-src/assets/lang.js` keeps the attribute correct during
   Material instant navigation. Every Play-mode language toggle now updates the
   document language as well as the visible text.
+- Navigation now uses each article's real H1 instead of a lowercased filename,
+  and groups the 70 concepts into Foundations / Modern C++ / Design Patterns /
+  Architecture & Enterprise / Systems & Performance / Craft & Tooling. The 37
+  pitfalls are grouped by failure family. A new top-level **Play** menu links
+  Arcade, UB Camp, Proof Gate, and the Labs.
+- `/lab/` is now an index as well as the Lifetime Timeline: four numbered cards
+  link to the lifetime, iterator, data-race, and double-free experiments. The
+  homepage label changed from `LIFETIME LAB` to `INTERACTIVE LABS`, and both
+  READMEs link the Labs from the first screen.
 
 ### Fixed
 

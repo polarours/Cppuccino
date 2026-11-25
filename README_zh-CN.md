@@ -22,7 +22,7 @@
 
 </div>
 
-<p align="center"><a href="https://polarours.github.io/Cppuccino/">文档站</a> · <a href="https://polarours.github.io/Cppuccino/arcade/">街机模式</a> · <a href="https://polarours.github.io/Cppuccino/arcade/camp/">UB 训练营</a> · <a href="https://github.com/polarours/Cppuccino/actions">Actions</a> · <a href="CONTRIBUTING.md">Contributing</a> · <a href="LICENSE">MIT</a></p>
+<p align="center"><a href="https://polarours.github.io/Cppuccino/">文档站</a> · <a href="https://polarours.github.io/Cppuccino/arcade/">街机模式</a> · <a href="https://polarours.github.io/Cppuccino/arcade/camp/">UB 训练营</a> · <a href="https://polarours.github.io/Cppuccino/lab/">实验</a> · <a href="https://github.com/polarours/Cppuccino/actions">Actions</a> · <a href="CONTRIBUTING.md">Contributing</a> · <a href="LICENSE">MIT</a></p>
 
 ## 快速统计
 
