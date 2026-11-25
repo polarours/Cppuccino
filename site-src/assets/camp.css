@@ -90,6 +90,48 @@ html[data-theme='retro'] .camp-hero h1 { text-shadow: 3px 3px 0 rgba(36, 27, 20,
   font-size: 0.85rem;
 }
 
+.camp-next {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.4rem;
+  margin: 0 0 1.6rem;
+  padding: 0.9rem 1.2rem;
+  border-left: 3px solid var(--accent);
+  background: var(--surface-2);
+}
+
+.camp-next-kicker {
+  margin: 0 0 0.2rem;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+}
+
+.camp-next strong {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+.camp-next a {
+  flex: 0 0 auto;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+}
+
+.camp-next a:hover { border-bottom-color: currentColor; }
+
+.camp-next.complete { border-left-color: var(--signal); }
+
+.camp-next.complete .camp-next-kicker,
+.camp-next.complete strong,
+.camp-next.complete a { color: var(--signal); }
+
 .camp-loop {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

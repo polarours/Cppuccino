@@ -45,6 +45,9 @@ readers and for stable references.
 - Every boss page now has a **CAMP** link in the header and a **BACK TO CAMP**
   link beside the editor. After a win, the reader can return to the camp and
   see the card advance to PROVE / CLEARED without using the browser back button.
+- The camp now shows a **NEXT STEP** strip derived from the same progress state:
+  it points directly at the first missing READ / LAB / FIGHT / PROVE action.
+  A completed camp switches it to a proof-review link.
 - A **Double Free boss fight** at `/arcade/boss/double-free/`: use the resource
   while it lives, release it once, and set the pointer to `nullptr`. A second
   `delete` triggers a real ASan `attempting double-free` report captured locally.

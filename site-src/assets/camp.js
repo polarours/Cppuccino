@@ -20,6 +20,11 @@
       open: 'OPEN',
       inProgress: 'IN PROGRESS',
       cleared: 'CLEARED',
+      nextStep: 'NEXT STEP',
+      next: { read: 'READ', lab: 'LAB', fight: 'FIGHT', prove: 'PROVE' },
+      continue: 'CONTINUE ↗',
+      campCompleteTitle: 'FOUR PROOFS STAMPED',
+      reviewProofs: 'REVIEW PROOFS ↗',
       noteTitle: 'WHY THIS CAMP EXISTS',
       noteBody: 'Every boss prints a sanitizer report captured from a local reproduction in this repository. The browser runs a small teaching DSL; the article and example are the real C++. Clear all four and you have a working mental model of lifetime, container, concurrency, and ownership bugs.',
       footer: 'No account, no leaderboard. Progress is local to this browser.',
@@ -32,6 +37,11 @@
       open: '待挑战',
       inProgress: '进行中',
       cleared: '已通关',
+      nextStep: '下一步',
+      next: { read: '阅读', lab: '实验', fight: '战斗', prove: '证明' },
+      continue: '继续 ↗',
+      campCompleteTitle: '四份证明已盖章',
+      reviewProofs: '查看证明 ↗',
       noteTitle: '为什么有这个训练营',
       noteBody: '每个 Boss 打印的 sanitizer 报告，都来自本仓库中的一次本地真实复现。浏览器里运行的是教学 DSL；文章和示例才是真正的 C++。四个都通关，你就有了生命周期、容器、并发、所有权四类 bug 的工作心智模型。',
       footer: '没有账号，没有排行榜。进度只存在当前浏览器。',
@@ -137,8 +147,35 @@
         : (completed ? t().inProgress : t().open);
     });
 
-    const complete = BOSSES.every((id) => stepStates(id).prove);
-    $('campComplete').hidden = !complete;
+    const allDone = BOSSES.every((id) => stepStates(id).prove);
+    const nextBox = $('campNext');
+    nextBox.classList.toggle('complete', allDone);
+
+    if (allDone) {
+      $('campNextKicker').textContent = t().cleared;
+      $('campNextTitle').textContent = t().campCompleteTitle;
+      $('campNextLink').href = 'prove/';
+      $('campNextLink').textContent = t().reviewProofs;
+    } else {
+      const nextBoss = BOSSES.find((id) => !stepStates(id).prove);
+      const states = stepStates(nextBoss);
+      const step = STEPS.find((name) => !states[name]);
+      const card = document.querySelector('.camp-card[data-quest="' + nextBoss + '"]');
+      const selector = (step === 'read' || step === 'lab')
+        ? 'a[data-article-en]'
+        : (step === 'fight' ? 'a[href*="boss"]' : 'a[href*="prove"]');
+      const target = card && card.querySelector(selector);
+      const name = card && card.querySelector('h2') ? card.querySelector('h2').textContent : nextBoss;
+
+      $('campNextKicker').textContent = t().nextStep;
+      $('campNextTitle').textContent = t().next[step] + ' · ' + name;
+      if (target) {
+        $('campNextLink').href = target.href;
+        $('campNextLink').textContent = t().continue;
+      }
+    }
+
+    $('campComplete').hidden = !allDone;
   }
 
   function applyTheme() {
