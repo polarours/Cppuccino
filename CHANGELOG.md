@@ -54,6 +54,13 @@ readers and for stable references.
 - Documentation and Play pages reported `<html lang="en">` even when the
   reader selected Chinese. This is a WCAG language-of-page failure, not only
   an SEO detail.
+- The runtime language correction decoded percent-encoded path segments, so a
+  Chinese page such as `/docs/%E4%B8%AD%E6%96%87%E7%89%88/...` no longer flipped
+  back to `lang="en"` after JavaScript started. `fix_html_lang.py --check
+  --require 1` now fails the Pages build if the static correction stops
+  finding Chinese pages.
+- Build matrix jobs are named by their numeric shard id instead of the
+  meaningless `shard Object`.
 
 ## [1.0.0] - 2026-11-25
 

@@ -15,14 +15,20 @@ from __future__ import annotations
 import argparse
 import re
 from pathlib import Path
+from urllib.parse import unquote
 
 HTML_TAG = re.compile(r'<html\b[^>]*>', re.IGNORECASE)
 LANG_ATTR = re.compile(r'\blang="[^"]*"', re.IGNORECASE)
 
 
 def is_chinese(relative: str) -> bool:
-    return ('/中文版/' in relative or relative.startswith('zh/')
-            or '/zh/' in relative)
+    # MkDocs normally writes the Unicode directory name, but a URL-encoded
+    # path (or a caller passing a URL-ish path) must be recognised too.
+    for candidate in (relative, unquote(relative)):
+        if ('/中文版/' in candidate or candidate.startswith('zh/')
+                or '/zh/' in candidate):
+            return True
+    return False
 
 
 def set_lang(text: str) -> str:
@@ -43,6 +49,8 @@ def main() -> int:
                         help='built site directory (default: site)')
     parser.add_argument('--check', action='store_true',
                         help='report changes instead of writing them')
+    parser.add_argument('--require', type=int, default=0, metavar='N',
+                        help='fail unless at least N Chinese pages are found')
     args = parser.parse_args()
 
     root = Path(args.site)
@@ -66,6 +74,9 @@ def main() -> int:
             path.write_text(updated, encoding='utf-8')
 
     print(f'{checked} Chinese page(s), {changed} updated')
+    if args.require and checked < args.require:
+        print(f'expected at least {args.require} Chinese page(s), found {checked}')
+        return 1
     if args.check and changed:
         return 1
     return 0

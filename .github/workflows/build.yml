@@ -40,7 +40,7 @@ jobs:
           echo "shards=$shards" >> "$GITHUB_OUTPUT"
 
   build:
-    name: shard ${{ matrix.shard }}
+    name: shard ${{ matrix.shard.id }}
     needs: discover
     runs-on: ubuntu-latest
     timeout-minutes: 40
