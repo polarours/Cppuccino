@@ -240,7 +240,7 @@ jobs:
   ci:
     name: CI
     # One required check for branch protection instead of every matrix shard.
-    needs: [build, sanitizers, data races, demos, coverage, tinyshell]
+    needs: [build, sanitize, races, demos, coverage, tinyshell]
     if: always()
     runs-on: ubuntu-latest
     steps:
