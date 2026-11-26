@@ -1,0 +1,14 @@
+---
+Checks: >
+  -*,
+  bugprone-*,
+  performance-*,
+  modernize-*,
+  readability-braces-around-statements,
+  readability-const-return-type,
+  readability-container-size-empty,
+  readability-redundant-*,
+  readability-static-accessed-through-instance
+WarningsAsErrors: ''
+HeaderFilterRegex: '(include|examples|cpp-mastery-roadmap)/.*\.(h|hpp)$'
+FormatStyle: file

@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use Cppuccino in teaching or research, please cite it as below."
+title: "Cppuccino: a bilingual C++ notebook with runnable proof"
+abstract: >-
+  Cppuccino is a bilingual English/Chinese C++ learning repository. It pairs
+  concept articles with failure-mode articles, runnable examples, staged
+  projects, and an interactive arcade whose boss fights reproduce real
+  sanitizer failures.
+authors:
+  - family-names: "polarours"
+repository-code: "https://github.com/polarours/Cppuccino"
+url: "https://polarours.github.io/Cppuccino/"
+license: MIT
+version: "1.0.0"
+date-released: "2026-11-26"
+keywords:
+  - C++
+  - C++20
+  - C++23
+  - undefined behavior
+  - sanitizers
+  - bilingual education
+  - computer science education
+type: software

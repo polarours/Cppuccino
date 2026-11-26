@@ -236,3 +236,18 @@ jobs:
           name: tinyshell-coverage
           path: coverage.xml
           retention-days: 7
+
+  ci:
+    name: CI
+    # One required check for branch protection instead of every matrix shard.
+    needs: [build, sanitizers, data races, demos, coverage, tinyshell]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the required jobs
+        run: |
+          if [ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" = "true" ]; then
+            echo "a required job failed or was cancelled"
+            exit 1
+          fi
+          echo "all required jobs succeeded"

@@ -14,15 +14,19 @@
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/github/license/polarours/Cppuccino?style=flat-square"></a>
 </p>
 
-<div align="center">
-
-| 140 docs | 74 pitfalls | 161 examples | 151 projects |
-|:--------:|:-----------:|:------------:|:------------:|
-| concepts  | failure modes | runnable code | across 43 stages |
-
-</div>
-
 <p align="center"><a href="https://polarours.github.io/Cppuccino/">Documentation</a> · <a href="https://polarours.github.io/Cppuccino/arcade/">Arcade</a> · <a href="https://polarours.github.io/Cppuccino/arcade/camp/">UB Camp</a> · <a href="https://polarours.github.io/Cppuccino/lab/">Labs</a> · <a href="https://github.com/polarours/Cppuccino/actions">Actions</a> · <a href="CONTRIBUTING.md">Contributing</a> · <a href="LICENSE">MIT</a></p>
+
+<p align="center">
+  <a href="https://polarours.github.io/Cppuccino/arcade/"><img src="assets/images/arcade-hero.gif" alt="Cppuccino Arcade: choose a stage, enter the UB Training Camp, or return to Read Mode" width="860"></a>
+</p>
+
+<p align="center"><strong>Read an idea. Break it. Repair it. Prove it.</strong></p>
+
+<p align="center">
+  <a href="https://polarours.github.io/Cppuccino/docs/en/undefined-behavior/">Start with Undefined Behavior</a> ·
+  <a href="https://polarours.github.io/Cppuccino/arcade/">Open the Arcade</a> ·
+  <a href="https://polarours.github.io/Cppuccino/arcade/boss/">Fight the Dangling Pointer</a>
+</p>
 
 ## Quick Stats
 

@@ -14,15 +14,19 @@
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/github/license/polarours/Cppuccino?style=flat-square"></a>
 </p>
 
-<div align="center">
-
-| 140 篇文档 | 74 篇陷阱 | 161 个示例 | 151 个项目 |
-|:----------:|:---------:|:----------:|:----------:|
-| 概念文章   | 失败模式   | 可运行代码  | 横跨 43 个阶段 |
-
-</div>
-
 <p align="center"><a href="https://polarours.github.io/Cppuccino/">文档站</a> · <a href="https://polarours.github.io/Cppuccino/arcade/">街机模式</a> · <a href="https://polarours.github.io/Cppuccino/arcade/camp/">UB 训练营</a> · <a href="https://polarours.github.io/Cppuccino/lab/">实验</a> · <a href="https://github.com/polarours/Cppuccino/actions">Actions</a> · <a href="CONTRIBUTING.md">Contributing</a> · <a href="LICENSE">MIT</a></p>
+
+<p align="center">
+  <a href="https://polarours.github.io/Cppuccino/arcade/"><img src="assets/images/arcade-hero-zh.gif" alt="Cppuccino 街机：选择关卡、进入 UB 训练营，或回到阅读模式" width="860"></a>
+</p>
+
+<p align="center"><strong>读懂一个想法，打碎它，修好它，再证明它。</strong></p>
+
+<p align="center">
+  <a href="https://polarours.github.io/Cppuccino/docs/中文版/未定义行为/">从未定义行为开始</a> ·
+  <a href="https://polarours.github.io/Cppuccino/arcade/">打开街机</a> ·
+  <a href="https://polarours.github.io/Cppuccino/arcade/boss/">挑战悬垂指针 Boss</a>
+</p>
 
 ## 快速统计
 

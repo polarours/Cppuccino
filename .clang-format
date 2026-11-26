@@ -1,0 +1,15 @@
+# Keep the repository's existing style rather than forcing a reformat of all
+# 161 examples. Contributors can run clang-format on the files they touch.
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+BreakBeforeBraces: Attach
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+SortIncludes: true
+IncludeBlocks: Regroup
+PointerAlignment: Left
+ReferenceAlignment: Left
