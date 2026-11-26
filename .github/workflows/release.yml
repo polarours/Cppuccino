@@ -22,18 +22,29 @@ jobs:
       - name: Check out
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Create the GitHub release
+      - name: Create or update the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           tag="$GITHUB_REF_NAME"
+          notes="docs/releases/${tag}.md"
           if gh release view "$tag" >/dev/null 2>&1; then
-            echo "release $tag already exists"
+            if [ -f "$notes" ]; then
+              gh release edit "$tag" \
+                --title "Cppuccino $tag" \
+                --notes-file "$notes" \
+                --latest
+            else
+              echo "release $tag already exists without curated notes"
+            fi
             exit 0
           fi
-          gh release create "$tag" \
-            --title "Cppuccino $tag" \
-            --generate-notes \
-            --latest \
-            --verify-tag
+
+          args=(--title "Cppuccino $tag" --latest --verify-tag)
+          if [ -f "$notes" ]; then
+            args+=(--notes-file "$notes")
+          else
+            args+=(--generate-notes)
+          fi
+          gh release create "$tag" "${args[@]}"
