@@ -63,9 +63,9 @@ readers and for stable references.
   meaningless `shard Object`.
 - Pushing a `v*` tag now creates a GitHub Release from the tag through
   `.github/workflows/release.yml`, using generated notes and the workflow token.
-- The READMEs open with a real arcade screenshot/video loop and a 60-second
-  entry path instead of repeating the statistics table. The launch copy lives
-  under `docs/launch/` so it can be reused without turning the repository into a
+- The READMEs open with a real arcade screenshot and a 60-second entry path
+  instead of repeating the statistics table. The launch copy lives under
+  `docs/launch/` so it can be reused without turning the repository into a
   marketing page.
 - Added `.editorconfig`, `.clang-format`, `.clang-tidy` and `CITATION.cff`, plus
   a single `CI` aggregator check so branch protection can require one stable
