@@ -61,6 +61,8 @@ readers and for stable references.
   finding Chinese pages.
 - Build matrix jobs are named by their numeric shard id instead of the
   meaningless `shard Object`.
+- Pushing a `v*` tag now creates a GitHub Release from the tag through
+  `.github/workflows/release.yml`, using generated notes and the workflow token.
 
 ## [1.0.0] - 2026-11-25
 
